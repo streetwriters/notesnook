@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@ui";
 import { ToolButton } from "./tool-button.js";
 import { useIsMobile } from "../stores/toolbar-store.js";
 import { strings } from "@notesnook/intl";
+import { Button } from "../../components/button.js";
 
 export type CounterProps = {
   title: string;
@@ -38,61 +39,60 @@ function _Counter(props: CounterProps) {
   return (
     <Flex
       sx={{
+        flexDirection: "row",
         alignItems: "stretch",
         borderRadius: "default",
         overflow: "hidden",
-        cursor: disabled ? "not-allowed" : "pointer",
         height: "100%",
+        mr: 1,
         ":hover": {
           bg: isMobile || disabled ? "transparent" : "hover-secondary"
         }
       }}
-      onClick={disabled ? undefined : onReset}
-      title={disabled ? "" : strings.clickToReset(title)}
     >
       <ToolButton
         toggled={false}
         title={strings.decrease(title)}
         icon="minus"
-        variant={"small"}
+        variant="small"
         disabled={disabled}
-        onClick={
-          disabled
-            ? undefined
-            : (e) => {
-                e.stopPropagation();
-                onDecrease();
-              }
-        }
+        onClick={disabled ? undefined : onDecrease}
       />
 
-      <Text
+      <Button
+        variant="secondary"
+        testID={`counter-reset-${title}`}
+        title={disabled ? "" : strings.clickToReset(title)}
+        disabled={disabled}
+        onClick={disabled ? undefined : onReset}
         sx={{
-          color: "paragraph",
-          fontSize: "subBody",
-          alignSelf: "center",
-          mx: 1,
-          textAlign: "center",
-          opacity: disabled ? 0.5 : 1
+          bg: "transparent",
+          p: 0,
+          px: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          ":hover": { bg: "transparent" }
         }}
       >
-        {value}
-      </Text>
+        <Text
+          sx={{
+            color: "paragraph",
+            fontSize: "subBody",
+            textAlign: "center",
+            opacity: disabled ? 0.5 : 1
+          }}
+        >
+          {value}
+        </Text>
+      </Button>
 
       <ToolButton
         toggled={false}
         title={strings.increase(title)}
         icon="plus"
-        variant={"small"}
+        variant="small"
         disabled={disabled}
-        onClick={
-          disabled
-            ? undefined
-            : (e) => {
-                e.stopPropagation();
-                onIncrease();
-              }
-        }
+        onClick={disabled ? undefined : onIncrease}
       />
     </Flex>
   );

@@ -42,7 +42,7 @@ function AlignmentTool(props: AlignmentToolProps) {
       icon={props.icon}
       title={props.title}
       onClick={() => {
-        editor.chain().focus().setTextAlign(alignmentRef.current).run();
+        editor.run({ name: "setTextAlign", args: [alignmentRef.current] });
       }}
       disabled={inCodeBlock}
       toggled={false}

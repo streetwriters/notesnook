@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
-import { Editor } from "../../types.js";
+import type { EditorController } from "../../controller.js";
 import { Dropdown } from "../components/dropdown.js";
-import { MenuItem } from "@notesnook/ui";
+import type { MenuItem } from "@ui";
 import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
@@ -56,13 +56,13 @@ export function FontSize(props: ToolProps) {
       title={strings.fontSize()}
       disabled={inCodeBlock}
       onDecrease={() =>
-        editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
+        editor.run({ name: "setFontSize", args: [`${decreaseFontSize()}px`] })
       }
-      onIncrease={() => {
-        editor.chain().focus().setFontSize(`${increaseFontSize()}px`).run();
-      }}
+      onIncrease={() =>
+        editor.run({ name: "setFontSize", args: [`${increaseFontSize()}px`] })
+      }
       onReset={() =>
-        editor.chain().focus().setFontSize(`${defaultFontSize}px`).run()
+        editor.run({ name: "setFontSize", args: [`${defaultFontSize}px`] })
       }
       value={fontSize || `${defaultFontSize}px`}
     />
@@ -104,7 +104,10 @@ export function FontFamily(props: ToolProps) {
   );
 }
 
-function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
+function toMenuItems(
+  editor: EditorController,
+  currentFontFamily: string
+): MenuItem[] {
   const menuItems: MenuItem[] = [];
   for (const font of getFonts()) {
     menuItems.push({
@@ -112,12 +115,7 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
       type: "button",
       title: font.title,
       isChecked: font.id === currentFontFamily,
-      onClick: () => editor.chain().focus().setFontFamily(font.id).run(),
-      styles: {
-        title: {
-          fontFamily: font.font
-        }
-      }
+      onClick: () => editor.run({ name: "setFontFamily", args: [font.id] })
     });
   }
   return menuItems;

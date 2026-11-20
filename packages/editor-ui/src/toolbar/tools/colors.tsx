@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { colord } from "colord";
+import type { UIElement } from "@ui";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { config } from "../../utils/config.js";
 import { SplitButton } from "../components/split-button.js";
-import { ColorPicker } from "../popups/color-picker.js";
+import { ColorPicker, toDataColor } from "../popups/color-picker.js";
 import {
+  toolbarRef,
   usePopupManager,
   useToolbarLocation
 } from "../stores/toolbar-store.js";
 import { ToolProps } from "../types.js";
-import { getEditorToolbarPopup } from "../utils/dom.js";
-import { PositionOptions } from "@notesnook/ui";
 import { strings } from "@notesnook/intl";
 
 type ColorType = "background" | "text" | "border";
@@ -101,7 +101,7 @@ export function ColorTool(props: ColorToolProps) {
     parentGroup,
     ...toolProps
   } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const defaultColors = DEFAULT_COLORS[type];
   const activeColor = _activeColor || config.get(cacheKey);
   const tColor = activeColor ? colord(activeColor) : undefined;
@@ -114,16 +114,8 @@ export function ColorTool(props: ColorToolProps) {
   const [colors, setColors] = useState(
     config.get<string[]>(`custom_${cacheKey}`, []) || []
   );
-  const position: PositionOptions = useMemo(
-    () => ({
-      isTargetAbsolute: true,
-      target: isBottom ? getEditorToolbarPopup() : buttonRef.current || "mouse",
-      align: isBottom ? "center" : "start",
-      location: isBottom ? "top" : "below",
-      yOffset: 10
-    }),
-    [isBottom, isOpen]
-  );
+  const activeBg = toDataColor(activeColor);
+  const hoverBg = tColor ? toDataColor(tColor.darken().toHex()) : undefined;
 
   useEffect(() => {
     config.set(`custom_${cacheKey}`, colors);
@@ -133,12 +125,12 @@ export function ColorTool(props: ColorToolProps) {
     <SplitButton
       {...toolProps}
       buttonRef={buttonRef}
-      iconColor={activeColor && tColor?.isDark() ? "white" : "icon"}
+      iconColor={activeColor && tColor?.isDark() ? "background" : "icon"}
       sx={{
         mr: 0,
-        bg: activeColor || "transparent",
-        ":hover:not(:disabled):not(:active)": {
-          bg: tColor ? tColor.darken().toRgbString() : "transparent"
+        bg: activeBg || "transparent",
+        ":hover": {
+          bg: hoverBg || "transparent"
         }
       }}
       onOpen={toggle}
@@ -148,13 +140,13 @@ export function ColorTool(props: ColorToolProps) {
       <PopupWrapper
         id={props.icon}
         group={"color"}
-        position={position}
+        anchorRef={isBottom ? toolbarRef : buttonRef}
+        placement={isBottom ? "top-start" : "bottom-start"}
         focusOnRender={false}
         blocking={false}
       >
         <ColorPicker
           color={activeColor}
-          editor={props.editor}
           colors={colors}
           defaultColors={defaultColors}
           onDelete={(color) => {
@@ -203,8 +195,8 @@ export function Highlight(props: ToolProps) {
       type="background"
       onColorChange={(color) =>
         color
-          ? editor.chain().setHighlight(color).run()
-          : editor.chain().unsetHighlight().run()
+          ? editor.run({ name: "setHighlight", args: [color] })
+          : editor.run({ name: "unsetHighlight" })
       }
     />
   );
@@ -222,8 +214,8 @@ export function TextColor(props: ToolProps) {
       type="text"
       onColorChange={(color) =>
         color
-          ? editor.chain().setColor(color).run()
-          : editor.chain().unsetColor().run()
+          ? editor.run({ name: "setColor", args: [color] })
+          : editor.run({ name: "unsetColor" })
       }
     />
   );

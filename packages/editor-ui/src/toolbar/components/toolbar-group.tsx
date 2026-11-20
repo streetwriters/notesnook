@@ -17,34 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Flex, type SxProp } from "@ui";
 import { ToolbarGroupDefinition, ToolButtonVariant } from "../types.js";
 import { findTool } from "../tools/index.js";
-import { Flex, FlexProps } from "@theme-ui/components";
-import { Editor } from "../../types.js";
 import { MoreTools } from "./more-tools.js";
 import { getToolDefinition } from "../tool-definitions.js";
 import { strings } from "@notesnook/intl";
+import { AnyEditor, toController } from "../../controller.js";
 
-export type ToolbarGroupProps = FlexProps & {
+export type ToolbarGroupProps = {
   tools: ToolbarGroupDefinition;
-  editor: Editor;
+  editor: AnyEditor;
   variant?: ToolButtonVariant;
   force?: boolean;
   groupId: string;
+  sx?: SxProp;
+  testID?: string;
+  className?: string;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, editor, force, sx, groupId, ...flexProps } = props;
+  const { tools, force, sx, groupId, testID } = props;
+  const editor = toController(props.editor);
 
   return (
     <Flex
-      className="toolbar-group"
+      testID={testID}
       sx={{
-        gap: [0, 0, "small"],
-        p: ["4px", "4px", "small"],
+        flexDirection: "row",
+        alignItems: "center",
+        p: 1,
         flexShrink: 0,
         ...sx
       }}
-      {...flexProps}
     >
       {tools.map((toolId) => {
         if (Array.isArray(toolId)) {

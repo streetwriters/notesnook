@@ -17,24 +17,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "@notesnook/theme";
-import { SchemeColors } from "@notesnook/theme";
 import React from "react";
-import { ButtonProps } from "@theme-ui/components";
+import {
+  Icon,
+  type ColorToken,
+  type IconSizeToken,
+  type SxProp,
+  type UIElement
+} from "@ui";
 import { IconNames, Icons } from "../icons.js";
 import { ToolButtonVariant } from "../types.js";
 import { Button } from "../../components/button.js";
-import { Icon } from "@notesnook/ui";
 import { useIsMobile } from "../stores/toolbar-store.js";
 
-export type ToolButtonProps = ButtonProps & {
+export type ToolButtonProps = {
+  id?: string;
   icon: IconNames;
-  iconColor?: SchemeColors;
-  iconSize?: keyof Theme["iconSizes"] | number;
+  title?: string;
+  iconColor?: ColorToken;
+  iconSize?: IconSizeToken;
   toggled?: boolean;
-  buttonRef?: React.RefObject<HTMLButtonElement>;
+  disabled?: boolean;
+  buttonRef?: React.Ref<UIElement>;
   variant?: ToolButtonVariant;
+  sx?: SxProp;
+  testID?: string;
+  onClick?: () => void;
 };
+
 export const ToolButton = React.memo(
   function ToolButton(props: ToolButtonProps) {
     const {
@@ -46,7 +56,10 @@ export const ToolButton = React.memo(
       sx,
       buttonRef,
       variant = "normal",
-      ...buttonProps
+      title,
+      disabled,
+      testID,
+      onClick
     } = props;
     const isMobile = useIsMobile();
 
@@ -54,32 +67,21 @@ export const ToolButton = React.memo(
       <Button
         variant="secondary"
         ref={buttonRef}
-        tabIndex={-1}
         id={`tool-${id || icon}`}
+        testID={testID ?? `tool-${id || icon}`}
+        title={title}
+        disabled={disabled}
+        onClick={onClick}
         sx={{
-          height: "unset",
           flexShrink: 0,
           p: variant === "small" ? "small" : 1,
           borderRadius: variant === "small" ? "small" : "default",
           m: 0,
           bg: toggled ? "background-selected" : "transparent",
           mr: variant === "small" ? 0 : 1,
-          ":last-of-type": {
-            mr: 0
-          },
-          ":hover:not(:disabled):not(:active)": !isMobile
-            ? undefined
-            : {
-                bg: "transparent"
-              },
+          ...(isMobile ? { ":hover": { bg: "transparent" } } : {}),
           ...sx
         }}
-        onMouseDown={(e) => {
-          if (globalThis.keyboardShown) {
-            e.preventDefault();
-          }
-        }}
-        {...buttonProps}
       >
         <Icon
           path={Icons[icon]}
@@ -95,6 +97,7 @@ export const ToolButton = React.memo(
       prev.icon === next.icon &&
       prev.disabled === next.disabled &&
       prev.onClick === next.onClick &&
+      prev.title === next.title &&
       JSON.stringify(prev.sx) === JSON.stringify(next.sx)
     );
   }

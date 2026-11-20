@@ -3,7 +3,13 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "paths": {
+      "@ui": ["./node_modules/@notesnook/ui/src/kit/contracts/index.ts"],
+      "@platform/files": ["./typings/platform-files.d.ts"],
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"]
+    }
   },
   "exclude": ["src/**/*.test.ts"],
   "include": ["src/**/*"]

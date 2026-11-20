@@ -19,18 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
-import { Box, Button, Flex } from "@theme-ui/components";
+import { Box, Button, Flex, Text, type UIElement } from "@ui";
 import { IconNames } from "../icons.js";
 import { useCallback, useRef } from "react";
 import { SplitButton } from "../components/split-button.js";
 import {
+  toolbarRef,
   usePopupManager,
   useToolbarLocation
 } from "../stores/toolbar-store.js";
-import { getToolbarElement } from "../utils/dom.js";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ToolButton } from "../components/tool-button.js";
-import { findListItemType, isListActive } from "../../utils/list.js";
+import type { EditorController } from "../../controller.js";
+import { NODE_NAMES } from "../../extension-types.js";
 import { strings } from "@notesnook/intl";
 
 type ListSubType<TListStyleTypes> = {
@@ -47,13 +48,19 @@ type ListToolProps<TListStyleTypes> = ToolProps & {
   subTypes: ListSubType<TListStyleTypes>[];
 };
 
+const BULLETS: Record<string, string> = {
+  disc: "•",
+  circle: "◦",
+  square: "▪"
+};
+
 function ListTool<TListStyleTypes extends string>(
   props: ListToolProps<TListStyleTypes>
 ) {
-  const { editor, onClick, subTypes, type, parentGroup } = props;
+  const { editor, onClick, subTypes, type, parentGroup, isActive } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const { toggle, isOpen, close } = usePopupManager({
     id: props.title,
     group: "lists",
@@ -76,47 +83,54 @@ function ListTool<TListStyleTypes extends string>(
         blocking={false}
         focusOnRender={false}
         autoCloseOnUnmount
-        position={{
-          isTargetAbsolute: true,
-          target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
-          align: "center",
-          location: isBottom ? "top" : "below",
-          yOffset: 10
-        }}
+        anchorRef={isBottom ? toolbarRef : buttonRef}
+        placement={isBottom ? "top-start" : "bottom-start"}
       >
-        <Box
+        <Flex
           sx={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            width: 264,
             bg: "background",
-            boxShadow: "menu",
             borderRadius: "default",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
             p: 1
           }}
         >
           {subTypes.map((item) => (
             <Button
               key={item.title}
+              testID={`list-type-${item.type}`}
+              title={item.title}
               variant={"menuitem"}
-              sx={{ width: 80, p: 0, borderRadius: "default" }}
-              onClick={() => {
-                let chain = editor.chain().focus();
-                if (!chain || !editor) return;
-
-                if (!isListActive(editor)) {
-                  if (type === "bulletList") chain = chain.toggleBulletList();
-                  else chain = chain.toggleOrderedList();
-                }
+              focusable={false}
+              sx={{ width: 80, p: 0, m: "2px", borderRadius: "default" }}
+              onPress={() => {
                 close();
-                return chain
-                  .updateAttributes(type, { listType: item.type })
-                  .run();
+                editor.run(
+                  ...(isActive
+                    ? []
+                    : [
+                        {
+                          name:
+                            type === "bulletList"
+                              ? "toggleBulletList"
+                              : "toggleOrderedList"
+                        }
+                      ]),
+                  { name: "updateAttributes", args: [type, { listType: item.type }] }
+                );
               }}
             >
-              <ListThumbnail listStyleType={item.type} />
+              <ListThumbnail
+                markers={
+                  type === "bulletList"
+                    ? Array(3).fill(BULLETS[item.type] || "•")
+                    : item.items
+                }
+              />
             </Button>
           ))}
-        </Box>
+        </Flex>
       </PopupWrapper>
     </SplitButton>
   );
@@ -127,7 +141,7 @@ export function NumberedList(props: ToolProps) {
   const isActive = useEditorQuery(editor, q.isActive("orderedList"), false);
 
   const onClick = useCallback(
-    () => editor.chain().focus().toggleOrderedList().run(),
+    () => editor.run({ name: "toggleOrderedList" }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -174,7 +188,7 @@ export function BulletList(props: ToolProps) {
   const { editor } = props;
   const isActive = useEditorQuery(editor, q.isActive("bulletList"), false);
   const onClick = useCallback(
-    () => editor.chain().focus().toggleBulletList().run(),
+    () => editor.run({ name: "toggleBulletList" }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
@@ -202,16 +216,53 @@ export function CheckList(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().toggleCheckList().run()}
+      onClick={() => editor.run({ name: "toggleCheckList" })}
     />
   );
+}
+
+function useListItemType(editor: EditorController): string | null {
+  const isTaskList = useEditorQuery(
+    editor,
+    q.isActive(NODE_NAMES.taskList),
+    false
+  );
+  const isCheckList = useEditorQuery(
+    editor,
+    q.isActive(NODE_NAMES.checkList),
+    false
+  );
+  const isOutlineList = useEditorQuery(
+    editor,
+    q.isActive(NODE_NAMES.outlineList),
+    false
+  );
+  const isBulletList = useEditorQuery(
+    editor,
+    q.isActive(NODE_NAMES.bulletList),
+    false
+  );
+  const isOrderedList = useEditorQuery(
+    editor,
+    q.isActive(NODE_NAMES.orderedList),
+    false
+  );
+  return isBulletList || isOrderedList
+    ? NODE_NAMES.listItem
+    : isOutlineList
+    ? NODE_NAMES.outlineListItem
+    : isTaskList
+    ? NODE_NAMES.taskItem
+    : isCheckList
+    ? NODE_NAMES.checkListItem
+    : null;
 }
 
 export function Indent(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
 
-  const listItemType = findListItemType(editor);
+  const listItemType = useListItemType(editor);
   if (!listItemType || !isBottom) return null;
 
   return (
@@ -219,7 +270,7 @@ export function Indent(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().sinkListItem(listItemType).run()}
+      onClick={() => editor.run({ name: "sinkListItem", args: [listItemType] })}
     />
   );
 }
@@ -228,7 +279,7 @@ export function Outdent(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
 
-  const listItemType = findListItemType(editor);
+  const listItemType = useListItemType(editor);
   if (!listItemType || !isBottom) return null;
 
   return (
@@ -236,46 +287,31 @@ export function Outdent(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().liftListItem(listItemType).run()}
+      onClick={() => editor.run({ name: "liftListItem", args: [listItemType] })}
     />
   );
 }
 
-type ListThumbnailProps = { listStyleType: string };
-function ListThumbnail(props: ListThumbnailProps) {
-  const { listStyleType } = props;
+function ListThumbnail(props: { markers: string[] }) {
   return (
-    <Flex
-      as="ul"
-      sx={{
-        flexDirection: "column",
-        flex: 1,
-        listStyleType,
-        m: 0,
-        ml: "10px",
-        p: "5px",
-        pl: "7px",
-        gap: `7px`
-      }}
-      onMouseDown={(e) => {
-        if (globalThis.keyboardShown) {
-          e.preventDefault();
-        }
-      }}
-    >
-      {[0, 1, 2].map((i) => (
-        <Box
+    <Flex sx={{ flexDirection: "column", flex: 1, p: 1, gap: 1 }}>
+      {props.markers.map((marker, i) => (
+        <Flex
           key={i.toString()}
-          as="li"
-          sx={{
-            display: "list-item",
-            color: "paragraph",
-            fontSize: 8,
-            bg: "border",
-            height: `7px`,
-            borderRadius: "small"
-          }}
-        />
+          sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}
+        >
+          <Text sx={{ fontSize: 8, color: "paragraph", width: 12 }}>
+            {marker}
+          </Text>
+          <Box
+            sx={{
+              flex: 1,
+              bg: "border",
+              height: 7,
+              borderRadius: "small"
+            }}
+          />
+        </Flex>
       ))}
     </Flex>
   );

@@ -41,7 +41,7 @@ function TextDirectionTool(props: TextDirectionToolProps) {
       icon={props.icon}
       title={props.title}
       onClick={() =>
-        editor.chain().focus().setTextDirection(directionRef.current).run()
+        editor.run({ name: "setTextDirection", args: [directionRef.current] })
       }
       disabled={inCodeBlock}
       toggled={false}

@@ -17,23 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ButtonProps, Flex } from "@theme-ui/components";
-import { Input } from "@theme-ui/components";
-import { Icon } from "@notesnook/ui";
+import {
+  Button,
+  ColorPicker as UIColorPicker,
+  ColorValue,
+  dataColor,
+  Flex,
+  Icon,
+  Input,
+  SxProp
+} from "@ui";
 import { Icons } from "../icons.js";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { colord } from "colord";
-import { HexColorPicker } from "react-colorful";
-import { Button } from "../../components/button.js";
 import { debounce } from "../../utils/debounce.js";
 import { Popup } from "../components/popup.js";
-import { SchemeColors } from "@notesnook/theme";
-import { Editor } from "../../types.js";
 import { strings } from "@notesnook/intl";
-import { useToolbarStore } from "../stores/toolbar-store.js";
 
 type ColorPickerProps = {
-  editor: Editor;
   colors?: string[];
   defaultColors?: string[];
   color?: string;
@@ -48,7 +49,16 @@ type ColorPickerProps = {
   cacheKey?: string;
   onDelete?: (color: string) => void;
 };
-const PALETTE_SIZE = [35, 35, 25];
+const PALETTE_SIZE = 25;
+const WHITE = dataColor("#ffffff");
+
+export function toDataColor(color?: string): ColorValue | undefined {
+  if (!color) return undefined;
+  const c = colord(color);
+  if (!c.isValid()) return undefined;
+  return dataColor(c.toHex());
+}
+
 export function ColorPicker(props: ColorPickerProps) {
   const {
     color,
@@ -62,11 +72,8 @@ export function ColorPicker(props: ColorPickerProps) {
     onSave,
     colors = [],
     defaultColors = [],
-    onDelete,
-    editor
+    onDelete
   } = props;
-  const ref = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
   const [currentColor, setCurrentColor] = useState<string>(
     colord(color || colors?.[0]).toHex()
@@ -74,11 +81,6 @@ export function ColorPicker(props: ColorPickerProps) {
   const [deleteMode, setDeleteMode] = useState(false);
   const tColor = colord(currentColor);
   const allColors = deleteMode ? colors : [...defaultColors, ...colors];
-
-  useEffect(() => {
-    if (!ref.current) return;
-    if (isPickerOpen) ref.current.focus({ preventScroll: true });
-  }, [isPickerOpen]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const onColorChange = useCallback(
@@ -91,36 +93,21 @@ export function ColorPicker(props: ColorPickerProps) {
   return (
     <Popup title={title} onClose={onClose} isPinned={isPinned} onPin={onPin}>
       <Flex
-        ref={ref}
-        tabIndex={-1}
         sx={{
           bg: "background",
-          boxShadow: ["menu", "none"],
-          borderRadius: ["default", "none"],
           flexDirection: "column",
-          ".react-colorful": {
-            width: "auto",
-            height: 150
-          },
-          ".react-colorful__saturation": {
-            borderRadius: ["default", 0]
-          },
-          width: ["calc(100vw - 20px)", 250]
-          //  width: ["auto", 250],
+          width: 250
         }}
       >
         {isPickerOpen ? (
           <>
-            <HexColorPicker
-              color={currentColor}
+            <UIColorPicker
+              testID="color-picker-custom"
+              value={currentColor}
               onChange={(color) => {
                 setCurrentColor(color);
                 onColorChange(color);
-                if (inputRef.current)
-                  inputRef.current.value = color.toUpperCase();
               }}
-              onTouchEnd={() => onChange(currentColor)}
-              onMouseUp={() => onChange(currentColor)}
             />
             <Flex
               sx={{
@@ -130,24 +117,23 @@ export function ColorPicker(props: ColorPickerProps) {
               }}
             >
               <Input
-                ref={inputRef}
+                testID="color-picker-hex"
+                key={currentColor}
                 variant={"clean"}
                 placeholder="#000000"
-                spellCheck={false}
                 sx={{
                   my: 2,
                   p: 0,
                   borderRadius: 0,
-                  fontSize: ["title", "title", "body"],
-                  color: "var(--paragraph-secondary)",
-                  width: [75, 75, 65],
+                  fontSize: "body",
+                  color: "paragraph-secondary",
+                  width: 75,
                   letterSpacing: 1.5,
                   textAlign: "center"
                 }}
                 defaultValue={currentColor.toUpperCase()}
                 maxLength={7}
-                onChange={(e) => {
-                  const { value } = e.target;
+                onChangeText={(value) => {
                   if (!value) return;
                   if (colord(value).isValid()) {
                     setCurrentColor(value);
@@ -157,9 +143,7 @@ export function ColorPicker(props: ColorPickerProps) {
               />
               {onSave && (
                 <PaletteButton
-                  sx={{
-                    boxShadow: "none"
-                  }}
+                  testID="color-picker-save"
                   disabled={allColors.includes(currentColor)}
                   icon={Icons.save}
                   iconSize={18}
@@ -170,24 +154,19 @@ export function ColorPicker(props: ColorPickerProps) {
             </Flex>
           </>
         ) : null}
-        <Flex>
+        <Flex sx={{ flexDirection: "row" }}>
           <Flex
-            className={
-              useToolbarStore.getState().isMobile
-                ? "hide-scrollbar"
-                : "scroll-bar"
-            }
             sx={{
               flex: 1,
+              flexDirection: "row",
               p: 1,
-              overflowX: ["auto", "hidden"],
-              flexWrap: ["nowrap", "wrap"],
-              overflowY: ["hidden", "auto"],
+              flexWrap: "wrap",
               maxHeight: 200
             }}
           >
             {!deleteMode && (
               <PaletteButton
+                testID="color-picker-clear"
                 icon={Icons.colorClear}
                 onClick={onClear}
                 title={strings.clear()}
@@ -195,43 +174,33 @@ export function ColorPicker(props: ColorPickerProps) {
               />
             )}
             <PaletteButton
+              testID="color-picker-delete-mode"
               icon={Icons.delete}
-              iconColor={deleteMode ? "var(--icon-error)" : "icon"}
-              bg={deleteMode ? "var(--background-error)" : "transparent"}
+              iconColor={deleteMode ? "icon-error" : "icon"}
+              bg={deleteMode ? "background-error" : "transparent"}
               onClick={() => setDeleteMode((s) => !s)}
               title={strings.deleteMode()}
               iconSize={18}
             />
             {!deleteMode && (
               <PaletteButton
+                testID="color-picker-palette"
                 icon={Icons.palette}
-                iconColor={tColor.isDark() ? "white" : "icon"}
-                onClick={() => {
-                  setIsPickerOpen((s) => {
-                    if (s) {
-                      editor.commands.focus();
-                    } else {
-                      const onSelectionChange = () => {
-                        setIsPickerOpen(false);
-                        editor.off("selectionUpdate", onSelectionChange);
-                      };
-                      editor.on("selectionUpdate", onSelectionChange);
-                    }
-                    return !s;
-                  });
-                }}
+                iconColor={tColor.isDark() ? WHITE : "icon"}
+                onClick={() => setIsPickerOpen((s) => !s)}
                 title={strings.chooseCustomColor()}
                 iconSize={18}
-                bg={currentColor}
+                bg={toDataColor(currentColor)}
               />
             )}
             {allColors.map((colorItem) => (
               <PaletteButton
+                testID={`color-${colorItem}`}
                 key={colorItem}
                 title={deleteMode ? strings.clickToRemove() : colorItem}
-                bg={colorItem}
+                bg={toDataColor(colorItem)}
                 iconSize={15}
-                iconColor={"white"}
+                iconColor={WHITE}
                 icon={
                   deleteMode && colors.includes(colorItem)
                     ? Icons.close
@@ -245,41 +214,46 @@ export function ColorPicker(props: ColorPickerProps) {
                   setCurrentColor(colorItem);
                   onChange(colorItem);
                 }}
-                sx={{ mb: [0, 1, 1] }}
               />
             ))}
           </Flex>
-          {onClose && (
-            <Button
-              variant={"icon"}
-              sx={{
-                display: ["block", "none"],
-                px: 2,
-                width: "50px",
-                alignSelf: "center"
-              }}
-              onClick={onClose}
-            >
-              <Icon path={Icons.close} size="big" />
-            </Button>
-          )}
         </Flex>
       </Flex>
     </Popup>
   );
 }
 
-type PaletteButtonProps = ButtonProps & {
+type PaletteButtonProps = {
+  testID?: string;
+  title?: string;
+  disabled?: boolean;
+  onClick: () => void;
   icon?: string;
-  iconColor?: SchemeColors;
+  iconColor?: ColorValue;
   iconSize?: number;
-  bg?: string;
+  bg?: ColorValue;
+  sx?: SxProp;
 };
 function PaletteButton(props: PaletteButtonProps) {
-  const { sx, iconColor, icon, iconSize = 20, bg, ...restProps } = props;
+  const {
+    sx,
+    iconColor,
+    icon,
+    iconSize = 20,
+    bg,
+    onClick,
+    testID,
+    title,
+    disabled
+  } = props;
   return (
     <Button
+      testID={testID}
+      title={title}
+      disabled={disabled}
+      focusable={false}
       variant={"icon"}
+      onPress={onClick}
       sx={{
         flexShrink: 0,
         width: PALETTE_SIZE,
@@ -287,14 +261,13 @@ function PaletteButton(props: PaletteButtonProps) {
         borderRadius: 50,
         boxShadow: "menu",
         p: 0,
-        ml: [2, 2, 1],
+        ml: 1,
+        mb: 1,
+        alignItems: "center",
+        justifyContent: "center",
         bg,
-        ":hover:not(:disabled):not(:active)": {
-          bg: bg?.startsWith("#") ? colord(bg).darken().toRgbString() : "hover"
-        },
         ...sx
       }}
-      {...restProps}
     >
       {icon && <Icon path={icon} color={iconColor} size={iconSize} />}
     </Button>

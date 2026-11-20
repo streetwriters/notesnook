@@ -19,9 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
-import { Editor } from "../../types.js";
+import type { EditorController } from "../../controller.js";
 import { Dropdown } from "../components/dropdown.js";
-import { MenuItem } from "@notesnook/ui";
+import type { MenuItem } from "@ui";
 import {
   ToolbarLocation,
   useToolbarLocation
@@ -69,7 +69,7 @@ export function Headings(props: ToolProps) {
 }
 
 function toMenuItems(
-  editor: Editor,
+  editor: EditorController,
   toolbarLocation: ToolbarLocation,
   currentHeadingLevel?: number
 ): MenuItem[] {
@@ -80,12 +80,13 @@ function toMenuItems(
     isChecked: level === currentHeadingLevel,
     modifier: keybindings[`insertHeading${level}`].keys,
     onClick: () =>
-      editor
-        ?.chain()
-        .focus()
-        .updateAttributes("textStyle", { fontSize: null, fontStyle: null })
-        .setHeading({ level })
-        .run()
+      editor.run(
+        {
+          name: "updateAttributes",
+          args: ["textStyle", { fontSize: null, fontStyle: null }]
+        },
+        { name: "setHeading", args: [{ level }] }
+      )
   }));
   const paragraph: MenuItem = {
     key: "paragraph",
@@ -93,7 +94,7 @@ function toMenuItems(
     title: strings.paragraph(),
     isChecked: !currentHeadingLevel,
     modifier: keybindings.insertParagraph.keys,
-    onClick: () => editor.chain().focus().setParagraph().run()
+    onClick: () => editor.run({ name: "setParagraph" })
   };
   return [paragraph, ...menuItems];
 }

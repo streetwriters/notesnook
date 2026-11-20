@@ -31,7 +31,7 @@ export function Italic(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={isActive}
-      onClick={() => editor.chain().focus().toggleItalic().run()}
+      onClick={() => editor.run({ name: "toggleItalic" })}
     />
   );
 }
@@ -44,7 +44,7 @@ export function Strikethrough(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={isActive}
-      onClick={() => editor.chain().focus().toggleStrike().run()}
+      onClick={() => editor.run({ name: "toggleStrike" })}
     />
   );
 }
@@ -57,7 +57,7 @@ export function Underline(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={isActive}
-      onClick={() => editor.chain().focus().toggleUnderline().run()}
+      onClick={() => editor.run({ name: "toggleUnderline" })}
     />
   );
 }
@@ -77,7 +77,7 @@ export function Code(props: ToolProps) {
       title={props.title}
       toggled={isActive}
       disabled={inCodeBlock}
-      onClick={() => editor.chain().focus().toggleCode().run()}
+      onClick={() => editor.run({ name: "toggleCode" })}
     />
   );
 }
@@ -91,7 +91,7 @@ export function Bold(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={isActive}
-      onClick={() => editor.chain().focus().toggleBold().run()}
+      onClick={() => editor.run({ name: "toggleBold" })}
     />
   );
 }
@@ -110,7 +110,7 @@ export function Subscript(props: ToolProps) {
       title={props.title}
       toggled={isActive}
       disabled={inCodeBlock}
-      onClick={() => editor.chain().focus().toggleSubscript().run()}
+      onClick={() => editor.run({ name: "toggleSubscript" })}
     />
   );
 }
@@ -129,7 +129,7 @@ export function Superscript(props: ToolProps) {
       title={props.title}
       toggled={isActive}
       disabled={inCodeBlock}
-      onClick={() => editor.chain().focus().toggleSuperscript().run()}
+      onClick={() => editor.run({ name: "toggleSuperscript" })}
     />
   );
 }
@@ -142,7 +142,10 @@ export function ClearFormatting(props: ToolProps) {
       title={props.title}
       toggled={false}
       onClick={() =>
-        editor?.chain().focus().unsetAllMarks().unsetMark("link").run()
+        editor.run(
+          { name: "unsetAllMarks" },
+          { name: "unsetMark", args: ["link"] }
+        )
       }
     />
   );
@@ -158,7 +161,7 @@ export function CodeRemove(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().unsetMark("code").run()}
+      onClick={() => editor.run({ name: "unsetMark", args: ["code"] })}
     />
   );
 }
@@ -175,7 +178,7 @@ export function Math(props: ToolProps) {
       icon={props.icon}
       title={props.title}
       toggled={false}
-      onClick={() => editor.chain().focus().insertMathInline().run()}
+      onClick={() => editor.run({ name: "insertMathInline" })}
       disabled={inCodeBlock}
     />
   );

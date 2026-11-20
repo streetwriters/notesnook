@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { ToolProps } from "../types.js";
+import { TiptapToolProps as ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";

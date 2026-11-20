@@ -225,7 +225,7 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
       <ButtonComponent
         ref={inner}
         {...nativeProps}
-        focusable={nativeProps.focusable ?? true}
+        focusable={props.focusable ?? nativeProps.focusable ?? true}
         accessibilityRole="button"
         disabled={disabled}
         style={style}

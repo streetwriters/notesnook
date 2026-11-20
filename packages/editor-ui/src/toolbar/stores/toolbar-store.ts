@@ -20,8 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { create } from "zustand";
 import { DownloadOptions } from "../../utils/downloader.js";
 import { useCallback } from "react";
+import type { UIElement } from "@ui";
 
 export type ToolbarLocation = "top" | "bottom";
+
+export const toolbarRef: { current: UIElement | null } = { current: null };
 
 export type PopupRef = {
   id: string;

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren } from "react";
-import { Flex } from "@theme-ui/components";
+import { Flex } from "@ui";
 import { ToolButton, ToolButtonProps } from "./tool-button.js";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store.js";
 import React from "react";
@@ -38,10 +38,12 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
       <Flex
         ref={buttonRef}
         sx={{
+          flexDirection: "row",
           flexShrink: 0,
           alignItems: "stretch",
           borderRadius: "default",
           overflow: "hidden",
+          mr: 1,
           ":hover": {
             bg: isMobile ? "transparent" : "hover-secondary"
           }
@@ -57,7 +59,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
           icon={toolbarLocation === "bottom" ? "chevronUp" : "chevronDown"}
           toggled={toggled}
           onClick={onOpen}
-          sx={{ m: 0, borderRadius: 0, height: "unset" }}
+          sx={{ m: 0, borderRadius: 0 }}
         />
       </Flex>
       {children}
@@ -68,6 +70,8 @@ export const SplitButton = React.memo(_SplitButton, (prev, next) => {
   return (
     prev.buttonRef === next.buttonRef &&
     prev.toggled === next.toggled &&
+    prev.onClick === next.onClick &&
+    prev.disabled === next.disabled &&
     JSON.stringify(prev.sx) === JSON.stringify(next.sx) &&
     prev.children === next.children
   );

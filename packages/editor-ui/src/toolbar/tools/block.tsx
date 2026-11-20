@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { ToolProps } from "../types.js";
+import { TiptapToolProps as ToolProps } from "../types.js";
 import { Editor, hasPermission } from "../../types.js";
 import { Icons } from "../icons.js";
 import { useMemo, useRef, useState } from "react";
 import { EmbedPopup } from "../popups/embed-popup.js";
 import { TablePopup } from "../popups/table-popup.js";
-import { MenuItem, Icon } from "@notesnook/ui";
+import { Icon, type MenuItem, type UIElement } from "@ui";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
@@ -85,7 +85,7 @@ function useBlockState(editor: Editor): BlockState {
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
@@ -112,21 +112,13 @@ export function InsertBlock(props: ToolProps) {
       <Button
         ref={buttonRef}
         variant="secondary"
+        testID="tool-insertBlock"
         sx={{
           p: 1,
           m: 0,
-          bg: isOpen ? "var(--background-secondary)" : "transparent",
+          bg: isOpen ? "background-secondary" : "transparent",
           mr: 1,
-          display: "flex",
-          alignItems: "center",
-          ":last-of-type": {
-            mr: 0
-          }
-        }}
-        onMouseDown={(e) => {
-          if (globalThis.keyboardShown) {
-            e.preventDefault();
-          }
+          alignItems: "center"
         }}
         onClick={() => setIsOpen((s) => !s)}
       >

@@ -18,30 +18,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Text } from "@theme-ui/components";
-import { Icon, MenuItem, MenuPresenter } from "@notesnook/ui";
+import { Icon, Text, type MenuItem, type UIElement } from "@ui";
 import { Icons } from "../icons.js";
 import {
+  toolbarRef,
   useIsMobile,
   usePopupManager,
   useToolbarLocation
 } from "../stores/toolbar-store.js";
-import { getToolbarElement } from "../utils/dom.js";
 import { Button } from "../../components/button.js";
+import { MenuPresenter } from "../../components/menu/index.js";
 
 type DropdownProps = {
   id: string;
   group: string;
   selectedItem: string | JSX.Element;
   items: MenuItem[];
-  buttonRef?: React.MutableRefObject<HTMLButtonElement | undefined>;
+  buttonRef?: React.MutableRefObject<UIElement | null>;
   menuWidth?: number;
   disabled?: boolean;
 };
 export function Dropdown(props: DropdownProps) {
   const { id, group, items, selectedItem, buttonRef, menuWidth, disabled } =
     props;
-  const internalRef = useRef<HTMLButtonElement>();
+  const internalRef = useRef<UIElement | null>(null);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
   const isBottom = toolbarLocation === "bottom";
@@ -51,30 +51,24 @@ export function Dropdown(props: DropdownProps) {
     <>
       <Button
         variant="secondary"
+        testID={`dropdown-${id}`}
         ref={(ref) => {
-          internalRef.current = ref || undefined;
-          if (buttonRef) buttonRef.current = ref || undefined;
+          internalRef.current = ref;
+          if (buttonRef) buttonRef.current = ref;
         }}
         sx={{
           p: 1,
           m: 0,
+          mr: 1,
           bg: isOpen ? "hover" : "transparent",
           height: "100%",
           flexShrink: 0,
-          display: "flex",
+          flexDirection: "row",
           alignItems: "center",
-          ":last-of-type": {
-            mr: 0
-          },
-          ":hover:not(:disabled):not(:active)": !isMobile
-            ? undefined
-            : {
-                bg: "transparent"
-              }
+          ...(isMobile ? { ":hover": { bg: "transparent" } } : {})
         }}
         disabled={disabled}
         onClick={toggle}
-        onMouseDown={(e) => e.preventDefault()}
       >
         {typeof selectedItem === "string" ? (
           <Text
@@ -101,7 +95,7 @@ export function Dropdown(props: DropdownProps) {
               : Icons.chevronDown
           }
           color={isOpen ? "accent" : "paragraph"}
-          size={"small"}
+          size="small"
         />
       </Button>
 
@@ -109,31 +103,12 @@ export function Dropdown(props: DropdownProps) {
         isOpen={isOpen}
         items={items}
         onClose={close}
-        position={{
-          target: isBottom
-            ? getToolbarElement()
-            : internalRef.current || "mouse",
-          isTargetAbsolute: true,
-          location: isBottom ? "top" : "below",
-          align: "center",
-          yOffset: 5
-        }}
-        blocking={!isMobile}
-        focusOnRender={!isMobile}
-        onMouseDown={(e) => {
-          if (globalThis.keyboardShown) {
-            e.preventDefault();
-          }
-        }}
+        anchorRef={isBottom ? toolbarRef : internalRef}
+        placement={isBottom ? "top-start" : "bottom-start"}
         sx={{
           minWidth: menuWidth,
-          maxWidth: isBottom ? "95vw" : "auto",
           flexDirection: isBottom ? "row" : "column",
-          overflowX: isBottom ? "auto" : "hidden",
-          marginRight: isBottom ? "10px" : 0,
-          display: "flex",
-          alignItems: isBottom ? "center" : "unset",
-          mr: isBottom ? 0 : 2
+          alignItems: isBottom ? "center" : undefined
         }}
       />
     </>

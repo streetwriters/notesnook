@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { ToolProps } from "../types.js";
+import { TiptapToolProps as ToolProps } from "../types.js";
 import { Editor } from "../../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
-import { MenuButtonItem, MenuItem } from "@notesnook/ui";
+import type { MenuButtonItem, MenuItem, UIElement } from "@ui";
 import { tableActions } from "../../table-actions.js";
 
 const {
@@ -75,7 +75,7 @@ export function TableSettings(props: ToolProps) {
 
 export function RowProperties(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const items = useMemo(
     () => [
@@ -119,7 +119,7 @@ export function RowProperties(props: ToolProps) {
 
 export function ColumnProperties(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const items = useMemo(
@@ -164,7 +164,7 @@ export function ColumnProperties(props: ToolProps) {
 
 export function TableProperties(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const items = useMemo<MenuItem[]>(
@@ -245,6 +245,7 @@ export function CellBackgroundColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
+      editor={props.controller}
       cacheKey="cellBackgroundColor"
       activeColor={cell.backgroundColor}
       title={strings.cellBackgroundColor()}
@@ -263,6 +264,7 @@ export function CellTextColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
+      editor={props.controller}
       cacheKey="cellTextColor"
       type="text"
       activeColor={cell.color}
@@ -281,6 +283,7 @@ export function CellBorderColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
+      editor={props.controller}
       cacheKey="cellBorderColor"
       activeColor={cell.borderColor}
       type="border"

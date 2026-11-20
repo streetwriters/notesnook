@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { ToolProps } from "../types.js";
+import { TiptapToolProps as ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
@@ -28,6 +28,7 @@ import { findSelectedNode } from "../../utils/prosemirror.js";
 import { Embed } from "../../extension-types.js";
 import { EmbedPopup } from "../popups/embed-popup.js";
 import { strings } from "@notesnook/intl";
+import type { UIElement } from "@ui";
 
 export function EmbedSettings(props: ToolProps) {
   const { editor } = props;
@@ -96,7 +97,7 @@ export function EmbedAlignCenter(props: ToolProps) {
 export function EmbedProperties(props: ToolProps) {
   const { editor } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
 
   // TODO: improve perf by deferring this until user opens the popup
   const embedNode = useMemo(() => findSelectedNode(editor, "embed"), [editor]);

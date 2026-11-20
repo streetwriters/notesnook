@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { ToolProps } from "../types.js";
+import { TiptapToolProps as ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useEffect, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
@@ -36,7 +36,7 @@ import { Icons } from "../icons.js";
 import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
 import { Icon } from "@notesnook/ui";
 import { LinkData } from "../../types.js";
-import { callHostAction } from "../../host.js";
+import type { UIElement } from "@ui";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -158,6 +158,7 @@ export function EditLink(props: ToolProps) {
   return (
     <LinkTool
       editor={props.editor}
+      controller={props.controller}
       icon={props.icon}
       title={props.title}
       isEditing
@@ -344,7 +345,7 @@ type LinkToolProps = ToolProps & {
 };
 function LinkTool(props: LinkToolProps) {
   const { isEditing, onClick, onDone, editor, ...toolProps } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<UIElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const [linkDefinition, setLinkDefinition] = useState<LinkDefinition>();

@@ -18,14 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "../types.js";
+import type { EditorController } from "../controller.js";
 import { IconNames } from "./icons.js";
 
 export type ToolButtonVariant = "small" | "normal";
 export type ToolProps = ToolDefinition & {
-  editor: Editor;
+  editor: EditorController;
   variant?: ToolButtonVariant;
   force?: boolean;
   parentGroup?: string;
+};
+
+export type TiptapToolProps = Omit<ToolProps, "editor"> & {
+  editor: Editor;
+  controller: EditorController;
 };
 
 export type ToolDefinition = {

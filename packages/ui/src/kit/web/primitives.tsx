@@ -206,6 +206,13 @@ export const Button = forwardRef<Contract.UIElement, Contract.ButtonProps>(
       <button
         type="button"
         {...(dom as Any)}
+        {...(props.focusable === false
+          ? {
+              tabIndex: -1,
+              onMouseDown: (event: { preventDefault(): void }) =>
+                event.preventDefault()
+            }
+          : undefined)}
         ref={element}
         disabled={props.disabled}
       >

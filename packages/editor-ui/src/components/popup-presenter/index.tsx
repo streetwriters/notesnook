@@ -18,33 +18,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, PropsWithChildren } from "react";
+import { create } from "zustand";
 import {
-  PositionOptions,
-  PopupPresenterProps,
-  PopupPresenter
-} from "@notesnook/ui";
-import {
-  getPopupContainer,
-  getPopupRoot,
-  getToolbarElement
-} from "../../toolbar/utils/dom.js";
+  Popover,
+  ResponsivePresenter as UIResponsivePresenter,
+  type AnchorRect,
+  type PopoverPlacement,
+  type SxProp,
+  type UIElement
+} from "@ui";
 import {
   useIsMobile,
   useToolbarStore
 } from "../../toolbar/stores/toolbar-store.js";
 import React from "react";
 import {
+  PositionOptions,
   ResponsivePresenter,
-  ResponsivePresenterProps
+  ResponsivePresenterProps,
+  resolveAnchor
 } from "../responsive/index.js";
 
-export type PopupWrapperProps = UsePopupHandlerOptions & {
-  autoCloseOnUnmount?: boolean;
-  position: PositionOptions;
-} & Partial<Omit<PopupPresenterProps, "onClose" | "isOpen">>;
+export type PopupAnchor = {
+  anchorRef?: React.RefObject<UIElement | null>;
+  anchorRect?: AnchorRect;
+  placement?: PopoverPlacement;
+  position?: PositionOptions;
+};
+
+export type PopupWrapperProps = UsePopupHandlerOptions &
+  PopupAnchor & {
+    autoCloseOnUnmount?: boolean;
+    sx?: SxProp;
+    scope?: string;
+    blocking?: boolean;
+    focusOnRender?: boolean;
+  };
+
 export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
-  const { id, position, children, autoCloseOnUnmount, ...presenterProps } =
-    props;
+  const { id, children, autoCloseOnUnmount, sx } = props;
   const { closePopup, isPopupOpen } = usePopupHandler(props);
   const isMobile = useIsMobile();
 
@@ -55,21 +67,75 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
     };
   }, [autoCloseOnUnmount, id, closePopup]);
 
+  const Presenter = isMobile ? UIResponsivePresenter : Popover;
   return (
-    <PopupPresenter
+    <Presenter
       key={id}
-      onClose={() => closePopup(id)}
-      position={position}
-      blocking
-      focusOnRender
-      className={isMobile ? "editor-mobile-toolbar-popup" : undefined}
-      isMobile={isMobile}
-      container={getPopupContainer()}
-      {...presenterProps}
       isOpen={isPopupOpen}
+      onClose={() => closePopup(id)}
+      sx={sx}
+      {...resolveAnchor(props)}
     >
       {children}
-    </PopupPresenter>
+    </Presenter>
+  );
+}
+
+type ShownPopup = {
+  id: number;
+  props: Partial<ResponsivePresenterProps>;
+  popup: (closePopup: () => void) => React.ReactNode;
+};
+
+const useShownPopups = create<{ popups: ShownPopup[] }>(() => ({
+  popups: []
+}));
+let nextPopupId = 0;
+
+type ShowPopupOptions = {
+  popup: (closePopup: () => void) => React.ReactNode;
+} & Partial<ResponsivePresenterProps>;
+
+export function showPopup(options: ShowPopupOptions) {
+  const { popup, ...props } = options;
+  const id = ++nextPopupId;
+  function hide() {
+    useShownPopups.setState((state) => ({
+      popups: state.popups.filter((p) => p.id !== id)
+    }));
+  }
+  useShownPopups.setState((state) => ({
+    popups: [...state.popups, { id, props, popup }]
+  }));
+  return hide;
+}
+
+export function PopupHost() {
+  const popups = useShownPopups((state) => state.popups);
+  return (
+    <>
+      {popups.map(({ id, props, popup }) => {
+        const hide = () =>
+          useShownPopups.setState((state) => ({
+            popups: state.popups.filter((p) => p.id !== id)
+          }));
+        return (
+          <ResponsivePresenter
+            key={id}
+            desktop="popup"
+            mobile="sheet"
+            {...props}
+            isOpen
+            onClose={() => {
+              hide();
+              props.onClose?.();
+            }}
+          >
+            {popup(hide)}
+          </ResponsivePresenter>
+        );
+      })}
+    </>
   );
 }
 
@@ -100,41 +166,4 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
   }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
 
   return { isPopupOpen, closePopup };
-}
-
-type ShowPopupOptions = {
-  popup: (closePopup: () => void) => React.ReactNode;
-} & Partial<ResponsivePresenterProps>;
-export function showPopup(options: ShowPopupOptions) {
-  const { popup, ...props } = options;
-
-  const root = getPopupRoot();
-  function hide() {
-    root.unmount();
-  }
-
-  root.render(
-    <ResponsivePresenter
-      isOpen
-      position={{
-        target: getToolbarElement(),
-        isTargetAbsolute: true,
-        location: "below",
-        align: "end",
-        yOffset: 10
-      }}
-      blocking
-      focusOnRender
-      container={getPopupContainer()}
-      {...props}
-      onClose={() => {
-        hide();
-        props.onClose?.();
-      }}
-    >
-      {popup(hide)}
-    </ResponsivePresenter>
-  );
-
-  return hide;
 }

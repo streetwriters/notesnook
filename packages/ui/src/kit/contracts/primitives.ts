@@ -132,6 +132,8 @@ export interface TextProps extends BaseProps {
 export interface ButtonProps extends BaseProps {
   variant?: keyof Theme["buttons"];
   disabled?: boolean;
+  /** `false` keeps focus where it was when the button is pressed. */
+  focusable?: boolean;
   children?: ReactNode;
 }
 

@@ -17,53 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useRef, ForwardedRef } from "react";
-import { useEffect } from "react";
-import { Button as RebassButton, ButtonProps } from "@theme-ui/components";
+import { forwardRef } from "react";
+import {
+  Button as UIButton,
+  type ButtonProps as UIButtonProps,
+  type UIElement
+} from "@ui";
 
-const _Button = (
-  props: ButtonProps,
-  forwardedRef: ForwardedRef<HTMLButtonElement>
-) => {
-  const { sx, ...buttonProps } = props;
+export type ButtonProps = UIButtonProps & { onClick?: () => void };
 
-  const buttonRef = useRef<HTMLButtonElement>();
-
-  useEffect(() => {
-    if (!buttonRef.current) return;
-
-    function onMouseDown(e: MouseEvent) {
-      if (globalThis.keyboardShown) {
-        e.preventDefault();
-      }
-    }
-
-    buttonRef.current.addEventListener("mousedown", onMouseDown, {
-      passive: false,
-      capture: true
-    });
-
-    return () => {
-      buttonRef.current?.removeEventListener("mousedown", onMouseDown, {
-        capture: true
-      });
-    };
-  }, []);
-
+export const Button = forwardRef<UIElement, ButtonProps>(function Button(
+  props,
+  ref
+) {
+  const { onClick, onPress, focusable = false, ...rest } = props;
   return (
-    <RebassButton
-      {...buttonProps}
-      sx={{
-        ...sx
-      }}
-      ref={(ref) => {
-        buttonRef.current = ref || undefined;
-        if (typeof forwardedRef === "function") forwardedRef(ref);
-        else if (forwardedRef) forwardedRef.current = ref;
-      }}
-      onClick={props.onClick}
+    <UIButton
+      ref={ref}
+      focusable={focusable}
+      {...rest}
+      onPress={onPress ?? (onClick ? () => onClick() : undefined)}
     />
   );
-};
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(_Button);
+});

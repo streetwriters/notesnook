@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EmotionThemeProvider } from "@notesnook/theme";
-import { Icon } from "@notesnook/ui";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Icon, Text, ThemeScope } from "@ui";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
 import { Icons } from "../icons.js";
@@ -42,7 +40,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
   const { title, onClose, onPin, isPinned, action, children } = props;
 
   return (
-    <EmotionThemeProvider scope="editorToolbar">
+    <ThemeScope scope="editorToolbar">
       <DesktopOnly>
         <Flex
           sx={{
@@ -50,27 +48,28 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             bg: "background",
             flexDirection: "column",
             borderRadius: "default",
-            // border: "1px solid var(--border)",
             boxShadow: "menu",
             minWidth: 200
           }}
         >
           {title && (
             <Flex
-              className="movable"
               sx={{
+                flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
                 p: 2
               }}
             >
               <Text variant={"title"}>{title}</Text>
-              <Flex sx={{ alignItems: "center", gap: 1 }}>
+              <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
                 {onPin ? (
                   <Button
+                    testID="popup-pin"
                     variant={"secondary"}
+                    focusable={false}
                     sx={{ p: 0, bg: "transparent" }}
-                    onClick={onPin}
+                    onPress={onPin}
                   >
                     <Icon
                       path={Icons.pin}
@@ -81,9 +80,11 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
                 ) : null}
                 {onClose ? (
                   <Button
+                    testID="popup-close"
                     variant={"secondary"}
+                    focusable={false}
                     sx={{ p: 0, bg: "transparent" }}
-                    onClick={onClose}
+                    onPress={onClose}
                   >
                     <Icon path={Icons.close} size={"big"} />
                   </Button>
@@ -94,21 +95,25 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           {children}
           {title && action && (
             <Flex
-              sx={{ justifyContent: "end" }}
-              bg="var(--background-secondary)"
-              p={1}
-              px={2}
-              mt={2}
+              sx={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                bg: "background-secondary",
+                p: 1,
+                px: 2,
+                mt: 2
+              }}
             >
               <Button
+                testID="popup-action"
                 variant="dialog"
-                onClick={
+                onPress={
                   action.disabled || action.loading ? undefined : action.onClick
                 }
                 disabled={action.disabled || action.loading}
               >
                 {action.loading ? (
-                  <Icon path={Icons.loading} rotate size="medium" />
+                  <Icon path={Icons.loading} rotate={360} size="medium" />
                 ) : (
                   action.title
                 )}
@@ -122,6 +127,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
 
         {action && (
           <Button
+            testID="popup-action"
             variant="accent"
             sx={{
               alignSelf: "stretch",
@@ -130,17 +136,17 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               mx: 1,
               py: 2
             }}
-            onClick={action.disabled ? undefined : action?.onClick}
+            onPress={action.disabled ? undefined : action?.onClick}
             disabled={action.disabled}
           >
             {action.loading ? (
-              <Icon path={Icons.loading} rotate size="medium" />
+              <Icon path={Icons.loading} rotate={360} size="medium" />
             ) : (
               action.title
             )}
           </Button>
         )}
       </MobileOnly>
-    </EmotionThemeProvider>
+    </ThemeScope>
   );
 }

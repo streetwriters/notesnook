@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { FloatingMenuProps } from "./types.js";
 import { SearchReplacePopup } from "../popups/search-replace.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
-import { getToolbarElement } from "../utils/dom.js";
+import { toolbarRef } from "../stores/toolbar-store.js";
 import { useEditorSearchStore } from "../stores/search-store.js";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
@@ -31,19 +31,12 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
     <ResponsivePresenter
       mobile="sheet"
       desktop="popup"
-      scope="dialog"
       isOpen={isSearching}
       onClose={() => editor.commands.endSearch()}
-      position={{
-        target: getToolbarElement(),
-        isTargetAbsolute: true,
-        location: "below",
-        align: "end",
-        yOffset: 5
-      }}
+      anchorRef={toolbarRef}
+      placement="bottom-end"
       blocking={false}
       focusOnRender={false}
-      draggable={false}
     >
       <SearchReplacePopup editor={editor} />
     </ResponsivePresenter>

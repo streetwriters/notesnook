@@ -18,18 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren } from "react";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import {
-  ActionSheetPresenter,
-  ActionSheetPresenterProps
-} from "../action-sheet/index.js";
+  Popover,
+  ResponsivePresenter as UIResponsivePresenter,
+  type AnchorRect,
+  type MenuItem,
+  type PopoverPlacement,
+  type SxProp,
+  type UIElement
+} from "@ui";
 import {
-  MenuPresenter,
-  MenuPresenterProps,
-  PopupPresenter,
-  PopupPresenterProps
-} from "@notesnook/ui";
-import { getPopupContainer } from "../../toolbar/utils/dom.js";
+  toolbarRef,
+  useIsMobile
+} from "../../toolbar/stores/toolbar-store.js";
+import { MenuPresenter } from "../menu/index.js";
 
 type ResponsiveContainerProps = {
   mobile?: JSX.Element;
@@ -50,24 +52,119 @@ export function MobileOnly(props: PropsWithChildren<unknown>) {
   return <ResponsiveContainer mobile={<>{props.children}</>} />;
 }
 
-export type PopupType = "sheet" | "menu" | "none" | "popup";
-export type ResponsivePresenterProps = MenuPresenterProps &
-  ActionSheetPresenterProps &
-  PopupPresenterProps & {
-    mobile?: PopupType;
-    desktop?: PopupType;
+type DomRectSource = {
+  getBoundingClientRect(): {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
   };
+};
+
+export type PositionOptions = {
+  target?: UIElement | DomRectSource | "mouse" | null;
+  location?: "below" | "top" | "left" | "right";
+  align?: "start" | "center" | "end";
+  isTargetAbsolute?: boolean;
+  yOffset?: number;
+  xOffset?: number;
+};
+
+export type PopupType = "sheet" | "menu" | "none" | "popup";
+export type ResponsivePresenterProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  mobile?: PopupType;
+  desktop?: PopupType;
+  items?: MenuItem[];
+  title?: string;
+  anchorRef?: React.RefObject<UIElement | null>;
+  anchorRect?: AnchorRect;
+  placement?: PopoverPlacement;
+  position?: PositionOptions;
+  sx?: SxProp;
+  blocking?: boolean;
+  focusOnRender?: boolean;
+};
+
+export function resolveAnchor(props: {
+  anchorRef?: React.RefObject<UIElement | null>;
+  anchorRect?: AnchorRect;
+  placement?: PopoverPlacement;
+  position?: PositionOptions;
+}): {
+  anchorRef?: React.RefObject<UIElement | null>;
+  anchorRect?: AnchorRect;
+  placement: PopoverPlacement;
+} {
+  const { position } = props;
+  const above = position?.location === "top";
+  const end = position?.align === "end";
+  const placement =
+    props.placement ??
+    (`${above ? "top" : "bottom"}-${end ? "end" : "start"}` as PopoverPlacement);
+  if (props.anchorRect || props.anchorRef)
+    return {
+      anchorRef: props.anchorRef,
+      anchorRect: props.anchorRect,
+      placement
+    };
+  const target = position?.target;
+  if (target && typeof target === "object") {
+    if ("measureInWindow" in target)
+      return { anchorRef: { current: target }, placement };
+    if ("getBoundingClientRect" in target) {
+      const rect = target.getBoundingClientRect();
+      return {
+        anchorRect: {
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height
+        },
+        placement
+      };
+    }
+  }
+  return { anchorRef: toolbarRef, placement };
+}
 
 export function ResponsivePresenter(
   props: PropsWithChildren<ResponsivePresenterProps>
 ) {
-  const { mobile = "menu", desktop = "menu", ...restProps } = props;
+  const {
+    mobile = "menu",
+    desktop = "menu",
+    isOpen,
+    onClose,
+    items,
+    sx,
+    children
+  } = props;
   const isMobile = useIsMobile();
-  if (isMobile && mobile === "sheet")
-    return <ActionSheetPresenter {...restProps} />;
-  else if (mobile === "menu" || desktop === "menu")
-    return <MenuPresenter {...restProps} />;
-  else if (mobile === "popup" || desktop === "popup") {
-    return <PopupPresenter container={getPopupContainer()} {...restProps} />;
-  } else return props.isOpen ? <>{props.children}</> : null;
+  const type = isMobile ? mobile : desktop;
+  const anchor = resolveAnchor(props);
+
+  if (type === "none") return isOpen ? <>{children}</> : null;
+  if (type === "menu")
+    return (
+      <MenuPresenter
+        isOpen={isOpen}
+        onClose={onClose}
+        items={items || []}
+        sx={sx}
+        {...anchor}
+      />
+    );
+  if (type === "sheet")
+    return (
+      <UIResponsivePresenter isOpen={isOpen} onClose={onClose} sx={sx} {...anchor}>
+        {children}
+      </UIResponsivePresenter>
+    );
+  return (
+    <Popover isOpen={isOpen} onClose={onClose} sx={sx} {...anchor}>
+      {children}
+    </Popover>
+  );
 }
