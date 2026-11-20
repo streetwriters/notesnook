@@ -78,7 +78,6 @@ export const NotesSourcePicker = (props: {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    useSettingStore.getState().setDeviceMode("mobile");
     if (loading) return;
     loadRows(props.includeBuiltins !== false).then(setRows);
   }, [loading, props.includeBuiltins]);
@@ -167,6 +166,10 @@ export const NotesSourcePicker = (props: {
 };
 
 export const NotesWidgetConfigure = () => {
+  useEffect(() => {
+    useSettingStore.getState().setDeviceMode("mobile");
+  }, []);
+
   return (
     <NotesSourcePicker
       onSelect={(source) => {
