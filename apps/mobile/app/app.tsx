@@ -222,7 +222,7 @@ export const withStartupBoundry = (
     useEffect(() => {
       async function init() {
         try {
-          if (props.configureMode === "note-preview") {
+          if (props.configureMode) {
             return;
           }
 
