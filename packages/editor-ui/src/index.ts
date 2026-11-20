@@ -53,6 +53,7 @@ export * from "./hooks/use-ref-value.js";
 export * from "./hooks/use-timer.js";
 
 export * from "./queries/index.js";
+export * from "./controller.js";
 export * from "./types.js";
 export * from "./extension-types.js";
 export * from "./table-actions.js";

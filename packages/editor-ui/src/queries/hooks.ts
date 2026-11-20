@@ -18,9 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useSyncExternalStore } from "react";
-import type { Editor } from "@tiptap/core";
+import type { Editor as TiptapEditor } from "@tiptap/core";
 import type { Query, QueryKind, QueryResults } from "./queries.js";
-import { getQueryStore } from "./store.js";
+import { getQueryStore, type QueryStore } from "./store.js";
+
+type Editor =
+  | TiptapEditor
+  | { readonly kind: "controller"; readonly queries: QueryStore };
+
+function storeOf(editor: Editor): QueryStore {
+  return "kind" in editor && editor.kind === "controller"
+    ? editor.queries
+    : getQueryStore(editor as TiptapEditor);
+}
 
 export function useEditorQuery<K extends QueryKind>(
   editor: Editor,
@@ -36,7 +46,7 @@ export function useEditorQuery<K extends QueryKind>(
   query: Query<K>,
   fallback?: QueryResults[K]
 ): QueryResults[K] | undefined {
-  const store = getQueryStore(editor);
+  const store = storeOf(editor);
   const subscribe = useCallback(
     (listener: () => void) => store.subscribe(query, listener),
     [store, query]
