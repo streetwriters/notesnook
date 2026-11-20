@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
+		0415CD97CA51268802CBE41E /* QuickNoteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6C09846F7AC87C24B16518B /* QuickNoteWidget.swift */; };
 		0476190AAA7BDA106AABC762 /* WidgetStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67894095FB3DCDED0154DF6B /* WidgetStrings.swift */; };
 		08DD7FDCCA0E8A094D361831 /* WidgetKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB36318142B31EB2992ED0D /* WidgetKeys.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -172,6 +173,7 @@
 		C78FEE0F2611F6EEC88E6EC7 /* WidgetStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetStore.swift; sourceTree = "<group>"; };
 		C89265087EBE8B605EC6DBC0 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE8C3C2D8840851D851B7D72 /* WidgetModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetModels.swift; sourceTree = "<group>"; };
+		E6C09846F7AC87C24B16518B /* QuickNoteWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickNoteWidget.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		EF88477758968C47002AB99A /* Pods-Notesnook-Add to Notes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Add to Notes.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-Add to Notes/Pods-Notesnook-Add to Notes.debug.xcconfig"; sourceTree = "<group>"; };
@@ -375,6 +377,7 @@
 		9C69E3ECD4A8B689C7775765 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				E6C09846F7AC87C24B16518B /* QuickNoteWidget.swift */,
 			);
 			name = Widgets;
 			path = Widgets;
@@ -986,6 +989,7 @@
 				D2AE20F7CD00227060AC76D9 /* WidgetStore.swift in Sources */,
 				0476190AAA7BDA106AABC762 /* WidgetStrings.swift in Sources */,
 				6A44C5CA7E3339EC2BB6A020 /* WidgetTheme.swift in Sources */,
+				0415CD97CA51268802CBE41E /* QuickNoteWidget.swift in Sources */,
 				9B0A96262908CB873EFEF38C /* WidgetKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
