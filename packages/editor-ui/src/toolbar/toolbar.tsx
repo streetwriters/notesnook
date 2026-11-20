@@ -130,7 +130,7 @@ export function ControllerToolbar(props: ControllerToolbarProps) {
                 sx={
                   index === toolbarTools.length - 1
                     ? undefined
-                    : { borderRight: "1px solid separator" }
+                    : { borderRight: "1px solid", borderRightColor: "separator" }
                 }
               />
             );

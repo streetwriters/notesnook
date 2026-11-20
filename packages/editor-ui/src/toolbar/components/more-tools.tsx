@@ -89,7 +89,8 @@ export function MoreTools(props: MoreToolsProps) {
           groupId={popupId}
           sx={{
             p: 0,
-            borderRight: autoOpen ? "none" : "1px solid border",
+            borderRight: autoOpen ? "none" : "1px solid",
+            borderRightColor: "border",
             pr: autoOpen ? 0 : 1,
             mr: autoOpen ? 0 : 1
           }}

@@ -182,7 +182,8 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 variant={"subBody"}
                 sx={{
                   flexShrink: 0,
-                  borderLeft: "1px solid var(--border)",
+                  borderLeft: "1px solid",
+                  borderLeftColor: "border",
                   color: "paragraph",
                   px: 1
                 }}
