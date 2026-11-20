@@ -55,6 +55,19 @@ const config = mergeConfig(base, {
       ) {
         return { type: "empty" };
       }
+      if (
+        context.originModulePath.startsWith(uiKit + path.sep) &&
+        !moduleName.startsWith(".") &&
+        !moduleName.startsWith("/") &&
+        !moduleName.startsWith("@ui") &&
+        !moduleName.startsWith("@platform") &&
+        !moduleName.startsWith("@notesnook/ui-kit")
+      ) {
+        context = {
+          ...context,
+          originModulePath: path.join(__dirname, "index.js")
+        };
+      }
       for (const [alias, dir] of Object.entries(targetAliases)) {
         if (moduleName === alias || moduleName.startsWith(alias + "/")) {
           return context.resolveRequest(

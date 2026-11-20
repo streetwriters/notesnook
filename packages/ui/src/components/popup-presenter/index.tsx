@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
+import {
+  useCallback,
+  useRef,
+  useEffect,
+  ComponentProps,
+  PropsWithChildren
+} from "react";
 import { Box, BoxProps } from "@theme-ui/components";
 import { getPosition, PositionOptions } from "../../utils/position.js";
 import Modal from "react-modal";
@@ -49,8 +55,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     ...restProps
   } = props;
 
-  const contentRef = useRef<HTMLDivElement>();
-  const observerRef = useRef<ResizeObserver>();
+  const contentRef = useRef<HTMLDivElement>(undefined);
+  const observerRef = useRef<ResizeObserver>(undefined);
 
   const repositionPopup = useCallback((position: PositionOptions) => {
     if (!contentRef.current || !position) return;
@@ -223,8 +229,14 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         }
       }}
     >
-      <EmotionThemeProvider scope={scope} {...restProps}>
-        {children}
+      <EmotionThemeProvider
+        scope={scope}
+        {...(restProps as Omit<
+          ComponentProps<typeof EmotionThemeProvider>,
+          "children"
+        >)}
+      >
+        {children as ComponentProps<typeof EmotionThemeProvider>["children"]}
       </EmotionThemeProvider>
     </Modal>
   );
