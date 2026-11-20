@@ -29,6 +29,7 @@ import {
   type RefAttributes
 } from "react";
 import type { PickedFile } from "@platform/files";
+import { files } from "../platform/files";
 import type * as Contract from "@notesnook/ui-kit/contracts/editor";
 import { Flex } from "@notesnook/ui-kit/desktop/primitives";
 import { useEditorThemeTokens } from "@notesnook/ui-kit/desktop/theme";
@@ -46,6 +47,12 @@ import {
   createRemoteQueryStore,
   type WireQuery
 } from "@notesnook/editor-ui/queries/remote-store.js";
+
+/** Asks for a CSV file and returns its text; undefined when none is picked. */
+export async function pickCsvFile(): Promise<string | undefined> {
+  const [file] = await files.pick({ acceptedFileTypes: ".csv" });
+  return file?.text();
+}
 
 const DEFAULT_FONT_FAMILY = "sans-serif";
 const DEFAULT_FONT_SIZE = 16;
@@ -123,7 +130,8 @@ export const EditorSurface = forwardRef<
             latest.current.host?.createInternalLink?.(attributes),
           openAttachmentPicker: (type) => {
             void latest.current.host?.openAttachmentPicker?.(type);
-          }
+          },
+          pickCsvFile
         }
       }),
     [queries]
