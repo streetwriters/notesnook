@@ -147,16 +147,14 @@ export const NotesSourcePicker = (props: {
             </TouchableOpacity>
           )}
           ListEmptyComponent={
-            props.description ? (
-              <Paragraph
-                color={colors.secondary.paragraph}
-                style={{ textAlign: "center", marginTop: 40 }}
-              >
-                {query
-                  ? strings.noResultsFound()
-                  : "No notebooks, tags or colors yet."}
-              </Paragraph>
-            ) : null
+            <Paragraph
+              color={colors.secondary.paragraph}
+              style={{ textAlign: "center", marginTop: 40 }}
+            >
+              {query
+                ? strings.noResultsFound()
+                : "No notebooks, tags or colors yet."}
+            </Paragraph>
           }
           ListFooterComponent={<View style={{ height: 200 }} />}
         />
