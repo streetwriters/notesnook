@@ -23,6 +23,7 @@ import NativeNotesnookEditor, {
   Commands,
   type NotesnookEditorNativeType
 } from "./NotesnookEditorNativeComponent";
+import { adaptEvents, createHandle, json } from "./adapter";
 
 export type EditorQuery = {
   /** Result key; the same key comes back in `onQueryResults`. */
@@ -92,18 +93,6 @@ export type NotesnookEditorHandle = {
   attachmentReady(id: number, path?: string | null): void;
 };
 
-function parse(json: string): any {
-  try {
-    return JSON.parse(json);
-  } catch {
-    return undefined;
-  }
-}
-
-function json(value: unknown): string | undefined {
-  return value === undefined ? undefined : JSON.stringify(value);
-}
-
 export const NotesnookEditor = React.forwardRef<
   NotesnookEditorHandle,
   NotesnookEditorProps
@@ -123,32 +112,7 @@ export const NotesnookEditor = React.forwardRef<
 
   React.useImperativeHandle(
     ref,
-    () => ({
-      run(commands) {
-        if (native.current) {
-          Commands.run(native.current, JSON.stringify(commands));
-        }
-      },
-      setQueries(queries) {
-        if (native.current) {
-          Commands.setQueries(native.current, JSON.stringify(queries));
-        }
-      },
-      focus(position = "end") {
-        if (native.current) Commands.focus(native.current, position);
-      },
-      setContent(html) {
-        if (native.current) Commands.setContent(native.current, html);
-      },
-      requestSave() {
-        if (native.current) Commands.requestSave(native.current);
-      },
-      attachmentReady(id, path) {
-        if (native.current) {
-          Commands.attachmentReady(native.current, id, path ?? "");
-        }
-      }
-    }),
+    () => createHandle(() => native.current, Commands),
     []
   );
 
@@ -160,40 +124,13 @@ export const NotesnookEditor = React.forwardRef<
     ref: native,
     theme: themeJson,
     settings: settingsJson,
-    onQueryResults: onQueryResults
-      ? (event) => {
-          const { revision, changed } = event.nativeEvent;
-          onQueryResults({ revision, changed: parse(changed) ?? {} });
-        }
-      : undefined,
-    onContentChange: onContentChange
-      ? (event) => onContentChange({ revision: event.nativeEvent.revision })
-      : undefined,
-    onSave: onSave
-      ? (event) =>
-          onSave({
-            revision: event.nativeEvent.revision,
-            html: event.nativeEvent.html
-          })
-      : undefined,
-    onHostAction: onHostAction
-      ? (event) =>
-          onHostAction({
-            kind: event.nativeEvent.kind,
-            payload: parse(event.nativeEvent.payload)
-          })
-      : undefined,
-    onAttachmentRequest: onAttachmentRequest
-      ? (event) => {
-          const { id, hash, mime, url } = event.nativeEvent;
-          onAttachmentRequest({
-            id,
-            hash: hash || undefined,
-            mime: mime || undefined,
-            url: url || undefined
-          });
-        }
-      : undefined
+    ...adaptEvents({
+      onQueryResults,
+      onContentChange,
+      onSave,
+      onHostAction,
+      onAttachmentRequest
+    })
   });
 });
 

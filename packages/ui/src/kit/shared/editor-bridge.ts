@@ -121,7 +121,9 @@ export function createAutoSaveGuard(limit = MAX_AUTO_SAVEABLE_WORDS) {
 }
 
 /** The word count in a `statistics` query result, if it holds one. */
-export function wordCount(changed: Record<string, unknown>): number | undefined {
+export function wordCount(
+  changed: Record<string, unknown>
+): number | undefined {
   const statistics = changed[STATISTICS_QUERY];
   if (!isObject(statistics) || !isObject(statistics.words)) return undefined;
   const total = statistics.words.total;
