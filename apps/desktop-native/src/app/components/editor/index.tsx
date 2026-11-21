@@ -65,6 +65,7 @@ import TitleBox from "./title-box";
 import { saveContent } from "./save-content";
 import { useEditorManager } from "./manager";
 import { useEditorHostActions } from "./use-host-actions";
+import { useDeniedPermissions } from "./use-denied-permissions";
 import useMobile from "../../hooks/use-mobile";
 
 export { saveContent };
@@ -259,6 +260,7 @@ function EditorView({ session }: { session: EditableSession }) {
   );
 
   const host = useEditorHostActions(sessionId);
+  const deniedPermissions = useDeniedPermissions();
 
   const getContent = useCallback(() => {
     const data = session.content?.data;
@@ -364,6 +366,7 @@ function EditorView({ session }: { session: EditableSession }) {
               autoSaveToast.hide = hide;
             }}
             host={host}
+            deniedPermissions={deniedPermissions}
             onPreviewDocument={(hash) =>
               useEditorStore.setState({ documentPreview: { hash } })
             }

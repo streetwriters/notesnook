@@ -222,3 +222,30 @@ export function takeContent(
   unsaved.current = undefined;
   return value;
 }
+
+/** The plan features the editor can be told to refuse, by command id. */
+export interface PermissionClaims {
+  callout: boolean;
+  outlineList: boolean;
+  taskList: boolean;
+  insertAttachment: boolean;
+}
+
+const CLAIM_COMMANDS: readonly [keyof PermissionClaims, string][] = [
+  ["callout", "setCallout"],
+  ["outlineList", "toggleOutlineList"],
+  ["taskList", "toggleTaskList"],
+  ["insertAttachment", "insertAttachment"]
+];
+
+/** The command ids the user's plan lacks, for `setDeniedPermissions`. */
+export function deniedPermissionIds(claims: PermissionClaims): string[] {
+  return CLAIM_COMMANDS.filter(([claim]) => !claims[claim]).map(
+    ([, id]) => id
+  );
+}
+
+/** The command that sends the denied ids to the native editor. */
+export function setDeniedPermissionsCommand(ids: readonly string[]) {
+  return { name: "setDeniedPermissions", payload: { ids: [...ids] } };
+}

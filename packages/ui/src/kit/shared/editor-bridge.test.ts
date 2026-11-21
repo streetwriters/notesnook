@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { describe, expect, it, vi } from "vitest";
 import {
   createAutoSaveGuard,
+  deniedPermissionIds,
   dispatchQueryResults,
+  setDeniedPermissionsCommand,
   focusPlan,
   routeHostAction,
   takeContent,
@@ -202,5 +204,45 @@ describe("takeContent", () => {
 
   it("returns an empty string when there is no content", () => {
     expect(takeContent({ current: undefined }, () => undefined)).toBe("");
+  });
+});
+
+describe("denied permissions", () => {
+  const all = {
+    callout: true,
+    outlineList: true,
+    taskList: true,
+    insertAttachment: true
+  };
+
+  it("denies nothing when the plan allows everything", () => {
+    expect(deniedPermissionIds(all)).toEqual([]);
+  });
+
+  it("denies exactly the features the plan lacks, by command id", () => {
+    expect(
+      deniedPermissionIds({ ...all, callout: false, taskList: false })
+    ).toEqual(["setCallout", "toggleTaskList"]);
+    expect(
+      deniedPermissionIds({
+        callout: false,
+        outlineList: false,
+        taskList: false,
+        insertAttachment: false
+      })
+    ).toEqual([
+      "setCallout",
+      "toggleOutlineList",
+      "toggleTaskList",
+      "insertAttachment"
+    ]);
+  });
+
+  it("builds the setDeniedPermissions command, empty list included", () => {
+    expect(setDeniedPermissionsCommand(["setCallout"])).toEqual({
+      name: "setDeniedPermissions",
+      payload: { ids: ["setCallout"] }
+    });
+    expect(setDeniedPermissionsCommand([]).payload.ids).toEqual([]);
   });
 });

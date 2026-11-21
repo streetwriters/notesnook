@@ -141,6 +141,13 @@ export interface EditorSurfaceProps {
   onAttachFiles?: (files: PickedFile[]) => void;
   /** Host actions for the editor UI; omit for a host without them. */
   host?: EditorHostActions;
+  /**
+   * Command ids the user's plan does not allow (`setCallout`,
+   * `toggleOutlineList`, `toggleTaskList`, `insertAttachment`). The native
+   * editor drops the matching content from pasted HTML. `undefined` until the
+   * plan is known; an empty list clears earlier denials.
+   */
+  deniedPermissions?: readonly string[];
   sx?: SxProp;
   testID?: string;
 }

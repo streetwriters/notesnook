@@ -38,6 +38,7 @@ import {
   dispatchQueryResults,
   focusPlan,
   routeHostAction,
+  setDeniedPermissionsCommand,
   takeContent,
   wordCount
 } from "@notesnook/ui-kit/shared/editor-bridge";
@@ -232,10 +233,22 @@ export const EditorSurface = forwardRef<
     load();
   }, [sessionId, nonce, load]);
 
+  // The ids the plan lacks go to the editor when it opens and whenever they
+  // change, so a plan upgrade clears earlier denials.
+  const denied = props.deniedPermissions;
+  const deniedKey = denied ? denied.join(",") : undefined;
+  useEffect(() => {
+    if (!denied) return;
+    native.current?.run(setDeniedPermissionsCommand(denied));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deniedKey]);
+
   const setRef = useCallback(
     (instance: NativeHandle | null) => {
       native.current = instance;
       if (!instance) return;
+      const ids = latest.current.deniedPermissions;
+      if (ids) instance.run(setDeniedPermissionsCommand(ids));
       instance.setQueries(withEditorQueries(queries.active()));
       load();
       latest.current.onReady?.(handle);
