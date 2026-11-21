@@ -35,6 +35,7 @@ import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { showToast } from "../../utils/toast";
+import { writeToClipboard } from "../../utils/clipboard";
 import { insertAttachments, type Attachment } from "./picker";
 import { useEditorManager } from "./manager";
 import {
@@ -64,7 +65,8 @@ function appDeps(sessionId: string): HostActionDeps {
     async previewAttachment({ hash, type }) {
       try {
         const attachment = await db.attachments.attachment(hash);
-        if (!attachment) throw new Error(`No attachment found with hash ${hash}`);
+        if (!attachment)
+          throw new Error(`No attachment found with hash ${hash}`);
         if (attachment.mimeType.startsWith("image/") || type === "image") {
           await previewImageAttachment(attachment);
         } else if (attachment.mimeType.startsWith("application/pdf")) {
@@ -90,12 +92,56 @@ function appDeps(sessionId: string): HostActionDeps {
     },
     pickAndAttach: (mime) => insertAttachments(mime, attachToEditor(sessionId)),
     async attachFiles(files) {
-      await AttachFilesDialog.show({ files, onDone: attachToEditor(sessionId) });
+      await AttachFilesDialog.show({
+        files,
+        onDone: attachToEditor(sessionId)
+      });
     },
     async pickInternalLink(attributes) {
       const link = await NoteLinkingDialog.show({ attributes });
       return link || undefined;
     },
+    async lookupLink(url) {
+      const link = parseInternalLink(url);
+      if (!link) return;
+      switch (link.type) {
+        case "note":
+        case "notebook":
+        case "tag": {
+          const table =
+            link.type === "note"
+              ? "notes"
+              : link.type === "notebook"
+              ? "notebooks"
+              : "tags";
+          const item = await db
+            .sql()
+            .selectFrom(table)
+            .where("id", "=", link.id)
+            .select("title")
+            .executeTakeFirst();
+          return { type: link.type, title: item?.title || "" };
+        }
+        case "color": {
+          const color = await db
+            .sql()
+            .selectFrom("colors")
+            .where("id", "=", link.id)
+            .select(["title", "colorCode"])
+            .executeTakeFirst();
+          return {
+            type: "color",
+            title: color?.title || "",
+            metadata: { colorCode: color?.colorCode || "" }
+          };
+        }
+      }
+    },
+    writeToClipboard: (text, html) =>
+      writeToClipboard({
+        "text/plain": text,
+        ...(html ? { "text/html": html } : {})
+      }),
     decryptAttachmentToTempFile,
     removeTempFile,
     onError: (message) => showToast("error", message)

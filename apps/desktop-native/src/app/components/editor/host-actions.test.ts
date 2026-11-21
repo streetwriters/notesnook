@@ -35,6 +35,8 @@ function makeDeps(overrides: Partial<HostActionDeps> = {}) {
     pickAndAttach: vi.fn(async () => {}),
     attachFiles: vi.fn(async () => {}),
     pickInternalLink: vi.fn(async () => ({ href: "nn://note/1", title: "T" })),
+    lookupLink: vi.fn(async () => undefined),
+    writeToClipboard: vi.fn(async () => {}),
     decryptAttachmentToTempFile: vi.fn(async (hash) => `/tmp/dec-${hash}`),
     removeTempFile: vi.fn(async () => {}),
     onError: vi.fn(),
@@ -42,6 +44,42 @@ function makeDeps(overrides: Partial<HostActionDeps> = {}) {
   };
   return deps;
 }
+
+describe("link data and clipboard", () => {
+  test("getLinkData asks the app what an internal link points to", async () => {
+    const deps = makeDeps({
+      lookupLink: vi.fn(async () => ({ type: "note" as const, title: "Plan" }))
+    });
+    const data = await createEditorHostActions(deps).getLinkData!(
+      "nn://note/1"
+    );
+    expect(deps.lookupLink).toHaveBeenCalledWith("nn://note/1");
+    expect(data).toEqual({ type: "note", title: "Plan" });
+  });
+
+  test("getLinkData is undefined for a link that is not internal", async () => {
+    const data = await createEditorHostActions(makeDeps()).getLinkData!(
+      "https://notesnook.com"
+    );
+    expect(data).toBeUndefined();
+  });
+
+  test("copyToClipboard writes text and html", async () => {
+    const deps = makeDeps();
+    await createEditorHostActions(deps).copyToClipboard!("a", "<b>a</b>");
+    expect(deps.writeToClipboard).toHaveBeenCalledWith("a", "<b>a</b>");
+  });
+
+  test("copyToClipboard reports a failure instead of throwing", async () => {
+    const deps = makeDeps({
+      writeToClipboard: vi.fn(async () => {
+        throw new Error("denied");
+      })
+    });
+    await createEditorHostActions(deps).copyToClipboard!("a");
+    expect(deps.onError).toHaveBeenCalledWith("denied");
+  });
+});
 
 describe("pathFromFileUrl", () => {
   test("decodes unix and windows file urls", () => {

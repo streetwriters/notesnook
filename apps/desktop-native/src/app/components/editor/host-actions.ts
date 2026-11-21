@@ -51,6 +51,12 @@ export interface HostActionDeps {
     href: string;
     title?: string;
   }): Promise<{ href: string; title?: string } | undefined>;
+  /** What an internal link points to (type and title); undefined if it is not one. */
+  lookupLink(
+    url: string
+  ): ReturnType<NonNullable<EditorHostActions["getLinkData"]>>;
+  /** Puts text, and optionally HTML, on the clipboard. */
+  writeToClipboard(text: string, html?: string): Promise<void>;
   onError(message: string): void;
 }
 
@@ -124,6 +130,16 @@ export function createEditorHostActions(
     },
 
     createInternalLink: (attributes) => deps.pickInternalLink(attributes),
+
+    getLinkData: (url) => deps.lookupLink(url),
+
+    async copyToClipboard(text, html) {
+      try {
+        await deps.writeToClipboard(text, html);
+      } catch (e) {
+        deps.onError(e instanceof Error ? e.message : String(e));
+      }
+    },
 
     async pasteFiles(files) {
       if (!files.length || !deps.canAttach()) return;

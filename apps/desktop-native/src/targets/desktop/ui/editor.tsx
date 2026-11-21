@@ -120,22 +120,42 @@ export const EditorSurface = forwardRef<
       ),
     []
   );
+  const destroyListeners = useRef(new Set<() => void>());
   const controller = useMemo(
     () =>
       createController({
         queries,
         run: (commands: EditorCommand[]) => native.current?.run(commands),
+        onDestroy: (listener) => {
+          const listeners = destroyListeners.current;
+          listeners.add(listener);
+          return () => void listeners.delete(listener);
+        },
         hostActions: {
           createInternalLink: async (attributes) =>
             latest.current.host?.createInternalLink?.(attributes),
           openAttachmentPicker: (type) => {
             void latest.current.host?.openAttachmentPicker?.(type);
           },
+          openLink: (url, openInNewTab) =>
+            latest.current.host?.openLink?.(url, openInNewTab),
+          getLinkData: async (url) => latest.current.host?.getLinkData?.(url),
+          copyToClipboard: (text, html) =>
+            latest.current.host?.copyToClipboard?.(text, html),
           pickCsvFile
         }
       }),
     [queries]
   );
+
+  // Tells popups that follow the editor (the hover popup) that it is gone.
+  useEffect(() => {
+    const listeners = destroyListeners.current;
+    return () => {
+      for (const listener of [...listeners]) listener();
+      listeners.clear();
+    };
+  }, []);
 
   // Content typed since the last load survives a tab switch (unmount).
   useLayoutEffect(
