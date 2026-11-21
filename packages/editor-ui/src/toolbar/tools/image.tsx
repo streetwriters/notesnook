@@ -20,13 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { q, useEditorQuery } from "../../queries/index.js";
 import { TiptapToolProps as ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { ImageProperties as ImagePropertiesPopup } from "../popups/image-properties.js";
 import { ImageAttributes } from "../../extension-types.js";
-import type { UIElement } from "@ui";
 
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;
@@ -116,12 +115,10 @@ export function ImageAlignCenter(props: ToolProps) {
 export function ImageProperties(props: ToolProps) {
   const { editor } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const buttonRef = useRef<UIElement>(null);
 
   return (
     <>
       <ToolButton
-        buttonRef={buttonRef}
         toggled={isOpen}
         icon={props.icon}
         title={props.title}
@@ -135,13 +132,9 @@ export function ImageProperties(props: ToolProps) {
         onClose={() => setIsOpen(false)}
         blocking
         focusOnRender={false}
-        position={{
-          target: buttonRef.current || "mouse",
-          align: "start",
-          location: "below",
-          yOffset: 10,
-          isTargetAbsolute: true
-        }}
+        editor={editor}
+        anchor={{ node: "image" }}
+        placement="bottom-start"
       >
         <ImagePropertiesPopup
           editor={editor}

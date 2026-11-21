@@ -76,6 +76,9 @@ export async function showLinkPopup(editor: Editor) {
       />
     ),
     mobile: "sheet",
-    desktop: "popup"
+    desktop: "popup",
+    editor,
+    anchor: "selection",
+    placement: "bottom-start"
   });
 }

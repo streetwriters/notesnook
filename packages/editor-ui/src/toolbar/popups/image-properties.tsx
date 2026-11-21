@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { Flex } from "@theme-ui/components";
+import { Flex } from "@ui";
 import { Popup } from "../components/popup.js";
 import { ImageAttributes } from "../../extension-types.js";
 import { Editor } from "../../types.js";

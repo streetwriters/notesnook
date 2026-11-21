@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
-import type { UIElement } from "@ui";
+import { useState } from "react";
 import { strings } from "@notesnook/intl";
 import { find } from "linkifyjs";
 import { q } from "../../queries/queries.js";
@@ -48,7 +47,6 @@ export function ControllerAddLink(props: ToolProps) {
     ""
   );
   const createInternalLink = editor.hostActions?.createInternalLink;
-  const buttonRef = useRef<UIElement>(null);
   const [link, setLink] = useState<LinkDefinition>();
   const href = typeof attributes.href === "string" ? attributes.href : "";
 
@@ -57,7 +55,6 @@ export function ControllerAddLink(props: ToolProps) {
       <ToolButton
         icon={isActive ? "linkEdit" : props.icon}
         title={props.title}
-        buttonRef={buttonRef}
         toggled={!!link}
         onClick={async () => {
           if (isActive && isInternalLink(href)) {
@@ -86,13 +83,9 @@ export function ControllerAddLink(props: ToolProps) {
       <ResponsivePresenter
         mobile="sheet"
         desktop="popup"
-        position={{
-          target: buttonRef.current || undefined,
-          isTargetAbsolute: true,
-          location: "below",
-          align: "center",
-          yOffset: 5
-        }}
+        editor={editor}
+        anchor="selection"
+        placement="bottom-start"
         title={isActive ? strings.editLink() : strings.insertLink()}
         isOpen={!!link}
         items={[]}

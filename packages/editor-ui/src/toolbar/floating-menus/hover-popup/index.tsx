@@ -116,14 +116,9 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
               ),
               blocking: false,
               focusOnRender: false,
-              position: {
-                target: "mouse",
-                align: "start",
-                location: "top",
-                isTargetAbsolute: true,
-                yOffset: 0,
-                xOffset: -30
-              }
+              editor,
+              anchor: { range: { from: pos, to: pos + node.nodeSize } },
+              placement: "top-start"
             });
             activePopup.current = { element, hide: hidePopup };
           },

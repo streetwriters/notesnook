@@ -18,9 +18,17 @@ import { Toolbar, useEditor, useToolbarStore } from "@notesnook/editor-ui";
 
 Deep `dist/cjs/...` imports are used by `apps/mobile` for plain data (`toolbar/tool-definitions`, `toolbar/icons`, `utils/font`).
 
-## Not done yet
+## UI primitives and popup positioning
 
-Components still use `theme-ui` and `@notesnook/ui`; moving them onto the `@ui` contracts is a follow-up.
+Components import their primitives and theming from the `@ui` contracts, not from `theme-ui`, `@notesnook/ui` or emotion.
+
+Popups (`ResponsivePresenter`, `PopupWrapper`, `showPopup`) take one of:
+
+- `editor` + `anchor`: the popup sits next to content, from the `q.anchor` query. `anchor` is `"selection"`, `{ node: "image" }` or `{ range: { from, to } }` (document positions). The position follows the document, on Tiptap and on the native editor alike (a `range` falls back to the caret on the native editor).
+- `anchorRef`: the popup sits next to a toolbar control (dropdowns, more-tools, colors, lists, block and table menus).
+- `anchorRect`: a window rect the caller measured itself. It wins over everything else.
+
+`placement` picks the side and alignment (`"bottom-start"`, `"top-end"`, …). With none of these the popup sits under the toolbar. There is no `position` option, no `getBoundingClientRect` and no `"mouse"` target any more.
 
 ## Scripts
 

@@ -132,12 +132,8 @@ export function InsertBlock(props: ToolProps) {
         isOpen={isOpen}
         items={menuItems}
         onClose={() => setIsOpen(false)}
-        position={{
-          target: buttonRef.current || undefined,
-          isTargetAbsolute: true,
-          location: toolbarLocation === "bottom" ? "top" : "below",
-          yOffset: 5
-        }}
+        anchorRef={buttonRef}
+        placement={toolbarLocation === "bottom" ? "top-start" : "bottom-start"}
       />
     </>
   );

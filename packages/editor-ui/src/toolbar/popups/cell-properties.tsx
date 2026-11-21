@@ -19,10 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { q, useEditorQuery } from "../../queries/index.js";
 import { Editor } from "../../types.js";
-import { Box } from "@theme-ui/components";
+import { Box, Icon } from "@ui";
 import { Tab, Tabs } from "../../components/tabs/index.js";
-import { Icon } from "@notesnook/ui";
-// import { MenuPresenter } from "../../components/menu/menu";
 import { Popup } from "../components/popup.js";
 import { Icons } from "../icons.js";
 import { ColorPicker } from "./color-picker.js";

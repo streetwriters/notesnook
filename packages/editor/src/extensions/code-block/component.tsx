@@ -43,6 +43,12 @@ export function CodeblockComponent(
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
   const elementRef = useRef<HTMLElement>();
   const [isOpen, setIsOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const theme = useThemeEngineStore((store) => store.theme);
 
@@ -153,6 +159,17 @@ export function CodeblockComponent(
             onClick={() => {
               if (!editor.isEditable) return;
 
+              const rect = toolbarRef.current?.getBoundingClientRect();
+              setAnchorRect(
+                rect
+                  ? {
+                      x: rect.left,
+                      y: rect.top,
+                      width: rect.width,
+                      height: rect.height
+                    }
+                  : undefined
+              );
               setIsOpen(true);
             }}
             title={strings.changeLanguage()}
@@ -206,13 +223,8 @@ export function CodeblockComponent(
         focusOnRender={false}
         mobile="sheet"
         desktop="popup"
-        position={{
-          target: toolbarRef.current || undefined,
-          align: "end",
-          isTargetAbsolute: true,
-          location: "top",
-          yOffset: 5
-        }}
+        anchorRect={anchorRect}
+        placement="top-end"
         title={strings.selectLanguage()}
       >
         <LanguageSelector

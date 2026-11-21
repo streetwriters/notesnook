@@ -108,12 +108,8 @@ export function RowProperties(props: ToolProps) {
         desktop="menu"
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        position={{
-          target: buttonRef.current,
-          isTargetAbsolute: true,
-          location: "below",
-          yOffset: 5
-        }}
+        anchorRef={buttonRef}
+        placement="bottom-start"
         items={items}
       />
     </>
@@ -153,12 +149,8 @@ export function ColumnProperties(props: ToolProps) {
         desktop="menu"
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        position={{
-          target: buttonRef.current,
-          isTargetAbsolute: true,
-          location: "below",
-          yOffset: 5
-        }}
+        anchorRef={buttonRef}
+        placement="bottom-start"
         items={items}
       />
     </>
@@ -205,12 +197,8 @@ export function TableProperties(props: ToolProps) {
         desktop="menu"
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        position={{
-          target: buttonRef.current,
-          isTargetAbsolute: true,
-          location: "below",
-          yOffset: -25
-        }}
+        anchorRef={buttonRef}
+        placement="bottom-start"
         items={items}
       />
     </>
@@ -430,7 +418,10 @@ const cellProperties = (editor: Editor): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("cellProperties")),
   onClick: () => {
     showPopup({
-      popup: (hide) => <CellPropertiesPopup onClose={hide} editor={editor} />
+      popup: (hide) => <CellPropertiesPopup onClose={hide} editor={editor} />,
+      editor,
+      anchor: "selection",
+      placement: "bottom-start"
     });
   }
 });

@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { Input } from "@theme-ui/components";
-import { useCallback, useEffect, useRef } from "react";
-import { Flex, Text } from "@theme-ui/components";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Flex, Input, Text, type UIElement } from "@ui";
 import { ToolButton } from "../components/tool-button.js";
 import { Editor } from "../../types.js";
 import { useEditorSearchStore } from "../stores/search-store.js";
+import { useIsMobile } from "../stores/toolbar-store.js";
 import { strings } from "@notesnook/intl";
 import { inlineDebounce } from "@notesnook/common";
 
@@ -45,7 +45,9 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
     selectedIndex: 0
   });
   const isEditable = useEditorQuery(editor, q.editable(), true);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<UIElement>(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const isMobile = useIsMobile();
 
   const search = useCallback(
     (term: string) => {
@@ -64,8 +66,8 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
         p: 1,
         bg: "background",
         flexDirection: "column",
-        boxShadow: ["none", "menu"],
-        borderRadius: [0, "default"]
+        boxShadow: isMobile ? undefined : "menu",
+        borderRadius: isMobile ? 0 : "default"
       }}
     >
       <Flex>
@@ -77,14 +79,12 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               flex: 1,
               position: "relative",
               alignItems: "center",
-              outline: "1px solid var(--border)",
+              outlineStyle: "solid",
+              outlineColor: isSearchFocused ? "accent" : "border",
+              outlineWidth: isSearchFocused ? 1.8 : 1,
               borderRadius: "default",
               p: 1,
               py: 0,
-              ":focus-within": {
-                outlineColor: "accent",
-                outlineWidth: "1.8px"
-              },
               ":hover": {
                 outlineColor: "accent"
               }
@@ -97,9 +97,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               placeholder={strings.search()}
               sx={{ p: 0, fontFamily: "monospace" }}
               value={searchTerm}
-              onChange={(e) => {
-                inlineDebounce("search", () => search(e.target.value), 100);
-                useEditorSearchStore.setState({ searchTerm: e.target.value });
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              onChangeText={(text) => {
+                inlineDebounce("search", () => search(text), 100);
+                useEditorSearchStore.setState({ searchTerm: text });
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -182,8 +184,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 variant={"subBody"}
                 sx={{
                   flexShrink: 0,
-                  borderLeft: "1px solid",
-                  borderLeftColor: "border",
+                  borderLeft: "1px solid border",
                   color: "paragraph",
                   px: 1
                 }}
@@ -197,8 +198,8 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               sx={{ mt: 1, p: "7px", fontFamily: "monospace" }}
               placeholder={strings.replace()}
               value={replaceTerm}
-              onChange={(e) =>
-                useEditorSearchStore.setState({ replaceTerm: e.target.value })
+              onChangeText={(text) =>
+                useEditorSearchStore.setState({ replaceTerm: text })
               }
             />
           )}

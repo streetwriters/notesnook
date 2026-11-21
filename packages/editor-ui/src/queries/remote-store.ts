@@ -37,7 +37,10 @@ type Entry = {
 export function toWireQuery(query: Query): WireQuery {
   if (query.kind === "anchor") {
     const target = query.args[0];
-    const node = typeof target === "object" && target !== null;
+    // The native editor measures the selected node or the caret; a document
+    // range has no native counterpart and falls back to the caret.
+    const node =
+      typeof target === "object" && target !== null && "node" in target;
     return { key: query.key, kind: "anchor", args: node ? ["node"] : [] };
   }
   return { key: query.key, kind: query.kind, args: [...query.args] };

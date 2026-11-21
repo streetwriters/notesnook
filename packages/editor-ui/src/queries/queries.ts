@@ -47,8 +47,15 @@ export type AnchorRect = {
   right: number;
   bottom: number;
 };
-/** What an anchor query measures: the selection, or the selected node of a type. */
-export type AnchorTarget = "selection" | { node: string | readonly string[] };
+/**
+ * What an anchor query measures: the selection, the selected node of a type,
+ * or a range of the document (for popups that open on something other than
+ * the selection, e.g. the link under the pointer).
+ */
+export type AnchorTarget =
+  | "selection"
+  | { node: string | readonly string[] }
+  | { range: { from: number; to: number } };
 
 export type QueryKind = keyof QueryResults;
 

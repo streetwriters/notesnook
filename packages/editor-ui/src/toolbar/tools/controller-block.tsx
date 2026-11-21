@@ -84,8 +84,10 @@ export function ControllerInsertBlock(props: ToolProps) {
   } = state;
 
   const menuItems = useMemo<MenuItem[]>(() => {
-    const run = (name: string, ...args: unknown[]) => () =>
-      editor.run({ name, args });
+    const run =
+      (name: string, ...args: unknown[]) =>
+      () =>
+        editor.run({ name, args });
     return [
       {
         key: "tasklist",
@@ -311,12 +313,8 @@ export function ControllerInsertBlock(props: ToolProps) {
         isOpen={isOpen}
         items={menuItems}
         onClose={() => setIsOpen(false)}
-        position={{
-          target: buttonRef.current || undefined,
-          isTargetAbsolute: true,
-          location: toolbarLocation === "bottom" ? "top" : "below",
-          yOffset: 5
-        }}
+        anchorRef={buttonRef}
+        placement={toolbarLocation === "bottom" ? "top-start" : "bottom-start"}
       />
     </>
   );

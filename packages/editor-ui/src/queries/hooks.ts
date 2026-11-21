@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { Editor as TiptapEditor } from "@tiptap/core";
-import type { Query, QueryKind, QueryResults } from "./queries.js";
+import {
+  q,
+  type AnchorRect,
+  type AnchorTarget,
+  type Query,
+  type QueryKind,
+  type QueryResults
+} from "./queries.js";
 import { getQueryStore, type QueryStore } from "./store.js";
 import { useStoreQuery } from "./use-query.js";
 
@@ -30,6 +37,24 @@ function storeOf(editor: Editor): QueryStore {
   return "kind" in editor && editor.kind === "controller"
     ? editor.queries
     : getQueryStore(editor as TiptapEditor);
+}
+
+const emptyStore: QueryStore = {
+  read: () => undefined,
+  subscribe: () => () => {}
+};
+
+/**
+ * Where a popup should open: the viewport rect of the selection, a selected
+ * node or a document range, kept current as the editor changes. Pass no
+ * editor to subscribe to nothing (e.g. while the popup is closed).
+ */
+export function useAnchorQuery(
+  editor: Editor | undefined,
+  target: AnchorTarget = "selection"
+): AnchorRect | null | undefined {
+  const store = editor ? storeOf(editor) : emptyStore;
+  return useStoreQuery(store, q.anchor(target));
 }
 
 export function useEditorQuery<K extends QueryKind>(

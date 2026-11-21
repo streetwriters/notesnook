@@ -22,10 +22,7 @@ import { create } from "zustand";
 import {
   Popover,
   ResponsivePresenter as UIResponsivePresenter,
-  type AnchorRect,
-  type PopoverPlacement,
-  type SxProp,
-  type UIElement
+  type SxProp
 } from "@ui";
 import {
   useIsMobile,
@@ -33,18 +30,13 @@ import {
 } from "../../toolbar/stores/toolbar-store.js";
 import React from "react";
 import {
-  PositionOptions,
+  PopupAnchorProps,
   ResponsivePresenter,
   ResponsivePresenterProps,
-  resolveAnchor
+  usePopupAnchor
 } from "../responsive/index.js";
 
-export type PopupAnchor = {
-  anchorRef?: React.RefObject<UIElement | null>;
-  anchorRect?: AnchorRect;
-  placement?: PopoverPlacement;
-  position?: PositionOptions;
-};
+export type PopupAnchor = PopupAnchorProps;
 
 export type PopupWrapperProps = UsePopupHandlerOptions &
   PopupAnchor & {
@@ -59,6 +51,7 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
   const { id, children, autoCloseOnUnmount, sx } = props;
   const { closePopup, isPopupOpen } = usePopupHandler(props);
   const isMobile = useIsMobile();
+  const anchor = usePopupAnchor({ ...props, isOpen: isPopupOpen });
 
   useEffect(() => {
     if (!autoCloseOnUnmount) return;
@@ -74,7 +67,7 @@ export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
       isOpen={isPopupOpen}
       onClose={() => closePopup(id)}
       sx={sx}
-      {...resolveAnchor(props)}
+      {...anchor}
     >
       {children}
     </Presenter>

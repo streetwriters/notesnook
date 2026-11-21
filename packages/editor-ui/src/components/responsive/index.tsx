@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useMemo } from "react";
 import {
   Popover,
   ResponsivePresenter as UIResponsivePresenter,
@@ -27,11 +27,16 @@ import {
   type SxProp,
   type UIElement
 } from "@ui";
-import {
-  toolbarRef,
-  useIsMobile
-} from "../../toolbar/stores/toolbar-store.js";
+import { toolbarRef, useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { MenuPresenter } from "../menu/index.js";
+import type { AnyEditor } from "../../controller.js";
+import { useAnchorQuery } from "../../queries/hooks.js";
+import {
+  pickPopupAnchor,
+  toPopoverRect,
+  type ResolvedAnchor
+} from "./anchor.js";
+import type { AnchorTarget } from "../../queries/queries.js";
 
 type ResponsiveContainerProps = {
   mobile?: JSX.Element;
@@ -52,82 +57,60 @@ export function MobileOnly(props: PropsWithChildren<unknown>) {
   return <ResponsiveContainer mobile={<>{props.children}</>} />;
 }
 
-type DomRectSource = {
-  getBoundingClientRect(): {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-  };
+/**
+ * Where a popup opens. A popup that belongs to the document (the selection,
+ * a node, a link) is anchored with `editor` + `anchor`, which the editor's
+ * `anchor` query measures. A popup that belongs to a toolbar control is
+ * anchored to that control with `anchorRef`. `anchorRect` is for a rect the
+ * caller already has. With none of them the popup opens at the toolbar.
+ */
+export type PopupAnchorProps = {
+  /** Anchor to a toolbar control, e.g. the button that opened the popup. */
+  anchorRef?: React.RefObject<UIElement | null>;
+  /** Anchor to a rect in window coordinates. */
+  anchorRect?: AnchorRect;
+  /** Anchor to what the editor's `anchor` query measures. Needs `editor`. */
+  anchor?: AnchorTarget;
+  editor?: AnyEditor;
+  placement?: PopoverPlacement;
 };
 
-export type PositionOptions = {
-  target?: UIElement | DomRectSource | "mouse" | null;
-  location?: "below" | "top" | "left" | "right";
-  align?: "start" | "center" | "end";
-  isTargetAbsolute?: boolean;
-  yOffset?: number;
-  xOffset?: number;
-};
+export type { ResolvedAnchor };
+
+/**
+ * Resolves where a popup opens: an explicit rect, else the editor's anchor
+ * query (while the popup is open), else a control, else the toolbar.
+ */
+export function usePopupAnchor(
+  props: PopupAnchorProps & { isOpen?: boolean }
+): ResolvedAnchor {
+  const { anchorRef, anchorRect, anchor, editor, isOpen = true } = props;
+  const measured = useAnchorQuery(
+    isOpen && anchor && !anchorRect ? editor : undefined,
+    anchor
+  );
+  const queried = useMemo(() => toPopoverRect(measured), [measured]);
+  return pickPopupAnchor({
+    anchorRect,
+    measured: queried,
+    anchorRef,
+    fallbackRef: toolbarRef,
+    placement: props.placement
+  });
+}
 
 export type PopupType = "sheet" | "menu" | "none" | "popup";
-export type ResponsivePresenterProps = {
+export type ResponsivePresenterProps = PopupAnchorProps & {
   isOpen: boolean;
   onClose: () => void;
   mobile?: PopupType;
   desktop?: PopupType;
   items?: MenuItem[];
   title?: string;
-  anchorRef?: React.RefObject<UIElement | null>;
-  anchorRect?: AnchorRect;
-  placement?: PopoverPlacement;
-  position?: PositionOptions;
   sx?: SxProp;
   blocking?: boolean;
   focusOnRender?: boolean;
 };
-
-export function resolveAnchor(props: {
-  anchorRef?: React.RefObject<UIElement | null>;
-  anchorRect?: AnchorRect;
-  placement?: PopoverPlacement;
-  position?: PositionOptions;
-}): {
-  anchorRef?: React.RefObject<UIElement | null>;
-  anchorRect?: AnchorRect;
-  placement: PopoverPlacement;
-} {
-  const { position } = props;
-  const above = position?.location === "top";
-  const end = position?.align === "end";
-  const placement =
-    props.placement ??
-    (`${above ? "top" : "bottom"}-${end ? "end" : "start"}` as PopoverPlacement);
-  if (props.anchorRect || props.anchorRef)
-    return {
-      anchorRef: props.anchorRef,
-      anchorRect: props.anchorRect,
-      placement
-    };
-  const target = position?.target;
-  if (target && typeof target === "object") {
-    if ("measureInWindow" in target)
-      return { anchorRef: { current: target }, placement };
-    if ("getBoundingClientRect" in target) {
-      const rect = target.getBoundingClientRect();
-      return {
-        anchorRect: {
-          x: rect.left,
-          y: rect.top,
-          width: rect.width,
-          height: rect.height
-        },
-        placement
-      };
-    }
-  }
-  return { anchorRef: toolbarRef, placement };
-}
 
 export function ResponsivePresenter(
   props: PropsWithChildren<ResponsivePresenterProps>
@@ -143,7 +126,7 @@ export function ResponsivePresenter(
   } = props;
   const isMobile = useIsMobile();
   const type = isMobile ? mobile : desktop;
-  const anchor = resolveAnchor(props);
+  const anchor = usePopupAnchor(props);
 
   if (type === "none") return isOpen ? <>{children}</> : null;
   if (type === "menu")
@@ -158,7 +141,12 @@ export function ResponsivePresenter(
     );
   if (type === "sheet")
     return (
-      <UIResponsivePresenter isOpen={isOpen} onClose={onClose} sx={sx} {...anchor}>
+      <UIResponsivePresenter
+        isOpen={isOpen}
+        onClose={onClose}
+        sx={sx}
+        {...anchor}
+      >
         {children}
       </UIResponsivePresenter>
     );

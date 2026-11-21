@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { q, useEditorQuery } from "../../queries/index.js";
 import { TiptapToolProps as ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import {
   LinkPopup,
@@ -31,16 +31,15 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
-import { Flex, Link, Text } from "@theme-ui/components";
+import { dataColor, Flex, Icon, Link, Text } from "@ui";
 import { NODE_NAMES } from "../../extension-types.js";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 import { strings } from "@notesnook/intl";
 import { find } from "linkifyjs";
 import { Icons } from "../icons.js";
 import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
-import { Icon } from "@notesnook/ui";
 import { LinkData } from "../../types.js";
-import type { UIElement } from "@ui";
+import { callHostAction } from "../../host.js";
 import { useTiptapController } from "./tiptap-only.js";
 
 export function LinkSettings(props: ToolProps) {
@@ -267,13 +266,11 @@ export function OpenLink(props: ToolProps) {
       ) : (
         <Link
           href={href}
-          onClick={(e) => {
+          onPress={(e) => {
             e.preventDefault();
             callHostAction(editor, "openLink", href);
             hide();
           }}
-          target="_blank"
-          variant="body"
           sx={{
             fontSize: "subBody",
             fontFamily: "body",
@@ -283,7 +280,6 @@ export function OpenLink(props: ToolProps) {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            ":visited": { color: "accent" },
             ":hover": { color: "accent", opacity: 0.8 }
           }}
         >
@@ -349,7 +345,6 @@ type LinkToolProps = ToolProps & {
 };
 function LinkTool(props: LinkToolProps) {
   const { isEditing, onClick, onDone, editor, ...toolProps } = props;
-  const buttonRef = useRef<UIElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const [linkDefinition, setLinkDefinition] = useState<LinkDefinition>();
@@ -363,7 +358,6 @@ function LinkTool(props: LinkToolProps) {
     <>
       <ToolButton
         {...toolProps}
-        buttonRef={buttonRef}
         onClick={() => {
           const result = onClick();
           if (!result) return;
@@ -375,13 +369,9 @@ function LinkTool(props: LinkToolProps) {
       <ResponsivePresenter
         mobile="sheet"
         desktop="popup"
-        position={{
-          target: buttonRef.current || undefined,
-          isTargetAbsolute: true,
-          location: "below",
-          align: "center",
-          yOffset: 5
-        }}
+        editor={editor}
+        anchor="selection"
+        placement="bottom-start"
         title={isEditing ? strings.editLink() : strings.insertLink()}
         isOpen={isOpen}
         items={[]}
@@ -425,8 +415,8 @@ function LinkTypeIcon({
 
   const color =
     type === "color" && metadata?.colorCode
-      ? metadata.colorCode
+      ? dataColor(metadata.colorCode)
       : "icon-secondary";
 
-  return <Icon path={path} color={color} size={13} sx={{ mr: 1 }} />;
+  return <Icon path={path} color={color} size={13} mr={1} />;
 }

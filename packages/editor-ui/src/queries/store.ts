@@ -183,7 +183,11 @@ function anchorRect(editor: Editor, target: AnchorTarget): AnchorRect | null {
   const { selection } = editor.state;
   let from = selection.from;
   let to = selection.to;
-  if (target !== "selection") {
+  if (typeof target === "object" && "range" in target) {
+    const size = editor.state.doc.content.size;
+    from = Math.max(0, Math.min(target.range.from, size));
+    to = Math.max(from, Math.min(target.range.to, size));
+  } else if (target !== "selection") {
     const types = Array.isArray(target.node) ? target.node : [target.node];
     const found = types
       .map((type) => selectedNodeRange(editor, type))
