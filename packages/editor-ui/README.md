@@ -22,7 +22,7 @@ Import from the package root only (the repo's `moduleResolution: node` ignores t
 import { Toolbar, useEditor, useToolbarStore } from "@notesnook/editor-ui";
 ```
 
-Deep `dist/cjs/...` imports are used by `apps/mobile` for plain data (`toolbar/tool-definitions`, `toolbar/icons`, `utils/font`).
+Deep `dist/cjs/...` imports are used by `apps/mobile` for plain data (`toolbar/tool-definitions`, `toolbar/icons`, `utils/font`). `apps/desktop-native` reads the same data (`toolbar-data`, `toolbar/tool-definitions`) through re-exports in `src/app/common/toolbar-*.ts`, and its `toolbar-data.test.ts` loads the `dist/cjs` files by those deep paths, so the tool list, icons and presets have one source.
 
 ## UI primitives and popup positioning
 
