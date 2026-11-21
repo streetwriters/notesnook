@@ -8,6 +8,12 @@ The editor's UI layer, split out of `@notesnook/editor`: the toolbar (tools, pop
 
 `@notesnook/editor` re-exports this package's barrel (`export * from "@notesnook/editor-ui"`), so existing `@notesnook/editor` imports keep working.
 
+## Reading and changing the editor
+
+Tools, popups and floating menus talk to an `EditorController`, never to Tiptap: they read with queries (`useControllerQuery(editor, q.isActive("link"))`) and change the document with `editor.run({ name, args })`. A new query goes in `queries/queries.ts` with a Tiptap evaluator in `queries/store.ts` and a native one in native-editor's `src/engine/host-api.ts`; a new command is a Tiptap command plus an engine command of the same name.
+
+Values that move with every caret step (`selectionOffset`, `selectedText`, `selection`) are read when a button is pressed (`useControllerQueryReader`), not subscribed to, so a caret move between plain paragraphs re-renders no tool (`packages/editor/src/__tests__/render-count.test.ts`). Only the Tiptap engine renders DOM, so `posAtElement` (hover popups) is optional on the controller.
+
 ## Usage
 
 Import from the package root only (the repo's `moduleResolution: node` ignores the `exports` map):
