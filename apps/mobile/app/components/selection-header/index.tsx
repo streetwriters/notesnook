@@ -81,6 +81,7 @@ export const SelectionHeader = React.memo(
       if (!selectedItemsList.length) return;
       db.notes.favorite(true, ...selectedItemsList);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
       clearSelection();
     };
 

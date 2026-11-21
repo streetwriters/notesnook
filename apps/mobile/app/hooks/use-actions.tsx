@@ -793,6 +793,7 @@ export const useActions = ({
     const duplicateNote = async () => {
       await db.notes.duplicate(item.id);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
       ToastManager.show({
         heading: strings.noteDuplicated(),
         type: "success",
@@ -824,6 +825,7 @@ export const useActions = ({
       await db.notes.favorite(!item.favorite, item.id);
       setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
     }
 
     async function pinToNotifications() {
