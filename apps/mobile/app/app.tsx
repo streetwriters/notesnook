@@ -59,7 +59,7 @@ if (appLockEnabled || appLockMode !== "none") {
 }
 
 const App = (props: { configureMode?: "note-preview" }) => {
-  useAppEvents();
+  useAppEvents({ configureMode: !!props.configureMode });
   if (!props.configureMode) {
     //@ts-ignore
     globalThis["IS_MAIN_APP_RUNNING"] = true;
