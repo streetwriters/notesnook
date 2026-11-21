@@ -156,6 +156,8 @@ npm run test:e2e -- platform pdf-preview
 
 Each launch opens a real window, so leave the machine alone while the tests run.
 
+CI (`.github/workflows/desktop-native.tests.yml`) builds the test app on Linux and Windows and runs the `boot`, `shell-launch` and `editor-*` specs there (under Xvfb on Linux); type checking and unit tests run on Linux.
+
 Unit tests, from `apps/desktop-native`:
 
 ```bash

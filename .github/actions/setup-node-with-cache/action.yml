@@ -13,6 +13,7 @@ runs:
           package-lock.json
           apps/mobile/package-lock.json
           apps/desktop/package-lock.json
+          apps/desktop-native/package-lock.json
           apps/web/package-lock.json
           apps/monograph/package-lock.json
           apps/theme-builder/package-lock.json
@@ -24,6 +25,7 @@ runs:
           packages/editor-mobile/package-lock.json
           packages/editor/package-lock.json
           packages/editor-ui/package-lock.json
+          packages/editor-native/package-lock.json
           packages/logger/package-lock.json
           packages/streamable-fs/package-lock.json
           packages/theme/package-lock.json

@@ -1,0 +1,241 @@
+name: Test @notesnook/desktop-native
+
+# Builds the native desktop app (apps/desktop-native) on Linux and Windows and
+# runs a smoke set of its end-to-end specs against the real binary: the app
+# boots, the shell launches, and the editor surface (the native editor from
+# streetwriters/native-editor, pulled in by packages/editor-native) opens notes
+# and tabs. macOS is covered by local runs and the react-native-gpui CI; these
+# two jobs are what keeps the Windows and Linux builds from rotting.
+#
+# Type checking and unit tests run once, on Linux: they do not depend on the
+# OS. The e2e step calls node and vitest directly instead of the package's
+# `build:test`/`test:e2e` scripts, because those use POSIX `VAR=value`
+# prefixes and a fixed binary path, which do not work under cmd or with the
+# short Windows target directory below.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "desktop-native"
+    paths:
+      - "apps/desktop-native/**"
+      - "packages/editor-native/**"
+      - "packages/editor-ui/**"
+      - "packages/editor/**"
+      - "packages/ui/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop-native.tests.yml"
+  pull_request:
+    branches:
+      - "desktop-native"
+    paths:
+      - "apps/desktop-native/**"
+      - "packages/editor-native/**"
+      - "packages/editor-ui/**"
+      - "packages/editor/**"
+      - "packages/ui/**"
+      - ".github/workflows/desktop-native.tests.yml"
+    types:
+      - "ready_for_review"
+      - "opened"
+      - "synchronize"
+      - "reopened"
+
+jobs:
+  test:
+    name: Build and smoke test (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            name: Linux
+          - os: windows-2022
+            name: Windows
+    steps:
+      # node_modules and the Cargo build reach past MAX_PATH (260 characters).
+      - name: Allow long paths in git
+        if: runner.os == 'Windows'
+        run: git config --system core.longpaths true
+
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@1.98.1
+
+      - name: Install Linux build tools
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          # GPUI's Linux backend (xkbcommon, xcb, wayland, fontconfig,
+          # freetype), the modules (dbus for notifications and the keychain,
+          # udev), WebKitGTK for the webview, and an X server with a window
+          # manager and a software Vulkan driver for the e2e run.
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build ccache nasm pkg-config \
+            xvfb openbox mesa-vulkan-drivers libvulkan1 libgl1-mesa-dri \
+            libxkbcommon-dev libxkbcommon-x11-dev libxcb1-dev libx11-xcb-dev \
+            libfontconfig-dev libfreetype-dev libwayland-dev \
+            libdbus-1-dev libudev-dev libssl-dev \
+            libgtk-3-dev libwebkit2gtk-4.1-dev \
+            libxkbcommon-x11-0 fonts-noto-cjk fonts-noto-color-emoji
+
+      - name: Install Windows build tools
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Ninja, NASM and Perl are needed by the C++ and OpenSSL builds under
+          # the native modules. Strawberry Perl ships on the runner image, so a
+          # failed Chocolatey fetch only matters for NASM.
+          foreach ($attempt in 1..2) {
+            choco install -y --no-progress ninja nasm strawberryperl
+            if (Test-Path 'C:\Program Files\NASM\nasm.exe') { break }
+            Start-Sleep -Seconds 10
+          }
+          if (-not (Test-Path 'C:\Program Files\NASM\nasm.exe')) {
+            $zip = Join-Path $env:RUNNER_TEMP 'nasm.zip'
+            & curl.exe -sS -L --retry 3 --retry-delay 5 --max-time 300 -o $zip 'https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip'
+            if ($LASTEXITCODE -ne 0) { throw "could not download NASM" }
+            Expand-Archive -Path $zip -DestinationPath $env:RUNNER_TEMP -Force
+            $found = Get-ChildItem -Path $env:RUNNER_TEMP -Recurse -Filter nasm.exe | Select-Object -First 1
+            New-Item -ItemType Directory -Force -Path 'C:\Program Files\NASM' | Out-Null
+            Copy-Item $found.FullName 'C:\Program Files\NASM\nasm.exe'
+          }
+          if (-not (Test-Path 'C:\Strawberry\perl\bin\perl.exe')) {
+            throw "perl is missing and Chocolatey could not install it"
+          }
+          Add-Content -Path $env:GITHUB_PATH -Value 'C:\Strawberry\perl\bin'
+          Add-Content -Path $env:GITHUB_PATH -Value 'C:\Program Files\NASM'
+
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          $instance = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $instance) { throw "no Visual Studio with the x64 C++ tools" }
+          $vcvars = Join-Path $instance 'VC\Auxiliary\Build\vcvarsall.bat'
+          cmd /c "`"$vcvars`" x64 >nul 2>&1 && set" | ForEach-Object {
+            $split = $_.IndexOf('=')
+            if ($split -gt 0) {
+              $name = $_.Substring(0, $split)
+              $value = $_.Substring($split + 1)
+              Set-Item -Path "env:$name" -Value $value
+              Add-Content -Path $env:GITHUB_ENV -Value "$name=$value" -Encoding utf8
+            }
+          }
+          if (-not (Get-Command cl.exe -ErrorAction SilentlyContinue)) { throw "cl.exe is not on PATH after vcvarsall x64" }
+          # The app imports msvcp140_2.dll, which the toolset ships in its
+          # redistributable folder and the runner does not have.
+          $crt = Get-ChildItem -Path (Join-Path $env:VCToolsRedistDir 'x64') -Directory -Filter 'Microsoft.VC*.CRT' | Select-Object -First 1
+          if ($crt) { Add-Content -Path $env:GITHUB_PATH -Value $crt.FullName -Encoding utf8 }
+          # Git's own link.exe shadows MSVC's on the bash PATH.
+          $link = (Get-Command link.exe -ErrorAction Stop).Source
+          if ($link -notmatch 'MSVC') { throw "link.exe resolves to $link, not MSVC" }
+          Add-Content -Path $env:GITHUB_ENV -Value "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=$link" -Encoding utf8
+
+      # The run-desktop CLI uses CARGO_TARGET_DIR when it is set, else
+      # desktop/build/target. MSVC cannot open paths of 260 characters or more,
+      # which the module builds' headers reach under the checkout, so Windows
+      # builds in a short directory.
+      - name: Choose the Cargo target directory
+        run: |
+          # The prebuilt react-native-gpui runtime is downloaded here and cached.
+          echo "RN_GPUI_PREBUILT_CACHE=$RUNNER_TEMP/rn-gpui-prebuilt" >> "$GITHUB_ENV"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            echo 'CARGO_TARGET_DIR=C:\t' >> "$GITHUB_ENV"
+            echo 'APP_BINARY=C:\t\debug\react-native-gpui--notesnook-desktop-native.exe' >> "$GITHUB_ENV"
+          else
+            dir="$GITHUB_WORKSPACE/apps/desktop-native/desktop/build/target"
+            echo "CARGO_TARGET_DIR=$dir" >> "$GITHUB_ENV"
+            echo "APP_BINARY=$dir/debug/react-native-gpui--notesnook-desktop-native" >> "$GITHUB_ENV"
+          fi
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop-native/desktop
+          cache-targets: false
+          cache-directories: ${{ env.CARGO_TARGET_DIR }}
+          cache-on-failure: true
+          save-if: ${{ github.ref == 'refs/heads/desktop-native' }}
+
+      - name: Cache the prebuilt runtime
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.RN_GPUI_PREBUILT_CACHE }}
+          key: rn-gpui-prebuilt-${{ runner.os }}-${{ hashFiles('apps/desktop-native/package-lock.json') }}
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop-native
+
+      - name: Type check
+        if: runner.os == 'Linux'
+        run: npm run tsc:desktop-native
+
+      - name: Unit tests
+        if: runner.os == 'Linux'
+        run: npm run test:unit:desktop-native
+
+      # Downloads Hermes for this host, bundles the JS (a test-driver build
+      # with --no-launch emits desktop/build/index.bundle) and compiles the app.
+      - name: Build the test app
+        working-directory: apps/desktop-native
+        env:
+          CARGO_INCREMENTAL: "0"
+        run: |
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          node scripts/with-hermes.mjs react-native-gpui run-desktop --features test-driver --no-launch --port 8171
+          test -f "$APP_BINARY" || { echo "::error::no app binary at $APP_BINARY"; exit 1; }
+          test -f desktop/build/index.bundle || { echo "::error::no JS bundle at desktop/build/index.bundle"; exit 1; }
+
+      # The Windows runner's screen is 1024x768, smaller than the app's
+      # 1280x800 window.
+      - name: Enlarge the Windows screen
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          try {
+            Set-DisplayResolution -Width 1920 -Height 1080 -Force
+          } catch {
+            Write-Warning "Set-DisplayResolution failed: $_"
+          }
+
+      - name: Smoke e2e (boot, shell launch, editor)
+        working-directory: apps/desktop-native
+        env:
+          RN_GPUI_TEST_BUNDLE: ${{ github.workspace }}/apps/desktop-native/desktop/build/index.bundle
+        run: |
+          export RN_GPUI_TEST_BINARY="$APP_BINARY"
+          specs="boot shell-launch editor-"
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            # openbox is the window manager that a window's first focus,
+            # maximising and minimising need under Xvfb.
+            xvfb-run -a -s "-screen 0 2560x1800x24" \
+              bash -c 'openbox >/dev/null 2>&1 & sleep 1; exec "$@"' _ \
+              npx vitest run --config desktop/vitest.e2e.config.ts $specs
+          else
+            npx vitest run --config desktop/vitest.e2e.config.ts $specs
+          fi
+
+      - name: Upload e2e failures
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: desktop-native-e2e-failures-${{ matrix.name }}
+          path: apps/desktop-native/desktop/build/e2e-failures
+          if-no-files-found: ignore
+          retention-days: 5
