@@ -3,6 +3,22 @@
 version = 4
 
 [[package]]
+name = "ab_glyph"
+version = "0.2.32"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01c0457472c38ea5bd1c3b5ada5e368271cb550be7a4ca4a0b4634e9913f6cc2"
+dependencies = [
+ "ab_glyph_rasterizer",
+ "owned_ttf_parser",
+]
+
+[[package]]
+name = "ab_glyph_rasterizer"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "366ffbaa4442f4684d91e2cd7c5ea7c4ed8add41959a31447066e279e432b618"
+
+[[package]]
 name = "accesskit"
 version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -255,7 +271,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -266,7 +282,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -297,7 +313,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "parking_lot",
  "percent-encoding",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
  "x11rb",
 ]
 
@@ -740,7 +756,7 @@ checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 [[package]]
 name = "bench_metrics"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "criterion",
@@ -749,13 +765,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "bit-set"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08807e080ed7f9d5433fa9b275196cfc35414f66a0c79d864dc51a0d825231a3"
+dependencies = [
+ "bit-vec 0.8.0",
+]
+
+[[package]]
 name = "bit-set"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56d87354e4229f54a44f7bf2435906a4656dba36026ab6eaca629a2c436a691c"
 dependencies = [
- "bit-vec",
+ "bit-vec 0.10.1",
 ]
+
+[[package]]
+name = "bit-vec"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
 
 [[package]]
 name = "bit-vec"
@@ -1308,7 +1348,7 @@ dependencies = [
 [[package]]
 name = "collections"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "gpui_util",
  "indexmap",
@@ -1396,6 +1436,15 @@ name = "convert_case"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "affbf0190ed2caf063e3def54ff444b449371d55c58e513a95ab98eca50adb49"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
+name = "convert_case"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1af709f1f33454bf52eadfc8c78b3b9ef9cb26fb54d16dc9cd9a7299f899fd1b"
 dependencies = [
  "unicode-segmentation",
 ]
@@ -1999,7 +2048,7 @@ dependencies = [
 [[package]]
 name = "derive_refineable"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2066,7 +2115,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2218,6 +2267,38 @@ dependencies = [
  "sha2",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "editor-core"
+version = "0.1.0"
+source = "git+https://github.com/streetwriters/native-editor?branch=main#8e52c1927d7406af59471d54b7c349af47de5f38"
+dependencies = [
+ "aho-corasick",
+ "anyhow",
+ "async-channel",
+ "base64 0.22.1",
+ "gpui",
+ "gpui-webview",
+ "image",
+ "memchr",
+ "ratex-layout",
+ "ratex-parser",
+ "ratex-svg",
+ "ratex-types",
+ "regex",
+ "regex-syntax",
+ "resvg",
+ "serde",
+ "serde_json",
+ "spellcheck",
+ "syntect",
+ "taffy 0.13.0",
+ "unicode-bidi",
+ "unicode-linebreak",
+ "unicode-normalization",
+ "unicode-segmentation",
+ "web-time",
 ]
 
 [[package]]
@@ -2373,7 +2454,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2436,6 +2517,28 @@ dependencies = [
  "rayon-core",
  "smallvec",
  "zune-inflate",
+]
+
+[[package]]
+name = "fancy-regex"
+version = "0.16.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "998b056554fbe42e03ae0e152895cd1a7e1002aec800fdc6635d20270260c46f"
+dependencies = [
+ "bit-set 0.8.0",
+ "regex-automata",
+ "regex-syntax",
+]
+
+[[package]]
+name = "fancy-regex"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a2e16b9a584b602f1e0e5e22c30ca0906786088c27500653e432d086def8b53"
+dependencies = [
+ "bit-set 0.8.0",
+ "regex-automata",
+ "regex-syntax",
 ]
 
 [[package]]
@@ -3102,7 +3205,7 @@ dependencies = [
 [[package]]
 name = "gpui"
 version = "0.2.2"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "accesskit",
  "anyhow",
@@ -3156,7 +3259,7 @@ dependencies = [
  "spin 0.10.1",
  "strum",
  "sum_tree",
- "taffy",
+ "taffy 0.15.0",
  "thiserror 2.0.21",
  "ttf-parser",
  "unicode-segmentation",
@@ -3170,9 +3273,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "gpui-webview"
+version = "0.1.0"
+source = "git+https://github.com/streetwriters/gpui-webview?branch=main#949ad21a79647f26b86b561be432d6e28e97bb17"
+dependencies = [
+ "anyhow",
+ "gpui",
+ "web-time",
+]
+
+[[package]]
 name = "gpui_apple"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "async-task",
@@ -3209,9 +3322,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "gpui_cpu_renderer"
+version = "0.1.0"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
+dependencies = [
+ "anyhow",
+ "gpui",
+ "image",
+ "log",
+ "tiny-skia",
+]
+
+[[package]]
 name = "gpui_ios"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "block2 0.6.2",
@@ -3232,7 +3357,7 @@ dependencies = [
 [[package]]
 name = "gpui_linux"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "accesskit",
  "accesskit_unix",
@@ -3277,7 +3402,7 @@ dependencies = [
 [[package]]
 name = "gpui_macos"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "accesskit",
  "accesskit_macos",
@@ -3317,7 +3442,7 @@ dependencies = [
 [[package]]
 name = "gpui_macros"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -3328,23 +3453,26 @@ dependencies = [
 [[package]]
 name = "gpui_platform"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "console_error_panic_hook",
  "gpui",
+ "gpui_apple",
+ "gpui_cpu_renderer",
  "gpui_ios",
  "gpui_linux",
  "gpui_macos",
  "gpui_web",
  "gpui_wgpu",
  "gpui_windows",
+ "log",
 ]
 
 [[package]]
 name = "gpui_shared_string"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "schemars",
  "serde",
@@ -3354,7 +3482,7 @@ dependencies = [
 [[package]]
 name = "gpui_util"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "log",
@@ -3364,7 +3492,7 @@ dependencies = [
 [[package]]
 name = "gpui_web"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "async-channel",
@@ -3393,7 +3521,7 @@ dependencies = [
 [[package]]
 name = "gpui_wgpu"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "ash",
@@ -3421,7 +3549,7 @@ dependencies = [
 [[package]]
 name = "gpui_windows"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "accesskit",
  "accesskit_windows",
@@ -3578,6 +3706,8 @@ version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 dependencies = [
+ "allocator-api2",
+ "equivalent",
  "foldhash 0.2.0",
 ]
 
@@ -3647,6 +3777,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "host-quickjs"
+version = "0.1.0"
+source = "git+https://github.com/streetwriters/native-editor?branch=main#8e52c1927d7406af59471d54b7c349af47de5f38"
+dependencies = [
+ "anyhow",
+ "cc",
+ "editor-core",
+ "rquickjs",
+ "serde_json",
+]
+
+[[package]]
 name = "http"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3669,7 +3811,7 @@ dependencies = [
 [[package]]
 name = "http_client"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "anyhow",
  "bytes",
@@ -4718,7 +4860,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "png 0.18.1",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -4733,7 +4875,7 @@ version = "30.0.0"
 source = "git+https://github.com/gfx-rs/wgpu?rev=cddb2f5d80dc0009b2ef6767635140cacf90a007#cddb2f5d80dc0009b2ef6767635140cacf90a007"
 dependencies = [
  "arrayvec",
- "bit-set",
+ "bit-set 0.11.1",
  "bitflags 2.13.2",
  "cfg-if",
  "cfg_aliases",
@@ -5544,6 +5686,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "owned_ttf_parser"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36820e9051aca1014ddc75770aab4d68bc1e9e632f0f5627c4086bc216fb583b"
+dependencies = [
+ "ttf-parser",
+]
+
+[[package]]
 name = "p256"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6194,8 +6345,8 @@ version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b8530004ccb15eae51c7e40009fbe317f341f804db54dc033eec1c50be28cfa0"
 dependencies = [
- "bit-set",
- "bit-vec",
+ "bit-set 0.11.1",
+ "bit-vec 0.10.1",
  "bitflags 2.13.2",
  "chacha20",
  "core_detect",
@@ -6402,6 +6553,113 @@ name = "rangemap"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a611d15b50743feb4c76b7d03edcb0e64f399c26961e4efe6975bc398be6aa3d"
+
+[[package]]
+name = "ratex-font"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1c3599bafdf0e0637d1bb9cf97c01528eaa46fab0c6810c3959c2da5f66b2242"
+dependencies = [
+ "phf",
+ "ratex-types",
+]
+
+[[package]]
+name = "ratex-font-loader"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81c91c7c9f70754d505f1073e79531ebc3cdc7d9b77e2e8709b59cd7ba9b8995"
+dependencies = [
+ "ab_glyph",
+ "ratex-font",
+ "ratex-katex-fonts",
+ "ratex-types",
+ "ratex-unicode-font",
+]
+
+[[package]]
+name = "ratex-katex-fonts"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "575eb89e2ab455fe9618b5f06d1838dff40064642d8ec454fedf14852d2ed0a3"
+
+[[package]]
+name = "ratex-layout"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "667f0b07c558d07d77c53208d90a5bd1918cbe5f76c1c36f3547bf08bc3d625a"
+dependencies = [
+ "ratex-font",
+ "ratex-parser",
+ "ratex-types",
+ "serde_json",
+]
+
+[[package]]
+name = "ratex-lexer"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d0fb77ea76a6f650f382f9660949cddc8afd695901f1c9293f92175a3d9e62f"
+dependencies = [
+ "ratex-types",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "ratex-parser"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1dbc57077b89566bde9fc17f468b83d6b17df90930874f8a3d0e7ef988f1ae9c"
+dependencies = [
+ "fancy-regex 0.20.2",
+ "ratex-font",
+ "ratex-lexer",
+ "ratex-types",
+ "regex",
+ "regex-lite",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "unicode-normalization",
+]
+
+[[package]]
+name = "ratex-svg"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e4b27a22f977b0a1bd63d0e24f5b2d94d45baad4ae4e5534a1cd03835cb84561"
+dependencies = [
+ "ab_glyph",
+ "base64 0.22.1",
+ "ratex-font",
+ "ratex-font-loader",
+ "ratex-katex-fonts",
+ "ratex-layout",
+ "ratex-parser",
+ "ratex-types",
+ "ratex-unicode-font",
+]
+
+[[package]]
+name = "ratex-types"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74b856c4a2c1d4b9669a10f03b207f97e16a53119bf607501732b97b5c87007f"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "ratex-unicode-font"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b6ff8cf7f5e091b741bad835485932287f47edbdff21bed6b1b6f575ac1bd72"
+dependencies = [
+ "fontdb",
+ "system-fonts",
+ "ttf-parser",
+]
 
 [[package]]
 name = "rav1e"
@@ -6628,7 +6886,7 @@ dependencies = [
 [[package]]
 name = "refineable"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "derive_refineable",
 ]
@@ -6657,10 +6915,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "regex-lite"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cab834c73d247e67f4fae452806d17d3c7501756d98c8808d7c9c7aa7d18f973"
+
+[[package]]
 name = "regex-syntax"
 version = "0.8.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
+
+[[package]]
+name = "relative-path"
+version = "2.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38540a682c6e9bca04a8bca9e5ec5a6ba168dfbb04c9998fe517a9befb92eb68"
+dependencies = [
+ "serde_core",
+]
 
 [[package]]
 name = "renderdoc-sys"
@@ -6778,6 +7051,7 @@ dependencies = [
  "rn-gpui-keychain",
  "rn-gpui-mmkv-secure",
  "rn-gpui-netinfo",
+ "rn-gpui-notesnook-editor",
  "rn-gpui-notifications",
  "rn-gpui-openpgp",
  "rn-gpui-pdf",
@@ -6914,6 +7188,20 @@ dependencies = [
  "if-addrs",
  "rn-gpui-module",
  "rn-gpui-module-build",
+]
+
+[[package]]
+name = "rn-gpui-notesnook-editor"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "editor-core",
+ "gpui",
+ "host-quickjs",
+ "react-native-gpui",
+ "rn-gpui-module",
+ "rn-gpui-module-build",
+ "serde_json",
 ]
 
 [[package]]
@@ -7082,6 +7370,51 @@ dependencies = [
 ]
 
 [[package]]
+name = "rquickjs"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0a22bf72f515cc4189dd7c63d016f6de92a11eee98ddf7dd64794198f6eb34e"
+dependencies = [
+ "rquickjs-core",
+ "rquickjs-macro",
+]
+
+[[package]]
+name = "rquickjs-core"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6657979a24d543e5fc66f32cef2f47ca82ce8eb55cec5f7d59a12b7b570bbf24"
+dependencies = [
+ "hashbrown 0.17.1",
+ "relative-path",
+ "rquickjs-sys",
+]
+
+[[package]]
+name = "rquickjs-macro"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a2ea9adb03b669c933482ff740b683cd36be7cef23891657a8ccb850401d286"
+dependencies = [
+ "convert_case 0.12.0",
+ "indexmap",
+ "proc-macro-crate 3.5.0",
+ "proc-macro2",
+ "quote",
+ "rquickjs-core",
+ "syn 3.0.9",
+]
+
+[[package]]
+name = "rquickjs-sys"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cee271d0eeba64f0915b846cb7ae02e16faf3dfdffdca91731101d9d30fe3423"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "rsa"
 version = "0.9.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7138,7 +7471,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -7195,7 +7528,7 @@ dependencies = [
  "security-framework 3.7.0",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -7278,7 +7611,7 @@ dependencies = [
 [[package]]
 name = "scheduler"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "async-task",
  "backtrace",
@@ -7812,6 +8145,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "spellbook"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0d204abcbdf8e88729306a8d0ca01a79d8a49969fe1f84696909d6dbc4321c1a"
+dependencies = [
+ "foldhash 0.1.5",
+ "hashbrown 0.15.5",
+]
+
+[[package]]
+name = "spellcheck"
+version = "0.1.0"
+source = "git+https://github.com/streetwriters/native-editor?branch=main#8e52c1927d7406af59471d54b7c349af47de5f38"
+dependencies = [
+ "futures",
+ "serde",
+ "spellbook",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "spin"
 version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7905,7 +8259,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 [[package]]
 name = "sum_tree"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "heapless",
  "rayon",
@@ -7984,6 +8338,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "syntect"
+version = "5.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "656b45c05d95a5704399aeef6bd0ddec7b2b3531b7c9e900abbf7c4d2190c925"
+dependencies = [
+ "bincode",
+ "fancy-regex 0.16.2",
+ "flate2",
+ "fnv",
+ "once_cell",
+ "regex-syntax",
+ "serde",
+ "serde_derive",
+ "thiserror 2.0.21",
+ "walkdir",
+]
+
+[[package]]
 name = "sys-locale"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8017,6 +8389,29 @@ dependencies = [
  "pkg-config",
  "toml 0.8.23",
  "version-compare",
+]
+
+[[package]]
+name = "system-fonts"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46ba78ea149d4bb0626dacad10aa789eedc83395889890a0e6e7ec69a4577442"
+dependencies = [
+ "fontdb",
+ "sys-locale",
+ "web-sys",
+]
+
+[[package]]
+name = "taffy"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c034e05f6ee85a12daa63863c2245797715075c70649947aa0da54f3f2ab1d0f"
+dependencies = [
+ "arrayvec",
+ "serde",
+ "slotmap",
+ "smallvec",
 ]
 
 [[package]]
@@ -8095,7 +8490,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -8414,7 +8809,7 @@ dependencies = [
  "once_cell",
  "png 0.18.1",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8472,7 +8867,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8510,6 +8905,15 @@ name = "unicode-linebreak"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b09c83c3c29d37506a3e260c08c03743a6bb66a9cd432c6934ab501a190571f"
+
+[[package]]
+name = "unicode-normalization"
+version = "0.1.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75cd3fb03d5288b3ba9a1ee103ac7e9cbb59f0b03d64f8ddfcc04dd42758a85d"
+dependencies = [
+ "tinyvec",
+]
 
 [[package]]
 name = "unicode-properties"
@@ -9022,8 +9426,8 @@ version = "30.0.0"
 source = "git+https://github.com/gfx-rs/wgpu?rev=cddb2f5d80dc0009b2ef6767635140cacf90a007#cddb2f5d80dc0009b2ef6767635140cacf90a007"
 dependencies = [
  "arrayvec",
- "bit-set",
- "bit-vec",
+ "bit-set 0.11.1",
+ "bit-vec 0.10.1",
  "bitflags 2.13.2",
  "bytemuck",
  "cfg_aliases",
@@ -9099,7 +9503,7 @@ dependencies = [
  "android_system_properties",
  "arrayvec",
  "ash",
- "bit-set",
+ "bit-set 0.11.1",
  "bitflags 2.13.2",
  "block2 0.6.2",
  "bytemuck",
@@ -9212,7 +9616,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]
@@ -9771,7 +10175,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d6f32a0ff4a9f6f01231eb2059cc85479330739333e0e58cadf03b6af2cca10"
 dependencies = [
  "cfg-if",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -10356,7 +10760,7 @@ dependencies = [
 [[package]]
 name = "ztracing"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 dependencies = [
  "tracing",
  "ztracing_macro",
@@ -10365,7 +10769,7 @@ dependencies = [
 [[package]]
 name = "ztracing_macro"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/gpui-fast?rev=3ad00a0#3ad00a066e99488b00bbfd02b9b1588546dd9e76"
+source = "git+https://github.com/streetwriters/gpui-fast?rev=c1ddb7b#c1ddb7baefb3dfdceb35da7d83324b97e8259830"
 
 [[package]]
 name = "zune-core"
