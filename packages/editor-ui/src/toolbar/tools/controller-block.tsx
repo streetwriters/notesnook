@@ -246,7 +246,17 @@ export function ControllerInsertBlock(props: ToolProps) {
               onClick: async () => {
                 if (!hasPermission("importCsvToTable")) return;
                 const text = await pickCsvFile?.();
-                const table = text ? csvToTable(text) : undefined;
+                if (!text) return;
+                // The native editor imports CSV itself (delimiter guess, short
+                // rows padded); Tiptap gets the table node built here.
+                if (!editor.tiptap) {
+                  editor.run({
+                    name: "importCsvToTable",
+                    args: [{ csv: text }]
+                  });
+                  return;
+                }
+                const table = csvToTable(text);
                 if (table) editor.run({ name: "insertContent", args: [table] });
               }
             },
