@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -69,6 +70,37 @@ export function isEscapeForOpenMenu(event: {
     !!document.querySelector(MENU) &&
     !(event.target as HTMLElement).closest(MENU)
   );
+}
+
+// React attaches `wheel` listeners as passive, so `preventDefault()` from a
+// React handler does nothing. Wheel handlers are registered here and invoked
+// from one non-passive document listener, walking up from the event target.
+const wheelHandlers = new Map<string, (event: WheelEvent) => void>();
+let wheelCounter = 0;
+
+function onDocumentWheel(event: WheelEvent) {
+  let node = event.target instanceof Element ? event.target : null;
+  while (node) {
+    const id = node.getAttribute("data-nn-wheel");
+    if (id) wheelHandlers.get(id)?.(event);
+    node = node.parentElement;
+  }
+}
+
+function addWheelHandler(id: string, handler: (event: WheelEvent) => void) {
+  if (wheelHandlers.size === 0)
+    document.addEventListener("wheel", onDocumentWheel, {
+      passive: false,
+      capture: true
+    });
+  wheelHandlers.set(id, handler);
+  return () => {
+    wheelHandlers.delete(id);
+    if (wheelHandlers.size === 0)
+      document.removeEventListener("wheel", onDocumentWheel, {
+        capture: true
+      });
+  };
 }
 
 export function getDragPayload() {
@@ -181,6 +213,22 @@ export interface DomOptions {
 export function useDom(props: BaseProps & Record<string, any>, options: DomOptions) {
   const context = useThemeContext();
   const [dragOver, setDragOver] = useState(false);
+  const dragDepth = useRef(0);
+  const [wheelId] = useState(() => `w${++wheelCounter}`);
+  const onWheel = props.onWheel;
+  const hasWheel = !!onWheel;
+  const latestWheel = useRef(onWheel);
+  latestWheel.current = onWheel;
+  useEffect(() => {
+    if (!hasWheel) return;
+    return addWheelHandler(wheelId, (event) =>
+      latestWheel.current?.({
+        deltaX: event.deltaX,
+        deltaY: event.deltaY,
+        preventDefault: () => event.preventDefault()
+      })
+    );
+  }, [hasWheel, wheelId]);
   const sx = useMemoSx(props, options.defaults);
   const generated = resolveClassName(sx, context, {
     variantGroup: options.variantGroup,
@@ -249,13 +297,7 @@ export function useDom(props: BaseProps & Record<string, any>, options: DomOptio
         preventDefault: () => event.preventDefault(),
         stopPropagation: () => event.stopPropagation()
       });
-  if (props.onWheel)
-    dom.onWheel = (event: React.WheelEvent) =>
-      props.onWheel!({
-        deltaX: event.deltaX,
-        deltaY: event.deltaY,
-        preventDefault: () => event.preventDefault()
-      });
+  if (props.onWheel) dom["data-nn-wheel"] = wheelId;
   if (props.onPointerDown)
     dom.onPointerDown = (event: ReactPointerEvent) =>
       props.onPointerDown!(toPointer(event));
@@ -308,8 +350,12 @@ export function useDom(props: BaseProps & Record<string, any>, options: DomOptio
       pageX: event.pageX,
       pageY: event.pageY
     });
+    // dragenter/dragleave also fire for children: count them so enter and
+    // leave are reported once per target, as on native.
     dom.onDragEnter = (event: ReactDragEvent) => {
       event.preventDefault();
+      dragDepth.current++;
+      if (dragDepth.current > 1) return;
       setDragOver(true);
       props.onDragEnter?.(dragEvent(event));
     };
@@ -318,18 +364,21 @@ export function useDom(props: BaseProps & Record<string, any>, options: DomOptio
       props.onDragOver?.(dragEvent(event));
     };
     dom.onDragLeave = (event: ReactDragEvent) => {
+      dragDepth.current = Math.max(0, dragDepth.current - 1);
+      if (dragDepth.current > 0) return;
       setDragOver(false);
       props.onDragLeave?.(dragEvent(event));
     };
     dom.onDrop = (event: ReactDragEvent) => {
       event.preventDefault();
+      dragDepth.current = 0;
       setDragOver(false);
-      const files = Array.from(event.dataTransfer.files).filter((file) =>
-        matchesAccept(file, accept ?? [])
-      );
-      if (files.length && props.onDropFiles)
-        props.onDropFiles(files.map(toDroppedFile));
-      else props.onDrop?.(dragEvent(event));
+      const all = Array.from(event.dataTransfer.files);
+      const files = all.filter((file) => matchesAccept(file, accept ?? []));
+      if (props.onDropFiles && all.length) {
+        // A file drop never reaches onDrop; rejected files are ignored.
+        if (files.length) props.onDropFiles(files.map(toDroppedFile));
+      } else props.onDrop?.(dragEvent(event));
     };
   }
   return dom;

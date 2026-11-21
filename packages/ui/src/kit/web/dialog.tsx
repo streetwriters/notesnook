@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect } from "react";
+import { useEffect, useRef, type KeyboardEvent, type RefObject } from "react";
 import { useEscape } from "../shared/use-escape";
 import type * as Contract from "../contracts/dialog";
 import { Close, Loading } from "../shared/icons";
@@ -62,6 +62,41 @@ export function Dialog(props: Contract.DialogProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
   useEscape(props.onClose, isOpen);
+  const panel = useRef<HTMLElement | null>(null);
+  // Move focus into the dialog on open and give it back on close.
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const node = panel.current;
+    if (node && !node.contains(document.activeElement)) {
+      (
+        node.querySelector<HTMLElement>(
+          "[autofocus], input, textarea, select, button, [tabindex]"
+        ) ?? node
+      ).focus({ preventScroll: true });
+    }
+    return () => previous?.focus?.({ preventScroll: true });
+  }, [isOpen]);
+  // Keep Tab inside the dialog.
+  const trapTab = (event: KeyboardEvent) => {
+    if (event.key !== "Tab" || !panel.current) return;
+    const focusable = Array.from(
+      panel.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    );
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || active === panel.current)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
   if (!isOpen) return null;
 
   return (
@@ -81,6 +116,14 @@ export function Dialog(props: Contract.DialogProps) {
           justifyContent: "center"
         }}
       >
+        <div
+          ref={panel as RefObject<HTMLDivElement>}
+          role="dialog"
+          aria-modal="true"
+          aria-label={props.title}
+          onKeyDown={trapTab}
+          style={{ display: "contents" }}
+        >
         <Flex
           testID={props.testID ?? "dialog"}
           onPress={(event) => event.stopPropagation()}
@@ -211,6 +254,7 @@ export function Dialog(props: Contract.DialogProps) {
           ) : null}
           {props.footer}
         </Flex>
+        </div>
       </Flex>
     </ThemeScope>
   );

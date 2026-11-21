@@ -22,6 +22,7 @@ import { create } from "zustand";
 import type * as Contract from "../contracts/overlays";
 import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
+import { useEscape } from "../shared/use-escape";
 import { useWindowSize } from "./hooks";
 import { Box, Flex } from "./primitives";
 import { ThemeScope } from "./theme";
@@ -50,6 +51,7 @@ function remove(id: number) {
 
 export function Popover(props: Contract.PopoverProps) {
   const [id] = useStable();
+  useEscape(props.onClose, props.isOpen);
 
   useEffect(() => {
     if (!props.isOpen) {

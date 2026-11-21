@@ -37,6 +37,7 @@ type Entry = {
 };
 
 const useToasts = create<{ entries: Entry[] }>(() => ({ entries: [] }));
+let toastCounter = 0;
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function hide(id: string) {
@@ -54,14 +55,11 @@ export const showToast: typeof Contract.showToast = (
   actions,
   hideAfter = 5000
 ) => {
-  const id = message;
-  const existing = timers.get(id);
-  if (existing) clearTimeout(existing);
+  // Each call gets its own id, so equal messages stack and hide() only
+  // hides the toast it returned.
+  const id = `toast-${++toastCounter}`;
   useToasts.setState((state) => ({
-    entries: [
-      ...state.entries.filter((entry) => entry.id !== id),
-      { id, type, message, actions }
-    ]
+    entries: [...state.entries, { id, type, message, actions }]
   }));
   if (hideAfter && Number.isFinite(hideAfter))
     timers.set(
@@ -85,6 +83,8 @@ export function ToastHost() {
     <ThemeScope scope="contextMenu">
       <div
         className="toasts-container"
+        role="status"
+        aria-live="polite"
         style={{
           position: "absolute",
           bottom: 16,
@@ -122,9 +122,9 @@ export function ToastHost() {
               >
                 {entry.message}
               </Text>
-              {entry.actions?.map((action) => (
+              {entry.actions?.map((action, index) => (
                 <Button
-                  key={action.text}
+                  key={`${index}-${action.text}`}
                   onPress={action.onClick}
                   sx={{
                     py: "7px",

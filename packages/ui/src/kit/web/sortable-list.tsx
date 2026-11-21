@@ -50,7 +50,11 @@ export function SortableList<T extends Contract.SortableItem>(
             setDragging(undefined);
             setOver(undefined);
           }}
-          onDragEnter={() => setOver(item.id)}
+          onDragEnter={(event) => {
+            const payload = event.payload as Contract.SortableItem | undefined;
+            if (payload && payload.group !== item.group) return;
+            setOver(item.id);
+          }}
           onDragLeave={() =>
             setOver((current) => (current === item.id ? undefined : current))
           }
@@ -59,6 +63,7 @@ export function SortableList<T extends Contract.SortableItem>(
             setDragging(undefined);
             setOver(undefined);
             if (!payload || payload.id === item.id) return;
+            if (payload.group !== item.group) return;
             if (!items.some((other) => other.id === payload.id)) return;
             onMove({
               activeId: payload.id,

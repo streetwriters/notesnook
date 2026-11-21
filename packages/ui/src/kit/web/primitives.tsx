@@ -295,7 +295,8 @@ export const Textarea = forwardRef<Contract.UIElement, Contract.TextareaProps>(
     });
     useLayoutEffect(() => {
       const target = element.current;
-      if (!target || props.rows !== 1) return;
+      // `rows` is the minimum height; the field grows to fit its content.
+      if (!target) return;
       target.style.height = "auto";
       target.style.height = `${target.scrollHeight}px`;
       target.style.overflow = "hidden";
@@ -312,6 +313,10 @@ export const Textarea = forwardRef<Contract.UIElement, Contract.TextareaProps>(
         readOnly={props.readOnly}
         autoFocus={props.autoFocus}
         maxLength={props.maxLength}
+        onFocus={(event) => {
+          if (props.selectTextOnFocus) event.currentTarget.select();
+          (dom.onFocus as any)?.(event);
+        }}
         onChange={(event) => props.onChangeText?.(event.target.value)}
       />
     );
@@ -467,11 +472,17 @@ export const Slider = forwardRef<Contract.UIElement, Contract.SliderProps>(
   function Slider(props, ref) {
     const element = useRef<HTMLInputElement | null>(null);
     useUIElement(ref, element);
-    const dom = useDom(props, {});
+    const { colors } = useThemeContext();
+    const dom = useDom(props, {
+      baseClass: "nn-slider",
+      variantGroup: props.variant ? "forms" : undefined,
+      variant: props.variant as string | undefined
+    });
     return (
       <input
         {...(dom as Any)}
         ref={element}
+        style={{ accentColor: colors.accent }}
         type="range"
         value={props.value}
         min={props.min}

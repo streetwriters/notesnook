@@ -26,6 +26,13 @@ import { createRoot } from "react-dom/client";
 import { initLocaleSync } from "../../app/common/locale";
 
 async function start() {
+  if (new URLSearchParams(location.search).get("page") === "primitives") {
+    const { PrimitivesTestPage } = await import("./primitives-test-page");
+    createRoot(document.getElementById("root")!).render(
+      <PrimitivesTestPage />
+    );
+    return;
+  }
   initLocaleSync();
   const [{ THEME_DARK, THEME_LIGHT }, { Root }, themeStore, ui] =
     await Promise.all([

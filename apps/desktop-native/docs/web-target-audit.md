@@ -34,26 +34,26 @@ file was edited, and no web code was changed by this audit.
 | 6 | `primitives` Button | `primitives.tsx` | Conforms |
 | 7 | `primitives` Image | `primitives.tsx` | Conforms |
 | 8 | `primitives` Input | `primitives.tsx` | Conforms (note N3) |
-| 9 | `primitives` Textarea | `primitives.tsx` | **Does not conform** (F1) |
+| 9 | `primitives` Textarea | `primitives.tsx` | Conforms (F1 fixed) |
 | 10 | `primitives` Checkbox | `primitives.tsx` | Conforms (note N4) |
 | 11 | `primitives` Radio | `primitives.tsx` | Conforms |
 | 12 | `primitives` Select | `primitives.tsx` | Conforms (note N5) |
 | 13 | `primitives` QRCode | `primitives.tsx` | **Does not conform** (F2) |
 | 14 | `primitives` ColorPicker | `primitives.tsx` | **Does not conform** (F3) |
 | 15 | `primitives` Switch | `primitives.tsx` | Conforms |
-| 16 | `primitives` Slider | `primitives.tsx` | **Does not conform** (F4) |
+| 16 | `primitives` Slider | `primitives.tsx` | Conforms (F4 fixed) |
 | 17 | `primitives` Progress | `primitives.tsx` | Conforms |
 | 18 | `primitives` Icon | `primitives.tsx` | Conforms |
 | 19 | `primitives` ThemeScope | `theme.tsx` → `shared/theme.tsx` | Conforms (note N6) |
-| 20 | `primitives` BaseProps event/drag/file props | `use-dom.tsx` | **Does not conform** (F5, F6) |
-| 21 | `dialog` Dialog, DialogButton | `dialog.tsx` | **Does not conform** (F7, F8) |
+| 20 | `primitives` BaseProps event/drag/file props | `use-dom.tsx` | Conforms (F5, F6 fixed; note N11) |
+| 21 | `dialog` Dialog, DialogButton | `dialog.tsx` | Conforms (F7, F8 fixed; note N12) |
 | 22 | `layout` SplitPane, Pane | `layout.tsx` | Conforms (note N7) |
 | 23 | `layout` ScrollContainer, LayoutRoot | `layout.tsx` | Conforms (note N8) |
 | 24 | `layout` TitleBar, TITLE_BAR_HEIGHT | `layout.tsx` | Conforms (note N9) |
-| 25 | `lists` VirtualList | `lists.tsx` | **Does not conform** (F9) |
-| 26 | `lists` SortableList | `sortable-list.tsx` | **Does not conform** (F10) |
-| 27 | `overlays` Popover, PopoverHost | `popover.tsx` | **Does not conform** (F11) |
-| 28 | `overlays` showToast, ToastHost | `toast.tsx` | **Does not conform** (F12) |
+| 25 | `lists` VirtualList | `lists.tsx` | Conforms (F9 fixed) |
+| 26 | `lists` SortableList | `sortable-list.tsx` | Conforms (F10 fixed) |
+| 27 | `overlays` Popover, PopoverHost | `popover.tsx` | **Does not conform** (F11, partly fixed) |
+| 28 | `overlays` showToast, ToastHost | `toast.tsx` | Conforms (F12 fixed) |
 | 29 | `overlays` DragGhostHost | `embeds.tsx` | Conforms |
 | 30 | `hooks` useMediaQuery, matchMediaQuery, useWindowSize, getPointerPosition, useThemeColor | `hooks.ts` | Conforms (note N10) |
 | 31 | `editor` EditorSurface, EditorHandle | `editor.tsx` | **Does not conform** (F13) |
@@ -61,7 +61,9 @@ file was edited, and no web code was changed by this audit.
 | 33 | `avatar-editor` AvatarEditor | `embeds.tsx` | **Does not conform** (F14, placeholder) |
 | 34 | `webview` WebView | `embeds.tsx` | **Does not conform** (F15) |
 
-Of 34 rows, 20 conform and 14 do not (9, 13, 14, 16, 20, 21, 25 to 28, 31 to 34).
+Of 34 rows, 27 conform and 7 do not (13, 14, 27, 31 to 34). The audit at
+`cb81efae2` found 20 and 14; rows 9, 16, 20, 21, 25, 26 and 28 were fixed
+afterwards (see Fix status). The F-sections below keep the original findings.
 
 ## Non-conformances
 
@@ -217,6 +219,51 @@ are placeholders or below the bar:
 
 ## Fix status
 
-Nothing was fixed by this audit. The README row "Editor: Stub surface, as on
+Fixed in `packages/ui/src/kit/web` (the web target moved there in 3.1), with the
+pure windowing maths unit tested (`shared/virtual-window.test.ts`) and every
+primitive on the new test page (below):
+
+| Finding | Status | What changed |
+| --- | --- | --- |
+| F1 Textarea | Fixed | `selectTextOnFocus` selects on focus; the field grows to its content for any `rows`, with `rows` as the minimum. |
+| F2 QRCode | Open | `logo` and the transparent PNG are not needed by the editor UI. |
+| F3 ColorPicker | Open | Needs a hue/saturation/alpha popup; the editor's colour popups will build on `Popover` (4.x). The native `<input type="color">` stays. |
+| F4 Slider | Fixed | `variant` resolves through the `forms` group; the thumb and track use the theme accent colour. |
+| F5 onWheel | Fixed | Handlers run from one non-passive document listener, so `preventDefault()` stops the scroll. |
+| F6 drag and drop | Fixed | Enter and leave are counted, so they fire once per target; a drop of only rejected files no longer reaches `onDrop`. The object URLs made for dropped files are still not revoked (their lifetime belongs to the consumer; see N11). |
+| F7 layering | Fixed | The web target no longer imports `src/app` (done by 3.1: `shared/use-escape`, `shared/icons`). |
+| F8 Dialog | Fixed | `role="dialog"`, `aria-modal`, `aria-label`, focus moved in on open and restored on close, Tab kept inside. Not portalled (see N12). |
+| F9 VirtualList | Fixed | Windowed: only the items in the viewport plus `overscan` pixels (default 200) are mounted, at offsets from measured heights. `scrollToIndex` works for unmounted items and honours `animated`; `initialScrollIndex` runs for any index above 0. |
+| F10 SortableList | Fixed | Drops and hover from another `group` are ignored. `index` stays the index of the drop target. |
+| F11 Popover | Partly fixed | Flip/clamp and rect anchoring came with 3.3, and Escape now closes it (through the shared escape stack). Still open: position does not follow scroll or anchor movement, no focus management, and every popover is a `contextMenu` scope. Left for the editor popups in 4.x/7.13. |
+| F12 Toast | Fixed | One id per call (equal messages stack, `hide()` hides only its own), the container is `role="status"` with `aria-live`, action keys include the index. |
+| F13 EditorSurface | Open | Imports `apps/web`, so it stays in the app; its `sx`, preview and progress gaps belong to the editor integration (5.x/7.1(c)). |
+| F14 PdfViewer, AvatarEditor | Open | Placeholders by design; the editor UI does not use them. |
+| F15 WebView | Open | Not used by the editor UI; `injectJavaScript` would need `allow-same-origin`, a security trade-off to decide separately. |
+
+Notes added by the fixes:
+
+- **N11** `toDroppedFile` still creates an object URL per dropped file and
+  never revokes it.
+- **N12** The `Dialog` backdrop is still `position: absolute` inside
+  `LayoutRoot`, not portalled, and `DialogButtonProps.role` is not mapped to a
+  DOM attribute.
+
+### Test page
+
+`npm run web`, then open `/?page=primitives`
+(`src/targets/web/primitives-test-page.tsx`, dev only). It renders every
+primitive, list and overlay (Box, Flex, Grid, Text, Label, Link, Image, Icon,
+Button, Input, Textarea, Checkbox, Radio, Switch, Select, Slider, Progress,
+ColorPicker, QRCode, SplitPane, VirtualList with 5000 items, SortableList,
+Dialog, Popover, Toast) inside `WebThemeProvider`, with a light/dark toggle.
+PdfViewer, AvatarEditor and WebView are left out because they are the
+placeholders above. It was type-checked but not opened in a browser in the
+task sandbox (the shared packages could not be built there).
+
+The README row "Editor: Stub surface, as on desktop" was stale (the web
+`EditorSurface` mounts the real editor) and was corrected before.
+
+Original note from the audit: nothing was fixed by the audit itself. The README row "Editor: Stub surface, as on
 desktop" was stale (the web `EditorSurface` mounts the real editor) and was
 corrected as part of writing this document.
