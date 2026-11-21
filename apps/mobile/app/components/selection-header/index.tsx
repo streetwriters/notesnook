@@ -77,9 +77,9 @@ export const SelectionHeader = React.memo(
       }
     }, [selectionMode]);
 
-    const addToFavorite = async () => {
+    const removeFromFavorites = async () => {
       if (!selectedItemsList.length) return;
-      db.notes.favorite(true, ...selectedItemsList);
+      await db.notes.favorite(false, ...selectedItemsList);
       Navigation.queueRoutesForUpdate();
       clearSelection();
     };
@@ -240,7 +240,7 @@ export const SelectionHeader = React.memo(
                 },
                 {
                   title: strings.unfavorite(),
-                  onPress: addToFavorite,
+                  onPress: removeFromFavorites,
                   visible: focusedRouteId === "Favorites",
                   icon: "star-off"
                 },
