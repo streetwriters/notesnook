@@ -42,30 +42,22 @@
     "react-colorful": "^5.6.1"
   },
   "devDependencies": {
-    "@emotion/react": "11.11.1",
     "@mdi/js": "7.4.47",
     "@tiptap/core": "2.6.6",
     "@tiptap/extension-text-style": "2.6.6",
     "@tiptap/pm": "2.6.6",
     "prosemirror-model": "1.25.11",
     "prosemirror-state": "1.4.4",
-    "@theme-ui/components": "0.16.1",
-    "@theme-ui/core": "0.16.1",
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
-    "@types/react-modal": "3.16.3",
     "happy-dom": "16.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-modal": "3.16.3",
     "vitest": "2.1.8",
     "zustand": "4.5.5"
   },
   "peerDependencies": {
-    "@emotion/react": ">=11",
     "@mdi/js": ">=7.2.96",
-    "@theme-ui/components": ">=0.16.0",
-    "@theme-ui/core": ">=0.16.0",
     "@tiptap/core": "2.6.6",
     "@tiptap/extension-text-style": "2.6.6",
     "@tiptap/pm": "2.6.6",
@@ -73,7 +65,6 @@
     "prosemirror-state": "1.4.4",
     "react": ">=18",
     "react-dom": ">=18",
-    "react-modal": ">=3",
     "zustand": ">=4"
   },
   "scripts": {
