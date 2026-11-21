@@ -60,6 +60,7 @@ import {
   VaultRequestType
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
@@ -946,6 +947,7 @@ export const useActions = ({
       }
       try {
         await db.vault.add(item.id);
+        NotePreviewWidget.updateNotes();
         const locked = await db.vaults.itemExists(item);
         if (locked) {
           close();
