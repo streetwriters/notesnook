@@ -238,13 +238,19 @@ export const NotesWidget = {
     NotesWidget.updateNotes();
   },
 
-  configure: (widgetId: number, source: NotesWidgetSource) => {
+  configure: async (widgetId: number, source: NotesWidgetSource) => {
     if (Platform.OS !== "android") return;
     NotesnookModule.setString(
       "appPreview",
       `notesWidget.config.${widgetId}`,
       JSON.stringify(source)
     );
-    NotesWidget.updateNotes();
+    // Updated right away instead of through the debounced timer: the configure
+    // activity finishes straight after this and JS timers stop running once it does.
+    try {
+      await updateAndroid();
+    } catch (err) {
+      console.error("Failed to update notes widget:", err);
+    }
   }
 };
