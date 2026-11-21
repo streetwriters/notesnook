@@ -5,7 +5,18 @@ name: Editor oracles
 # streetwriters/native-editor (`tests/*.json`, `scripts/_*-oracle.mjs`). A
 # schema change on the web side changes what the engine built from
 # `packages/editor` parses, so the regenerated oracle no longer matches the
-# committed one and this job fails with a diff.
+# committed one and this job fails with a diff. It also runs the native
+# engine's own oracle, conformance and byte-for-byte round-trip tests, so the
+# native side is checked against the same corpora.
+#
+# The job is meant to be a required check: its name, "Oracles (Tiptap schema)",
+# is stable and it runs on every pull request that touches the editor. Marking
+# it required is branch protection, set in the repository settings
+# (Settings > Branches > `desktop-native` and `master` > Require status checks),
+# not in this file. The `paths` filters below mean a pull request that touches
+# none of them never starts the job; GitHub shows a required check as pending
+# for such a PR, so mark it required only together with an admin bypass, or drop
+# the filters from the `pull_request` trigger.
 
 on:
   workflow_dispatch:
@@ -49,15 +60,39 @@ jobs:
       - name: Checkout notesnook
         uses: actions/checkout@v5
 
+      # A change to the Tiptap schema usually needs a matching change in the
+      # native engine, which lives in another repository. Use the native-editor
+      # branch with the same name as this one when it exists, so both halves of
+      # one change are checked together; otherwise check against `main`.
+      - name: Pick the matching native-editor branch
+        id: native-editor-ref
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          ref=main
+          if [ -n "$BRANCH" ] && git ls-remote --exit-code --heads https://github.com/streetwriters/native-editor.git "refs/heads/$BRANCH" > /dev/null; then
+            ref="$BRANCH"
+          fi
+          echo "native-editor ref: $ref"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
       - name: Checkout native-editor (owns the oracles)
         uses: actions/checkout@v5
         with:
           repository: streetwriters/native-editor
-          ref: main
+          ref: ${{ steps.native-editor-ref.outputs.ref }}
           path: native-editor
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native-editor
 
       - name: Install packages
         run: |
@@ -73,6 +108,16 @@ jobs:
         run: |
           node scripts/smoke-engine.mjs
           node scripts/html-bridge.mjs
+          node scripts/round-trip.mjs
+
+      # The same oracles and corpora, run through the QuickJS host the desktop
+      # app embeds: the DOM and real-notes oracle comparisons
+      # (`dom::conformance`) and the byte-for-byte load/save round trip
+      # (`tests/round_trip.rs`). This is what keeps a desktop save from
+      # changing or dropping a note.
+      - name: Native oracle, conformance and round-trip tests
+        working-directory: native-editor
+        run: cargo test --locked -p host-quickjs
 
       - name: Every Tiptap extension has a native counterpart or a preserved-block note
         working-directory: native-editor
