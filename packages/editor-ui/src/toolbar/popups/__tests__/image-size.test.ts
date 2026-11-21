@@ -45,9 +45,27 @@ describe("image properties sizing", () => {
     });
   });
 
-  test("without a ratio the typed side is the only one that changes", () => {
+  test("without a ratio an image is not squashed into a square", () => {
     expect(imageRatio({})).toBe(0);
-    expect(sizeForWidth({}, "50")).toEqual({ width: 50, height: 50 });
+    expect(sizeForWidth({}, "50")).toEqual({ width: 50 });
+    expect(sizeForHeight({ width: 80 }, "50")).toEqual({
+      width: 80,
+      height: 50,
+      locked: false
+    });
+    expect(sizeForHeight({}, "50")).toBeNull();
+  });
+
+  test("typing a width digit by digit uses the ratio from the start", () => {
+    const ratio = 1.6;
+    // Each step resizes the image, so the popup keeps the first ratio rather
+    // than re-reading it from the rounded size.
+    const sizes = ["1", "12", "120"].map((t) => sizeForWidth({}, t, ratio));
+    expect(sizes).toEqual([
+      { width: 1, height: 1 },
+      { width: 12, height: 8 },
+      { width: 120, height: 75 }
+    ]);
   });
 
   test("empty, zero, negative and non-numeric input changes nothing", () => {

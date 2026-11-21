@@ -26,7 +26,11 @@ export type ImageDimensions = {
   aspectRatio?: number;
 };
 
-export type ImageSize = { width: number; height: number };
+/**
+ * A size request for the engine's `setImageSize`. A missing `height` lets the
+ * engine keep the image's own ratio; `locked: false` stretches (both given).
+ */
+export type ImageSize = { width: number; height?: number; locked?: false };
 
 /**
  * The image's width over its height: the stored `aspectRatio` when it has one
@@ -44,26 +48,37 @@ function valid(value: number): boolean {
   return Number.isFinite(value) && value > 0;
 }
 
-/** The size after typing a new width: the height follows the ratio. */
+/**
+ * The size after typing a new width: the height follows `ratio` (the image's
+ * own by default; the popup passes the one it captured when it opened, so
+ * rounding while typing can't drift it). Without any ratio only the width is
+ * set: the image keeps whatever shape it has instead of becoming a square.
+ */
 export function sizeForWidth(
   image: ImageDimensions,
-  text: string
+  text: string,
+  ratio: number = imageRatio(image)
 ): ImageSize | null {
   const width = Math.round(Number(text));
   if (!valid(width)) return null;
-  const ratio = imageRatio(image);
-  return { width, height: ratio ? Math.round(width / ratio) : width };
+  return ratio ? { width, height: Math.round(width / ratio) } : { width };
 }
 
-/** The size after typing a new height: the width follows the ratio. */
+/**
+ * The size after typing a new height: the width follows `ratio`. Without one
+ * the width stays as it is and the image stretches to the typed height.
+ */
 export function sizeForHeight(
   image: ImageDimensions,
-  text: string
+  text: string,
+  ratio: number = imageRatio(image)
 ): ImageSize | null {
   const height = Math.round(Number(text));
   if (!valid(height)) return null;
-  const ratio = imageRatio(image);
-  return { width: ratio ? Math.round(height * ratio) : height, height };
+  if (ratio) return { width: Math.round(height * ratio), height };
+  if (image.width && image.width > 0)
+    return { width: image.width, height, locked: false };
+  return null;
 }
 
 export function setImageSizeCommand(size: ImageSize): EditorCommand {

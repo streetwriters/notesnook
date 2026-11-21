@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Flex } from "@ui";
 import { strings } from "@notesnook/intl";
 import { q } from "../../queries/queries.js";
@@ -29,8 +29,8 @@ import { MoreTools } from "../components/more-tools.js";
 import { Popup } from "../components/popup.js";
 import { InlineInput } from "../../components/inline-input/index.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
-import { useToolbarLocation } from "../stores/toolbar-store.js";
 import {
+  imageRatio,
   setImageAlignmentCommand,
   setImageSizeCommand,
   sizeForHeight,
@@ -51,9 +51,11 @@ export function ImageSettings(props: ToolProps) {
   const { editor } = props;
   const isImage = useEditorQuery(editor, q.isActive("image"), false);
   const isEditable = useEditorQuery(editor, q.editable(), true);
-  const isBottom = useToolbarLocation() === "bottom";
 
-  if (!isImage || !isBottom) return null;
+  // The Tiptap editor shows these tools on a floating bar over the image on
+  // desktop, so its `imageSettings` is bottom-toolbar only. The native editor
+  // has no such bar: the tools live behind this button on every toolbar.
+  if (!isImage) return null;
 
   return (
     <MoreTools
@@ -108,7 +110,17 @@ export type ImagePropertiesPopupProps = {
 export function ImagePropertiesPopup(props: ImagePropertiesPopupProps) {
   const { editor, onClose } = props;
   const image = useImage(editor);
+  // The proportions the image had when the popup opened: each keystroke
+  // resizes the image, and a ratio re-read from the rounded size would drift.
+  const ratio = useRef<number | null>(null);
+  // What the user is typing in a field, so it isn't rewritten under them
+  // ("1", "12", "120"); the other field follows the image.
+  const [typing, setTyping] = useState<{
+    field: "width" | "height";
+    text: string;
+  } | null>(null);
   if (!image) return null;
+  ratio.current ??= imageRatio(image);
 
   return (
     <Popup title={strings.imageProperties()} onClose={onClose}>
@@ -116,21 +128,31 @@ export function ImagePropertiesPopup(props: ImagePropertiesPopupProps) {
         <InlineInput
           label={strings.width()}
           type="number"
-          value={String(image.width || 0)}
+          value={
+            typing?.field === "width" ? typing.text : String(image.width || 0)
+          }
           containerProps={{ sx: { mr: 1 } }}
           onChangeText={(text) => {
-            const size = sizeForWidth(image, text);
+            setTyping({ field: "width", text });
+            const size = sizeForWidth(image, text, ratio.current ?? 0);
             if (size) editor.run(setImageSizeCommand(size));
           }}
+          onBlur={() => setTyping(null)}
         />
         <InlineInput
           label={strings.height()}
           type="number"
-          value={String(image.height || 0)}
+          value={
+            typing?.field === "height"
+              ? typing.text
+              : String(image.height || 0)
+          }
           onChangeText={(text) => {
-            const size = sizeForHeight(image, text);
+            setTyping({ field: "height", text });
+            const size = sizeForHeight(image, text, ratio.current ?? 0);
             if (size) editor.run(setImageSizeCommand(size));
           }}
+          onBlur={() => setTyping(null)}
         />
       </Flex>
     </Popup>
