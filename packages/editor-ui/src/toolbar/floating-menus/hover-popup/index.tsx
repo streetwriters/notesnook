@@ -106,6 +106,9 @@ export function HoverPopupHandler(props: HoverPopupProps) {
             const pos = editor.posAtElement?.(element);
             if (pos === undefined) return;
 
+            const node = editor.queries.read(q.nodeAt(pos));
+            if (!node) return;
+
             const hidePopup = showPopup({
               popup: () => (
                 <HoverPopupContent
@@ -118,7 +121,7 @@ export function HoverPopupHandler(props: HoverPopupProps) {
               blocking: false,
               focusOnRender: false,
               editor,
-              anchor: { range: { from: pos, to: pos + node.nodeSize } },
+              anchor: { range: { from: pos, to: node.to } },
               placement: "top-start"
             });
             activePopup.current = { element, hide: hidePopup };
