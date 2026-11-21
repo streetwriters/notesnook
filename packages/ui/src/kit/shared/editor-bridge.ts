@@ -158,6 +158,7 @@ export interface HostActionTarget {
     openAttachmentPicker?(type: "image" | "file" | "camera"): unknown;
     pasteFiles?(files: never[]): unknown;
     saveCsvFile?(csv: string, filename?: string): unknown;
+    reportError?(message: string): unknown;
   };
   onPreviewDocument?: (hash: string) => void;
   onAttachFiles?: (files: never[]) => void;
@@ -180,6 +181,7 @@ export function routeHostAction(
     files?: never[];
     openInNewTab?: boolean;
     csv?: string;
+    message?: string;
   };
   const host = target.host;
   switch (action.kind) {
@@ -205,6 +207,10 @@ export function routeHostAction(
     case "exportTableAsCsv":
       if (typeof p.csv !== "string" || !p.csv) return false;
       void host?.saveCsvFile?.(p.csv);
+      return true;
+    case "editorError":
+      if (typeof p.message !== "string" || !p.message) return false;
+      void host?.reportError?.(p.message);
       return true;
     case "pasteFiles":
       if (!p.files?.length) return false;
@@ -235,18 +241,25 @@ export interface PermissionClaims {
   outlineList: boolean;
   taskList: boolean;
   insertAttachment: boolean;
+  /** Pro-plan CSV features; a claim left out is allowed. */
+  importCsvToTable?: boolean;
+  exportTableAsCsv?: boolean;
 }
 
 const CLAIM_COMMANDS: readonly [keyof PermissionClaims, string][] = [
   ["callout", "setCallout"],
   ["outlineList", "toggleOutlineList"],
   ["taskList", "toggleTaskList"],
-  ["insertAttachment", "insertAttachment"]
+  ["insertAttachment", "insertAttachment"],
+  ["importCsvToTable", "importCsvToTable"],
+  ["exportTableAsCsv", "exportTableAsCsv"]
 ];
 
 /** The command ids the user's plan lacks, for `setDeniedPermissions`. */
 export function deniedPermissionIds(claims: PermissionClaims): string[] {
-  return CLAIM_COMMANDS.filter(([claim]) => !claims[claim]).map(([, id]) => id);
+  return CLAIM_COMMANDS.filter(([claim]) => claims[claim] === false).map(
+    ([, id]) => id
+  );
 }
 
 /** The command that sends the denied ids to the native editor. */

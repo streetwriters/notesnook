@@ -32,7 +32,9 @@ export function useDeniedPermissions(): string[] | undefined {
   const features = useAreFeaturesAvailable([
     "callout",
     "outlineList",
-    "taskList"
+    "taskList",
+    "importCsvToTable",
+    "exportTableAsCsv"
   ]);
   const isLoggedIn = useUserStore((state) => !!state.isLoggedIn);
 
@@ -43,7 +45,9 @@ export function useDeniedPermissions(): string[] | undefined {
             callout: !!features.callout?.isAllowed,
             outlineList: !!features.outlineList?.isAllowed,
             taskList: !!features.taskList?.isAllowed,
-            insertAttachment: isLoggedIn
+            insertAttachment: isLoggedIn,
+            importCsvToTable: !!features.importCsvToTable?.isAllowed,
+            exportTableAsCsv: !!features.exportTableAsCsv?.isAllowed
           })
         : undefined,
     [features, isLoggedIn]

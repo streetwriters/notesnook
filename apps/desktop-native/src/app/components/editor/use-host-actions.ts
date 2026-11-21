@@ -146,9 +146,12 @@ function appDeps(sessionId: string): HostActionDeps {
       let file: Awaited<ReturnType<typeof files.create>>;
       try {
         file = await files.create(filename);
-      } catch {
-        // The save dialog was dismissed.
-        return false;
+      } catch (e) {
+        // Only a dismissed save dialog is a cancel; any other failure
+        // (permissions, a full disk) must reach the user.
+        if (e instanceof Error && e.message === "No file was selected")
+          return false;
+        throw e;
       }
       try {
         await file.write(new TextEncoder().encode(text));

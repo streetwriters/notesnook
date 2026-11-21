@@ -93,6 +93,8 @@ export interface EditorHostActions {
   copyToClipboard?(text: string, html?: string): void | Promise<void>;
   /** Saves a table exported as CSV where the user chooses (a save dialog). */
   saveCsvFile?(csv: string, filename?: string): void | Promise<void>;
+  /** Shows a message for something the editor refused or could not do. */
+  reportError?(message: string): void;
 }
 
 export interface EditorHeading {

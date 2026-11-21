@@ -87,6 +87,12 @@ describe("link data and clipboard", () => {
     expect(deps.onError).toHaveBeenCalledWith("disk full");
   });
 
+  test("reportError shows the editor's message", () => {
+    const deps = makeDeps();
+    createEditorHostActions(deps).reportError!("too big");
+    expect(deps.onError).toHaveBeenCalledWith("too big");
+  });
+
   test("copyToClipboard reports a failure instead of throwing", async () => {
     const deps = makeDeps({
       writeToClipboard: vi.fn(async () => {

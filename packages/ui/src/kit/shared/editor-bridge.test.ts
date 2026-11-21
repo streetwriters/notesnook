@@ -161,6 +161,17 @@ describe("routeHostAction", () => {
     ).toBe(false);
   });
 
+  it("shows an editor error message through the host", () => {
+    const host = { reportError: vi.fn() };
+    expect(
+      routeHostAction(
+        { kind: "editorError", payload: { message: "too big" } },
+        { host }
+      )
+    ).toBe(true);
+    expect(host.reportError).toHaveBeenCalledWith("too big");
+  });
+
   it("ignores empty pastes and unknown actions", () => {
     const onAttachFiles = vi.fn();
     expect(
@@ -234,6 +245,16 @@ describe("denied permissions", () => {
 
   it("denies nothing when the plan allows everything", () => {
     expect(deniedPermissionIds(all)).toEqual([]);
+  });
+
+  it("denies the Pro CSV features by command id", () => {
+    expect(
+      deniedPermissionIds({
+        ...all,
+        importCsvToTable: false,
+        exportTableAsCsv: false
+      })
+    ).toEqual(["importCsvToTable", "exportTableAsCsv"]);
   });
 
   it("denies exactly the features the plan lacks, by command id", () => {

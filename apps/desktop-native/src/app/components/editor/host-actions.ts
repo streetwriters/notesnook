@@ -143,6 +143,10 @@ export function createEditorHostActions(
       }
     },
 
+    reportError(message) {
+      deps.onError(message);
+    },
+
     async saveCsvFile(csv, filename = "table.csv") {
       try {
         await deps.saveTextFile(filename, csv);
