@@ -17,80 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// The toolbar's tools, icons and presets are plain data owned by
+// `@notesnook/editor-ui` (`toolbar-data`); mobile reads the same data. These
+// files only re-export it, so there is one list to keep in step.
+import type {
+  ToolbarDefinition,
+  ToolbarGroupDefinition,
+  ToolId
+} from "@notesnook/editor-ui/toolbar-data/index.js";
 import type { IconNames } from "./toolbar-icons";
 
-export type ToolId =
-  | "bold"
-  | "italic"
-  | "underline"
-  | "strikethrough"
-  | "code"
-  | "codeRemove"
-  | "subscript"
-  | "superscript"
-  | "clearformatting"
-  | "addInternalLink"
-  | "addLink"
-  | "editLink"
-  | "removeLink"
-  | "copyLink"
-  | "linkSettings"
-  | "openLink"
-  | "insertBlock"
-  | "numberedList"
-  | "bulletList"
-  | "checkList"
-  | "fontSize"
-  | "fontFamily"
-  | "headings"
-  | "alignment"
-  | "textDirection"
-  | "textColor"
-  | "highlight"
-  | "math"
-  | "imageSettings"
-  | "imageAlignCenter"
-  | "imageAlignLeft"
-  | "imageAlignRight"
-  | "imageProperties"
-  | "embedAlignCenter"
-  | "embedAlignLeft"
-  | "embedAlignRight"
-  | "embedProperties"
-  | "embedSettings"
-  | "webclipFullScreen"
-  | "webclipOpenExternal"
-  | "webclipOpenSource"
-  | "webclipSettings"
-  | "previewAttachment"
-  | "attachmentSettings"
-  | "downloadAttachment"
-  | "removeAttachment"
-  | "tableSettings"
-  | "columnProperties"
-  | "rowProperties"
-  | "cellProperties"
-  | "insertColumnLeft"
-  | "insertColumnRight"
-  | "moveColumnLeft"
-  | "moveColumnRight"
-  | "deleteColumn"
-  | "splitCells"
-  | "mergeCells"
-  | "cellBackgroundColor"
-  | "cellBorderColor"
-  | "cellTextColor"
-  | "cellBorderWidth"
-  | "insertRowAbove"
-  | "insertRowBelow"
-  | "moveRowUp"
-  | "moveRowDown"
-  | "deleteRow"
-  | "deleteTable"
-  | "exportToCSV"
-  | "outdent"
-  | "indent"
-  | "none";
+export type { ToolbarDefinition, ToolbarGroupDefinition, ToolId };
 
 export type ToolDefinition = {
   icon: IconNames;
@@ -98,7 +35,3 @@ export type ToolDefinition = {
   conditional?: boolean;
   description?: string;
 };
-
-export type ToolbarGroupDefinition = (ToolId | ToolId[])[];
-
-export type ToolbarDefinition = ToolbarGroupDefinition[];

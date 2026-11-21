@@ -28,15 +28,18 @@ import {
   type ForwardRefExoticComponent,
   type RefAttributes
 } from "react";
-import type { PickedFile } from "@platform/files";
 import { files } from "../platform/files";
 import type * as Contract from "@notesnook/ui-kit/contracts/editor";
 import { Flex } from "@notesnook/ui-kit/desktop/primitives";
 import { useEditorThemeTokens } from "@notesnook/ui-kit/desktop/theme";
 import {
   EDITOR_QUERIES,
+  createAutoSaveGuard,
   dispatchQueryResults,
-  takeContent
+  focusPlan,
+  routeHostAction,
+  takeContent,
+  wordCount
 } from "@notesnook/ui-kit/shared/editor-bridge";
 import { ControllerToolbar } from "@notesnook/editor-ui/toolbar/toolbar.js";
 import {
@@ -111,6 +114,7 @@ export const EditorSurface = forwardRef<
   const selection = useRef<Contract.EditorSelection>({ from: 0, to: 0 });
   const unsaved = useRef<string | undefined>(undefined);
   const hidden = useRef(false);
+  const autoSave = useRef(createAutoSaveGuard()).current;
   const tokens = useEditorThemeTokens();
 
   const queries = useMemo(
@@ -168,23 +172,19 @@ export const EditorSurface = forwardRef<
   const load = useCallback(() => {
     const next = takeContent(unsaved, latest.current.content);
     html.current = next;
+    autoSave.reset();
     native.current?.setContent(next);
-  }, []);
+  }, [autoSave]);
 
   const handle = useMemo<Contract.EditorHandle>(
     () => ({
       focus: (options) => {
         const editor = native.current;
         if (!editor) return;
-        const position = options?.position;
-        if (typeof position === "object") {
-          editor.run({
-            name: "setTextSelection",
-            args: [{ from: position.from, to: position.to }]
-          });
-          selection.current = position;
-          editor.focus("end");
-        } else editor.focus(position ?? "end");
+        const plan = focusPlan(options?.position);
+        if (plan.commands.length) editor.run(plan.commands);
+        if (plan.selection) selection.current = plan.selection;
+        editor.focus(plan.focus);
       },
       undo: () => native.current?.run({ name: "undo" }),
       redo: () => native.current?.run({ name: "redo" }),
@@ -274,8 +274,17 @@ export const EditorSurface = forwardRef<
             queries.apply(changed);
             const next = dispatchQueryResults(changed, latest.current);
             if (next) selection.current = next;
+            const words = wordCount(changed);
+            if (words !== undefined && autoSave.update(words))
+              latest.current.onAutoSaveDisabled?.();
           }}
-          onContentChange={() => latest.current.onContentChange?.(html.current)}
+          onContentChange={() => {
+            // A hidden tab, a read-only view and a note too long to save
+            // automatically do not report edits (the web editor does the same).
+            if (hidden.current || latest.current.readonly || !autoSave.enabled)
+              return;
+            latest.current.onContentChange?.(html.current);
+          }}
           onSave={({ html: saved }) => {
             html.current = saved;
             latest.current.onSave?.(saved);
@@ -291,30 +300,7 @@ export const EditorSurface = forwardRef<
               .then((path) => native.current?.attachmentReady(id, path ?? null))
               .catch(() => native.current?.attachmentReady(id, null));
           }}
-          onHostAction={({ kind, payload }) => {
-            const p = (payload ?? {}) as {
-              hash?: string;
-              url?: string;
-              type?: string;
-              files?: PickedFile[];
-              openInNewTab?: boolean;
-            };
-            const host = latest.current.host;
-            if (kind === "previewAttachment" && p.hash) {
-              if (host?.previewAttachment)
-                void host.previewAttachment({ hash: p.hash, type: p.type });
-              else latest.current.onPreviewDocument?.(p.hash);
-            } else if (kind === "downloadAttachment" && p.hash)
-              void host?.downloadAttachment?.({ hash: p.hash });
-            else if (kind === "openLink" && p.url)
-              void host?.openLink?.(p.url, p.openInNewTab);
-            else if (kind === "openAttachmentPicker")
-              void host?.openAttachmentPicker?.(
-                p.type === "file" || p.type === "camera" ? p.type : "image"
-              );
-            else if (kind === "pasteFiles" && p.files?.length)
-              void host?.pasteFiles?.(p.files);
-          }}
+          onHostAction={(action) => routeHostAction(action, latest.current)}
         />
       ) : null}
     </Flex>
