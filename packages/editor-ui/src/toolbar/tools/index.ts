@@ -80,6 +80,14 @@ import {
   ExportToCSV
 } from "./table.js";
 
+import {
+  ImageSettings,
+  ImageAlignLeft,
+  ImageAlignCenter,
+  ImageAlignRight,
+  ImageProperties
+} from "./controller-image.js";
+
 export type { ToolId };
 
 const none = () => null;
@@ -137,6 +145,11 @@ const tools: Partial<Record<ToolId, React.FunctionComponent<ToolProps>>> = {
   deleteRow: DeleteRow,
   deleteTable: DeleteTable,
   exportToCSV: ExportToCSV,
+  imageSettings: ImageSettings,
+  imageAlignLeft: ImageAlignLeft,
+  imageAlignCenter: ImageAlignCenter,
+  imageAlignRight: ImageAlignRight,
+  imageProperties: ImageProperties,
   none
 };
 
