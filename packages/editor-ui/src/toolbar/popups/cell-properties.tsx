@@ -26,6 +26,10 @@ import { Popup } from "../components/popup.js";
 import { Icons } from "../icons.js";
 import { ColorPicker } from "./color-picker.js";
 import { strings } from "@notesnook/intl";
+import {
+  setCellAttributeCommand,
+  type CellPropertyAttribute
+} from "./cell-properties-commands.js";
 
 type CellPropertiesProps = { editor: EditorController; onClose: () => void };
 export function CellProperties(props: CellPropertiesProps) {
@@ -35,8 +39,10 @@ export function CellProperties(props: CellPropertiesProps) {
     color?: string;
     borderColor?: string;
   };
-  const setAttribute = (name: string, value: string | undefined) =>
-    editor.run({ name: "setCellAttribute", args: [name, value] });
+  const setAttribute = (
+    name: CellPropertyAttribute,
+    value: string | undefined
+  ) => editor.run(setCellAttributeCommand(name, value));
   return (
     <Popup title={strings.cellProperties()} onClose={onClose}>
       <Tabs activeIndex={0}>
