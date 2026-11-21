@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { updateNoteWidgets } from "../services/widgets/update-widgets";
+import {
+  updateNoteWidgets,
+  WidgetRefresh
+} from "../services/widgets/update-widgets";
 import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
@@ -599,6 +602,7 @@ export const useAppEvents = () => {
     // first launch afterwards is the earliest chance to put them right.
     updateNoteWidgets();
     WidgetTheme.watch();
+    WidgetRefresh.watch();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;
