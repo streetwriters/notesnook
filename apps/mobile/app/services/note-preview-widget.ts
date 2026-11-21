@@ -67,6 +67,24 @@ async function updateIOSNotes() {
 
 let timer: NodeJS.Timeout;
 export const NotePreviewWidget = {
+  /**
+   * Empties every note preview widget. updateNotes() skips notes that no longer
+   * exist, which leaves their stored content showing, so this is for when all of
+   * the notes are gone (logout).
+   */
+  clear: async () => {
+    try {
+      if (Platform.OS === "ios") {
+        publishIOSNotes([]);
+      } else if (Platform.OS === "android") {
+        for (const id of await NotesnookModule.getWidgetNotes()) {
+          NotesnookModule.updateWidgetNote(id, "");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to clear note preview widgets:", err);
+    }
+  },
   updateNotes: () => {
     if (Platform.OS !== "android" && Platform.OS !== "ios") return;
     clearTimeout(timer);
