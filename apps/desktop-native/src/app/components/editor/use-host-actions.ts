@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo } from "react";
-import { shell } from "@platform";
+import { files, shell } from "@platform";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
 import { handleInternalLink } from "../../common";
@@ -142,6 +142,23 @@ function appDeps(sessionId: string): HostActionDeps {
         "text/plain": text,
         ...(html ? { "text/html": html } : {})
       }),
+    async saveTextFile(filename, text) {
+      let file: Awaited<ReturnType<typeof files.create>>;
+      try {
+        file = await files.create(filename);
+      } catch {
+        // The save dialog was dismissed.
+        return false;
+      }
+      try {
+        await file.write(new TextEncoder().encode(text));
+        await file.close();
+        return true;
+      } catch (e) {
+        await file.abort();
+        throw e;
+      }
+    },
     decryptAttachmentToTempFile,
     removeTempFile,
     onError: (message) => showToast("error", message)

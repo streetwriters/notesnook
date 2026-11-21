@@ -144,6 +144,23 @@ describe("routeHostAction", () => {
     expect(host.pasteFiles).toHaveBeenCalledWith(files);
   });
 
+  it("hands an exported table's CSV to the host to save", () => {
+    const host = { saveCsvFile: vi.fn() };
+    expect(
+      routeHostAction(
+        { kind: "exportTableAsCsv", payload: { csv: "a,b\r\n1,2" } },
+        { host }
+      )
+    ).toBe(true);
+    expect(host.saveCsvFile).toHaveBeenCalledWith("a,b\r\n1,2");
+    expect(
+      routeHostAction(
+        { kind: "exportTableAsCsv", payload: { csv: "" } },
+        { host }
+      )
+    ).toBe(false);
+  });
+
   it("ignores empty pastes and unknown actions", () => {
     const onAttachFiles = vi.fn();
     expect(

@@ -91,6 +91,8 @@ export interface EditorHostActions {
   >;
   /** Puts text (and optionally HTML) on the clipboard. */
   copyToClipboard?(text: string, html?: string): void | Promise<void>;
+  /** Saves a table exported as CSV where the user chooses (a save dialog). */
+  saveCsvFile?(csv: string, filename?: string): void | Promise<void>;
 }
 
 export interface EditorHeading {

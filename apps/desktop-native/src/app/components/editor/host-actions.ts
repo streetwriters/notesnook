@@ -57,6 +57,8 @@ export interface HostActionDeps {
   ): ReturnType<NonNullable<EditorHostActions["getLinkData"]>>;
   /** Puts text, and optionally HTML, on the clipboard. */
   writeToClipboard(text: string, html?: string): Promise<void>;
+  /** Writes text to a file the user picks in a save dialog; false if they cancel. */
+  saveTextFile(filename: string, text: string): Promise<boolean>;
   onError(message: string): void;
 }
 
@@ -136,6 +138,14 @@ export function createEditorHostActions(
     async copyToClipboard(text, html) {
       try {
         await deps.writeToClipboard(text, html);
+      } catch (e) {
+        deps.onError(e instanceof Error ? e.message : String(e));
+      }
+    },
+
+    async saveCsvFile(csv, filename = "table.csv") {
+      try {
+        await deps.saveTextFile(filename, csv);
       } catch (e) {
         deps.onError(e instanceof Error ? e.message : String(e));
       }

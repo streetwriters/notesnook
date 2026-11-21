@@ -157,6 +157,7 @@ export interface HostActionTarget {
     openLink?(url: string, openInNewTab?: boolean): unknown;
     openAttachmentPicker?(type: "image" | "file" | "camera"): unknown;
     pasteFiles?(files: never[]): unknown;
+    saveCsvFile?(csv: string, filename?: string): unknown;
   };
   onPreviewDocument?: (hash: string) => void;
   onAttachFiles?: (files: never[]) => void;
@@ -178,6 +179,7 @@ export function routeHostAction(
     type?: string;
     files?: never[];
     openInNewTab?: boolean;
+    csv?: string;
   };
   const host = target.host;
   switch (action.kind) {
@@ -199,6 +201,10 @@ export function routeHostAction(
       void host?.openAttachmentPicker?.(
         p.type === "file" || p.type === "camera" ? p.type : "image"
       );
+      return true;
+    case "exportTableAsCsv":
+      if (typeof p.csv !== "string" || !p.csv) return false;
+      void host?.saveCsvFile?.(p.csv);
       return true;
     case "pasteFiles":
       if (!p.files?.length) return false;
@@ -240,9 +246,7 @@ const CLAIM_COMMANDS: readonly [keyof PermissionClaims, string][] = [
 
 /** The command ids the user's plan lacks, for `setDeniedPermissions`. */
 export function deniedPermissionIds(claims: PermissionClaims): string[] {
-  return CLAIM_COMMANDS.filter(([claim]) => !claims[claim]).map(
-    ([, id]) => id
-  );
+  return CLAIM_COMMANDS.filter(([claim]) => !claims[claim]).map(([, id]) => id);
 }
 
 /** The command that sends the denied ids to the native editor. */

@@ -37,6 +37,7 @@ function makeDeps(overrides: Partial<HostActionDeps> = {}) {
     pickInternalLink: vi.fn(async () => ({ href: "nn://note/1", title: "T" })),
     lookupLink: vi.fn(async () => undefined),
     writeToClipboard: vi.fn(async () => {}),
+    saveTextFile: vi.fn(async () => true),
     decryptAttachmentToTempFile: vi.fn(async (hash) => `/tmp/dec-${hash}`),
     removeTempFile: vi.fn(async () => {}),
     onError: vi.fn(),
@@ -68,6 +69,22 @@ describe("link data and clipboard", () => {
     const deps = makeDeps();
     await createEditorHostActions(deps).copyToClipboard!("a", "<b>a</b>");
     expect(deps.writeToClipboard).toHaveBeenCalledWith("a", "<b>a</b>");
+  });
+
+  test("saveCsvFile writes the CSV to the chosen file, table.csv by default", async () => {
+    const deps = makeDeps();
+    await createEditorHostActions(deps).saveCsvFile!("a,b\r\n1,2");
+    expect(deps.saveTextFile).toHaveBeenCalledWith("table.csv", "a,b\r\n1,2");
+  });
+
+  test("saveCsvFile reports a failure instead of throwing", async () => {
+    const deps = makeDeps({
+      saveTextFile: vi.fn(async () => {
+        throw new Error("disk full");
+      })
+    });
+    await createEditorHostActions(deps).saveCsvFile!("a");
+    expect(deps.onError).toHaveBeenCalledWith("disk full");
   });
 
   test("copyToClipboard reports a failure instead of throwing", async () => {
