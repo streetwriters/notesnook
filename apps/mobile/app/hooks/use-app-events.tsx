@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   updateListWidgets,
-  updateNoteWidgets
+  updateNoteWidgets,
+  WidgetRefresh
 } from "../services/widgets/update-widgets";
 import { NotePreviewWidget } from "../services/note-preview-widget";
 import { isFeatureAvailable } from "@notesnook/common";
@@ -607,6 +608,7 @@ export const useAppEvents = () => {
     // first launch afterwards is the earliest chance to put them right.
     updateNoteWidgets();
     WidgetTheme.watch();
+    WidgetRefresh.watch();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;
