@@ -31,10 +31,24 @@ const SHARED = [
 export default defineConfig({
   resolve: {
     mainFields: ["module", "jsnext:main", "jsnext"],
-    alias: SHARED.map((name) => ({
-      find: name,
-      replacement: path.resolve(__dirname, "node_modules", name)
-    }))
+    alias: [
+      // the editor UI's web target of the `@ui` contracts, as in apps/web
+      {
+        find: /^@ui$/,
+        replacement: path.resolve(__dirname, "../ui/src/kit/web/index.ts")
+      },
+      {
+        find: /^@platform$/,
+        replacement: path.resolve(
+          __dirname,
+          "../ui/src/kit/web/embedded-platform.ts"
+        )
+      },
+      ...SHARED.map((name) => ({
+        find: name,
+        replacement: path.resolve(__dirname, "node_modules", name)
+      }))
+    ]
   },
   test: {
     alias: {
