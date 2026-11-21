@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Editor } from "../../types.js";
+import type { EditorController } from "../../controller.js";
 import type { MenuButtonItem } from "@ui";
 import { ToolButton } from "../components/tool-button.js";
-import { ToolDefinition, TiptapToolProps } from "../types.js";
+import { ToolDefinition, ToolProps } from "../types.js";
 import { IconNames, Icons } from "../icons.js";
 
 export function menuButtonToTool(
-  constructItem: (editor: Editor) => MenuButtonItem
+  constructItem: (editor: EditorController) => MenuButtonItem
 ) {
-  return function Tool(props: TiptapToolProps & { icon: IconNames }) {
+  return function Tool(props: ToolProps & { icon: IconNames }) {
     const item = constructItem(props.editor);
     return (
       <ToolButton

@@ -63,9 +63,14 @@ export function ControllerToolbar(props: ControllerToolbarProps) {
   } = props;
   const isMobile = useIsMobile();
   const isEditable = useEditorQuery(editor, q.editable(), true);
+  // Only the read-only mobile toolbar looks at this. Elsewhere the query is
+  // swapped for one that never changes mid-edit, so entering a link or an
+  // image does not re-render the whole toolbar.
   const hasReadonlyNode = useEditorQuery(
     editor,
-    q.isActive(READONLY_MOBILE_TOOLBAR_NODES),
+    isMobile && !isEditable
+      ? q.isActive(READONLY_MOBILE_TOOLBAR_NODES)
+      : q.editable(),
     false
   );
   const toolbarTools = useMemo(
@@ -130,7 +135,10 @@ export function ControllerToolbar(props: ControllerToolbarProps) {
                 sx={
                   index === toolbarTools.length - 1
                     ? undefined
-                    : { borderRight: "1px solid", borderRightColor: "separator" }
+                    : {
+                        borderRight: "1px solid",
+                        borderRightColor: "separator"
+                      }
                 }
               />
             );

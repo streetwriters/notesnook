@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { q, useEditorQuery } from "../../queries/index.js";
-import { Editor } from "../../types.js";
+import { q } from "../../queries/queries.js";
+import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
+import type { EditorController } from "../../controller.js";
 import { Box, Icon } from "@ui";
 import { Tab, Tabs } from "../../components/tabs/index.js";
 import { Popup } from "../components/popup.js";
@@ -26,10 +27,16 @@ import { Icons } from "../icons.js";
 import { ColorPicker } from "./color-picker.js";
 import { strings } from "@notesnook/intl";
 
-type CellPropertiesProps = { editor: Editor; onClose: () => void };
+type CellPropertiesProps = { editor: EditorController; onClose: () => void };
 export function CellProperties(props: CellPropertiesProps) {
   const { editor, onClose } = props;
-  const attributes = useEditorQuery(editor, q.attributes("tableCell"), {});
+  const attributes = useEditorQuery(editor, q.attributes("tableCell"), {}) as {
+    backgroundColor?: string;
+    color?: string;
+    borderColor?: string;
+  };
+  const setAttribute = (name: string, value: string | undefined) =>
+    editor.run({ name: "setCellAttribute", args: [name, value] });
   return (
     <Popup title={strings.cellProperties()} onClose={onClose}>
       <Tabs activeIndex={0}>
@@ -46,12 +53,8 @@ export function CellProperties(props: CellPropertiesProps) {
           <ColorPicker
             expanded={true}
             color={attributes.backgroundColor}
-            onChange={(color) =>
-              editor.commands.setCellAttribute("backgroundColor", color)
-            }
-            onClear={() =>
-              editor.commands.setCellAttribute("backgroundColor", undefined)
-            }
+            onChange={(color) => setAttribute("backgroundColor", color)}
+            onClear={() => setAttribute("backgroundColor", undefined)}
           />
         </Tab>
         <Tab
@@ -67,10 +70,8 @@ export function CellProperties(props: CellPropertiesProps) {
           <ColorPicker
             expanded={true}
             color={attributes.color}
-            onChange={(color) =>
-              editor.commands.setCellAttribute("color", color)
-            }
-            onClear={() => editor.commands.setCellAttribute("color", undefined)}
+            onChange={(color) => setAttribute("color", color)}
+            onClear={() => setAttribute("color", undefined)}
           />
         </Tab>
         <Tab
@@ -86,12 +87,8 @@ export function CellProperties(props: CellPropertiesProps) {
           <ColorPicker
             expanded={true}
             color={attributes.borderColor}
-            onChange={(color) =>
-              editor.commands.setCellAttribute("borderColor", color)
-            }
-            onClear={() =>
-              editor.commands.setCellAttribute("borderColor", undefined)
-            }
+            onChange={(color) => setAttribute("borderColor", color)}
+            onClear={() => setAttribute("borderColor", undefined)}
           />
         </Tab>
       </Tabs>

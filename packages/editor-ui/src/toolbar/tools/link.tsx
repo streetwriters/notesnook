@@ -17,8 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { q, useEditorQuery } from "../../queries/index.js";
-import { TiptapToolProps as ToolProps } from "../types.js";
+import { q, findOffsetMark, type NodeOffset } from "../../queries/queries.js";
+import {
+  useControllerQuery as useEditorQuery,
+  useControllerQueryReader
+} from "../../queries/use-query.js";
+import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useEffect, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
@@ -29,9 +33,6 @@ import {
 } from "../popups/link-popup.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { MoreTools } from "../components/more-tools.js";
-import { useRefValue } from "../../hooks/use-ref-value.js";
-import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
-import { dataColor, Flex, Icon, Link, Text } from "@ui";
 import { NODE_NAMES } from "../../extension-types.js";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 import { strings } from "@notesnook/intl";
@@ -39,12 +40,34 @@ import { find } from "linkifyjs";
 import { Icons } from "../icons.js";
 import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
 import { LinkData } from "../../types.js";
-import { callHostAction } from "../../host.js";
-import { useTiptapController } from "./tiptap-only.js";
+import { callHostAction, getHostAction } from "../../host.js";
+import { Flex, Icon, Link, Text, dataColor } from "@ui";
+
+/**
+ * The link the tool acts on: the node the hover popup is over, otherwise the
+ * text run under the selection. Both are plain data read through the
+ * controller, so the tools work the same on every engine.
+ */
+function useLinkTarget(props: ToolProps) {
+  const { editor } = props;
+  const { selectedNode: hovered, hide } = useHoverPopupContext();
+  // The offset moves with every caret step, so it is only read when a button
+  // is pressed. What the tool renders from is the link's own attributes,
+  // which stay the same while the caret moves.
+  const readOffset = useControllerQueryReader(editor, q.selectionOffset());
+  const attributes = useEditorQuery(editor, q.attributes(NODE_NAMES.link), {});
+  const link = findOffsetMark(hovered, NODE_NAMES.link);
+  return {
+    hide,
+    hovered,
+    getTarget: (): NodeOffset | undefined =>
+      hovered ?? readOffset() ?? undefined,
+    attributes: (link?.attrs ?? attributes) as { href?: string }
+  };
+}
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
-  const controller = useTiptapController(props);
   const isActive = useEditorQuery(editor, q.isActive("link"), false);
   const isEditable = useEditorQuery(editor, q.editable(), true);
   const isBottom = useToolbarLocation() === "bottom";
@@ -53,7 +76,6 @@ export function LinkSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
-      controller={controller}
       autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
@@ -70,18 +92,17 @@ export function AddLink(props: ToolProps) {
   const { editor } = props;
 
   const isActive = useEditorQuery(editor, q.isActive("link"), false);
+  const readSelectedText = useControllerQueryReader(editor, q.selectedText());
 
   if (isActive) return <EditLink {...props} icon={"linkEdit"} />;
   return (
     <LinkTool
       {...props}
-      onDone={(attributes) => editor.commands.toggleLink(attributes)}
+      onDone={(attributes) =>
+        editor.run({ name: "toggleLink", args: [attributes] })
+      }
       onClick={() => {
-        if (!editor) return;
-        const selectedText = editor.state.doc.textBetween(
-          editor.state.selection.from,
-          editor.state.selection.to
-        );
+        const selectedText = readSelectedText() ?? "";
         const href =
           find(selectedText).find(
             (item) => item.isLink && item.href === selectedText
@@ -95,6 +116,7 @@ export function AddLink(props: ToolProps) {
 export function AddInternalLink(props: ToolProps) {
   const { editor } = props;
   const isActive = useEditorQuery(editor, q.isActive(NODE_NAMES.link), false);
+  const readSelectedText = useControllerQueryReader(editor, q.selectedText());
 
   return (
     <ToolButton
@@ -102,14 +124,13 @@ export function AddInternalLink(props: ToolProps) {
       title={props.title}
       disabled={isActive}
       onClick={async () => {
-        const link = await editor.storage.createInternalLink?.();
+        const selectedText = readSelectedText() ?? "";
+        const link = await getHostAction(editor, "createInternalLink")?.();
         if (!link) return;
-
-        const selectedText = editor.state.doc.textBetween(
-          editor.state.selection.from,
-          editor.state.selection.to
-        );
-        editor.commands.setLink({ ...link, title: selectedText || link.title });
+        editor.run({
+          name: "setLink",
+          args: [{ ...link, title: selectedText || link.title }]
+        });
       }}
     />
   );
@@ -117,81 +138,98 @@ export function AddInternalLink(props: ToolProps) {
 
 export function EditLink(props: ToolProps) {
   const { editor } = props;
-  const linkAttributes = useEditorQuery(
-    editor,
-    q.attributes(NODE_NAMES.link),
-    {}
-  );
   const isEditable = useEditorQuery(editor, q.editable(), true);
-  const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
-  const selectedNode = useRefValue(
-    _selectedNode || selectionToOffset(editor.state)
+  const readLinkText = useControllerQueryReader(
+    editor,
+    q.selectedText(NODE_NAMES.link)
   );
-  const { node } = _selectedNode || {};
-  const link = node ? findMark(node, NODE_NAMES.link) : null;
-  const attrs = link?.attrs || linkAttributes;
+  const { hide, hovered, getTarget, attributes } = useLinkTarget(props);
 
   if (!isEditable) return null;
-  if (attrs && isInternalLink(attrs.href))
+  if (isInternalLink(attributes.href))
     return (
-      <ToolButton
-        icon={props.icon}
-        title={props.title}
-        onClick={async () => {
-          hide();
-          const link = await editor.storage.createInternalLink?.();
-          if (!link) return;
-          const { from, to } = editor.state.selection;
-          if (selectedNode.current)
-            editor.commands.setTextSelection(selectedNode.current);
-
-          const selectedText =
-            !!selectedNode.current &&
-            editor.state.doc.textBetween(
-              selectedNode.current.from,
-              selectedNode.current.to
-            );
-          editor.commands.setLink({
-            ...link,
-            title: selectedText || link.title
-          });
-          if (selectedNode.current)
-            editor.commands.setTextSelection({ from, to });
-        }}
+      <EditInternalLink
+        {...props}
+        href={attributes.href as string}
+        getTarget={getTarget}
+        hide={hide}
       />
     );
 
   return (
     <LinkTool
-      editor={props.editor}
-      controller={props.controller}
-      icon={props.icon}
-      title={props.title}
+      {...props}
       isEditing
-      onDone={(attributes) => {
-        editor.chain().focus().extendMarkRange("link").run();
-        editor.commands.setLink(attributes);
+      onDone={(link) => {
+        editor.run(
+          { name: "extendMarkRange", args: [NODE_NAMES.link] },
+          { name: "setLink", args: [link] }
+        );
         hide();
       }}
       onClick={() => {
-        editor.commands.extendMarkRange("link");
+        // read before the link under the caret becomes the selection
+        const linkText = readLinkText() ?? "";
+        const target = getTarget();
+        // the link under the caret becomes the selection, as it always has,
+        // so the popup and the save both act on the whole link
+        editor.run({ name: "extendMarkRange", args: [NODE_NAMES.link] });
 
-        const href = attrs?.href;
+        const href = attributes.href;
         if (!href) return;
 
-        const selectedText =
-          editor.state.doc.textBetween(
-            editor.state.selection.from,
-            editor.state.selection.to
-          ) ||
-          selectedNode.current?.node?.textContent ||
-          editor.state.selection.$from.nodeBefore?.textContent ||
-          "";
+        const title = hovered?.text || linkText || target?.text || "";
+        return { title, href };
+      }}
+    />
+  );
+}
 
-        return {
-          title: selectedText,
+function EditInternalLink(
+  props: ToolProps & {
+    href: string;
+    getTarget: () => NodeOffset | undefined;
+    hide: () => void;
+  }
+) {
+  const { editor, href, getTarget, hide } = props;
+  const readSelection = useControllerQueryReader(editor, q.selection());
+
+  return (
+    <ToolButton
+      icon={props.icon}
+      title={props.title}
+      onClick={async () => {
+        const node = getTarget();
+        const caret = readSelection();
+        hide();
+        const link = await getHostAction(
+          editor,
+          "createInternalLink"
+        )?.({
           href
-        };
+        });
+        if (!link) return;
+        const title = (node && node.text) || link.title;
+        editor.run(
+          ...(node
+            ? [
+                {
+                  name: "setTextSelection",
+                  args: [{ from: node.from, to: node.to }]
+                }
+              ]
+            : []),
+          { name: "setLink", args: [{ ...link, title }] },
+          ...(node && caret
+            ? [
+                {
+                  name: "setTextSelection",
+                  args: [{ from: caret.from, to: caret.to }]
+                }
+              ]
+            : [])
+        );
       }}
     />
   );
@@ -208,12 +246,17 @@ export function RemoveLink(props: ToolProps) {
       title={props.title}
       toggled={false}
       onClick={() => {
-        if (selectedNode)
-          editor.commands.setTextSelection({
-            from: selectedNode.from,
-            to: selectedNode.to
-          });
-        editor.chain().focus().unsetLink().run();
+        editor.run(
+          ...(selectedNode
+            ? [
+                {
+                  name: "setTextSelection",
+                  args: [{ from: selectedNode.from, to: selectedNode.to }]
+                }
+              ]
+            : []),
+          { name: "unsetLink" }
+        );
         hide();
       }}
     />
@@ -222,18 +265,8 @@ export function RemoveLink(props: ToolProps) {
 
 export function OpenLink(props: ToolProps) {
   const { editor } = props;
-  const linkAttributes = useEditorQuery(
-    editor,
-    q.attributes(NODE_NAMES.link),
-    {}
-  );
-  const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
-  const selectedNode = useRefValue(
-    _selectedNode || selectionToOffset(editor.state)
-  );
-  const { node } = selectedNode.current || {};
-  const link = node ? findMark(node, "link") : null;
-  const href = link?.attrs.href ?? (linkAttributes.href as string) ?? null;
+  const { hide, attributes } = useLinkTarget(props);
+  const href = attributes.href ?? null;
   const [loading, setLoading] = useState(false);
   const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
 
@@ -243,14 +276,14 @@ export function OpenLink(props: ToolProps) {
     (async () => {
       try {
         setLoading(true);
-        const result = await editor.storage.getLinkData?.(href);
+        const result = await getHostAction(editor, "getLinkData")?.(href);
         setLinkData(result);
         setLoading(false);
       } catch (e) {
         setLoading(false);
       }
     })();
-  }, [href]);
+  }, [href, editor]);
 
   if (!href) return null;
 
@@ -301,18 +334,8 @@ export function OpenLink(props: ToolProps) {
 
 export function CopyLink(props: ToolProps) {
   const { editor } = props;
-  const linkAttributes = useEditorQuery(
-    editor,
-    q.attributes(NODE_NAMES.link),
-    {}
-  );
-  const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
-  const selectedNode = useRefValue(
-    _selectedNode || selectionToOffset(editor.state)
-  );
-  const { node } = selectedNode.current || {};
-  const link = node ? findMark(node, "link") : null;
-  const href = link?.attrs.href ?? (linkAttributes.href as string) ?? null;
+  const { hide, attributes } = useLinkTarget(props);
+  const href = attributes.href ?? null;
   if (!href) return null;
 
   return (
@@ -321,15 +344,17 @@ export function CopyLink(props: ToolProps) {
       toggled={false}
       onClick={async () => {
         const linkData = isInternalLink(href)
-          ? await editor.storage.getLinkData?.(href)
+          ? await getHostAction(editor, "getLinkData")?.(href)
           : undefined;
         if (linkData?.title) {
-          editor.storage.copyToClipboard?.(
+          callHostAction(
+            editor,
+            "copyToClipboard",
             href,
             `<a href="${href}">${linkData.title}</a>`
           );
         } else {
-          editor.storage.copyToClipboard?.(href);
+          callHostAction(editor, "copyToClipboard", href);
         }
         hide();
       }}
@@ -377,7 +402,7 @@ function LinkTool(props: LinkToolProps) {
         items={[]}
         onClose={() => {
           setIsOpen(false);
-          editor.commands.focus();
+          editor.run({ name: "focus" });
         }}
         focusOnRender={false}
       >

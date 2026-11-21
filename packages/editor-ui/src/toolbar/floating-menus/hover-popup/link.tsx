@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolbarGroup } from "../../tiptap.js";
-import { HoverPopupProps } from "./index.js";
+import { ControllerToolbarGroup } from "../../components/toolbar-group.js";
+import { findOffsetMark } from "../../../queries/queries.js";
+import type { HoverPopupProps } from "./index.js";
 import { useHoverPopupContext } from "./context.js";
 import { ToolbarGroupDefinition } from "../../types.js";
 
@@ -31,17 +32,12 @@ const LINK_TOOLS: ToolbarGroupDefinition = [
 function LinkHoverPopup(props: HoverPopupProps) {
   const { editor } = props;
   const { selectedNode } = useHoverPopupContext();
-  const { node } = selectedNode || {};
 
-  if (
-    !node?.isText ||
-    node.marks.length <= 0 ||
-    !node.marks.some((mark) => mark.type.name === "link")
-  )
+  if (!selectedNode?.isText || !findOffsetMark(selectedNode, "link"))
     return null;
 
   return (
-    <ToolbarGroup
+    <ControllerToolbarGroup
       force
       tools={LINK_TOOLS}
       groupId={"linkHoverTools"}

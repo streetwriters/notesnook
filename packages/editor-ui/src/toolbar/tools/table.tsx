@@ -17,24 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { q, useEditorQuery } from "../../queries/index.js";
-import { TiptapToolProps as ToolProps } from "../types.js";
-import { Editor } from "../../types.js";
+import { q } from "../../queries/queries.js";
+import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
+import { ToolProps } from "../types.js";
+import type { EditorController } from "../../controller.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import type { MenuButtonItem, MenuItem, UIElement } from "@ui";
-import { tableActions } from "../../table-actions.js";
-
-const {
-  moveColumnLeft: moveColumnLeftAction,
-  moveColumnRight: moveColumnRightAction,
-  moveRowDown: moveRowDownAction,
-  moveRowUp: moveRowUpAction,
-  selectColumn,
-  selectRow,
-  exportToCSV: exportToCsvAction
-} = tableActions;
 import { MoreTools } from "../components/more-tools.js";
 import { menuButtonToTool, toolToMenuButton } from "./utils.js";
 import { getToolDefinition } from "../tool-definitions.js";
@@ -45,11 +35,9 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { strings } from "@notesnook/intl";
-import { useTiptapController } from "./tiptap-only.js";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
-  const controller = useTiptapController(props);
   const isTable = useEditorQuery(editor, q.isActive("table"), false);
   const isBottom = useToolbarLocation() === "bottom";
   if (!isTable || !isBottom) return null;
@@ -57,7 +45,6 @@ export function TableSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
-      controller={controller}
       autoCloseOnUnmount
       popupId="tableSettings"
       tools={[
@@ -207,7 +194,6 @@ export function TableProperties(props: ToolProps) {
 
 export function CellProperties(props: ToolProps) {
   const { editor } = props;
-  const controller = useTiptapController(props);
   const isTable = useEditorQuery(editor, q.isActive("table"), false);
   const isBottom = useToolbarLocation() === "bottom";
   if (!isTable || !isBottom) return null;
@@ -216,7 +202,6 @@ export function CellProperties(props: ToolProps) {
     <>
       <MoreTools
         {...props}
-        controller={controller}
         popupId="cellProperties"
         tools={[
           "mergeCells",
@@ -231,6 +216,12 @@ export function CellProperties(props: ToolProps) {
   );
 }
 
+const setCellAttribute = (
+  editor: EditorController,
+  name: string,
+  value: unknown
+) => editor.run({ name: "setCellAttribute", args: [name, value] });
+
 export function CellBackgroundColor(props: ToolProps) {
   const { editor } = props;
   const cell = useEditorQuery(editor, q.attributes("tableCell"), {});
@@ -238,13 +229,12 @@ export function CellBackgroundColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      editor={useTiptapController(props)}
       cacheKey="cellBackgroundColor"
-      activeColor={cell.backgroundColor}
+      activeColor={cell.backgroundColor as string | undefined}
       title={strings.cellBackgroundColor()}
       type="background"
       onColorChange={(color) =>
-        editor.chain().setCellAttribute("backgroundColor", color).run()
+        setCellAttribute(editor, "backgroundColor", color)
       }
     />
   );
@@ -257,14 +247,11 @@ export function CellTextColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      editor={useTiptapController(props)}
       cacheKey="cellTextColor"
       type="text"
-      activeColor={cell.color}
+      activeColor={cell.color as string | undefined}
       title={strings.cellTextColor()}
-      onColorChange={(color) =>
-        editor.chain().focus().setCellAttribute("color", color).run()
-      }
+      onColorChange={(color) => setCellAttribute(editor, "color", color)}
     />
   );
 }
@@ -276,14 +263,11 @@ export function CellBorderColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      editor={useTiptapController(props)}
       cacheKey="cellBorderColor"
-      activeColor={cell.borderColor}
+      activeColor={cell.borderColor as string | undefined}
       type="border"
       title={strings.cellBorderColor()}
-      onColorChange={(color) =>
-        editor.chain().focus().setCellAttribute("borderColor", color).run()
-      }
+      onColorChange={(color) => setCellAttribute(editor, "borderColor", color)}
     />
   );
 }
@@ -294,7 +278,7 @@ export function CellBorderWidth(props: ToolProps) {
     editor,
     q.attributes("tableCell"),
     {}
-  );
+  ) as { borderWidth?: string | number };
   const borderWidth: number = _borderWidth
     ? typeof _borderWidth === "string"
       ? parseInt(_borderWidth)
@@ -314,107 +298,98 @@ export function CellBorderWidth(props: ToolProps) {
     <Counter
       title={strings.cellBorderWidth()}
       onDecrease={() =>
-        editor.commands.setCellAttribute("borderWidth", decreaseBorderWidth())
+        setCellAttribute(editor, "borderWidth", decreaseBorderWidth())
       }
       onIncrease={() =>
-        editor.commands.setCellAttribute("borderWidth", increaseBorderWidth())
+        setCellAttribute(editor, "borderWidth", increaseBorderWidth())
       }
-      onReset={() => editor.commands.setCellAttribute("borderWidth", 1)}
+      onReset={() => setCellAttribute(editor, "borderWidth", 1)}
       value={borderWidth + "px"}
     />
   );
 }
 
-const insertColumnLeft = (editor: Editor): MenuButtonItem => ({
+const insertColumnLeft = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertColumnLeft")),
   onClick: () =>
-    editor
-      .chain()
-      .focus()
-      .addColumnBefore()
-      .command(({ tr, state }) => selectColumn(tr, state, "prev"))
-      .run()
+    editor.run(
+      { name: "addColumnBefore" },
+      { name: "selectTableColumn", args: ["prev"] }
+    )
 });
 
-const insertColumnRight = (editor: Editor): MenuButtonItem => ({
+const insertColumnRight = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertColumnRight")),
   onClick: () =>
-    editor
-      .chain()
-      .focus()
-      .addColumnAfter()
-      .command(({ tr, state }) => selectColumn(tr, state, "next"))
-      .run()
+    editor.run(
+      { name: "addColumnAfter" },
+      { name: "selectTableColumn", args: ["next"] }
+    )
 });
 
-const moveColumnLeft = (editor: Editor): MenuButtonItem => ({
+const moveColumnLeft = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("moveColumnLeft")),
-  onClick: () => moveColumnLeftAction(editor)
+  onClick: () => editor.run({ name: "moveColumnLeft" })
 });
 
-const moveColumnRight = (editor: Editor): MenuButtonItem => ({
+const moveColumnRight = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("moveColumnRight")),
-  onClick: () => moveColumnRightAction(editor)
+  onClick: () => editor.run({ name: "moveColumnRight" })
 });
 
-const deleteColumn = (editor: Editor): MenuButtonItem => ({
+const deleteColumn = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("deleteColumn")),
-  onClick: () => editor.chain().focus().deleteColumn().run()
+  onClick: () => editor.run({ name: "deleteColumn" })
 });
 
-const splitCells = (editor: Editor): MenuButtonItem => ({
+const splitCells = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("splitCells")),
-  onClick: () => editor.chain().focus().splitCell().run()
+  onClick: () => editor.run({ name: "splitCell" })
 });
 
-const mergeCells = (editor: Editor): MenuButtonItem => ({
+const mergeCells = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("mergeCells")),
-  onClick: () => editor.chain().focus().mergeCells().run()
+  onClick: () => editor.run({ name: "mergeCells" })
 });
 
-const insertRowAbove = (editor: Editor): MenuButtonItem => ({
+const insertRowAbove = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertRowAbove")),
   onClick: () =>
-    editor
-      .chain()
-      .focus()
-      .addRowBefore()
-      .command(({ tr, state }) => selectRow(tr, state, "prev"))
-      .run()
+    editor.run(
+      { name: "addRowBefore" },
+      { name: "selectTableRow", args: ["prev"] }
+    )
 });
 
-const insertRowBelow = (editor: Editor): MenuButtonItem => ({
+const insertRowBelow = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("insertRowBelow")),
-  onClick: () => {
-    editor
-      .chain()
-      .focus()
-      .addRowAfter()
-      .command(({ tr, state }) => selectRow(tr, state, "next"))
-      .run();
-  }
+  onClick: () =>
+    editor.run(
+      { name: "addRowAfter" },
+      { name: "selectTableRow", args: ["next"] }
+    )
 });
 
-const moveRowUp = (editor: Editor): MenuButtonItem => ({
+const moveRowUp = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("moveRowUp")),
-  onClick: () => moveRowUpAction(editor)
+  onClick: () => editor.run({ name: "moveRowUp" })
 });
-const moveRowDown = (editor: Editor): MenuButtonItem => ({
+const moveRowDown = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("moveRowDown")),
-  onClick: () => moveRowDownAction(editor)
+  onClick: () => editor.run({ name: "moveRowDown" })
 });
 
-const deleteRow = (editor: Editor): MenuButtonItem => ({
+const deleteRow = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("deleteRow")),
-  onClick: () => editor.chain().focus().deleteRow().run()
+  onClick: () => editor.run({ name: "deleteRow" })
 });
 
-const deleteTable = (editor: Editor): MenuButtonItem => ({
+const deleteTable = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("deleteTable")),
-  onClick: () => editor.chain().focus().deleteTable().run()
+  onClick: () => editor.run({ name: "deleteTable" })
 });
 
-const cellProperties = (editor: Editor): MenuButtonItem => ({
+const cellProperties = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("cellProperties")),
   onClick: () => {
     showPopup({
@@ -426,9 +401,9 @@ const cellProperties = (editor: Editor): MenuButtonItem => ({
   }
 });
 
-const exportToCSV = (editor: Editor): MenuButtonItem => ({
+const exportToCSV = (editor: EditorController): MenuButtonItem => ({
   ...toolToMenuButton(getToolDefinition("exportToCSV")),
-  onClick: () => exportToCsvAction(editor)
+  onClick: () => editor.run({ name: "exportTableAsCsv" })
 });
 
 export const InsertColumnLeft = menuButtonToTool(insertColumnLeft);

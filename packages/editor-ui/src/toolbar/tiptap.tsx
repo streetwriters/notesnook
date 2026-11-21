@@ -37,7 +37,9 @@ export function Toolbar(props: ToolbarProps) {
       {...props}
       editor={editor}
       floatingMenus={
-        editor.tiptap ? <EditorFloatingMenus editor={editor.tiptap} /> : null
+        editor.tiptap ? (
+          <EditorFloatingMenus editor={editor.tiptap} controller={editor} />
+        ) : null
       }
     />
   );
@@ -48,5 +50,7 @@ export type ToolbarGroupProps = Omit<ControllerToolbarGroupProps, "editor"> & {
 };
 
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  return <ControllerToolbarGroup {...props} editor={toController(props.editor)} />;
+  return (
+    <ControllerToolbarGroup {...props} editor={toController(props.editor)} />
+  );
 }

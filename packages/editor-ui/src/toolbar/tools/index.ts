@@ -47,9 +47,38 @@ import { TextDirection } from "./text-direction.js";
 import { Highlight, TextColor } from "./colors.js";
 import { ControllerInsertBlock } from "./controller-block.js";
 import {
-  ControllerAddLink,
-  ControllerAddInternalLink
-} from "./controller-link.js";
+  AddLink,
+  AddInternalLink,
+  EditLink,
+  RemoveLink,
+  LinkSettings,
+  OpenLink,
+  CopyLink
+} from "./link.js";
+import {
+  TableSettings,
+  ColumnProperties,
+  RowProperties,
+  CellProperties,
+  InsertColumnLeft,
+  InsertColumnRight,
+  MoveColumnLeft,
+  MoveColumnRight,
+  DeleteColumn,
+  SplitCells,
+  MergeCells,
+  InsertRowAbove,
+  InsertRowBelow,
+  MoveRowUp,
+  MoveRowDown,
+  DeleteRow,
+  DeleteTable,
+  CellBackgroundColor,
+  CellBorderColor,
+  CellTextColor,
+  CellBorderWidth,
+  ExportToCSV
+} from "./table.js";
 
 export type { ToolId };
 
@@ -79,8 +108,35 @@ const tools: Partial<Record<ToolId, React.FunctionComponent<ToolProps>>> = {
   outdent: Outdent,
   indent: Indent,
   insertBlock: ControllerInsertBlock,
-  addLink: ControllerAddLink,
-  addInternalLink: ControllerAddInternalLink,
+  addLink: AddLink,
+  addInternalLink: AddInternalLink,
+  editLink: EditLink,
+  removeLink: RemoveLink,
+  copyLink: CopyLink,
+  linkSettings: LinkSettings,
+  openLink: OpenLink,
+  tableSettings: TableSettings,
+  columnProperties: ColumnProperties,
+  rowProperties: RowProperties,
+  cellProperties: CellProperties,
+  insertColumnLeft: InsertColumnLeft,
+  insertColumnRight: InsertColumnRight,
+  moveColumnLeft: MoveColumnLeft,
+  moveColumnRight: MoveColumnRight,
+  deleteColumn: DeleteColumn,
+  splitCells: SplitCells,
+  mergeCells: MergeCells,
+  cellBackgroundColor: CellBackgroundColor,
+  cellBorderColor: CellBorderColor,
+  cellTextColor: CellTextColor,
+  cellBorderWidth: CellBorderWidth,
+  insertRowAbove: InsertRowAbove,
+  insertRowBelow: InsertRowBelow,
+  moveRowUp: MoveRowUp,
+  moveRowDown: MoveRowDown,
+  deleteRow: DeleteRow,
+  deleteTable: DeleteTable,
+  exportToCSV: ExportToCSV,
   none
 };
 

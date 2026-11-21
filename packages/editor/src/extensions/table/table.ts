@@ -26,7 +26,13 @@ import {
   ParentConfig
 } from "@tiptap/core";
 import { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
+import {
+  EditorState,
+  Plugin,
+  PluginKey,
+  TextSelection,
+  Transaction
+} from "@tiptap/pm/state";
 import { EditorView, NodeView } from "@tiptap/pm/view";
 import { createColGroup } from "./utilities/createColGroup.js";
 import { createTable } from "./utilities/createTable.js";
@@ -51,6 +57,31 @@ import { fixTables } from "./prosemirror-tables/fixtables.js";
 import { CellSelection } from "./prosemirror-tables/cellselection.js";
 import { columnResizing } from "./prosemirror-tables/columnresizing.js";
 import { tableEditing } from "./prosemirror-tables/index.js";
+import {
+  exportToCSV,
+  moveColumnLeft,
+  moveColumnRight,
+  moveRowDown,
+  moveRowUp,
+  selectColumn,
+  selectRow
+} from "./actions.js";
+
+/** Runs a move action on the chain's transaction; a throw (no table) is false. */
+function moveCommand(
+  move: (tr: Transaction, state: EditorState) => boolean,
+  tr: Transaction,
+  state: EditorState,
+  dispatch: unknown
+) {
+  try {
+    if (dispatch) return move(tr, state);
+    // `can()`: dry-run on a throwaway transaction
+    return move(state.tr, state);
+  } catch {
+    return false;
+  }
+}
 
 export interface TableOptions {
   /**
@@ -246,6 +277,28 @@ declare module "@tiptap/core" {
       }) => ReturnType;
 
       /**
+       * Select the row above or below the current one (after inserting one)
+       */
+      selectTableRow: (direction: "prev" | "next") => ReturnType;
+
+      /**
+       * Select the column before or after the current one (after inserting one)
+       */
+      selectTableColumn: (direction: "prev" | "next") => ReturnType;
+
+      /** Move the current column one place to the left */
+      moveColumnLeft: () => ReturnType;
+
+      /** Move the current column one place to the right */
+      moveColumnRight: () => ReturnType;
+
+      /** Move the current row one place up */
+      moveRowUp: () => ReturnType;
+
+      /** Move the current row one place down */
+      moveRowDown: () => ReturnType;
+
+      /**
        * Export the current table as a CSV file
        */
       exportTableAsCsv: () => ReturnType;
@@ -426,6 +479,46 @@ export const Table = Node.create<TableOptions>({
         (name, value) =>
         ({ state, dispatch }) => {
           return setCellAttr(name, value)(state, dispatch);
+        },
+      selectTableRow:
+        (direction) =>
+        ({ tr, state, dispatch }) => {
+          try {
+            return dispatch ? selectRow(tr, state, direction) : true;
+          } catch {
+            return false;
+          }
+        },
+      selectTableColumn:
+        (direction) =>
+        ({ tr, state, dispatch }) => {
+          try {
+            return dispatch ? selectColumn(tr, state, direction) : true;
+          } catch {
+            return false;
+          }
+        },
+      moveColumnLeft:
+        () =>
+        ({ tr, state, dispatch }) =>
+          moveCommand(moveColumnLeft, tr, state, dispatch),
+      moveColumnRight:
+        () =>
+        ({ tr, state, dispatch }) =>
+          moveCommand(moveColumnRight, tr, state, dispatch),
+      moveRowUp:
+        () =>
+        ({ tr, state, dispatch }) =>
+          moveCommand(moveRowUp, tr, state, dispatch),
+      moveRowDown:
+        () =>
+        ({ tr, state, dispatch }) =>
+          moveCommand(moveRowDown, tr, state, dispatch),
+      exportTableAsCsv:
+        () =>
+        ({ editor, dispatch }) => {
+          if (dispatch) exportToCSV(editor);
+          return true;
         },
       goToNextCell:
         () =>

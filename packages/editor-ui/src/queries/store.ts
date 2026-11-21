@@ -22,9 +22,11 @@ import type { Editor as NotesnookEditor } from "../types.js";
 import { findSelectedNode } from "../utils/prosemirror.js";
 import { getTextDirection } from "../utils/text-direction.js";
 import type { SearchStorage } from "../extension-types.js";
+import type { Node as ProsemirrorNode } from "prosemirror-model";
 import type {
   AnchorRect,
   AnchorTarget,
+  NodeOffset,
   Query,
   QueryKind,
   QueryResults
@@ -162,10 +164,49 @@ function evaluate(editor: Editor, query: Query): unknown {
         return editor.isFocused;
       case "selectedText":
         return selectedText(editor, query.args[0] as string | undefined);
+      case "selectionOffset":
+        return selectionOffset(editor);
+      case "nodeAt":
+        return nodeAt(editor, query.args[0] as number);
     }
   } catch {
     return undefined;
   }
+}
+
+function describeNode(node: ProsemirrorNode, from: number): NodeOffset {
+  return {
+    from,
+    to: from + node.nodeSize,
+    text: node.textContent,
+    isText: node.isText,
+    marks: node.marks.map((mark) => ({
+      type: mark.type.name,
+      attrs: mark.attrs
+    }))
+  };
+}
+
+/** The run of text under the selection start and its range (`selectionToOffset`). */
+function selectionOffset(editor: Editor): NodeOffset {
+  const { from, $from, to, $to } = editor.state.selection;
+  const node = editor.state.doc.nodeAt(from);
+  if (!node)
+    return {
+      from: from - $from.textOffset,
+      to: to - $to.textOffset,
+      text: "",
+      isText: false,
+      marks: []
+    };
+  return describeNode(node, from - $from.textOffset);
+}
+
+function nodeAt(editor: Editor, pos: number): NodeOffset | null {
+  if (typeof pos !== "number" || pos < 0 || pos > editor.state.doc.content.size)
+    return null;
+  const node = editor.state.doc.nodeAt(pos);
+  return node ? describeNode(node, pos) : null;
 }
 
 function selectedText(editor: Editor, mark: string | undefined): string {
@@ -194,6 +235,12 @@ function anchorRect(editor: Editor, target: AnchorTarget): AnchorRect | null {
       .find((range) => range);
     if (!found) return null;
     [from, to] = found;
+    // A node is measured by its own box, not by the carets at its ends.
+    const dom = editor.view.nodeDOM(found[0]);
+    if (dom instanceof HTMLElement) {
+      const { top, left, right, bottom } = dom.getBoundingClientRect();
+      return { top, left, right, bottom };
+    }
   }
   const start = editor.view.coordsAtPos(from);
   const end = from === to ? start : editor.view.coordsAtPos(to, -1);

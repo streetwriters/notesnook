@@ -26,8 +26,39 @@ import {
   type EditorController
 } from "./controller.js";
 import { TIPTAP_TOOLS } from "./toolbar/tools/tiptap.js";
+import type { EditorHostActions } from "./host.js";
 
 const controllers = new WeakMap<TiptapEditor, EditorController>();
+
+const HOST_ACTIONS: (keyof EditorHostActions)[] = [
+  "openLink",
+  "downloadAttachment",
+  "previewAttachment",
+  "openAttachmentPicker",
+  "pasteFiles",
+  "resolveAttachmentPath",
+  "createInternalLink",
+  "getLinkData",
+  "copyToClipboard"
+];
+
+/**
+ * The host actions a Tiptap host supplies through `editor.storage`, read
+ * lazily so one the host sets (or clears) later is still seen.
+ */
+function storageHostActions(editor: TiptapEditor): EditorHostActions {
+  const actions: Record<string, unknown> = {};
+  for (const name of HOST_ACTIONS) {
+    Object.defineProperty(actions, name, {
+      enumerable: true,
+      get: () => {
+        const action = (editor.storage as Record<string, unknown>)[name];
+        return typeof action === "function" ? action : undefined;
+      }
+    });
+  }
+  return actions as EditorHostActions;
+}
 
 export function tiptapController(editor: TiptapEditor): EditorController {
   let controller = controllers.get(editor);
@@ -37,6 +68,21 @@ export function tiptapController(editor: TiptapEditor): EditorController {
       queries: getQueryStore(editor),
       tiptap: editor as Editor,
       tools: TIPTAP_TOOLS,
+      hostActions: storageHostActions(editor),
+      onDestroy(listener) {
+        editor.on("destroy", listener);
+        return () => {
+          editor.off("destroy", listener);
+        };
+      },
+      posAtElement(element) {
+        try {
+          const pos = editor.view.posAtDOM(element, 0);
+          return pos < 0 ? undefined : pos;
+        } catch {
+          return undefined;
+        }
+      },
       run(...commands) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let chain: any = editor.chain().focus();

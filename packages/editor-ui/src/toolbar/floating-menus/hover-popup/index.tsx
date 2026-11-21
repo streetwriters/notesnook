@@ -17,38 +17,54 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, type ComponentType } from "react";
 import { showPopup } from "../../../components/popup-presenter/index.js";
-import { Editor } from "../../../types.js";
-import { FloatingMenuProps } from "../types.js";
+import type { EditorController } from "../../../controller.js";
+import { q } from "../../../queries/queries.js";
+import { useControllerQuery as useEditorQuery } from "../../../queries/use-query.js";
 import { LinkHoverPopupHandler } from "./link.js";
 import { HoverPopupContextProvider } from "./context.js";
 
 export type HoverPopupProps = {
-  editor: Editor;
+  editor: EditorController;
 };
 
 const handlers = [LinkHoverPopupHandler];
 
 const HOVER_TIMEOUT = 1000;
 
-export function HoverPopupHandler(props: FloatingMenuProps) {
+/** The popup body: waits for the node under the pointer, then renders it. */
+function HoverPopupContent(props: {
+  editor: EditorController;
+  pos: number;
+  hide: () => void;
+  Popup: ComponentType<HoverPopupProps>;
+}) {
+  const { editor, pos, hide, Popup } = props;
+  const query = useMemo(() => q.nodeAt(pos), [pos]);
+  const node = useEditorQuery(editor, query);
+  if (!node) return null;
+  return (
+    <HoverPopupContextProvider value={{ selectedNode: node, hide }}>
+      <Popup editor={editor} />
+    </HoverPopupContextProvider>
+  );
+}
+
+export function HoverPopupHandler(props: HoverPopupProps) {
   const { editor } = props;
   const hoverTimeoutId = useRef<number>();
   const activePopup = useRef<{ element: HTMLElement; hide: () => void }>();
 
   useEffect(() => {
-    function onDestroy() {
-      activePopup.current?.hide();
-    }
-    editor.on("destroy", onDestroy);
-    return () => {
-      editor.off("destroy", onDestroy);
-    };
-  }, []);
+    return editor.onDestroy(() => activePopup.current?.hide());
+  }, [editor]);
 
   useEffect(
     () => {
+      // hovering is a DOM concern: an engine that cannot say which position
+      // an element is at has no hover popups
+      if (!editor.posAtElement) return;
       function onContextMenu(e: MouseEvent) {
         if (
           !e.target ||
@@ -83,36 +99,21 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
         hoverTimeoutId.current = setTimeout(
           () => {
             const PopupHandler = handlers.find((h) => h.isActive(element));
-            if (
-              !PopupHandler ||
-              !editor ||
-              !editor.view ||
-              editor.view.isDestroyed
-            )
-              return;
+            if (!PopupHandler) return;
 
             const { popup: Popup } = PopupHandler;
 
-            const pos = editor.view.posAtDOM(element, 0);
-            if (pos < 0) return;
-
-            const node = editor.view.state.doc.nodeAt(pos);
-            if (!node) return;
+            const pos = editor.posAtElement?.(element);
+            if (pos === undefined) return;
 
             const hidePopup = showPopup({
               popup: () => (
-                <HoverPopupContextProvider
-                  value={{
-                    selectedNode: {
-                      node,
-                      from: pos,
-                      to: pos + node.nodeSize
-                    },
-                    hide: () => hidePopup()
-                  }}
-                >
-                  <Popup editor={editor} />
-                </HoverPopupContextProvider>
+                <HoverPopupContent
+                  editor={editor}
+                  pos={pos}
+                  hide={() => hidePopup()}
+                  Popup={Popup}
+                />
               ),
               blocking: false,
               focusOnRender: false,

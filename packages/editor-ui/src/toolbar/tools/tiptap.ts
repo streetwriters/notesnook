@@ -21,30 +21,6 @@ import type { ToolOverrides } from "../../controller.js";
 import { tiptapOnly } from "./tiptap-only.js";
 import { InsertBlock } from "./block.js";
 import {
-  TableSettings,
-  ColumnProperties,
-  RowProperties,
-  CellProperties,
-  InsertColumnLeft,
-  InsertColumnRight,
-  MoveColumnLeft,
-  MoveColumnRight,
-  DeleteColumn,
-  SplitCells,
-  MergeCells,
-  InsertRowAbove,
-  InsertRowBelow,
-  MoveRowUp,
-  MoveRowDown,
-  DeleteRow,
-  DeleteTable,
-  CellBackgroundColor,
-  CellBorderColor,
-  CellTextColor,
-  CellBorderWidth,
-  ExportToCSV
-} from "./table.js";
-import {
   ImageSettings,
   ImageAlignCenter,
   ImageAlignLeft,
@@ -65,15 +41,6 @@ import {
   EmbedSettings
 } from "./embed.js";
 import {
-  AddLink,
-  AddInternalLink,
-  EditLink,
-  RemoveLink,
-  LinkSettings,
-  OpenLink,
-  CopyLink
-} from "./link.js";
-import {
   WebClipFullScreen,
   WebClipSettings,
   WebClipOpenExternal,
@@ -81,13 +48,6 @@ import {
 } from "./web-clip.js";
 
 export const TIPTAP_TOOLS: ToolOverrides = {
-  addInternalLink: tiptapOnly(AddInternalLink),
-  addLink: tiptapOnly(AddLink),
-  editLink: tiptapOnly(EditLink),
-  removeLink: tiptapOnly(RemoveLink),
-  copyLink: tiptapOnly(CopyLink),
-  linkSettings: tiptapOnly(LinkSettings),
-  openLink: tiptapOnly(OpenLink),
   insertBlock: tiptapOnly(InsertBlock),
 
   imageSettings: tiptapOnly(ImageSettings),
@@ -110,28 +70,5 @@ export const TIPTAP_TOOLS: ToolOverrides = {
   previewAttachment: tiptapOnly(PreviewAttachment),
   attachmentSettings: tiptapOnly(AttachmentSettings),
   downloadAttachment: tiptapOnly(DownloadAttachment),
-  removeAttachment: tiptapOnly(RemoveAttachment),
-
-  tableSettings: tiptapOnly(TableSettings),
-  columnProperties: tiptapOnly(ColumnProperties),
-  rowProperties: tiptapOnly(RowProperties),
-  cellProperties: tiptapOnly(CellProperties),
-  insertColumnLeft: tiptapOnly(InsertColumnLeft),
-  insertColumnRight: tiptapOnly(InsertColumnRight),
-  moveColumnLeft: tiptapOnly(MoveColumnLeft),
-  moveColumnRight: tiptapOnly(MoveColumnRight),
-  deleteColumn: tiptapOnly(DeleteColumn),
-  splitCells: tiptapOnly(SplitCells),
-  mergeCells: tiptapOnly(MergeCells),
-  cellBackgroundColor: tiptapOnly(CellBackgroundColor),
-  cellBorderColor: tiptapOnly(CellBorderColor),
-  cellTextColor: tiptapOnly(CellTextColor),
-  cellBorderWidth: tiptapOnly(CellBorderWidth),
-  insertRowAbove: tiptapOnly(InsertRowAbove),
-  insertRowBelow: tiptapOnly(InsertRowBelow),
-  moveRowUp: tiptapOnly(MoveRowUp),
-  moveRowDown: tiptapOnly(MoveRowDown),
-  deleteRow: tiptapOnly(DeleteRow),
-  deleteTable: tiptapOnly(DeleteTable),
-  exportToCSV: tiptapOnly(ExportToCSV)
+  removeAttachment: tiptapOnly(RemoveAttachment)
 };

@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { NodeWithOffset } from "../../../utils/prosemirror.js";
+import type { NodeOffset } from "../../../queries/queries.js";
 import { createContext, useContext } from "react";
 
 const HoverPopupContext = createContext<{
-  selectedNode?: NodeWithOffset;
+  /** The node the pointer is over, as plain data (from `q.nodeAt`). */
+  selectedNode?: NodeOffset;
   hide: () => void;
 }>({ hide: () => {} });
 export function useHoverPopupContext() {

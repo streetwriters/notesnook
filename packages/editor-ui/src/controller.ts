@@ -23,17 +23,13 @@ import type { Editor } from "./types.js";
 import type { QueryStore } from "./queries/store.js";
 import type { ToolProps } from "./toolbar/types.js";
 import type { ToolId } from "./toolbar-data/index.js";
+import type { EditorHostActions } from "./host.js";
 
 export type EditorCommand = { name: string; args?: unknown[] };
 
 export type ToolOverrides = Partial<Record<ToolId, ComponentType<ToolProps>>>;
 
-export type ControllerHostActions = {
-  openAttachmentPicker?: (type: "image" | "file" | "camera") => void;
-  createInternalLink?: (attributes?: {
-    href: string;
-    title?: string;
-  }) => Promise<{ href: string; title?: string } | undefined>;
+export type ControllerHostActions = EditorHostActions & {
   pickCsvFile?: () => Promise<string | undefined>;
 };
 
@@ -44,6 +40,13 @@ export interface EditorController {
   readonly tiptap?: Editor;
   readonly tools?: ToolOverrides;
   readonly hostActions?: ControllerHostActions;
+  /** Calls `listener` once when the editor goes away; returns an unsubscribe. */
+  onDestroy(listener: () => void): () => void;
+  /**
+   * The document position of a rendered element (hover popups find what the
+   * pointer is over). Only engines that render DOM have it.
+   */
+  posAtElement?(element: Element): number | undefined;
 }
 
 export type AnyEditor = Editor | TiptapEditor | EditorController;
@@ -63,12 +66,16 @@ export function createController(options: {
   run: (commands: EditorCommand[]) => void;
   tools?: ToolOverrides;
   hostActions?: ControllerHostActions;
+  onDestroy?: (listener: () => void) => () => void;
+  posAtElement?: (element: Element) => number | undefined;
 }): EditorController {
   return {
     kind: "controller",
     queries: options.queries,
     tools: options.tools,
     hostActions: options.hostActions,
-    run: (...commands) => options.run(commands)
+    run: (...commands) => options.run(commands),
+    onDestroy: options.onDestroy ?? (() => () => undefined),
+    posAtElement: options.posAtElement
   };
 }

@@ -59,7 +59,9 @@ export interface EditorHostActions {
     size?: number;
     type?: string;
   }): void | Promise<void>;
-  openAttachmentPicker?(type: "image" | "file" | "camera"): void | Promise<void>;
+  openAttachmentPicker?(
+    type: "image" | "file" | "camera"
+  ): void | Promise<void>;
   /**
    * Lets the user pick a note (or heading) to link to; resolves to the link,
    * or undefined when they cancel.
@@ -75,6 +77,20 @@ export interface EditorHostActions {
    * engines that cannot take bytes through JS (the native editor).
    */
   resolveAttachmentPath?(hash: string): Promise<string | undefined>;
+  /**
+   * What an internal link (`nn://…`) points to, for the link popups: the type
+   * and title of the note, notebook, tag or color. Undefined for other URLs.
+   */
+  getLinkData?(url: string): Promise<
+    | {
+        type: "note" | "notebook" | "color" | "tag";
+        title?: string;
+        metadata?: Record<string, string | undefined>;
+      }
+    | undefined
+  >;
+  /** Puts text (and optionally HTML) on the clipboard. */
+  copyToClipboard?(text: string, html?: string): void | Promise<void>;
 }
 
 export interface EditorHeading {

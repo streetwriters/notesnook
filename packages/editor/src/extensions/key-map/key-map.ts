@@ -21,6 +21,8 @@ import { tiptapKeys } from "@notesnook/common";
 import { Extension } from "@tiptap/core";
 import {
   showLinkPopup,
+  insertInternalLink,
+  tiptapController,
   isListActive,
   config,
   DEFAULT_COLORS
@@ -65,22 +67,11 @@ export const KeyMap = Extension.create({
         return true;
       },
       [tiptapKeys.insertInternalLink.keys]: ({ editor }) => {
-        editor.storage.createInternalLink?.().then((link) => {
-          if (!link) return;
-
-          const selectedText = editor.state.doc.textBetween(
-            editor.state.selection.from,
-            editor.state.selection.to
-          );
-          editor.commands.setLink({
-            ...link,
-            title: selectedText || link.title
-          });
-        });
+        insertInternalLink(tiptapController(editor));
         return true;
       },
       [tiptapKeys.insertLink.keys]: ({ editor }) => {
-        showLinkPopup(editor);
+        showLinkPopup(tiptapController(editor));
         return true;
       },
       [tiptapKeys.toggleTextColor.keys]: ({ editor }) => {

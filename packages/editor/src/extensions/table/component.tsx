@@ -21,19 +21,22 @@ import { Flex } from "@theme-ui/components";
 import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor as TiptapEditor } from "@tiptap/core";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { EditorView, NodeView } from "prosemirror-view";
 import { getPosition } from "@notesnook/ui";
 import {
-  Editor,
+  type AnchorRect,
+  type EditorController,
   InsertColumnRight,
   InsertRowBelow,
   RowProperties,
   TableProperties,
   getToolDefinition,
-  findSelectedDOMNode,
   hasSameAttributes,
-  DesktopOnly
+  DesktopOnly,
+  q,
+  tiptapController,
+  useControllerQuery
 } from "@notesnook/editor-ui";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
@@ -46,6 +49,13 @@ export function TableComponent(
   const colgroupRef = useRef<HTMLTableColElement>(null);
   const tableRef = useRef<HTMLTableElement>();
   const { textDirection } = node.attrs;
+  const controller = useMemo(() => tiptapController(editor), [editor]);
+  const editableQuery = useMemo(() => q.editable(), []);
+  const isEditable = useControllerQuery(
+    controller,
+    editableQuery,
+    editor.isEditable
+  );
 
   useEffect(() => {
     if (!colgroupRef.current || !tableRef.current) return;
@@ -58,42 +68,18 @@ export function TableComponent(
     );
   }, [node, cellMinWidth]);
 
-  // useEffect(() => {
-  //   function transactionListener({
-  //     editor
-  //   }: {
-  //     transaction: Transaction;
-  //     editor: TiptapEditor;
-  //   }) {
-  //     if (!colgroupRef.current || !tableRef.current) return;
-
-  //     const cellsInRow = tableRef.current?.rows[0]?.cells.length || 0;
-  //     if (colgroupRef.current?.childElementCount !== cellsInRow)
-  //       updateColumns(
-  //         selectedRect(editor.state).table,
-  //         colgroupRef.current,
-  //         tableRef.current,
-  //         cellMinWidth
-  //       );
-  //   }
-  //   editor.on("transaction", transactionListener);
-  //   return () => {
-  //     editor.off("transaction", transactionListener);
-  //   };
-  // }, []);
-
   return (
     <>
       <DesktopOnly>
-        {editor.isEditable ? (
+        {isEditable ? (
           <>
             <TableRowToolbar
-              editor={editor}
+              editor={controller}
               table={tableRef}
               textDirection={textDirection}
             />
             <TableColumnToolbar
-              editor={editor}
+              editor={controller}
               table={tableRef}
               textDirection={textDirection}
             />
@@ -170,46 +156,83 @@ export function TableNodeView(editor: TiptapEditor) {
 }
 
 type TableToolbarProps = {
-  editor: Editor;
+  editor: EditorController;
   table?: React.MutableRefObject<HTMLTableElement | undefined>;
   textDirection: TextDirections;
 };
 
+const ROW_TYPES = ["tableRow"];
+const CELL_TYPES = ["tableCell", "tableHeader"];
+
+/** A positioning target that is a rectangle, not an element. */
+function rectTarget(rect: AnchorRect, context: Element): HTMLElement {
+  return {
+    contextElement: context,
+    getBoundingClientRect: () =>
+      new DOMRect(
+        rect.left,
+        rect.top,
+        rect.right - rect.left,
+        rect.bottom - rect.top
+      )
+  } as unknown as HTMLElement;
+}
+
+/**
+ * The box of the selected node of the given types, but only when it is inside
+ * this table (the selection may be in another one).
+ */
+function useTableAnchor(
+  editor: EditorController,
+  types: string[],
+  table?: React.MutableRefObject<HTMLTableElement | undefined>
+): AnchorRect | null {
+  const query = useMemo(() => q.anchor({ node: types }), [types]);
+  const anchor = useControllerQuery(editor, query, null);
+  const [inside, setInside] = useState<AnchorRect | null>(null);
+  useLayoutEffect(() => {
+    const tableRect = table?.current?.getBoundingClientRect();
+    const contained =
+      !!anchor &&
+      !!tableRect &&
+      anchor.top >= tableRect.top - 1 &&
+      anchor.bottom <= tableRect.bottom + 1 &&
+      anchor.left >= tableRect.left - 1 &&
+      anchor.right <= tableRect.right + 1;
+    setInside(contained ? anchor : null);
+  }, [anchor, table]);
+  return inside;
+}
+
 function TableRowToolbar(props: TableToolbarProps) {
   const { editor, textDirection, table } = props;
   const rowToolsRef = useRef<HTMLDivElement>(null);
+  const row = useTableAnchor(editor, ROW_TYPES, table);
 
-  useEffect(() => {
-    function onSelectionUpdate() {
-      if (!rowToolsRef.current || !table?.current) {
-        return;
-      }
-
-      const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
-      if (!currentRow || !table.current.contains(currentRow)) {
-        rowToolsRef.current.style.display = "none";
-        return;
-      }
-      rowToolsRef.current.style.display = "flex";
-
-      const rowTools = rowToolsRef.current;
-      getPosition(rowTools, {
-        location: textDirection ? "right" : "left",
-        target: currentRow,
-        align: "start",
-        xOffset: textDirection ? 5 : -5,
-        yOffset: -3
-      }).then(({ top, left }) => {
-        rowTools.style.top = `${top}px`;
-        rowTools.style.left = `${left}px`;
-      });
+  useLayoutEffect(() => {
+    const rowTools = rowToolsRef.current;
+    if (!rowTools || !table?.current) return;
+    if (!row) {
+      rowTools.style.display = "none";
+      return;
     }
-
-    editor.on("selectionUpdate", onSelectionUpdate);
+    rowTools.style.display = "flex";
+    let cancelled = false;
+    getPosition(rowTools, {
+      location: textDirection ? "right" : "left",
+      target: rectTarget(row, table.current),
+      align: "start",
+      xOffset: textDirection ? 5 : -5,
+      yOffset: -3
+    }).then(({ top, left }) => {
+      if (cancelled) return;
+      rowTools.style.top = `${top}px`;
+      rowTools.style.left = `${left}px`;
+    });
     return () => {
-      editor.off("selectionUpdate", onSelectionUpdate);
+      cancelled = true;
     };
-  }, [textDirection]);
+  }, [row, textDirection, table]);
 
   return (
     <Flex
@@ -249,45 +272,57 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
+  const cell = useTableAnchor(editor, CELL_TYPES, table);
+  // The cell's box is measured when the selection changes; horizontal scrolling
+  // of the table moves it afterwards, so track how far.
+  const scrollAtMeasure = useRef(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   useEffect(() => {
-    function onSelectionUpdate() {
-      if (!columnToolsRef.current || !table?.current) {
-        return;
-      }
-
-      const currentCell = findSelectedDOMNode(editor, [
-        "tableCell",
-        "tableHeader"
-      ]);
-      if (!currentCell || !table.current.contains(currentCell)) {
-        columnToolsRef.current.style.display = `none`;
-        return;
-      }
-      columnToolsRef.current.style.display = "flex";
-
-      const columnTools = columnToolsRef.current;
-      getPosition(columnTools, {
-        location: "top",
-        align: "center",
-        target: currentCell as HTMLElement,
-        yAnchor: table.current,
-        yOffset: 2
-      }).then(({ top, left }) => {
-        columnTools.style.left = `${left}px`;
-        columnTools.style.top = `${top}px`;
-      });
-    }
-
     const scrollContainer = table?.current?.parentElement;
+    if (!scrollContainer) return;
+    scrollAtMeasure.current = scrollContainer.scrollLeft;
+    setScrollLeft(scrollContainer.scrollLeft);
+    const onScroll = () => setScrollLeft(scrollContainer.scrollLeft);
+    scrollContainer.addEventListener("scroll", onScroll);
+    return () => scrollContainer.removeEventListener("scroll", onScroll);
+  }, [cell, table]);
 
-    editor.on("selectionUpdate", onSelectionUpdate);
-    scrollContainer?.addEventListener("scroll", onSelectionUpdate);
+  useLayoutEffect(() => {
+    const columnTools = columnToolsRef.current;
+    const tableElement = table?.current;
+    if (!columnTools || !tableElement) return;
+    if (!cell) {
+      columnTools.style.display = "none";
+      return;
+    }
+    columnTools.style.display = "flex";
+    const shift = scrollAtMeasure.current - scrollLeft;
+    const tableRect = tableElement.getBoundingClientRect();
+    let cancelled = false;
+    getPosition(columnTools, {
+      location: "top",
+      align: "center",
+      // The cell's columns, over the table's full height.
+      target: rectTarget(
+        {
+          left: cell.left + shift,
+          right: cell.right + shift,
+          top: tableRect.top,
+          bottom: tableRect.bottom
+        },
+        tableElement
+      ),
+      yOffset: 2
+    }).then(({ top, left }) => {
+      if (cancelled) return;
+      columnTools.style.left = `${left}px`;
+      columnTools.style.top = `${top}px`;
+    });
     return () => {
-      editor.off("selectionUpdate", onSelectionUpdate);
-      scrollContainer?.removeEventListener("scroll", onSelectionUpdate);
+      cancelled = true;
     };
-  }, []);
+  }, [cell, scrollLeft, table]);
 
   return (
     <Flex

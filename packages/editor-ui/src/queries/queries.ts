@@ -36,6 +36,24 @@ export type QueryResults = {
   anchor: AnchorRect | null;
   focused: boolean;
   selectedText: string;
+  selectionOffset: NodeOffset;
+  nodeAt: NodeOffset | null;
+};
+
+/** A mark on a node, as plain data. */
+export type MarkInfo = { type: string; attrs: Record<string, unknown> };
+
+/**
+ * A node (the text run or the atom) and where it sits in the document: what
+ * the link tools need to select and rewrite it.
+ */
+export type NodeOffset = {
+  from: number;
+  to: number;
+  /** The node's text content; empty for a node without text. */
+  text: string;
+  isText: boolean;
+  marks: MarkInfo[];
 };
 
 export type SelectionInfo = { from: number; to: number; empty: boolean };
@@ -93,5 +111,17 @@ export const q = {
   anchor: (target: AnchorTarget = "selection") => query("anchor", target),
   focused: () => query("focused"),
   selectedText: (mark?: string) =>
-    mark ? query("selectedText", mark) : query("selectedText")
+    mark ? query("selectedText", mark) : query("selectedText"),
+  /** The text run (or node) at the selection start, with its range. */
+  selectionOffset: () => query("selectionOffset"),
+  /** The node at a document position, with its range; null when none. */
+  nodeAt: (pos: number) => query("nodeAt", pos)
 };
+
+/** The first mark of a type on a node offset. */
+export function findOffsetMark(
+  offset: NodeOffset | null | undefined,
+  type: string
+): MarkInfo | undefined {
+  return offset?.marks.find((mark) => mark.type === type);
+}

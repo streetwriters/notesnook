@@ -36,48 +36,33 @@ type TableCell = {
   pos: number;
 };
 
-function moveColumnRight(editor: Editor) {
-  const { tr } = editor.state;
-  const rect = selectedRect(editor.state);
-  if (rect.right === rect.map.width) return;
-
-  const transaction = moveColumn(tr, rect, rect.left, rect.left + 1);
-  if (!transaction) return;
-
-  editor.view.dispatch(transaction);
+/**
+ * The move actions are Tiptap commands: they edit the transaction they are
+ * given and return whether they moved anything, so the toolbar runs them
+ * through `EditorController.run` and never dispatches itself.
+ */
+function moveColumnRight(tr: Transaction, state: EditorState) {
+  const rect = selectedRect(state);
+  if (rect.right === rect.map.width) return false;
+  return !!moveColumn(tr, rect, rect.left, rect.left + 1);
 }
 
-function moveColumnLeft(editor: Editor) {
-  const { tr } = editor.state;
-  const rect = selectedRect(editor.state);
-  if (rect.left === 0) return;
-
-  const transaction = moveColumn(tr, rect, rect.left, rect.left - 1);
-  if (!transaction) return;
-
-  editor.view.dispatch(transaction);
+function moveColumnLeft(tr: Transaction, state: EditorState) {
+  const rect = selectedRect(state);
+  if (rect.left === 0) return false;
+  return !!moveColumn(tr, rect, rect.left, rect.left - 1);
 }
 
-function moveRowDown(editor: Editor) {
-  const { tr } = editor.state;
-  const rect = selectedRect(editor.state);
-  if (rect.top + 1 === rect.map.height || rect.top === 0) return;
-
-  const transaction = moveRow(tr, rect, rect.top, rect.top + 1);
-  if (!transaction) return;
-
-  editor.view.dispatch(transaction);
+function moveRowDown(tr: Transaction, state: EditorState) {
+  const rect = selectedRect(state);
+  if (rect.top + 1 === rect.map.height || rect.top === 0) return false;
+  return !!moveRow(tr, rect, rect.top, rect.top + 1);
 }
 
-function moveRowUp(editor: Editor) {
-  const { tr } = editor.state;
-  const rect = selectedRect(editor.state);
-  if (rect.top === 0 || rect.top === 1) return;
-
-  const transaction = moveRow(tr, rect, rect.top, rect.top - 1);
-  if (!transaction) return;
-
-  editor.view.dispatch(transaction);
+function moveRowUp(tr: Transaction, state: EditorState) {
+  const rect = selectedRect(state);
+  if (rect.top === 0 || rect.top === 1) return false;
+  return !!moveRow(tr, rect, rect.top, rect.top - 1);
 }
 
 function moveColumn(
@@ -250,16 +235,7 @@ function exportToCSV(editor?: Editor) {
   }
 }
 
-registerTableActions({
-  moveColumnLeft,
-  moveColumnRight,
-  moveRowDown,
-  moveRowUp,
-  selectRow,
-  selectColumn,
-  exportToCSV,
-  importCsvToTable
-});
+registerTableActions({ importCsvToTable });
 
 export {
   moveColumnLeft,

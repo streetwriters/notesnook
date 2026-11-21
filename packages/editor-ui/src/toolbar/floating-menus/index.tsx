@@ -21,14 +21,17 @@ import { DesktopOnly } from "../../components/responsive/index.js";
 import { HoverPopupHandler } from "./hover-popup/index.js";
 import { SearchReplaceFloatingMenu } from "./search-replace.js";
 import { FloatingMenuProps } from "./types.js";
+import type { EditorController } from "../../controller.js";
 
-export function EditorFloatingMenus(props: FloatingMenuProps) {
+export function EditorFloatingMenus(
+  props: FloatingMenuProps & { controller: EditorController }
+) {
   return (
     <>
-      <SearchReplaceFloatingMenu {...props} />
+      <SearchReplaceFloatingMenu editor={props.editor} />
 
       <DesktopOnly>
-        <HoverPopupHandler {...props} />
+        <HoverPopupHandler editor={props.controller} />
       </DesktopOnly>
     </>
   );

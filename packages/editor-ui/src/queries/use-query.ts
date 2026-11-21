@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import type { Query, QueryKind, QueryResults } from "./queries.js";
 import type { QueryStore } from "./store.js";
 
@@ -31,6 +31,23 @@ export function useStoreQuery<K extends QueryKind>(
   );
   return useSyncExternalStore(subscribe, () => store.read(query));
 }
+
+/**
+ * Keeps `query` fresh in the store (a remote store only answers subscribed
+ * queries) without re-rendering when it changes. Returns a reader for event
+ * handlers: values that move with every caret step belong here, not in
+ * `useControllerQuery`, or the tool re-renders on every caret move.
+ */
+export function useControllerQueryReader<K extends QueryKind>(
+  editor: { readonly queries: QueryStore },
+  query: Query<K>
+): () => QueryResults[K] | undefined {
+  const store = editor.queries;
+  useEffect(() => store.subscribe(query, noop), [store, query]);
+  return useCallback(() => store.read(query), [store, query]);
+}
+
+const noop = () => undefined;
 
 export function useControllerQuery<K extends QueryKind>(
   editor: { readonly queries: QueryStore },
