@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { updateNoteWidgets } from "../services/widgets/update-widgets";
+import {
+  updateListWidgets,
+  updateNoteWidgets
+} from "../services/widgets/update-widgets";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
@@ -357,6 +361,10 @@ const onLogout = async (reason: string) => {
   MMKV.clearStore();
   resetTabStore();
   clearAllStores();
+  // the database is empty by now, so these write out empty lists
+  NotePreviewWidget.clear();
+  updateListWidgets();
+  Notifications.updateRemindersForWidget().catch(() => {});
   setImmediate(() => {
     refreshAllStores();
   });
