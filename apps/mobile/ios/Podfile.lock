@@ -1755,7 +1755,7 @@ PODS:
     - Yoga
   - react-native-share-extension (2.9.5):
     - React
-  - react-native-sodium (2.0.0-alpha.1):
+  - react-native-sodium (2.0.0-alpha.2):
     - Base64
     - React-Core
   - react-native-theme-switch-animation (0.6.0):
@@ -3173,12 +3173,12 @@ SPEC CHECKSUMS:
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pdf: 70836b3b48595c7f85a3aa2b5d122b175c455733
-  react-native-quick-sqlite: 41588741c066601d29ee2fb7a295e5cf46f62d23
+  react-native-quick-sqlite: c8abd0e68fe045620fcc626041950d6b2fa2c88a
   react-native-restart: f2a57ccec2e6481deb1f19958ac60c0813313784
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-screenguard: 4daf8cb9c41b1c5a37c1db285832c481459ed4de
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
-  react-native-sodium: bcea1f5e08a3f2ea918c96dce7b7964c8c9c196f
+  react-native-sodium: 12293ab339b0561a710493bb34888ce2709849df
   react-native-theme-switch-animation: eaa4470e7539e317c7612e60028d6ee902fe1183
   react-native-upload: 7b7ad336c3db703b68a8c07cf38e9319ae90d695
   react-native-view-shot: fb3c0774edb448f42705491802a455beac1502a2
