@@ -154,7 +154,7 @@ const SheetWrapper = ({
         ExtraOverlayComponent={
           <>
             {overlay}
-            <Toast context="local" />
+            <Toast context="local" avoidKeyboard />
           </>
         }
         onClose={_onClose}
