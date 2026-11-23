@@ -35,6 +35,13 @@ type UseKeyboardListNavigationOptions = {
   focusItemAt: (index: number) => void;
   open?: (index: number) => void;
   skip?: (index: number) => boolean;
+  /**
+   * Open the item the arrow keys land on, instead of only moving focus to it.
+   * Lists that treat the focused item as the selected one (the notes list)
+   * enable this; lists that are a tree of containers leave it off, because
+   * moving focus there must not open anything.
+   */
+  openOnMove?: boolean;
 };
 
 export function useKeyboardListNavigation(
@@ -48,7 +55,8 @@ export function useKeyboardListNavigation(
     reset,
     select,
     bulkSelect,
-    focusItemAt
+    focusItemAt,
+    openOnMove
   } = options;
   const cursor = useRef(-1);
   const anchor = useRef(-1);
@@ -74,6 +82,24 @@ export function useKeyboardListNavigation(
     select(cursor.current);
     return true;
   }, [open, resetSelection, select, length]);
+
+  /**
+   * Moves the cursor to `nextIndex`, focuses that row, and — on lists that opt
+   * in — opens it. Returns false only when the index is outside the list, so a
+   * key that cannot move anything keeps its default behaviour.
+   */
+  const moveTo = useCallback(
+    (nextIndex: number) => {
+      if (nextIndex < 0 || nextIndex >= length) return false;
+      const moved = nextIndex !== cursor.current;
+      resetSelection();
+      focusItemAt(nextIndex);
+      cursor.current = nextIndex;
+      if (moved && openOnMove && open) open(nextIndex);
+      return true;
+    },
+    [length, resetSelection, focusItemAt, openOnMove, open]
+  );
 
   const onMouseUp = useCallback(
     (e: MouseEvent, itemIndex: number) => {
@@ -103,31 +129,17 @@ export function useKeyboardListNavigation(
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const max = length - 1;
-
       keydownHandler({
         Space: openActiveItem,
         Enter: openActiveItem,
-        ArrowUp: () => {
-          resetSelection();
-
-          let nextIndex = moveUpCyclic(cursor.current, max);
-          while (skip && skip(nextIndex))
-            nextIndex = moveUpCyclic(nextIndex, max);
-          focusItemAt(nextIndex);
-          cursor.current = nextIndex;
-          return true;
-        },
-        ArrowDown: () => {
-          resetSelection();
-
-          let nextIndex = moveDownCyclic(cursor.current, max);
-          while (skip && skip(nextIndex))
-            nextIndex = moveDownCyclic(nextIndex, max);
-          focusItemAt(nextIndex);
-          cursor.current = nextIndex;
-          return true;
-        },
+        ArrowUp: () => moveTo(nextIndexFrom(cursor.current, -1, length, skip)),
+        ArrowDown: () => moveTo(nextIndexFrom(cursor.current, 1, length, skip)),
+        ...(openOnMove
+          ? {
+              k: () => moveTo(nextIndexFrom(cursor.current, -1, length, skip)),
+              j: () => moveTo(nextIndexFrom(cursor.current, 1, length, skip))
+            }
+          : {}),
         "Mod-a": () => {
           resetSelection();
           bulkSelect(new Array(length).fill(0).map((_, i) => i));
@@ -177,8 +189,9 @@ export function useKeyboardListNavigation(
             deselect(cursor.current);
           }
 
-          let nextIndex = moveDown(cursor.current, max);
-          if (skip && skip(nextIndex)) nextIndex = moveDown(nextIndex, max);
+          let nextIndex = moveDown(cursor.current, length - 1);
+          if (skip && skip(nextIndex))
+            nextIndex = moveDown(nextIndex, length - 1);
           if (nextIndex === cursor.current) return false;
 
           focusItemAt(nextIndex);
@@ -198,6 +211,8 @@ export function useKeyboardListNavigation(
     [
       length,
       openActiveItem,
+      moveTo,
+      openOnMove,
       resetSelection,
       skip,
       focusItemAt,
@@ -209,6 +224,29 @@ export function useKeyboardListNavigation(
   );
 
   return { onMouseUp, onKeyDown };
+}
+
+/**
+ * The next index one step up or down `length` rows, wrapping at both ends, and
+ * stepping over the rows `skip` rejects. Exported so the movement rules can be
+ * tested without mounting the hook.
+ */
+export function nextIndexFrom(
+  current: number,
+  delta: 1 | -1,
+  length: number,
+  skip?: (index: number) => boolean
+): number {
+  const max = length - 1;
+  const step = delta === 1 ? moveDownCyclic : moveUpCyclic;
+  let next = step(current, max);
+  // A list where every row is skipped has no reachable index; stop instead of
+  // looping forever.
+  for (let attempts = 0; attempts < length; attempts++) {
+    if (!skip || !skip(next)) return next;
+    next = step(next, max);
+  }
+  return current;
 }
 
 const moveDownCyclic = (i: number, max: number) => (i < max ? ++i : 0);

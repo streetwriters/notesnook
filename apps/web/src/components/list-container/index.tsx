@@ -65,6 +65,22 @@ export const CustomScrollbarsVirtualList = forwardRef<
   );
 });
 
+/**
+ * Lists whose rows are notes rather than containers. Moving through them with
+ * the keyboard opens the note it lands on, the way the mouse selects one; the
+ * other lists (tags, notebooks) are containers, so a keyboard move there only
+ * moves focus and must not open anything.
+ */
+const NOTE_LIST_TYPES = new Set<GroupingKey>([
+  "home",
+  "notes",
+  "favorites",
+  "reminders",
+  "archive",
+  "search",
+  "trash"
+]);
+
 type ListContainerProps = {
   type: GroupingKey;
   group?: GroupingKey;
@@ -157,6 +173,7 @@ function ListContainer(props: ListContainerProps) {
 
   const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
     length: items.length,
+    openOnMove: NOTE_LIST_TYPES.has(type),
     reset: () => toggleSelection(false),
     deselect: (index) => {
       const id = items.cacheItem(index)?.item?.id;
