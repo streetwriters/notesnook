@@ -27,7 +27,7 @@ import { persist, StateStorage } from "zustand/middleware";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import { eSendEvent } from "../../../services/event-manager";
-import { eOnLoadNote } from "../../../utils/events";
+import { eOnLoadNote, eResetEditorTabs } from "../../../utils/events";
 import { editorController } from "./utils";
 
 class TabHistory {
@@ -230,6 +230,8 @@ export function resetTabStore() {
     ...DEFAULT_TABS
   });
   TabSessionStorage.storage.clearStore();
+  syncTabs();
+  eSendEvent(eResetEditorTabs);
 }
 
 export const useTabStore = create<TabStore, any>(
