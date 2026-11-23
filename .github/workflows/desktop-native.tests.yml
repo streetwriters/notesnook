@@ -82,7 +82,8 @@ jobs:
           # GPUI's Linux backend (xkbcommon, xcb, wayland, fontconfig,
           # freetype), the modules (dbus for notifications and the keychain,
           # udev), WebKitGTK for the webview, and an X server with a window
-          # manager and a software Vulkan driver for the e2e run.
+          # manager, a software Vulkan driver and a Secret Service (dbus-x11,
+          # gnome-keyring) for the e2e run.
           sudo apt-get install -y --no-install-recommends \
             build-essential cmake ninja-build ccache nasm pkg-config \
             xvfb openbox mesa-vulkan-drivers libvulkan1 libgl1-mesa-dri \
@@ -90,7 +91,8 @@ jobs:
             libfontconfig-dev libfreetype-dev libwayland-dev \
             libdbus-1-dev libudev-dev libssl-dev \
             libgtk-3-dev libwebkit2gtk-4.1-dev \
-            libxkbcommon-x11-0 fonts-noto-cjk fonts-noto-color-emoji
+            libxkbcommon-x11-0 fonts-noto-cjk fonts-noto-color-emoji \
+            dbus-x11 gnome-keyring
 
       - name: Install Windows build tools
         if: runner.os == 'Windows'
@@ -224,6 +226,11 @@ jobs:
           export RN_GPUI_TEST_BINARY="$APP_BINARY"
           specs="boot shell-launch editor-"
           if [ "$RUNNER_OS" = "Linux" ]; then
+            # The keychain module stores the database key through the Secret
+            # Service; the runner has no desktop session, so start a D-Bus
+            # session with an unlocked gnome-keyring for the app to use.
+            eval "$(dbus-launch --sh-syntax)"
+            echo -n e2e | gnome-keyring-daemon --unlock --components=secrets > /dev/null
             # openbox is the window manager that a window's first focus,
             # maximising and minimising need under Xvfb.
             xvfb-run -a -s "-screen 0 2560x1800x24" \

@@ -160,11 +160,12 @@ export async function applyTheme(change: {
   theme: "system" | "light" | "dark";
   backgroundColor?: string;
 }) {
+  // Only macOS has native window chrome and a window background the app can
+  // tint; react-native-gpui rejects both calls elsewhere, which surfaced as
+  // unhandled errors at startup on Windows and Linux.
+  if (environment.os !== "macOS") return;
   const window = await main();
-  // Only macOS draws native window chrome the app can tint; react-native-gpui
-  // rejects the call elsewhere, which surfaced as an unhandled error at startup
-  // on Windows and Linux.
-  if (environment.os === "macOS") await window.setChromeAppearance(change.theme);
+  await window.setChromeAppearance(change.theme);
   if (change.backgroundColor)
     await window.setBackgroundColor(change.backgroundColor);
 }
