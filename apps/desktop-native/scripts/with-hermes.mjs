@@ -51,13 +51,11 @@ function run(command, args, options = {}) {
 // once in Cargo's checkout of the pinned revision.
 async function prepareNativeEditor() {
   // The app manifest depends on the generated `desktop/autolink` crate, which
-  // run-desktop writes; a fresh checkout has none yet, so generate it first.
-  if (!fs.existsSync(path.join(appRoot, "desktop", "autolink", "Cargo.toml"))) {
-    const { autolink } = await import(
-      "@react-native-gpui/cli/src/autolink.js"
-    );
-    autolink({ projectRoot: appRoot });
-  }
+  // run-desktop writes. A fresh checkout has none, and one left by another
+  // branch may lack the editor, so regenerate it first (run-desktop does the
+  // same again; it only rewrites files whose content changed).
+  const { autolink } = await import("@react-native-gpui/cli/src/autolink.js");
+  autolink({ projectRoot: appRoot });
   const metadata = spawnSync(
     "cargo",
     [
