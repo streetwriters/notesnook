@@ -90,7 +90,7 @@
     "react-native-gzip": "^1.2.1",
     "react-native-keychain": "11.0.0",
     "react-native-mmkv-storage": "13.1.0",
-    "react-native-quick-sqlite": "github:streetwriters/react-native-quick-sqlite#fb62bbd72b6d586b34456bdc49bc2ded25f6a557",
+    "react-native-quick-sqlite": "github:streetwriters/react-native-quick-sqlite#f883b668941898f506b87e4611c6f3c5cd8425cb",
     "react-native-reanimated": "~4.7.0",
     "react-native-svg": "~15.15.0",
     "react-native-url-polyfill": "^2.0.0",
