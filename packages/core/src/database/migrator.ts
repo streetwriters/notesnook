@@ -70,7 +70,6 @@ class Migrator {
 
       const table = new SQLCollection(
         db.sql,
-        db.transaction,
         collection.table,
         db.eventManager,
         db.sanitizer

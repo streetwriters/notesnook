@@ -29,7 +29,6 @@ export class InboxItemsHistory implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "inboxitemshistory",
       db.eventManager,
       db.sanitizer

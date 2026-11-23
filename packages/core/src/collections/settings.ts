@@ -105,7 +105,6 @@ export class Settings implements ICollection {
   constructor(db: Database) {
     this.collection = new SQLCachedCollection(
       db.sql,
-      db.transaction,
       "settings",
       db.eventManager,
       db.sanitizer

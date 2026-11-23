@@ -49,13 +49,26 @@ export const EMPTY_CONTENT = (noteId: string): UnencryptedContentItem => ({
   locked: false
 });
 
+type ContentLinks = {
+  /** The hashes of the attachments used by the content */
+  hashes: string[];
+  /** The notes the content links to */
+  internalLinks: InternalLink[];
+};
+/**
+ * Content that went through `Content.prepare`.
+ */
+export type PreparedContent = {
+  readonly content: Partial<ContentItem>;
+  readonly links?: ContentLinks;
+};
+
 export class Content implements ICollection {
   name = "content";
   readonly collection: SQLCollection<"content", ContentItem>;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "content",
       db.eventManager,
       db.sanitizer
@@ -66,20 +79,56 @@ export class Content implements ICollection {
     await this.collection.init();
   }
 
-  async add(content: Partial<ContentItem>) {
-    if (typeof content.data === "object") {
-      if ("data" in content.data && typeof content.data.data === "string")
-        content.data = content.data.data;
-      else if (!content.data.iv && !content.data.cipher)
-        content.data = `<p>Content is invalid: ${JSON.stringify(
-          content.data
-        )}</p>`;
+  /**
+   * Does everything that has to be done to content before it is written that
+   * doesn't need the database: validating it, saving its new attachments
+   * (file I/O, encryption keys) and finding the links in it. This is the
+   * slow part of saving content, so do it before starting a transaction and
+   * write the result with `addPrepared` inside it.
+   */
+  async prepare(content: Partial<ContentItem>): Promise<PreparedContent> {
+    const item = { ...content };
+    if (typeof item.data === "object") {
+      if ("data" in item.data && typeof item.data.data === "string")
+        item.data = item.data.data;
+      else if (!item.data.iv && !item.data.cipher)
+        item.data = `<p>Content is invalid: ${JSON.stringify(item.data)}</p>`;
     }
 
-    if (content.remote)
+    if (item.remote)
       throw new Error(
         "Please use db.content.merge for merging remote content."
       );
+
+    let links: ContentLinks | undefined;
+    if (
+      typeof item.data === "string" &&
+      item.data &&
+      item.type &&
+      item.noteId
+    ) {
+      const processed = await this.process({
+        type: item.type,
+        data: item.data
+      });
+      if (processed) {
+        const { data, ...processedLinks } = processed;
+        item.data = data;
+        links = processedLinks;
+      }
+    }
+    return { content: item, links };
+  }
+
+  async add(content: Partial<ContentItem>) {
+    return this.addPrepared(await this.prepare(content));
+  }
+
+  /**
+   * Writes content that went through `prepare`. It only uses the database.
+   */
+  async addPrepared(prepared: PreparedContent) {
+    const content = { ...prepared.content };
 
     if (content.noteId && !content.id) {
       // find content from noteId
@@ -97,15 +146,11 @@ export class Content implements ICollection {
     const id = content.id || getId();
 
     const encryptedData = isCipher(content.data) ? content.data : undefined;
-    let unencryptedData =
+    const unencryptedData =
       typeof content.data === "string" ? content.data : undefined;
 
-    if (unencryptedData && content.type && content.noteId)
-      unencryptedData = await this.postProcess({
-        type: content.type,
-        data: unencryptedData,
-        noteId: content.noteId
-      });
+    if (prepared.links && content.noteId)
+      await this.relate(content.noteId, prepared.links);
 
     if (content.id && (await this.exists(content.id))) {
       const contentData = encryptedData
@@ -335,19 +380,30 @@ export class Content implements ICollection {
   }
 
   async postProcess(contentItem: NoteContent<false> & { noteId: string }) {
+    const processed = await this.process(contentItem);
+    if (!processed) return contentItem.data;
+
+    await this.relate(contentItem.noteId, processed);
+    return processed.data;
+  }
+
+  /**
+   * Relates a note to the attachments and notes that its content uses.
+   */
+  private async relate(noteId: string, links: ContentLinks) {
+    await this.processInternalLinks(noteId, links.internalLinks);
+    await this.processLinkedAttachments(noteId, links.hashes);
+  }
+
+  private async process(contentItem: { type: ContentType; data: string }) {
     const content = await getContentFromData(
       contentItem.type,
       contentItem.data
     );
-    if (!content) return contentItem.data;
-    const { data, hashes, internalLinks } = await content.postProcess(
+    if (!content) return;
+    return await content.postProcess(
       this.db.attachments.save.bind(this.db.attachments)
     );
-
-    await this.processInternalLinks(contentItem.noteId, internalLinks);
-    await this.processLinkedAttachments(contentItem.noteId, hashes);
-
-    return data;
   }
 
   private async processLinkedAttachments(noteId: string, hashes: string[]) {

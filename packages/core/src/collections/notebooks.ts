@@ -35,7 +35,6 @@ export class Notebooks implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "notebooks",
       db.eventManager,
       db.sanitizer
@@ -221,23 +220,27 @@ export class Notebooks implements ICollection {
   }
 
   async moveToTrash(...ids: string[]) {
-    await this.db.transaction(async (tr) => {
-      const query = withSubNotebooks(tr, ids, this.db.trash.cache.notebooks)
+    await this.db.transaction(async (tx) => {
+      const query = withSubNotebooks(
+        tx.sql(),
+        ids,
+        this.db.trash.cache.notebooks
+      )
         .selectFrom("subNotebooks")
         .select("id");
 
       const subNotebookIds = (await query.execute()).map((ref) => ref.id);
       deleteItems(subNotebookIds, ...ids);
       if (subNotebookIds.length > 0)
-        await this.db.trash.add("notebook", subNotebookIds, "app");
-      await this.db.trash.add("notebook", ids, "user");
+        await tx.trash.add("notebook", subNotebookIds, "app");
+      await tx.trash.add("notebook", ids, "user");
     });
   }
 
   async remove(...ids: string[]) {
-    await this.db.transaction(async () => {
-      await this.db.relations.unlinkOfType("notebook", ids);
-      await this.collection.softDelete(ids);
+    await this.db.transaction(async (tx) => {
+      await tx.relations.unlinkOfType("notebook", ids);
+      await tx.notebooks.collection.softDelete(ids);
     });
   }
 

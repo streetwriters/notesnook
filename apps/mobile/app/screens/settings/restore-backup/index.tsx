@@ -31,7 +31,11 @@ import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { deleteCacheFileByName } from "../../../common/filesystem/io";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
+import {
+  cacheDir,
+  copyFileAsync,
+  santizeUri
+} from "../../../common/filesystem/utils";
 import { presentDialog } from "../../../components/dialog/functions";
 import {
   endProgress,
@@ -157,7 +161,8 @@ const restoreBackup = async (options: {
 
       let count = 0;
       const skippedAttachments = new Set<string>();
-      await db.transaction(async () => {
+      // all files are restored or none
+      await db.transaction(async (tx) => {
         let passwordOrKey: PasswordOrKey | undefined = undefined;
         for (const path of extractedBackupFiles) {
           if (path === ".nnbackup" || path === "attachments") continue;
@@ -187,7 +192,7 @@ const restoreBackup = async (options: {
             throw new Error(strings.failedToDecryptBackup());
           }
 
-          const skipped = await db.backup.import(backup, {
+          const skipped = await tx.backup.import(backup, {
             ...passwordOrKey,
             attachmentsKey: attachmentsKey
           });
@@ -234,7 +239,7 @@ const restoreBackup = async (options: {
       const rawData =
         Platform.OS === "android"
           ? await ScopedStorage.readFile(filePath, "utf8")
-          : await RNFetchBlob.fs.readFile(filePath, "utf8");
+          : await RNFetchBlob.fs.readFile(santizeUri(filePath), "utf8");
       const backup: LegacyBackupFile = JSON.parse(rawData) as LegacyBackupFile;
 
       const isEncryptedBackup =
@@ -247,19 +252,19 @@ const restoreBackup = async (options: {
       });
 
       const { encryptionKey, password } = isEncryptedBackup
-        ? ({} as PasswordOrKey)
-        : await withPassword();
+        ? await withPassword()
+        : ({} as PasswordOrKey);
 
       if (isEncryptedBackup && !encryptionKey && !password) {
         endProgress();
         throw new Error(strings.failedToDecryptBackup());
       }
 
-      await db.transaction(async () => {
-        updateProgress({
-          progress: strings.restoringBackup()
-        });
-        await db.backup.import(backup, {
+      updateProgress({
+        progress: strings.restoringBackup()
+      });
+      await db.transaction(async (tx) => {
+        await tx.backup.import(backup, {
           encryptionKey,
           password
         });
@@ -547,7 +552,8 @@ const BackupItem = ({
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >
-          {strings.createdOn()} {getFormattedDate(item?.lastModified, "date-time")}
+          {strings.createdOn()}{" "}
+          {getFormattedDate(item?.lastModified, "date-time")}
           {isLegacyBackup ? ` ${strings.legacyBackup()}` : ""} (
           {formatBytes((item as ReactNativeBlobUtilStat).size)})
         </Paragraph>

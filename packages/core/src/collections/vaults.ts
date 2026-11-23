@@ -30,7 +30,6 @@ export class Vaults implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "vaults",
       db.eventManager,
       db.sanitizer
@@ -59,9 +58,9 @@ export class Vaults implements ICollection {
   }
 
   async remove(id: string) {
-    await this.db.transaction(async () => {
-      await this.db.relations.unlinkOfType("vault", [id]);
-      await this.collection.softDelete([id]);
+    await this.db.transaction(async (tx) => {
+      await tx.relations.unlinkOfType("vault", [id]);
+      await tx.vaults.collection.softDelete([id]);
     });
   }
 
