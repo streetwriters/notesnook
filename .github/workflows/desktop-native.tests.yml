@@ -7,8 +7,9 @@ name: Test @notesnook/desktop-native
 # and tabs. macOS is covered by local runs and the react-native-gpui CI; these
 # two jobs are what keeps the Windows and Linux builds from rotting.
 #
-# Type checking and unit tests run once, on Linux: they do not depend on the
-# OS. The e2e step calls node and vitest directly instead of the package's
+# Type checking runs on both: it is also the step that builds the shared
+# @notesnook/* packages the bundle needs. Unit tests run once, on Linux: they do
+# not depend on the OS. The e2e step calls node and vitest directly instead of the package's
 # `build:test`/`test:e2e` scripts, because those use POSIX `VAR=value`
 # prefixes and a fixed binary path, which do not work under cmd or with the
 # short Windows target directory below.
@@ -182,8 +183,9 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop-native
 
+      # Also builds the shared @notesnook/* packages (their dist/) that the JS
+      # bundle imports, so it runs on both systems.
       - name: Type check
-        if: runner.os == 'Linux'
         run: npm run tsc:desktop-native
 
       - name: Unit tests

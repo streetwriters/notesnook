@@ -49,7 +49,15 @@ function run(command, args, options = {}) {
 // from the checkout's own node_modules, which Cargo never installs, so a fresh
 // machine or CI fails there with "Cannot find module 'esbuild'". Install them
 // once in Cargo's checkout of the pinned revision.
-function prepareNativeEditor() {
+async function prepareNativeEditor() {
+  // The app manifest depends on the generated `desktop/autolink` crate, which
+  // run-desktop writes; a fresh checkout has none yet, so generate it first.
+  if (!fs.existsSync(path.join(appRoot, "desktop", "autolink", "Cargo.toml"))) {
+    const { autolink } = await import(
+      "@react-native-gpui/cli/src/autolink.js"
+    );
+    autolink({ projectRoot: appRoot });
+  }
   const metadata = spawnSync(
     "cargo",
     [
@@ -86,6 +94,6 @@ run(process.execPath, [path.join(hermes, "scripts/fetch-binaries.mjs")]);
 
 const [command, ...args] = process.argv.slice(2);
 if (command) {
-  prepareNativeEditor();
+  await prepareNativeEditor();
   run(command, args);
 }
