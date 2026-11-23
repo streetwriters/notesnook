@@ -1,0 +1,4 @@
+- Show image size with and without compression before attaching
+- Minor bug fixes and improvements
+
+Thank you for using Notesnook!

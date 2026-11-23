@@ -64,7 +64,7 @@ module PrebuiltPods
 
     FileUtils.rm_rf(destination)
     FileUtils.mkdir_p(destination)
-    system('unzip', '-oq', zip, '-d', destination) || raise(
+    system('ditto', '-x', '-k', zip, destination) || raise(
       "[Prebuilt iOS] failed to unzip #{zip}"
     )
     FileUtils.touch(marker)
