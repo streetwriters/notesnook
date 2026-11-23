@@ -544,7 +544,15 @@ const initializeDatabase = async (password?: string) => {
   Walkthrough.init();
 };
 
-export const useAppEvents = () => {
+/**
+ * @param configureMode set when running as an Android widget configure screen.
+ * Those share the main app's JS runtime, and EventManager is keyed by handler,
+ * so subscribing here (and unsubscribing on unmount) would remove the main
+ * app's handlers. Only database initialization runs in this mode.
+ */
+export const useAppEvents = ({
+  configureMode
+}: { configureMode?: boolean } = {}) => {
   const [isAppLoading, initialUrl] = useSettingStore((state) => [
     state.isAppLoading,
     state.initialUrl
@@ -577,7 +585,7 @@ export const useAppEvents = () => {
   }, [setLastSynced]);
 
   useEffect(() => {
-    if (isAppLoading) return;
+    if (isAppLoading || configureMode) return;
 
     // Widgets outlive the app process, so they can be left showing content the app no longer has
     // (most obviously after the user clears app data). Nothing can run at that moment, so the
@@ -598,16 +606,16 @@ export const useAppEvents = () => {
     return () => {
       subscriptions.forEach((sub) => sub?.unsubscribe?.());
     };
-  }, [isAppLoading, onSyncComplete]);
+  }, [isAppLoading, onSyncComplete, configureMode]);
 
   useEffect(() => {
-    if (initialUrl && !isAppLoading) {
+    if (initialUrl && !isAppLoading && !configureMode) {
       onAppOpenedFromURL({
         url: initialUrl!,
         isInitialUrl: true
       });
     }
-  }, [initialUrl, isAppLoading]);
+  }, [initialUrl, isAppLoading, configureMode]);
 
   const subscribeToPurchaseListeners = useCallback(async () => {
     if (Platform.OS === "android") {
@@ -737,6 +745,7 @@ export const useAppEvents = () => {
   );
 
   useEffect(() => {
+    if (configureMode) return;
     const subscriptions = [
       db.eventManager.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
       db.eventManager.subscribe(EVENTS.userFetched, async () => {
@@ -860,9 +869,10 @@ export const useAppEvents = () => {
         }
       });
     };
-  }, [onSyncComplete, onUserUpdated]);
+  }, [onSyncComplete, onUserUpdated, configureMode]);
 
   useEffect(() => {
+    if (configureMode) return;
     const onInternetStateChanged = async () => {
       if (!syncedOnLaunch.current) return;
       Sync.run("global", false, "full");
@@ -940,7 +950,7 @@ export const useAppEvents = () => {
       sub?.remove();
       unsubscribePurchaseListeners();
     };
-  }, [isAppLoading, appLocked, checkAutoBackup]);
+  }, [isAppLoading, appLocked, checkAutoBackup, configureMode]);
 
   useEffect(() => {
     if (!appLocked && !syncing && refValues.current.backupDidWait) {
@@ -962,11 +972,11 @@ export const useAppEvents = () => {
   }
 
   useEffect(() => {
-    if (!isAppLoading) {
+    if (!isAppLoading && !configureMode) {
       onUserUpdated();
       doAppLoadActions();
     }
-  }, [isAppLoading, onUserUpdated]);
+  }, [isAppLoading, onUserUpdated, configureMode]);
 
   useEffect(() => {
     if (!appLocked && isAppLoading) {
