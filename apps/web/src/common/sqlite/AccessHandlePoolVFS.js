@@ -46,6 +46,11 @@ function log(...args) {
   // console.debug(...args);
 }
 
+function toErrorCode(e, code) {
+  console.error(e);
+  return e?.name === "QuotaExceededError" ? VFS.SQLITE_FULL : code;
+}
+
 /**
  * This VFS uses the updated Access Handle API with all synchronous methods
  * on FileSystemSyncAccessHandle (instead of just read and write). It will
@@ -127,10 +132,14 @@ export class AccessHandlePoolVFS extends VFS.Base {
     if (file) {
       log(`xClose ${file.path}`);
 
-      file.accessHandle.flush();
       this.#mapIdToFile.delete(fileId);
-      if (file.flags & VFS.SQLITE_OPEN_DELETEONCLOSE) {
-        this.#deletePath(file.path);
+      try {
+        file.accessHandle.flush();
+        if (file.flags & VFS.SQLITE_OPEN_DELETEONCLOSE) {
+          this.#deletePath(file.path);
+        }
+      } catch (e) {
+        return toErrorCode(e, VFS.SQLITE_IOERR_CLOSE);
       }
     }
     return VFS.SQLITE_OK;
@@ -140,48 +149,68 @@ export class AccessHandlePoolVFS extends VFS.Base {
     const file = this.#mapIdToFile.get(fileId);
     log(`xRead ${file.path} ${pData.byteLength} ${iOffset}`);
 
-    const nBytes = file.accessHandle.read(pData, {
-      at: HEADER_OFFSET_DATA + iOffset
-    });
-    if (nBytes < pData.byteLength) {
-      pData.fill(0, nBytes, pData.byteLength);
-      return VFS.SQLITE_IOERR_SHORT_READ;
+    try {
+      const nBytes = file.accessHandle.read(pData, {
+        at: HEADER_OFFSET_DATA + iOffset
+      });
+      if (nBytes < pData.byteLength) {
+        pData.fill(0, nBytes, pData.byteLength);
+        return VFS.SQLITE_IOERR_SHORT_READ;
+      }
+      return VFS.SQLITE_OK;
+    } catch (e) {
+      return toErrorCode(e, VFS.SQLITE_IOERR_READ);
     }
-    return VFS.SQLITE_OK;
   }
 
   xWrite(fileId, pData, iOffset) {
     const file = this.#mapIdToFile.get(fileId);
     log(`xWrite ${file.path} ${pData.byteLength} ${iOffset}`);
 
-    const nBytes = file.accessHandle.write(pData, {
-      at: HEADER_OFFSET_DATA + iOffset
-    });
-    return nBytes === pData.byteLength ? VFS.SQLITE_OK : VFS.SQLITE_IOERR;
+    try {
+      const nBytes = file.accessHandle.write(pData, {
+        at: HEADER_OFFSET_DATA + iOffset
+      });
+      return nBytes === pData.byteLength ? VFS.SQLITE_OK : VFS.SQLITE_IOERR;
+    } catch (e) {
+      return toErrorCode(e, VFS.SQLITE_IOERR_WRITE);
+    }
   }
 
   xTruncate(fileId, iSize) {
     const file = this.#mapIdToFile.get(fileId);
     log(`xTruncate ${file.path} ${iSize}`);
 
-    file.accessHandle.truncate(HEADER_OFFSET_DATA + iSize);
-    return VFS.SQLITE_OK;
+    try {
+      file.accessHandle.truncate(HEADER_OFFSET_DATA + iSize);
+      return VFS.SQLITE_OK;
+    } catch (e) {
+      return toErrorCode(e, VFS.SQLITE_IOERR_TRUNCATE);
+    }
   }
 
   xSync(fileId, flags) {
     const file = this.#mapIdToFile.get(fileId);
     log(`xSync ${file.path} ${flags}`);
 
-    file.accessHandle.flush();
-    return VFS.SQLITE_OK;
+    try {
+      file.accessHandle.flush();
+      return VFS.SQLITE_OK;
+    } catch (e) {
+      return toErrorCode(e, VFS.SQLITE_IOERR_FSYNC);
+    }
   }
 
   xFileSize(fileId, pSize64) {
     const file = this.#mapIdToFile.get(fileId);
-    const size = file.accessHandle.getSize() - HEADER_OFFSET_DATA;
-    log(`xFileSize ${file.path} ${size}`);
-    pSize64.setBigInt64(0, BigInt(size), true);
-    return VFS.SQLITE_OK;
+    try {
+      const size = file.accessHandle.getSize() - HEADER_OFFSET_DATA;
+      log(`xFileSize ${file.path} ${size}`);
+      pSize64.setBigInt64(0, BigInt(size), true);
+      return VFS.SQLITE_OK;
+    } catch (e) {
+      return toErrorCode(e, VFS.SQLITE_IOERR_FSTAT);
+    }
   }
 
   xSectorSize(fileId) {
@@ -203,9 +232,12 @@ export class AccessHandlePoolVFS extends VFS.Base {
 
   xDelete(name, syncDir) {
     log(`xDelete ${name} ${syncDir}`);
-    const path = this.#getPath(name);
-    this.#deletePath(path);
-    return VFS.SQLITE_OK;
+    try {
+      this.#deletePath(this.#getPath(name));
+      return VFS.SQLITE_OK;
+    } catch (e) {
+      return toErrorCode(e, VFS.SQLITE_IOERR_DELETE);
+    }
   }
 
   async close() {

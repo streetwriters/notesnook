@@ -57,12 +57,17 @@ class OriginPrivateFileStore implements IFileStorage {
           })
           .then((file) => file.createSyncAccessHandle())
           .then((handle) => {
-            handle.write(data);
-            handle.close();
+            try {
+              handle.write(data);
+            } finally {
+              handle.close();
+            }
           })
       );
     } catch (e) {
       console.error("Failed to write chunk", e);
+      await this.deleteChunk(chunkName);
+      throw e;
     }
   }
 
