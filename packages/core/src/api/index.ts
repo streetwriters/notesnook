@@ -89,6 +89,7 @@ import { LazyPromise } from "../utils/lazy-promise.js";
 import { InboxApiKeys } from "./inbox-api-keys.js";
 import { Circle } from "./circle.js";
 import { Wrapped } from "./wrapped.js";
+import { PendingSyncItems } from "../database/pending-sync-items.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -185,6 +186,9 @@ class Database {
     assertOutsideTransaction();
     return this._kv;
   };
+  pendingSyncItems = new PendingSyncItems(
+    this.sql as unknown as DatabaseAccessor<RawDatabaseSchema>
+  );
   private _config: ConfigStorage = new ConfigStorage(
     this.databaseReady.promise
   );
