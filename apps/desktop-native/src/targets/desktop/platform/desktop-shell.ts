@@ -161,7 +161,10 @@ export async function applyTheme(change: {
   backgroundColor?: string;
 }) {
   const window = await main();
-  await window.setChromeAppearance(change.theme);
+  // Only macOS draws native window chrome the app can tint; react-native-gpui
+  // rejects the call elsewhere, which surfaced as an unhandled error at startup
+  // on Windows and Linux.
+  if (environment.os === "macOS") await window.setChromeAppearance(change.theme);
   if (change.backgroundColor)
     await window.setBackgroundColor(change.backgroundColor);
 }
