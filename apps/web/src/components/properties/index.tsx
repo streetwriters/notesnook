@@ -43,6 +43,7 @@ import {
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
+import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
 import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
@@ -744,12 +745,15 @@ function Notebooks({ noteId }: { noteId: string }) {
 }
 
 function Reminders({ noteId }: { noteId: string }) {
+  // reminders is replaced on every reminder store refresh (add/edit/delete),
+  // so depend on it to re-query the reminders linked to this note.
+  const reminders = useReminderStore((store) => store.reminders);
   const result = usePromise(
     () =>
       db.relations
         .from({ id: noteId, type: "note" }, "reminder")
         .selector.sorted(db.settings.getGroupOptions("reminders")),
-    [noteId]
+    [noteId, reminders]
   );
   if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
