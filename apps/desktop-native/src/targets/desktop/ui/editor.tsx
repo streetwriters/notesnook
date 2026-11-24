@@ -72,6 +72,7 @@ type NativeHandle = {
 };
 type NativeProps = {
   readonly?: boolean;
+  placeholder?: string;
   sessionId?: string;
   theme?: Record<string, string>;
   style?: unknown;
