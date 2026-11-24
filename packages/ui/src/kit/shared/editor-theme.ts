@@ -26,6 +26,8 @@ export interface EditorThemeTokens {
   surface: string;
   text: string;
   prefix: string;
+  /** The empty-note hint. */
+  placeholder: string;
   selection: string;
   link: string;
   rule: string;
@@ -61,6 +63,7 @@ export function createEditorThemeTokens(
     surface: c.background,
     text: c.paragraph,
     prefix: c.icon,
+    placeholder: c["paragraph-secondary"] ?? c.icon,
     selection: c.textSelection ?? `${c.accent}40`,
     link: c.accent,
     rule: c.separator,
