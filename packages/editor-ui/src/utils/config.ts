@@ -17,13 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Hosts without `localStorage` (the native app) keep the values in memory.
+const memory = new Map<string, string>();
+const storage = {
+  getItem: (key: string): string | null =>
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage.getItem(key)
+      : (memory.get(key) ?? null),
+  setItem: (key: string, value: string) => {
+    if (typeof window !== "undefined" && window.localStorage)
+      window.localStorage.setItem(key, value);
+    else memory.set(key, value);
+  },
+  removeItem: (key: string) => {
+    if (typeof window !== "undefined" && window.localStorage)
+      window.localStorage.removeItem(key);
+    else memory.delete(key);
+  }
+};
+
 function set<T>(key: string, value: T | null) {
-  if (!value) return window.localStorage.removeItem(key);
-  window.localStorage.setItem(key, JSON.stringify(value));
+  if (!value) return storage.removeItem(key);
+  storage.setItem(key, JSON.stringify(value));
 }
 
 function get<T>(key: string, def?: T): T | undefined {
-  const value = window.localStorage.getItem(key);
+  const value = storage.getItem(key);
   if (!value) return def;
 
   return tryParse(value) as T;
