@@ -44,7 +44,26 @@ npm run bootstrap -- --scope=desktop-native
 npm run start:desktop-native
 ```
 
-The first run downloads the Hermes engine for your machine, installs the native editor's JS build dependencies (`npm ci` in Cargo's checkout of `streetwriters/native-editor`, whose build script bundles the editor engine with esbuild), and the first build compiles the Rust side, which takes several minutes; later builds are incremental. The native runtime itself is downloaded prebuilt.
+The first run installs the native editor's JS build dependencies (`npm ci` in Cargo's checkout of `streetwriters/native-editor`, whose build script bundles the editor engine with esbuild), and the first build compiles the Rust side, which takes several minutes; later builds are incremental. The native runtime itself is downloaded prebuilt.
+
+#### The Hermes engine
+
+The Hermes engine is downloaded once per user, not per checkout: `scripts/with-hermes.mjs` (which `npm run start:desktop-native`, `desktop`, `build` and `build:test` go through) keeps it in a shared cache and points the build at it, so every worktree reuses the same copy and a build whose copy is already there never touches the network.
+
+| Platform | Shared cache                                                     |
+| -------- | ---------------------------------------------------------------- |
+| macOS    | `~/Library/Caches/react-native-gpui/hermes`                      |
+| Linux    | `$XDG_CACHE_HOME/react-native-gpui/hermes` (else `~/.cache/...`) |
+| Windows  | `%LOCALAPPDATA%\react-native-gpui\hermes`                        |
+
+```bash
+# download it ahead of time, e.g. before building in a sandbox without network
+npm run prefetch:hermes
+# or install a hermes-<platform>.zip you downloaded from the release yourself
+npm run prefetch:hermes -- --from ~/Downloads/hermes-darwin-arm64.zip
+```
+
+Set `RN_GPUI_HERMES_BIN_ROOT` to use another folder; when it is set it is used as it is. The cache holds `<platform>/` folders with a `.release` file naming the installed release: a copy for another release is replaced on the next build, and an install is staged next to the cache under a lock and moved into place whole, so builds in several worktrees at once are safe. When the copy is missing and cannot be downloaded, the build stops and prints the command to run once with network access and the `fetch-binaries.mjs --from` command for a manual download.
 
 On macOS every rebuilt app is signed ad hoc, so the keychain asks again for each item the app stored. Set `APPLE_SIGNING_IDENTITY` to a signing identity, such as your Apple Development certificate, and choose "Always Allow" once:
 

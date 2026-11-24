@@ -21,23 +21,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 // Makes sure the pinned Hermes engine is in the shared per-user cache (see
 // hermes-cache.mjs), then runs the command with RN_GPUI_HERMES_BIN_ROOT set to
-// that cache, so the CMake build reads the folder the download went to.
+// that cache, so the CMake build reads the folder the download went to. Before
+// the command it also installs the native editor's JS build dependencies.
 
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
-import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { HermesUnavailableError, prepareHermes } from "./hermes-cache.mjs";
 
-const require = createRequire(import.meta.url);
-const hermes = path.dirname(
-  require.resolve("@react-native-gpui/hermes/package.json")
-);
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     stdio: "inherit",
+    env: process.env,
     shell: process.platform === "win32",
     ...options
   });
@@ -88,10 +86,20 @@ async function prepareNativeEditor() {
   });
 }
 
-run(process.execPath, [path.join(hermes, "scripts/fetch-binaries.mjs")]);
+try {
+  await prepareHermes();
+} catch (error) {
+  console.error(
+    error instanceof HermesUnavailableError
+      ? `\n${error.message}\n`
+      : `with-hermes: ${error.message}`
+  );
+  process.exit(1);
+}
 
 const [command, ...args] = process.argv.slice(2);
 if (command) {
   await prepareNativeEditor();
+  // process.env now carries RN_GPUI_HERMES_BIN_ROOT.
   run(command, args);
 }
