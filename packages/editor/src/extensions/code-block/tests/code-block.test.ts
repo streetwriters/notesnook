@@ -175,6 +175,14 @@ test("infer code language from class", async () => {
       h("pre", [], { class: "brush: js hello world hope", lang: "typescript" })
     )
   ).toBe("javascript");
+
+  expect(inferLanguage(h("pre", [], { class: "language-plaintext" }))).toBe(
+    "plaintext"
+  );
+
+  expect(inferLanguage(h("pre", [], { class: "language-text" }))).toBe(
+    "plaintext"
+  );
 });
 
 test("editing code in a highlighted code block should not be too slow", async () => {

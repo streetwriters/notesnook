@@ -33,7 +33,13 @@ export async function langen(rootDirectory) {
       "utf-8"
     )
   );
-  let languages = [];
+  let languages = [
+    {
+      filename: "plaintext",
+      title: "Plain text",
+      alias: ["text", "plain", "txt"]
+    }
+  ];
   for (const key in json.languages) {
     if (key === "meta") continue;
     const language = json.languages[key];
@@ -62,6 +68,7 @@ export async function langen(rootDirectory) {
 export async function loadLanguage(language: string) {
   switch (language) {
     ${languages
+      .filter((l) => l.filename !== "plaintext")
       .map(({ filename, alias }) => {
         return [
           ...(alias || []).map((a) => `case "${a}":`),
