@@ -174,8 +174,6 @@ import {
   mdiLinkOff,
   mdiMagnifyPlusOutline,
   mdiMagnifyMinusOutline,
-  mdiRotateRight,
-  mdiRotateLeft,
   mdiKeyOutline,
   mdiDatabaseImportOutline,
   mdiDeveloperBoard,
@@ -327,6 +325,8 @@ import CheckboxUncheckedSvg from "@notesnook/icons/checkbox-unchecked.svg?react"
 import BellPlusSvg from "@notesnook/icons/bell-plus.svg?react";
 import VibrateSvg from "@notesnook/icons/vibrate.svg?react";
 import ArrowsClockwiseSvg from "@notesnook/icons/arrows-clockwise.svg?react";
+import ArrowClockwiseSvg from "@notesnook/icons/arrow-clockwise.svg?react";
+import MagnifyingGlassMinusSvg from "@notesnook/icons/magnifying-glass-minus.svg?react";
 import BellSimpleSlashSvg from "@notesnook/icons/bell-simple-slash.svg?react";
 import CheckSquareSvg from "@notesnook/icons/check-square.svg?react";
 import SidebarSimpleSvg from "@notesnook/icons/sidebar-simple.svg?react";
@@ -725,8 +725,6 @@ export const FileWebClip = createIcon(mdiWeb);
 export const Unlink = createIcon(mdiLinkOff);
 export const ZoomIn = createIcon(mdiMagnifyPlusOutline);
 export const ZoomOut = createIcon(mdiMagnifyMinusOutline);
-export const RotateCW = createIcon(mdiRotateRight);
-export const RotateACW = createIcon(mdiRotateLeft);
 export const Reset = createIcon(mdiRestore);
 
 export const Account = createIcon(mdiAccountOutline);
@@ -891,6 +889,8 @@ export const BellPlus = createSvgIcon(BellPlusSvg);
 export const BellSimpleSlash = createSvgIcon(BellSimpleSlashSvg);
 export const Vibrate = createSvgIcon(VibrateSvg);
 export const ArrowsClockwise = createSvgIcon(ArrowsClockwiseSvg);
+export const ArrowClockwise = createSvgIcon(ArrowClockwiseSvg);
+export const MagnifyingGlassMinus = createSvgIcon(MagnifyingGlassMinusSvg);
 export const CheckSquare = createSvgIcon(CheckSquareSvg);
 export const SidebarSimple = createSvgIcon(SidebarSimpleSvg);
 export const Eyeglasses = createSvgIcon(EyeglassesSvg);
