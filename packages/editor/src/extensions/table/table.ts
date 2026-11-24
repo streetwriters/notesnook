@@ -28,6 +28,7 @@ import {
 import { DOMOutputSpec, Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import { EditorView, NodeView } from "@tiptap/pm/view";
+import { setCellBorderColor } from "./utilities/setCellBorderColor.js";
 import { createColGroup } from "./utilities/createColGroup.js";
 import { createTable } from "./utilities/createTable.js";
 import { deleteTableWhenAllCellsSelected } from "./utilities/deleteTableWhenAllCellsSelected.js";
@@ -425,6 +426,8 @@ export const Table = Node.create<TableOptions>({
       setCellAttribute:
         (name, value) =>
         ({ state, dispatch }) => {
+          if (name === "borderColor" && typeof value === "string" && value)
+            return setCellBorderColor(value)(state, dispatch);
           return setCellAttr(name, value)(state, dispatch);
         },
       goToNextCell:
