@@ -348,6 +348,7 @@ const onLogout = async (reason: string) => {
   Navigation.queueRoutesForUpdate();
   SettingsService.resetSettings();
   useUserStore.getState().setUser(null);
+  useUserStore.setState({ profile: undefined });
   useUserStore.getState().setSyncing(false);
   useUserStore.getState().setIsLoggingOut(false);
   eSendEvent(eAfterSync);
