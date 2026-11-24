@@ -115,6 +115,8 @@ function Container(
   );
   const style = { ...viewStyle };
   for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
+  // Pressable things show the hand cursor unless the style says otherwise.
+  if (onPress && style.cursor === undefined) style.cursor = "pointer";
   if (onPress)
     return (
       <PressableComponent
@@ -191,7 +193,11 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
     <TextComponent
       ref={inner}
       {...nativeProps}
-      style={resolveLineHeight({ ...inherited, ...viewStyle })}
+      style={resolveLineHeight({
+        ...inherited,
+        ...(onPress ? { cursor: "pointer" } : {}),
+        ...viewStyle
+      })}
       numberOfLines={numberOfLines ?? resolved.numberOfLines}
       selectable={selectable ?? resolved.selectable}
       onPress={onPress}
@@ -218,6 +224,7 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
     const onPress = pressHandler(props);
     const style = { ...viewStyle };
     for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
+    if (style.cursor === undefined) style.cursor = disabled ? "default" : "pointer";
     const ButtonComponent = resolved.animated
       ? AnimatedPressable
       : AnyPressable;
@@ -309,7 +316,10 @@ function TextField(
     <AnyInput
       ref={inner}
       {...fields}
-      style={viewStyle}
+      style={{
+        cursor: props.disabled ? "default" : "text",
+        ...viewStyle
+      }}
       value={props.value}
       defaultValue={props.defaultValue}
       placeholder={props.placeholder}

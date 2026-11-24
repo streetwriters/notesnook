@@ -27,6 +27,7 @@ enum Pending {
 #[derive(Default)]
 struct Desired {
     readonly: bool,
+    placeholder: String,
     theme: String,
     settings: String,
 }
@@ -40,6 +41,9 @@ struct NotesnookEditor {
     desired: Desired,
     applied: Desired,
     applied_once: bool,
+    /// A focus request that arrived before the view existed; it is granted on
+    /// the first render that has the view and a window.
+    focus_pending: bool,
     save_generation: Rc<Cell<u64>>,
 }
 
@@ -140,11 +144,13 @@ impl NotesnookEditorSpec for NotesnookEditor {
             pending: Vec::new(),
             desired: Desired {
                 readonly: props.readonly(),
+                placeholder: props.placeholder().to_string(),
                 theme: props.theme().to_string(),
                 settings: props.settings().to_string(),
             },
             applied: Desired::default(),
             applied_once: false,
+            focus_pending: false,
             save_generation: Rc::new(Cell::new(0)),
         }
     }
@@ -157,6 +163,7 @@ impl NotesnookEditorSpec for NotesnookEditor {
     ) {
         self.desired = Desired {
             readonly: props.readonly(),
+            placeholder: props.placeholder().to_string(),
             theme: props.theme().to_string(),
             settings: props.settings().to_string(),
         };
@@ -178,6 +185,12 @@ impl NotesnookEditorSpec for NotesnookEditor {
             return div().size_full().child(error.clone()).into_any_element();
         }
         self.apply(app);
+        if self.focus_pending {
+            if let Some(view) = self.view.clone() {
+                self.focus_pending = false;
+                view.update(app, |view, cx| view.focus(window, cx));
+            }
+        }
         match &self.view {
             Some(view) => div().size_full().child(view.clone()).into_any_element(),
             None => div().size_full().into_any_element(),
@@ -193,8 +206,11 @@ impl NotesnookEditorSpec for NotesnookEditor {
     }
 
     fn focus(&mut self, _position: String, cx: &mut NotesnookEditorContext) {
-        if let Some(view) = self.view.clone() {
-            cx.with_window(|window, app| view.update(app, |view, cx| view.focus(window, cx)));
+        match self.view.clone() {
+            Some(view) => {
+                cx.with_window(|window, app| view.update(app, |view, cx| view.focus(window, cx)));
+            }
+            None => self.focus_pending = true,
         }
     }
 
@@ -263,6 +279,11 @@ impl NotesnookEditor {
             let editable = !self.desired.readonly;
             view.update(app, |view, cx| view.set_editable(editable, cx));
             self.applied.readonly = self.desired.readonly;
+        }
+        if first || self.desired.placeholder != self.applied.placeholder {
+            let text = Some(self.desired.placeholder.clone()).filter(|text| !text.is_empty());
+            view.update(app, |view, cx| view.set_placeholder(text, cx));
+            self.applied.placeholder = self.desired.placeholder.clone();
         }
         if !self.desired.theme.is_empty() && self.desired.theme != self.applied.theme {
             let theme = self.desired.theme.clone();

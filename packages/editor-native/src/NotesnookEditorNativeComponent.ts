@@ -57,6 +57,8 @@ export type AttachmentRequestEvent = Readonly<{
 
 export interface NativeProps extends ViewProps {
   readonly?: boolean;
+  /** Hint shown while the note is empty. */
+  placeholder?: string;
   /** Identifies the note session; changing it resets the editor's view state. */
   sessionId?: string;
   /** JSON object of theme tokens (colours as CSS strings). */

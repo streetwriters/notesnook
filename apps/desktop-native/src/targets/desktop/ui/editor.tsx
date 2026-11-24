@@ -282,6 +282,7 @@ export const EditorSurface = forwardRef<
           style={{ flex: 1 }}
           sessionId={props.sessionId}
           readonly={props.readonly}
+          placeholder={props.placeholder}
           theme={theme}
           onQueryResults={({ changed }) => {
             queries.apply(changed);

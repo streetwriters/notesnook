@@ -61,6 +61,8 @@ export type AttachmentRequest = {
 
 export type NotesnookEditorProps = Omit<ViewProps, "children"> & {
   readonly?: boolean;
+  /** Hint shown while the note is empty. */
+  placeholder?: string;
   sessionId?: string;
   /** Theme tokens, colours as CSS strings. */
   theme?: Record<string, string>;
