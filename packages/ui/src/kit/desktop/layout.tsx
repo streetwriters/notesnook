@@ -358,7 +358,14 @@ export function ScrollContainer(props: Contract.ScrollContainerProps) {
     testID: props.testID
   });
   return (
-    <AnyScrollView {...nativeProps} style={viewStyle}>
+    // flexGrow makes the content at least as tall as the viewport, so a child
+    // with `flex: 1` (the native editor) fills the page instead of collapsing
+    // to its content, as in a web `overflow: auto` column.
+    <AnyScrollView
+      {...nativeProps}
+      style={viewStyle}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
       {props.children}
     </AnyScrollView>
   );
