@@ -23,7 +23,8 @@
     "build:test:web": "TEST=true vite build --config vite.config.web.ts",
     "test:e2e:web": "npm run build:test:web && cd ../web && npx playwright test -c ../desktop-native/playwright.web.config.ts",
     "tsc:web": "tsc --noEmit -p src/targets/web/tsconfig.json",
-    "test:unit": "vitest run --config vitest.unit.config.ts"
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@ammarahmed/react-native-eventsource": "1.2.0",
@@ -46,7 +47,7 @@
     "@react-native-community/netinfo": "~11.4.1",
     "@react-native-gpui/clipboard": "1.16.0",
     "@react-native-gpui/codegen": "0.87.0-alpha.1",
-    "@react-native-gpui/core": "0.87.0-alpha.3",
+    "@react-native-gpui/core": "0.87.0-alpha.5",
     "@react-native-gpui/crypto": "0.0.2",
     "@react-native-gpui/device-info": "14.1.0",
     "@react-native-gpui/fs": "0.0.1-alpha.1",
@@ -60,7 +61,7 @@
     "@react-native-gpui/reanimated": "4.7.0-alpha.1",
     "@react-native-gpui/spellcheck": "0.0.1",
     "@react-native-gpui/svg": "15.15.0-alpha.1",
-    "@react-native-gpui/system": "0.0.1",
+    "@react-native-gpui/system": "0.0.2",
     "@react-native-gpui/updater": "0.0.1",
     "@react-native-gpui/webauthn": "0.0.1",
     "@react-native-gpui/webview": "13.16.1",
@@ -120,6 +121,7 @@
     "@vitejs/plugin-react": "^4.7.0",
     "comlink": "^4.4.2",
     "event-source-polyfill": "^1.0.31",
+    "patch-package": "^7.0.0",
     "pngjs": "^7.0.0",
     "react-dom": "^19.2.3",
     "typescript": "^5.8.3",

@@ -1,0 +1,21 @@
+diff --git a/node_modules/react-native-mmkv-storage/desktop/cpp/mmkv-adapter.cpp b/node_modules/react-native-mmkv-storage/desktop/cpp/mmkv-adapter.cpp
+--- a/node_modules/react-native-mmkv-storage/desktop/cpp/mmkv-adapter.cpp
++++ b/node_modules/react-native-mmkv-storage/desktop/cpp/mmkv-adapter.cpp
+@@ -16,7 +16,7 @@ static std::unordered_map<std::string, MMKV *> mmkvInstances;
+
+ static string rPath = "";
+
+-extern "C" ssize_t mmkv_secure_get(const char *alias, char *out, size_t capacity);
++extern "C" ptrdiff_t mmkv_secure_get(const char *alias, char *out, size_t capacity);
+ extern "C" bool mmkv_secure_set(const char *alias, const char *value);
+ extern "C" bool mmkv_secure_exists(const char *alias);
+ extern "C" bool mmkv_secure_remove(const char *alias);
+@@ -24,7 +24,7 @@ extern "C" bool mmkv_secure_remove(const char *alias);
+ static string readSecureKey(const string &alias)
+ {
+     char buffer[512];
+-    ssize_t length = mmkv_secure_get(alias.c_str(), buffer, sizeof(buffer));
++    ptrdiff_t length = mmkv_secure_get(alias.c_str(), buffer, sizeof(buffer));
+     return length < 0 ? string() : string(buffer, length);
+ }
+
