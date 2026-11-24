@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { colord } from "colord";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { config } from "../../utils/config.js";
@@ -113,6 +114,22 @@ export function ColorTool(props: ColorToolProps) {
   const [colors, setColors] = useState(
     config.get<string[]>(`custom_${cacheKey}`, []) || []
   );
+  /**
+   * popup state is shared between tabs, so this popup can be opened while
+   * its tab is hidden and get positioned against an invisible button. We
+   * reposition it once the button becomes visible, without a flicker.
+   */
+  const [buttonLayout, setButtonLayout] = useState(0);
+  useEffect(() => {
+    const button = buttonRef.current;
+    if (!button) return;
+    const observer = new ResizeObserver(() =>
+      flushSync(() => setButtonLayout((l) => l + 1))
+    );
+    observer.observe(button);
+    return () => observer.disconnect();
+  }, []);
+
   const position: PositionOptions = useMemo(
     () => ({
       isTargetAbsolute: true,
@@ -121,7 +138,7 @@ export function ColorTool(props: ColorToolProps) {
       location: isBottom ? "top" : "below",
       yOffset: 10
     }),
-    [isBottom, isOpen]
+    [isBottom, isOpen, buttonLayout]
   );
 
   useEffect(() => {
