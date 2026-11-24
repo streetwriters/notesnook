@@ -266,7 +266,9 @@ function TipTap(props: TipTapProps) {
           }
         }
       },
-      enableInputRules: markdownShortcuts,
+      // font ligatures are input rules too, so keep them enabled even
+      // when markdown shortcuts are turned off
+      enableInputRules: markdownShortcuts ? true : ["fontLigature"],
       enableFontLigatures: fontLigatures,
       downloadOptions,
       doubleSpacedLines,
