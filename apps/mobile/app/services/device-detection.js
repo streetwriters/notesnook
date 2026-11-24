@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Dimensions, PixelRatio, Platform } from "react-native";
 import DeviceInfo from "react-native-device-info";
+import { resolveDeviceMode } from "../utils/responsive-layout";
 
 let windowSize = Dimensions.get("window");
 let screenSize = Dimensions.get("screen");
@@ -73,34 +74,14 @@ export class DeviceDetectionService {
   };
 
   checkSmallTab(orientation) {
-    let deviceSize = this.getDeviceSize();
-
-    const isLandscape = orientation?.startsWith("LANDSCAPE");
-    const isValidTabletSize = deviceSize > 5.5;
-    const isValidLargeTabletSize = deviceSize > 9;
-
-    if (
-      (!this.isTablet() && isLandscape && isValidTabletSize) ||
-      (this.isTablet() && isValidTabletSize && !isValidLargeTabletSize)
-    ) {
-      this.isTab = true;
-      this.isPhone = false;
-      this.isSmallTab = true;
-    } else if (this.isTablet() && isLandscape && isValidLargeTabletSize) {
-      this.isTab = true;
-      this.isPhone = false;
-      this.isSmallTab = false;
-    } else {
-      if (!this.isTablet() || deviceSize < 5.5) {
-        this.isTab = false;
-        this.isPhone = true;
-        this.isSmallTab = false;
-      } else {
-        this.isTab = true;
-        this.isSmallTab = true;
-        this.isPhone = false;
-      }
-    }
+    const mode = resolveDeviceMode({
+      windowWidth: this.width,
+      isTabletDevice: !!this.isTablet(),
+      isLandscape: orientation?.startsWith("LANDSCAPE")
+    });
+    this.isPhone = mode === "mobile";
+    this.isTab = mode !== "mobile";
+    this.isSmallTab = mode === "smallTablet";
   }
 
   isPhoneOrTablet() {

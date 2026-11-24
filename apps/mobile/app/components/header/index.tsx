@@ -114,24 +114,29 @@ export const Header = ({
           onLeftButtonPress={onLeftMenuButtonPress}
         />
 
-        {!title ? (
-          <View
-            style={{
-              width: 100,
-              backgroundColor: colors.primary.hover,
-              height: 10,
-              borderRadius: 100
-            }}
-          />
-        ) : hasSearch ? (
-          <Paragraph>
-            {selectionMode
-              ? strings.itemsSelected(selectedItemsList.length)
-              : strings.searchInRoute(title)}
-          </Paragraph>
-        ) : (
-          <Heading size={AppFontSize.lg}>{title}</Heading>
-        )}
+        <View style={{ flex: 1, minWidth: 0 }}>
+          {!title ? (
+            <View
+              style={{
+                width: 100,
+                maxWidth: "100%",
+                backgroundColor: colors.primary.hover,
+                height: 10,
+                borderRadius: 100
+              }}
+            />
+          ) : hasSearch ? (
+            <Paragraph numberOfLines={1}>
+              {selectionMode
+                ? strings.itemsSelected(selectedItemsList.length)
+                : strings.searchInRoute(title)}
+            </Paragraph>
+          ) : (
+            <Heading size={AppFontSize.lg} numberOfLines={1}>
+              {title}
+            </Heading>
+          )}
+        </View>
 
         <RightMenus rightButton={rightButton} />
       </HeaderWrapper>

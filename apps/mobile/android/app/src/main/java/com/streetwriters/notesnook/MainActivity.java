@@ -16,18 +16,41 @@ import androidx.core.view.WindowInsetsCompat;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
+import com.reactnativecommunity.webview.RNCWebView;
 import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    // Registered before any editor view is created. The WebView reads this
+    // when the keyboard commits an image.
+    RNCWebView.keyboardImageListener = KeyboardImagePaste::onReceive;
     RNBootSplash.init(this, R.style.BootTheme);
 
     super.onCreate(null);
+    WindowBoundsSync.install(this, getReactHost());
+    WindowBoundsSync.sync(this, getReactHost());
+    attachKeyboardImages();
     if (BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    WindowBoundsSync.install(this, getReactHost());
+    WindowBoundsSync.sync(this, getReactHost());
+    attachKeyboardImages();
+  }
+
+  private void attachKeyboardImages() {
+    if (getReactHost() != null) {
+      KeyboardImagePaste.attach(getReactHost().getCurrentReactContext());
+    }
+    View content = findViewById(android.R.id.content);
+    KeyboardImagePaste.watch(content);
   }
 
   /**
@@ -53,6 +76,10 @@ public class MainActivity extends ReactActivity {
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     getReactHost().onConfigurationChanged(this);
+    // Runs after React Native re-reads the application display metrics,
+    // which otherwise stay at the full display size inside a pop-up window.
+    WindowBoundsSync.sync(this, getReactHost());
+    attachKeyboardImages();
     Intent intent = new Intent("onConfigurationChanged");
     intent.putExtra("newConfig", newConfig);
     this.sendBroadcast(intent);

@@ -22,6 +22,7 @@ import React, { useEffect, useRef } from "react";
 import {
   AppState,
   AppStateStatus,
+  DeviceEventEmitter,
   KeyboardAvoidingView,
   TextInput,
   View
@@ -32,6 +33,7 @@ import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { editorRef } from "../../utils/global-refs";
+import { attachPastedImages } from "./tiptap/picker";
 import { editorController, textInput } from "./tiptap/utils";
 
 export type PaneWidths = {
@@ -93,6 +95,23 @@ export const EditorWrapper = ({
       sub?.remove();
     };
   }, [loading]);
+
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(
+      "nnKeyboardImage",
+      (payload?: {
+        images?: { path: string; mime?: string; filename?: string }[];
+      }) => {
+        if (!payload?.images?.length) return;
+        attachPastedImages(payload.images).catch(() => {
+          /* picker surfaces its own errors */
+        });
+      }
+    );
+    return () => {
+      sub.remove();
+    };
+  }, []);
 
   return (
     <View

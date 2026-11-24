@@ -112,23 +112,47 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
   const isSmallTab = deviceMode === "smallTablet";
   const isLoaded = useRef(false);
   const prevWidths = useRef(widths);
+  const prevMode = useRef(deviceMode);
   const isIPhone = Platform.OS === "ios";
   const tabChangedFromSwipeAction = useSharedValue(false);
 
   useEffect(() => {
+    const previous = prevWidths.current;
+    const widthsChanged =
+      !previous ||
+      previous.sidebar !== widths.sidebar ||
+      previous.list !== widths.list ||
+      previous.editor !== widths.editor;
+    const modeChanged = prevMode.current !== deviceMode;
+    prevMode.current = deviceMode;
+
     if (deviceMode === "tablet" || fullscreen) {
       translateX.value = 0;
-    } else {
-      if (prevWidths.current?.sidebar !== widths.sidebar) {
-        translateX.value = widths.sidebar;
-        if (translateX.value === editorPosition) {
-          onChangeTab?.({ i: 2, from: 1 });
-        }
+    } else if (widthsChanged || modeChanged || !isLoaded.current) {
+      // Keep the page the user is on. Mobile shows one column, so an open
+      // editor has to move to the new editor offset. Two-pane layouts park
+      // on the list+editor offset (the sidebar width).
+      if (deviceMode === "mobile" && currentTab.value === 2) {
+        translateX.value = editorPosition;
+      } else if (isDrawerOpen.value && deviceMode === "mobile") {
+        translateX.value = drawerPosition;
+      } else {
+        translateX.value = homePosition;
       }
     }
     isLoaded.current = true;
     prevWidths.current = widths;
-  }, [deviceMode, widths, fullscreen, translateX, editorPosition, onChangeTab]);
+  }, [
+    deviceMode,
+    widths,
+    fullscreen,
+    translateX,
+    editorPosition,
+    homePosition,
+    currentTab,
+    isDrawerOpen,
+    drawerPosition
+  ]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -228,10 +252,16 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
           translateX.value = animated ? withTiming(0) : 0;
           return;
         }
-        translateX.value = animated ? withTiming(homePosition) : homePosition;
-        if (!animated) {
-          translateX.value = 299;
-          translateX.value = 300;
+        if (animated) {
+          translateX.value = withTiming(homePosition);
+        } else if (translateX.value === homePosition) {
+          // Reanimated drops a write that assigns the value it already
+          // holds. The old code forced 300, which only matched a 300dp
+          // sidebar and left every other window width mis-aligned.
+          translateX.value = homePosition + 0.5;
+          translateX.value = homePosition;
+        } else {
+          translateX.value = homePosition;
         }
         useSideBarDraggingStore.setState({
           dragging: false

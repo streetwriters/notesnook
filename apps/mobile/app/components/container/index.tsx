@@ -31,12 +31,17 @@ export const Container = ({ children }: PropsWithChildren) => {
   const windowHeightRef = useRef(Dimensions.get("window").height);
   const { height: windowHeight } = useWindowDimensions();
   const timerRef = useRef<NodeJS.Timeout>(undefined);
+  // Android pop-up windows change height continuously. A pixel height
+  // captured 500ms after layout stays stale for the rest of the resize.
+  // iOS keeps the lock so the keyboard does not collapse the tree.
+  const pinHeight = Platform.OS === "ios";
   useEffect(() => {
+    if (!pinHeight) return;
     if (windowHeight !== windowHeightRef.current) {
       setHeight(0);
       windowHeightRef.current = windowHeight;
     }
-  }, [windowHeight]);
+  }, [pinHeight, windowHeight]);
 
   return (
     <View
@@ -44,16 +49,18 @@ export const Container = ({ children }: PropsWithChildren) => {
         overflow: "hidden",
         paddingTop: Platform.OS === "android" ? 0 : insets.top,
         paddingBottom: Platform.OS === "android" ? 0 : insets.bottom,
-        height: height || "100%",
+        flex: 1,
+        height: pinHeight ? height || "100%" : undefined,
         width: "100%",
         backgroundColor: colors.primary.background
       }}
       onLayout={(event) => {
-        const height = event.nativeEvent.layout.height;
+        if (!pinHeight) return;
+        const nextHeight = event.nativeEvent.layout.height;
         clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
           if (!keyboard.keyboardShown) {
-            setHeight(height);
+            setHeight(nextHeight);
           }
         }, 500);
       }}
