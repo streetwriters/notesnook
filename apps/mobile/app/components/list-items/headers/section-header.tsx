@@ -99,8 +99,9 @@ export const SectionHeader = React.memo<
           }}
         >
           <Pressable
+            disabled={screen === "Search"}
             onPress={() => {
-              if (screen !== "Search") onOpenJumpToDialog();
+              onOpenJumpToDialog();
             }}
             hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
             style={{
