@@ -237,7 +237,11 @@ jobs:
               bash -c 'openbox >/dev/null 2>&1 & sleep 1; exec "$@"' _ \
               npx vitest run --config desktop/vitest.e2e.config.ts $specs
           else
-            npx vitest run --config desktop/vitest.e2e.config.ts $specs
+            # The harness draws at scale 2 by default: on a 1920x1080 screen
+            # the window would be 960 px wide, under the app's 1000 px tablet
+            # breakpoint, which collapses the navigation the specs wait for.
+            RN_GPUI_TEST_SCALE_FACTOR=1 \
+              npx vitest run --config desktop/vitest.e2e.config.ts $specs
           fi
 
       - name: Upload e2e failures
