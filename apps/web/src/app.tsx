@@ -211,8 +211,7 @@ function DesktopAppContents() {
               minSize={50}
               maxSize={isTablet ? 0 : 500}
               style={{
-                overflow: "initial",
-                zIndex: 3
+                overflow: "initial"
               }}
             >
               <NavigationMenu
