@@ -313,7 +313,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "parking_lot",
  "percent-encoding",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
  "x11rb",
 ]
 
@@ -2115,7 +2115,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users 0.5.3",
- "windows-sys 0.59.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2272,7 +2272,7 @@ dependencies = [
 [[package]]
 name = "editor-core"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/native-editor?branch=main#3b7b7ed42a549ecb0c7dac7d58b68c4056927650"
+source = "git+https://github.com/streetwriters/native-editor?branch=main#25e9467efc432bdb32a3b4502f30473631fb2b26"
 dependencies = [
  "aho-corasick",
  "anyhow",
@@ -2454,7 +2454,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3764,7 +3764,7 @@ dependencies = [
 [[package]]
 name = "host-quickjs"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/native-editor?branch=main#3b7b7ed42a549ecb0c7dac7d58b68c4056927650"
+source = "git+https://github.com/streetwriters/native-editor?branch=main#25e9467efc432bdb32a3b4502f30473631fb2b26"
 dependencies = [
  "anyhow",
  "cc",
@@ -7456,7 +7456,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -7513,7 +7513,7 @@ dependencies = [
  "security-framework 3.7.0",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8135,14 +8135,14 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d204abcbdf8e88729306a8d0ca01a79d8a49969fe1f84696909d6dbc4321c1a"
 dependencies = [
- "foldhash 0.1.5",
- "hashbrown 0.15.5",
+ "foldhash 0.2.0",
+ "hashbrown 0.16.1",
 ]
 
 [[package]]
 name = "spellcheck"
 version = "0.1.0"
-source = "git+https://github.com/streetwriters/native-editor?branch=main#3b7b7ed42a549ecb0c7dac7d58b68c4056927650"
+source = "git+https://github.com/streetwriters/native-editor?branch=main#25e9467efc432bdb32a3b4502f30473631fb2b26"
 dependencies = [
  "futures",
  "serde",
@@ -8475,7 +8475,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -9601,7 +9601,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -10160,7 +10160,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d6f32a0ff4a9f6f01231eb2059cc85479330739333e0e58cadf03b6af2cca10"
 dependencies = [
  "cfg-if",
- "windows-sys 0.59.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
