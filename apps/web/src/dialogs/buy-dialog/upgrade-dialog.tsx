@@ -27,24 +27,40 @@ import {
 import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
 import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { FeatureCaption } from "./feature-caption";
 import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { formatRecurringPeriodShort } from "./plan-list";
-import { useCheckoutStore } from "./store";
-import { BuyDialog } from "./buy-dialog";
-import { ErrorText } from "../../components/error-text";
 import { getCurrencySymbol } from "../../common/currencies";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { ChangePlanDialog } from "./change-plan-dialog";
-import { Loading } from "../../components/icons";
+import {
+  Bell,
+  CheckIcon,
+  Cloud,
+  FileDoc,
+  Icon,
+  Loading,
+  Notebook,
+  Tag,
+  Warning
+} from "../../components/icons";
 import { showToast } from "../../utils/toast";
+import { hardNavigate } from "../../navigation";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { strings } from "@notesnook/intl";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
   onClose: () => void;
+};
+
+const FEATURE_ICONS: Partial<Record<FeatureId, Icon>> = {
+  storage: Cloud,
+  fileSize: FileDoc,
+  notebooks: Notebook,
+  tags: Tag,
+  activeReminders: Bell
 };
 
 export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
@@ -72,141 +88,300 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
       "activeReminders"
     ])
   ].map((id) => getFeature(id));
+  const featureRows: (typeof features)[] = [];
+  for (let i = 0; i < features.length; i += 2)
+    featureRows.push(features.slice(i, i + 2));
 
   return (
     <BaseDialog
       testId="upgrade-dialog"
-      title={strings.unlockFeatureToday()}
-      description={strings.upgradePlanTo(metadata.title)}
       isOpen={true}
       onClose={onClose}
-      textAlignment="center"
-      sx={{ pb: 2 }}
+      width={550}
+      noScroll
+      sx={{
+        borderRadius: "radius3",
+        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+        // BaseDialog's empty header already provides the top padding
+        pb: "spacing7"
+      }}
     >
-      <ErrorText error={feature.error} sx={{ alignItems: "center" }} />
       <Flex
         sx={{
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 2
+          gap: "spacing7",
+          px: "spacing7",
+          overflowY: "auto"
         }}
       >
-        <Flex
-          sx={{
-            flexDirection: "column",
-            mt: 1,
-            gap: 1,
-            bg: "background-secondary",
-            borderRadius: "dialog",
-            border: "1px solid var(--border)",
-            p: 1,
-            alignSelf: "stretch"
-          }}
-        >
-          <Text variant="body" sx={{ fontWeight: "bold", color: "heading" }}>
-            {feature.availableOn === SubscriptionPlan.ESSENTIAL
-              ? strings.essentialPlan()
-              : feature.availableOn === SubscriptionPlan.BELIEVER
-              ? strings.believerPlan()
-              : strings.proPlan()}
-          </Text>
-          {features.map((f) => {
-            const caption =
-              f.availability[
-                planToAvailability(feature.availableOn || SubscriptionPlan.PRO)
-              ].caption;
-            return (
-              <Flex key={f.id} sx={{ justifyContent: "space-between" }}>
-                <Text
-                  variant="body"
-                  color={f.id === feature.id ? "accent" : "paragraph"}
-                >
-                  {f.title}
-                </Text>
-                <Text
-                  variant="body"
+        <Flex sx={{ flexDirection: "column", gap: "spacing6" }}>
+          {feature.error ? (
+            <Flex
+              sx={{
+                alignItems: "center",
+                gap: "spacing3",
+                px: "spacing4",
+                py: "spacing3",
+                bg: "background-error",
+                borderRadius: "radius2"
+              }}
+            >
+              <Warning size={16} color="icon-error" sx={{ flexShrink: 0 }} />
+              <Text
+                className="selectable"
+                sx={{
+                  fontSize: "sm",
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  color: "paragraph-error"
+                }}
+              >
+                {feature.error}
+              </Text>
+            </Flex>
+          ) : null}
+          <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+            <Text
+              data-test-id="dialog-title"
+              sx={{
+                fontSize: "lg",
+                fontWeight: 600,
+                lineHeight: 1.4,
+                color: "heading"
+              }}
+            >
+              {strings.unlockFeatureToday()}
+            </Text>
+            <Text
+              sx={{
+                fontSize: "sm",
+                fontWeight: 400,
+                lineHeight: 1,
+                color: "paragraph"
+              }}
+            >
+              {strings.upgradePlanTo(metadata.title)}
+            </Text>
+          </Flex>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing6",
+              p: "spacing7",
+              bg: "background-secondary",
+              borderRadius: "radius4"
+            }}
+          >
+            <Flex
+              sx={{ alignItems: "center", justifyContent: "space-between" }}
+            >
+              <Text
+                sx={{
+                  fontSize: "md",
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  color: "heading"
+                }}
+              >
+                What’s included
+              </Text>
+              <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
+                <Box
                   sx={{
-                    "& path": {
-                      fill:
-                        f.id === feature.id
-                          ? "var(--accent) !important"
-                          : "var(--paragraph-secondary) !important"
-                    }
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    bg: "accent"
+                  }}
+                />
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    color: "accent"
                   }}
                 >
-                  <FeatureCaption caption={caption} />
+                  {feature.availableOn === SubscriptionPlan.ESSENTIAL
+                    ? strings.essentialPlan()
+                    : feature.availableOn === SubscriptionPlan.BELIEVER
+                    ? strings.believerPlan()
+                    : strings.proPlan()}
                 </Text>
               </Flex>
-            );
-          })}
+            </Flex>
+            <Box sx={{ height: 1, bg: "separator" }} />
+            {featureRows.map((row) => (
+              <Flex
+                key={row.map((f) => f.id).join()}
+                sx={{ alignItems: "center", justifyContent: "space-between" }}
+              >
+                {row.map((f) => {
+                  const isCurrent = f.id === feature.id;
+                  const FeatureIcon = isCurrent
+                    ? CheckIcon
+                    : FEATURE_ICONS[f.id as FeatureId] || CheckIcon;
+                  const caption = f.availability[
+                    planToAvailability(
+                      feature.availableOn || SubscriptionPlan.PRO
+                    )
+                  ].caption as boolean | number | string;
+                  return (
+                    <Flex
+                      key={f.id}
+                      sx={{
+                        flex: "1 0 0",
+                        minWidth: 1,
+                        alignItems: "flex-start",
+                        gap: "spacing4"
+                      }}
+                    >
+                      <FeatureIcon
+                        size={15}
+                        color={isCurrent ? "accent" : "icon"}
+                        sx={{ flexShrink: 0 }}
+                      />
+                      <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+                        <Text
+                          sx={{
+                            fontSize: "xs",
+                            fontWeight: 400,
+                            lineHeight: 1,
+                            color: isCurrent ? "accent" : "paragraph"
+                          }}
+                        >
+                          {f.title}
+                        </Text>
+                        <Text
+                          sx={{
+                            fontSize: "sm",
+                            fontWeight: 500,
+                            lineHeight: 1,
+                            color: isCurrent ? "accent" : "heading"
+                          }}
+                        >
+                          {caption === "infinity" ? (
+                            strings.unlimited()
+                          ) : caption === true ? (
+                            "Included"
+                          ) : (
+                            <FeatureCaption caption={caption} />
+                          )}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  );
+                })}
+              </Flex>
+            ))}
+          </Flex>
+          <Flex
+            sx={{
+              alignItems: "center",
+              px: "spacing4",
+              py: "spacing3",
+              bg: "background-secondary",
+              borderRadius: "radius2"
+            }}
+          >
+            <Text sx={{ fontSize: "sm", fontWeight: 400, lineHeight: 1 }}>
+              <Text as="span" sx={{ fontWeight: 500, color: "heading" }}>
+                {strings.cancelAnytime()}
+              </Text>{" "}
+              <Text as="span" sx={{ color: "paragraph" }}>
+                {strings.dayMoneyBackGuarantee(
+                  PERIOD_METADATA.yearly.refundDays
+                )}
+              </Text>
+            </Text>
+          </Flex>
         </Flex>
-        <Text variant="body">
-          <strong>{strings.cancelAnytime()}</strong>{" "}
-          {strings.dayMoneyBackGuarantee(PERIOD_METADATA.yearly.refundDays)}
-        </Text>
-        {!subscription || subscription.plan === SubscriptionPlan.FREE ? (
-          <>
-            <Button
-              variant="accent"
-              disabled={!plan}
-              onClick={() => {
-                if (!plan) return;
-                onClose();
+        <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+          {!subscription || subscription.plan === SubscriptionPlan.FREE ? (
+            <>
+              <Button
+                variant="new_accent"
+                disabled={!plan}
+                sx={{
+                  alignSelf: "stretch",
+                  px: "spacing4",
+                  py: "spacing5"
+                }}
+                onClick={() => {
+                  if (!plan) return;
+                  onClose();
 
+                  if (
+                    !subscription ||
+                    subscription.plan === SubscriptionPlan.FREE
+                  ) {
+                    const url = new URLSearchParams({
+                      plan: Buffer.from(JSON.stringify(plan)).toString("base64")
+                    });
+                    hardNavigate("/checkout", url.toString());
+                  } else ChangePlanDialog.show({ selectedPlan: plan.id });
+                }}
+              >
+                {plan ? (
+                  strings.upgradeToPlan(
+                    metadata.title,
+                    `${getCurrencySymbol(plan.currency)}${
+                      plan.price.gross
+                    }${formatRecurringPeriodShort(plan.period)}`
+                  )
+                ) : (
+                  <Loading size={16} color="accentForeground" />
+                )}
+              </Button>
+              <Button
+                variant="new_bordered"
+                sx={{
+                  alignSelf: "stretch",
+                  px: "spacing4",
+                  py: "spacing5",
+                  // Figma draws this stroke inside the button
+                  border: "none",
+                  boxShadow: "inset 0 0 0 1px var(--border)"
+                }}
+                onClick={() => {
+                  onClose();
+                  hardNavigate("/plans");
+                }}
+              >
+                {strings.compareAllPlans()}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="new_accent"
+              disabled={!plan}
+              sx={{
+                alignSelf: "stretch",
+                px: "spacing4",
+                py: "spacing5"
+              }}
+              onClick={() => {
                 if (
-                  !subscription ||
-                  subscription.plan === SubscriptionPlan.FREE
-                ) {
-                  useCheckoutStore.getState().selectPlan(plan);
-                  BuyDialog.show({});
-                } else ChangePlanDialog.show({ selectedPlan: plan.id });
+                  isUserSubscribed() &&
+                  subscription?.provider !== SubscriptionProvider.PADDLE &&
+                  subscription?.provider !== SubscriptionProvider.STREETWRITERS
+                )
+                  return showToast(
+                    "error",
+                    strings.onlyChangePlanFromOriginalPlatform()
+                  );
+                onClose();
+                ChangePlanDialog.show({});
               }}
             >
               {plan ? (
-                strings.upgradeToPlan(
-                  metadata.title,
-                  `${getCurrencySymbol(plan.currency)}${plan.price.gross}${formatRecurringPeriodShort(plan.period)}`
-                )
+                <>{strings.changePlan()}</>
               ) : (
                 <Loading size={16} color="accentForeground" />
               )}
             </Button>
-            <Button
-              variant="tertiary"
-              onClick={() => {
-                onClose();
-                BuyDialog.show({});
-              }}
-            >
-              {strings.compareAllPlans()}
-            </Button>
-          </>
-        ) : (
-          <Button
-            variant="accent"
-            disabled={!plan}
-            onClick={() => {
-              if (
-                isUserSubscribed() &&
-                subscription?.provider !== SubscriptionProvider.PADDLE &&
-                subscription?.provider !== SubscriptionProvider.STREETWRITERS
-              )
-                return showToast(
-                  "error",
-                  strings.onlyChangePlanFromOriginalPlatform()
-                );
-              onClose();
-              ChangePlanDialog.show({});
-            }}
-          >
-            {plan ? (
-              <>{strings.changePlan()}</>
-            ) : (
-              <Loading size={16} color="accentForeground" />
-            )}
-          </Button>
-        )}
+          )}
+        </Flex>
       </Flex>
     </BaseDialog>
   );
