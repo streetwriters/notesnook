@@ -295,6 +295,7 @@ function EditorView({ session }: { session: EditableSession }) {
           <EditorSurface
             sessionId={session.id}
             readonly={readonly}
+            placeholder={strings.startWritingNote()}
             content={getContent}
             onContentChange={() => (lastChangedTime.current = Date.now())}
             onSelectionChange={(selection) =>

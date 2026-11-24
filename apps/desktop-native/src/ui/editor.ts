@@ -68,6 +68,8 @@ export interface EditorHandle {
 export interface EditorSurfaceProps {
   sessionId: string;
   readonly?: boolean;
+  /** Hint shown while the note is empty (the product's `placeholder` option). */
+  placeholder?: string;
   nonce?: number;
   content: () => string | undefined;
   onContentChange?: (html: string) => void;
