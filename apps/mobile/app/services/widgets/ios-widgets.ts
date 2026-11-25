@@ -66,15 +66,24 @@ export const IOSWidgets = {
   isSupported: Platform.OS === "ios",
 
   write(key: string, value: unknown) {
-    if (!IOSWidgets.isSupported) return;
-    getStorage().setString(key, JSON.stringify(value));
+    if (!IOSWidgets.isSupported) return false;
+    const serialized = JSON.stringify(value);
+    const storage = getStorage();
+    if (storage.getString(key) === serialized) return false;
+    storage.setString(key, serialized);
+    return true;
   },
 
-  publish(key: string, value: unknown, kinds: IOSWidgetKind[]) {
+  publish(
+    key: string,
+    value: unknown,
+    kinds: IOSWidgetKind[],
+    changed = false
+  ) {
     if (!IOSWidgets.isSupported) return;
-    IOSWidgets.write(key, value);
-    IOSWidgets.write("strings", getLocalizedStrings());
-    IOSWidgets.reload(kinds);
+    const written = IOSWidgets.write(key, value);
+    const stringsWritten = IOSWidgets.write("strings", getLocalizedStrings());
+    if (changed || written || stringsWritten) IOSWidgets.reload(kinds);
   },
 
   remove(key: string) {

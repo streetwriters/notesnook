@@ -133,8 +133,13 @@ async function updateIOS() {
     sources.push({ ...source, title });
   }
 
+  let changed = false;
   for (const source of sources) {
-    IOSWidgets.write(`notes.${source.key}`, await fetchNotes(source));
+    const written = IOSWidgets.write(
+      `notes.${source.key}`,
+      await fetchNotes(source)
+    );
+    changed = written || changed;
   }
 
   const keys = sources.map((source) => source.key);
@@ -142,6 +147,7 @@ async function updateIOS() {
     if (keys.includes(key)) continue;
     IOSWidgets.remove(`notes.${key}`);
     IOSWidgets.remove(`notesPage.${key}`);
+    changed = true;
   }
   IOSWidgets.write("notesListKeys", keys);
 
@@ -154,8 +160,9 @@ async function updateIOS() {
   );
   if (Object.keys(pruned).length !== Object.keys(slots).length) {
     IOSWidgets.write("widgetSlotSources", pruned);
+    changed = true;
   }
-  IOSWidgets.publish("widgetSources", sources, ["NotesListWidget"]);
+  IOSWidgets.publish("widgetSources", sources, ["NotesListWidget"], changed);
 }
 
 async function updateAndroid() {
@@ -239,6 +246,7 @@ export const NotesWidget = {
         );
         IOSWidgets.write("widgetSlotSources", { ...slots, [slot]: source.key });
       }
+      IOSWidgets.reload(["NotesListWidget"]);
     }).then(() => NotesWidget.updateNotes());
   },
 
