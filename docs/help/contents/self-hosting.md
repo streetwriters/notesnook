@@ -62,7 +62,8 @@ You should now have two files in your directory:
 Open the `.env` file into an editor. This guide will go over the minimum you need to change.
 
 :::warning This guide does not cover setting up an SMTP server!
-You **will have to** do this if you plan on using the password reset feature, or want to use email-based two factor auth (the default). If you don't change the two factor method after creating your account, you may become locked out of the account. You have been warned.
+You **will have to** do this if you plan on using the password reset feature, or want to use email-based two factor auth (the default). If you don't change the two factor method after creating your account, you may become locked out of the account. **You have been warned.**
+**All accounts currently have mandatory two factor authentication.**
 
 :::
 
