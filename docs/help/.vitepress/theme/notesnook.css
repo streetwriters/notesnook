@@ -461,6 +461,11 @@ html {
   max-width: 100%;
 }
 
+.vp-doc img[src*="/static/mobile-integration/"] {
+  max-width: min(100%, 400px);
+  height: auto;
+}
+
 /* The CSS reset makes every image `display: block`, which breaks the line when a
    UI glyph is referenced mid-sentence ("press the ⋯ button"). An image sharing
    its *line* with text is treated as a glyph — inline, sized to the text,
