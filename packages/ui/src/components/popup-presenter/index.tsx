@@ -204,7 +204,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
             position: "fixed",
             backgroundColor: undefined,
             padding: 0,
-            zIndex: 999,
+            zIndex: 1000,
             outline: 0,
             opacity: `1 !important`,
             isolation: "isolate"
