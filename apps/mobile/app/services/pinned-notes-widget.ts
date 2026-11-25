@@ -24,13 +24,25 @@ import { Platform } from "react-native";
 
 let timer: NodeJS.Timeout;
 
-export function toWidgetNote(note: Note) {
-  return {
+async function getLockedNoteIds(ids: string[]) {
+  if (!ids.length) return new Set<string>();
+  const rows = await db
+    .sql()
+    .selectFrom("content")
+    .where("noteId", "in", ids)
+    .select(["noteId", "locked"])
+    .execute();
+  return new Set(rows.filter((row) => row.locked).map((row) => row.noteId));
+}
+
+export async function toWidgetNotes(notes: Note[]) {
+  const locked = await getLockedNoteIds(notes.map((note) => note.id));
+  return notes.map((note) => ({
     id: note.id,
     title: note.title || strings.untitledNote(),
-    headline: note.locked ? "" : note.headline || "",
-    locked: !!note.locked
-  };
+    headline: locked.has(note.id) ? "" : note.headline || "",
+    locked: locked.has(note.id)
+  }));
 }
 
 /**

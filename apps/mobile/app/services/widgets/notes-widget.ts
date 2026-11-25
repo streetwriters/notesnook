@@ -21,7 +21,7 @@ import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import { db } from "../../common/database";
 import { NotesnookModule } from "../../utils/notesnook-module";
-import { toWidgetNote } from "../pinned-notes-widget";
+import { toWidgetNotes } from "../pinned-notes-widget";
 import { IOSWidgets } from "./ios-widgets";
 
 export type NotesWidgetSourceType =
@@ -120,10 +120,9 @@ async function fetchNotes(source: NotesWidgetSource) {
   if (isRecent) {
     notes = notes.filter((note) => !note.pinned && !note.conflicted);
   }
-  return notes
-    .filter((note) => !note.dateDeleted)
-    .slice(0, MAX_NOTES)
-    .map(toWidgetNote);
+  return toWidgetNotes(
+    notes.filter((note) => !note.dateDeleted).slice(0, MAX_NOTES)
+  );
 }
 
 async function updateIOS() {

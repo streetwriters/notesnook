@@ -21,13 +21,14 @@ import { db } from "../common/database";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { Platform } from "react-native";
 import { IOSWidgets } from "./widgets/ios-widgets";
-import { toWidgetNote } from "./pinned-notes-widget";
+import { toWidgetNotes } from "./pinned-notes-widget";
 import { htmlToWidgetBlocks, NoteBlocks } from "./widgets/note-blocks";
 
-type PreviewNote = ReturnType<typeof toWidgetNote> & Partial<NoteBlocks>;
+type PreviewNote = Awaited<ReturnType<typeof toWidgetNotes>>[number] &
+  Partial<NoteBlocks>;
 
 async function getContentBlocks(note: Note): Promise<Partial<NoteBlocks>> {
-  if (note.locked || !note.contentId) return {};
+  if (!note.contentId) return {};
   try {
     const content = await db.content.get(note.contentId);
     if (!content || content.locked || typeof content.data !== "string") {
@@ -40,7 +41,11 @@ async function getContentBlocks(note: Note): Promise<Partial<NoteBlocks>> {
 }
 
 async function toPreviewNote(note: Note): Promise<PreviewNote> {
-  return { ...toWidgetNote(note), ...(await getContentBlocks(note)) };
+  const [widgetNote] = await toWidgetNotes([note]);
+  return {
+    ...widgetNote,
+    ...(widgetNote.locked ? {} : await getContentBlocks(note))
+  };
 }
 
 async function serializeAndroidNote(note: Note) {
