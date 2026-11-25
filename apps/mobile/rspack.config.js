@@ -4,6 +4,7 @@ const Repack = require("@callstack/repack");
 const { ReanimatedPlugin } = require("@callstack/repack-plugin-reanimated");
 const {
   NormalModuleReplacementPlugin,
+  IgnorePlugin,
   default: rspack
 } = require("@rspack/core");
 
@@ -155,10 +156,23 @@ module.exports = (env) => {
         },
         ...Repack.getAssetTransformRules({
           inline: false
-        })
+        }),
+        {
+          // Embed locale catalogs as raw JSON strings; they are parsed lazily
+          // in @notesnook/intl. Hermes compiles JSON object literals into
+          // bytecode that is several times larger than the equivalent string.
+          test: /packages[\\/]intl[\\/]dist[\\/]locales[\\/].*\.json$/,
+          type: "asset/source"
+        }
       ]
     },
     plugins: [
+      // @notesnook/intl also ships web locale chunks (used by async initLocale)
+      // which mobile never calls (it uses initLocaleSync), so don't bundle them.
+      new IgnorePlugin({
+        resourceRegExp: /^\.\/_[\w.-]+\.js$/,
+        contextRegExp: /packages[\\/]intl[\\/]dist$/
+      }),
       new NormalModuleReplacementPlugin(/node:crypto/, (resource) => {
         resource.request = resource.request.replace(/^node:/, "");
       }),
