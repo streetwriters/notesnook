@@ -31,8 +31,22 @@ private extension UIColor {
 }
 
 enum WidgetTheme {
+  private static let lock = NSLock()
+  private static var cachedJSON: String?
+  private static var cachedPalette: ThemePalette?
+
+  private static var palette: ThemePalette? {
+    lock.lock()
+    defer { lock.unlock() }
+    let json = WidgetStore.readString(forKey: WidgetKey.theme)
+    if json != cachedJSON {
+      cachedJSON = json
+      cachedPalette = json?.data(using: .utf8).flatMap { try? JSONDecoder().decode(ThemePalette.self, from: $0) }
+    }
+    return cachedPalette
+  }
+
   static var accent: Color {
-    let palette = WidgetStore.decode(ThemePalette.self, forKey: WidgetKey.theme)
     let light = UIColor(hex: palette?.light)
     let dark = UIColor(hex: palette?.dark)
     return Color(
