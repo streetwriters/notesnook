@@ -685,7 +685,13 @@ export default class Lookup {
     const { content } = transformQuery(query);
     const contentMatches = new Set(
       (
-        (await this.ftsQueryBuilder({ content: content?.expression })
+        (await this.ftsQueryBuilder(
+          { content: content?.expression },
+          [],
+          this.db.notes.collection.createFilter<Note>((qb) =>
+            qb.where("type", "==", "trash")
+          )
+        )
           ?.select(["results.id"])
           .execute()
           .catch((e) => {
