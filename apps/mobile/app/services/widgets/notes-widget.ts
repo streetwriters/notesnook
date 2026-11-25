@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Note } from "@notesnook/core";
+import { isFalse, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import { db } from "../../common/database";
@@ -108,21 +108,18 @@ function getSortOptions(source: NotesWidgetSource) {
 }
 
 async function fetchNotes(source: NotesWidgetSource) {
-  const isRecent = source.type === "recent";
-  const skipped = isRecent
-    ? (await db.notes.pinned.count()) + (await db.notes.conflicted.count())
-    : 0;
-
-  let notes = (await getSelector(source)
-    .limit(MAX_NOTES + skipped)
-    .items(undefined, getSortOptions(source))) as Note[];
-
-  if (isRecent) {
-    notes = notes.filter((note) => !note.pinned && !note.conflicted);
+  let selector = getSelector(source)
+    .where(isFalse("dateDeleted"))
+    .fields(["notes.id", "notes.title", "notes.headline"])
+    .limit(MAX_NOTES);
+  if (source.type === "recent") {
+    selector = selector.where(isFalse("pinned")).where(isFalse("conflicted"));
   }
-  return toWidgetNotes(
-    notes.filter((note) => !note.dateDeleted).slice(0, MAX_NOTES)
-  );
+  const notes = (await selector.items(
+    undefined,
+    getSortOptions(source)
+  )) as Note[];
+  return toWidgetNotes(notes);
 }
 
 async function updateIOS() {
