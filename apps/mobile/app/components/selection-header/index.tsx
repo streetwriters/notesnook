@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { updateListWidgets } from "../../services/widgets/update-widgets";
+import {
+  updateListWidgets,
+  updateNoteWidgets
+} from "../../services/widgets/update-widgets";
 import { Item, ItemType, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
@@ -89,7 +92,7 @@ export const SelectionHeader = React.memo(
       if (!selectedItemsList.length) return;
       await db.trash.restore(...selectedItemsList);
       Navigation.queueRoutesForUpdate();
-      updateListWidgets();
+      updateNoteWidgets();
 
       clearSelection();
       ToastManager.show({

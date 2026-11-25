@@ -66,6 +66,9 @@ async function updateIOSNotes() {
   for (const item of stored) {
     const note = await db.notes.note(item.id);
     if (note) updated.push(await toPreviewNote(note));
+    else if (await db.notes.trashed(item.id)) {
+      updated.push({ ...item, headline: "", blocks: [] });
+    }
   }
   publishIOSNotes(updated);
 }

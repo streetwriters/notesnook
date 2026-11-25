@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
-import { updateListWidgets } from "../services/widgets/update-widgets";
+import {
+  updateListWidgets,
+  updateNoteWidgets
+} from "../services/widgets/update-widgets";
 import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import {
   Color,
@@ -280,7 +283,7 @@ export const useActions = ({
     close();
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
-    updateListWidgets();
+    updateNoteWidgets();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
       heading:
