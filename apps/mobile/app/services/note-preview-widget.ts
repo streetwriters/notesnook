@@ -49,7 +49,7 @@ async function toPreviewNote(note: Note): Promise<PreviewNote> {
 }
 
 async function serializeAndroidNote(note: Note) {
-  return JSON.stringify({ ...note, ...(await getContentBlocks(note)) });
+  return JSON.stringify(await toPreviewNote(note));
 }
 
 const MAX_IOS_PREVIEW_NOTES = 20;

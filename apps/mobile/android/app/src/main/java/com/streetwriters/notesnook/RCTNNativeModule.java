@@ -28,7 +28,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.streetwriters.notesnook.datatypes.Note;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,22 +154,15 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getWidgetNotes(Promise promise) {
         WritableArray arr = Arguments.createArray();
-        for (Note note : WidgetUtils.getWidgetNotes(getReactApplicationContext()).values()) {
-            arr.pushString(note.getId());
+        for (String id : WidgetUtils.getWidgetNoteIds(getReactApplicationContext()).values()) {
+            arr.pushString(id);
         }
         promise.resolve(arr);
     }
 
     @ReactMethod
     public void hasWidgetNote(final String noteId, Promise promise) {
-        boolean found = false;
-        for (Note note : WidgetUtils.getWidgetNotes(getReactApplicationContext()).values()) {
-            if (note.getId().equals(noteId)) {
-                found = true;
-                break;
-            }
-        }
-        promise.resolve(found);
+        promise.resolve(WidgetUtils.getWidgetNoteIds(getReactApplicationContext()).containsValue(noteId));
     }
 
     @ReactMethod
@@ -181,8 +173,8 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
         // Match on the note's id, not on the raw JSON containing it somewhere: a note whose body
         // happens to mention another note's id is not the same note.
-        for (Map.Entry<Integer, Note> entry : WidgetUtils.getWidgetNotes(getReactApplicationContext()).entrySet()) {
-            if (!noteId.equals(entry.getValue().getId())) continue;
+        for (Map.Entry<Integer, String> entry : WidgetUtils.getWidgetNoteIds(getReactApplicationContext()).entrySet()) {
+            if (!noteId.equals(entry.getValue())) continue;
             edit.putString(String.valueOf(entry.getKey()), data);
             ids.add(entry.getKey());
         }

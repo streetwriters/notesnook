@@ -18,11 +18,14 @@ import android.widget.RemoteViews;
 import androidx.core.widget.RemoteViewsCompat;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.reflect.TypeToken;
 import com.streetwriters.notesnook.datatypes.Note;
 import com.streetwriters.notesnook.datatypes.NotesWidgetSource;
 import com.streetwriters.notesnook.datatypes.Reminder;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -157,20 +160,39 @@ public class WidgetUtils {
      * its own key. Only numeric keys are widget notes, so anything else is skipped rather than
      * being treated as a note.
      */
-    static Map<Integer, Note> getWidgetNotes(Context context) {
+    static Map<Integer, String> getWidgetNoteIds(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        Map<Integer, Note> notes = new LinkedHashMap<>();
+        Map<Integer, String> ids = new LinkedHashMap<>();
 
         for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
             Integer widgetId = parseWidgetId(entry.getKey());
             if (widgetId == null) continue;
             if (!(entry.getValue() instanceof String)) continue;
 
-            Note note = parseNote((String) entry.getValue());
-            if (note == null || note.getId() == null) continue;
-            notes.put(widgetId, note);
+            String id = readNoteId((String) entry.getValue());
+            if (id != null) ids.put(widgetId, id);
         }
-        return notes;
+        return ids;
+    }
+
+    /**
+     * Reads just the id of a stored note. Stored notes carry their content blocks, and matching an
+     * id should not mean building every one of them.
+     */
+    private static String readNoteId(String data) {
+        if (data == null || data.isEmpty()) return null;
+        try (JsonReader reader = new JsonReader(new StringReader(data))) {
+            reader.beginObject();
+            while (reader.hasNext()) {
+                if ("id".equals(reader.nextName()) && reader.peek() == JsonToken.STRING) {
+                    return reader.nextString();
+                }
+                reader.skipValue();
+            }
+        } catch (Exception e) {
+            Log.e("NotePreviewWidget", "Could not read a stored note id", e);
+        }
+        return null;
     }
 
     /**
