@@ -116,6 +116,18 @@ const Actions = ({
       },
       icon: "upload"
     },
+    ...(failed && !attachment.dateUploaded
+      ? [
+          {
+            name: strings.retry(),
+            onPress: async () => {
+              await db.attachments.retryUpload(attachment.hash);
+              fwdRef.current?.hide();
+            },
+            icon: "reload"
+          }
+        ]
+      : []),
     {
       name: strings.fileCheck(),
       onPress: async () => {

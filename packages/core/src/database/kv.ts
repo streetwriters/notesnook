@@ -37,6 +37,11 @@ interface KV {
    * Revision of the user when the current master key was set.
    */
   masterKeyRevision: number;
+  /**
+   * Local-only (never synced) automatic upload retry state per attachment
+   * hash.
+   */
+  uploadRetries: Record<string, { attempts: number; nextRetryAt: number }>;
 }
 
 export const KEYS: (keyof KV)[] = [

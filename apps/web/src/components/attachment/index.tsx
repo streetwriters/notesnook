@@ -34,6 +34,7 @@ import {
   Icon,
   Loading,
   PasswordInvisible,
+  Refresh,
   References,
   Rename,
   Reupload,
@@ -376,6 +377,17 @@ const AttachmentMenuItems: (
           await db.fs().cancel(attachment.hash);
         } else await reuploadAttachment(attachment.type, attachment.hash);
       }
+    },
+    {
+      type: "button",
+      key: "retry-upload",
+      title: strings.retry(),
+      icon: Refresh.path,
+      isHidden:
+        !!attachment.dateUploaded ||
+        !attachment.failed ||
+        status?.type === "upload",
+      onClick: () => db.attachments.retryUpload(attachment.hash)
     },
     {
       type: "button",
