@@ -23,6 +23,7 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import { db } from "../../common/database";
 import { strings } from "@notesnook/intl";
 import { Header } from "../../components/header";
+import AppIcon from "../../components/ui/AppIcon";
 import Input from "../../components/ui/input";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { useDBItem } from "../../hooks/use-db-item";
@@ -30,6 +31,7 @@ import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { NotePreviewWidget } from "../../services/note-preview-widget";
 import { NotesnookModule } from "../../utils/notesnook-module";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -60,11 +62,26 @@ const NoteItem = (props: {
         <View
           style={{
             flexDirection: "row",
+            alignItems: "center",
             paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <View
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
             style={{
+              width: 32,
+              height: 32,
+              marginRight: DefaultAppStyles.GAP_SMALL,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <AppIcon name="note-outline" size={AppFontSize.lg} />
+          </View>
+          <View
+            style={{
+              flex: 1,
               flexDirection: "column"
             }}
           >

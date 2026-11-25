@@ -23,6 +23,7 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
 import { Header } from "../../components/header";
+import AppIcon from "../../components/ui/AppIcon";
 import Input from "../../components/ui/input";
 import Paragraph from "../../components/ui/typography/paragraph";
 import {
@@ -33,9 +34,48 @@ import {
 } from "../../services/widgets/notes-widget";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { NotesnookModule } from "../../utils/notesnook-module";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 
-type Row = { source: NotesWidgetSource; group: string };
+type Row = {
+  source: NotesWidgetSource;
+  group: string;
+  icon: string;
+  color?: string;
+};
+
+const BUILTIN_ICONS: Record<string, string> = {
+  recent: "clock-outline",
+  pinned: "pin-outline",
+  favorites: "star-outline"
+};
+
+const SourceIcon = ({ row }: { row: Row }) => (
+  <View
+    accessibilityElementsHidden
+    importantForAccessibility="no-hide-descendants"
+    style={{
+      width: 32,
+      height: 32,
+      marginRight: DefaultAppStyles.GAP_SMALL,
+      justifyContent: "center",
+      alignItems: "center"
+    }}
+  >
+    {row.color ? (
+      <View
+        style={{
+          width: 18,
+          height: 18,
+          borderRadius: 100,
+          backgroundColor: row.color
+        }}
+      />
+    ) : (
+      <AppIcon name={row.icon} size={AppFontSize.lg} />
+    )}
+  </View>
+);
 
 async function loadRows(includeBuiltins: boolean): Promise<Row[]> {
   const [notebooks, tags, colors] = await Promise.all([
@@ -48,20 +88,25 @@ async function loadRows(includeBuiltins: boolean): Promise<Row[]> {
     ...(includeBuiltins
       ? getBuiltinNotesWidgetSources().map((source) => ({
           source,
-          group: general
+          group: general,
+          icon: BUILTIN_ICONS[source.type]
         }))
       : []),
     ...notebooks.map((item) => ({
       source: createNotesWidgetSource("notebook", item.title, item.id),
-      group: strings.dataTypesPluralCamelCase.notebook()
+      group: strings.dataTypesPluralCamelCase.notebook(),
+      icon: "book-outline"
     })),
     ...tags.map((item) => ({
       source: createNotesWidgetSource("tag", item.title, item.id),
-      group: strings.dataTypesPluralCamelCase.tag()
+      group: strings.dataTypesPluralCamelCase.tag(),
+      icon: "pound"
     })),
     ...colors.map((item) => ({
       source: createNotesWidgetSource("color", item.title, item.id),
-      group: strings.colors()
+      group: strings.colors(),
+      icon: "circle",
+      color: item.colorCode
     }))
   ];
 }
@@ -128,22 +173,26 @@ export const NotesSourcePicker = (props: {
               activeOpacity={0.7}
               onPress={() => props.onSelect(item.source)}
               style={{
+                flexDirection: "row",
+                alignItems: "center",
                 borderBottomWidth: 1,
                 borderBottomColor: colors.primary.border,
                 paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-                minHeight: 45,
-                justifyContent: "center"
+                minHeight: 45
               }}
             >
-              <Paragraph
-                numberOfLines={1}
-                style={{ color: colors.primary.paragraph, fontSize: 15 }}
-              >
-                {item.source.title}
-              </Paragraph>
-              <Paragraph size={12} color={colors.secondary.paragraph}>
-                {item.group}
-              </Paragraph>
+              <SourceIcon row={item} />
+              <View style={{ flex: 1 }}>
+                <Paragraph
+                  numberOfLines={1}
+                  style={{ color: colors.primary.paragraph, fontSize: 15 }}
+                >
+                  {item.source.title}
+                </Paragraph>
+                <Paragraph size={12} color={colors.secondary.paragraph}>
+                  {item.group}
+                </Paragraph>
+              </View>
             </TouchableOpacity>
           )}
           ListEmptyComponent={
