@@ -394,7 +394,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
           label={strings.keyName()}
           placeholder={strings.exampleKeyName()}
           onChangeText={(text) => (name.current = text)}
-          onSubmit={() => onSubmit()}
+          onSubmitEditing={() => onSubmit()}
           required
         />
         <Flex sx={{ flexDirection: "column" }}>
@@ -403,7 +403,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
           </Text>
           <Select
             value={String(selectedExpiry)}
-            onChange={(value) => setSelectedExpiry(Number(value))}
+            onValueChange={(value) => setSelectedExpiry(Number(value))}
             options={getExpiryOptions().map((option) => ({
               title: option.label,
               value: String(option.value)

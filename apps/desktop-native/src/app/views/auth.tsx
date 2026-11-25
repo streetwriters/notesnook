@@ -1317,7 +1317,7 @@ export function AuthField(
       testID={props.testID || id}
       value={values[id] ?? defaultValue ?? ""}
       onChangeText={(text) => setValue(id, text)}
-      onSubmit={() => submit()}
+      onSubmitEditing={() => submit()}
       {...authFieldProps}
     />
   );

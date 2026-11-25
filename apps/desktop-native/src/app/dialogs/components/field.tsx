@@ -26,7 +26,8 @@ import {
   Textarea,
   type InputProps,
   type SxProp,
-  type UIElement
+  type TextareaProps,
+  type UIInputElement
 } from "@ui";
 import {
   PasswordInvisible,
@@ -117,7 +118,7 @@ function ActionButtons(props: {
   );
 }
 
-export const Field = forwardRef<UIElement, FieldProps>(function Field(
+export const Field = forwardRef<UIInputElement, FieldProps>(function Field(
   props,
   ref
 ) {
@@ -202,7 +203,7 @@ export const Field = forwardRef<UIElement, FieldProps>(function Field(
       <Flex sx={{ position: "relative", flex: 1, flexDirection: "row" }}>
         {as === "textarea" ? (
           <Textarea
-            {...inputProps}
+            {...(inputProps as unknown as TextareaProps)}
             ref={ref}
             rows={rows}
             variant={resolvedVariant}

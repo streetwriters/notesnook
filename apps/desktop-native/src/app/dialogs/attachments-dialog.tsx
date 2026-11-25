@@ -231,7 +231,7 @@ export const AttachmentsDialog = DialogManager.register(
                     <Checkbox
                       sx={{ width: 18, height: 18 }}
                       checked={selected.length === attachments.length}
-                      onChange={async (checked) => {
+                      onCheckedChange={async (checked) => {
                         setSelected(
                           checked
                             ? await filterAttachments(

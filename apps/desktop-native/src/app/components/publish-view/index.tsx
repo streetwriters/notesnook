@@ -198,7 +198,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
             error={errors.title}
             value={values.title}
             onChangeText={(title) => setValues((v) => ({ ...v, title }))}
-            onSubmit={handlePublish}
+            onSubmitEditing={handlePublish}
             sx={{ width: "100%" }}
             styles={{
               input: { px: "spacing5", py: "spacing6", fontSize: "sm" }
@@ -536,7 +536,7 @@ function ToggleSwitch({
       title={title}
       checked={isOn}
       disabled={disabled}
-      onChange={onChange}
+      onCheckedChange={onChange}
       sx={{ m: 0, flexShrink: 0, bg: isOn ? "accent" : "icon-disabled" }}
     />
   );

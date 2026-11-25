@@ -82,7 +82,7 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
           testID="title-input"
           defaultValue={props.defaultValue}
           onChangeText={(text) => (value.current = text)}
-          onSubmit={onSubmit}
+          onSubmitEditing={onSubmit}
           sx={{ mt: "spacing6", mb: "spacing7" }}
         />
         <ErrorText error={error?.message} />

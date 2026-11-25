@@ -228,6 +228,7 @@ type AppearanceProps = {
   cursor?: "default" | "pointer" | "text" | "not-allowed" | "grab" | "move";
   pointerEvents?: "auto" | "none";
   userSelect?: "auto" | "none" | "text";
+  objectFit?: "cover" | "contain" | "fill";
 };
 
 type TextStyleProps = {
@@ -243,6 +244,7 @@ type TextStyleProps = {
   textOverflow?: "clip" | "ellipsis";
   whiteSpace?: "normal" | "nowrap" | "pre" | "pre-wrap";
   wordBreak?: "normal" | "break-all" | "break-word";
+  lineClamp?: number;
 };
 
 type StateKeys = {
@@ -267,6 +269,49 @@ export type SxProp = ColorProps &
   TextStyleProps &
   StateKeys &
   MotionProps;
+
+export type ThemeUICSSObject = SxProp;
+export type ThemeUIStyleObject = SxProp;
+export type RestrictedSxProp = SxProp;
+
+type Unresponsive<T> = Exclude<T, readonly unknown[]>;
+type StyleLength = number | `${number}px` | "auto";
+type StyleSpaceKeys =
+  | "margin"
+  | "marginTop"
+  | "marginRight"
+  | "marginBottom"
+  | "marginLeft"
+  | "padding"
+  | "paddingTop"
+  | "paddingRight"
+  | "paddingBottom"
+  | "paddingLeft"
+  | "gap"
+  | "rowGap"
+  | "columnGap";
+
+export type StyleProp = {
+  [K in keyof LayoutProps]?: Unresponsive<LayoutProps[K]>;
+} & {
+  [K in StyleSpaceKeys]?: StyleLength;
+} & {
+  opacity?: number;
+  visibility?: "visible" | "hidden";
+  color?: string;
+  backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  borderRadius?: number;
+  fontSize?: number;
+  cursor?: AppearanceProps["cursor"];
+  pointerEvents?: AppearanceProps["pointerEvents"];
+  userSelect?: AppearanceProps["userSelect"];
+  objectFit?: AppearanceProps["objectFit"];
+  transform?: string;
+  transition?: string;
+  overscrollBehavior?: "auto" | "contain" | "none";
+};
 
 export type ThemeScopeName =
   | "base"

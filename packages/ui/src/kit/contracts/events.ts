@@ -17,6 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type {
+  UIElement,
+  UIInputElement,
+  UISelectElement,
+  UITextAreaElement
+} from "./elements";
+
 export type Modifiers = {
   shiftKey: boolean;
   ctrlKey: boolean;
@@ -24,6 +31,7 @@ export type Modifiers = {
   metaKey: boolean;
 };
 
+/** @deprecated `onClick` events carry the DOM's numeric `button`. */
 export type PointerButton = "primary" | "secondary" | "auxiliary";
 
 export interface UIEvent {
@@ -31,16 +39,21 @@ export interface UIEvent {
   stopPropagation(): void;
 }
 
-export interface PressEvent extends UIEvent, Modifiers {
-  button: PointerButton;
-  detail: number;
-  x: number;
-  y: number;
-  pageX: number;
-  pageY: number;
+export type UIEventTarget = object;
+
+export interface UISyntheticEvent<T = UIElement> extends UIEvent {
+  target: UIEventTarget;
+  currentTarget: T;
 }
 
-export interface ContextMenuEvent extends UIEvent, Modifiers {
+export interface UIMouseEvent<T = UIElement>
+  extends UISyntheticEvent<T>,
+    Modifiers {
+  button: number;
+  buttons: number;
+  detail: number;
+  clientX: number;
+  clientY: number;
   pageX: number;
   pageY: number;
 }
@@ -62,15 +75,110 @@ export type Key =
   | " "
   | (string & NonNullable<unknown>);
 
-export interface KeyEvent extends UIEvent, Modifiers {
+export interface UINativeKeyboardEvent extends UIEvent, Modifiers {
   key: Key;
+  code: string;
   repeat: boolean;
 }
 
-export interface FocusEvent extends UIEvent {
+export interface UIKeyboardEvent<T = UIElement>
+  extends UISyntheticEvent<T>,
+    Modifiers {
+  key: Key;
+  code: string;
+  repeat: boolean;
+  nativeEvent: UINativeKeyboardEvent;
+}
+
+export interface UIFocusEvent<T = UIElement> extends UISyntheticEvent<T> {
+  target: UIEventTarget & T;
   relatedTarget?: unknown;
 }
 
+export interface UIChangeEvent<
+  T = UIInputElement | UITextAreaElement | UISelectElement
+> extends UISyntheticEvent<T> {
+  target: UIEventTarget & T;
+}
+
+export type UIFormEvent<T = UIElement> = UISyntheticEvent<T>;
+
+export interface UIWheelEvent<T = UIElement>
+  extends UISyntheticEvent<T>,
+    Modifiers {
+  deltaX: number;
+  deltaY: number;
+}
+
+export interface UITouch {
+  identifier: number;
+  clientX: number;
+  clientY: number;
+  pageX: number;
+  pageY: number;
+}
+
+export interface UITouchEvent<T = UIElement>
+  extends UISyntheticEvent<T>,
+    Modifiers {
+  touches: ArrayLike<UITouch>;
+  changedTouches: ArrayLike<UITouch>;
+}
+
+export interface UIFile {
+  readonly name: string;
+  readonly size: number;
+  readonly type: string;
+  text(): Promise<string>;
+  arrayBuffer(): Promise<ArrayBuffer>;
+}
+
+export interface UIDataTransfer {
+  readonly files: ArrayLike<UIFile>;
+  readonly types: readonly string[];
+  dropEffect: string;
+  effectAllowed: string;
+  getData(format: string): string;
+  setData(format: string, data: string): void;
+  clearData(format?: string): void;
+}
+
+export interface UIClipboardEvent<T = UIElement> extends UISyntheticEvent<T> {
+  clipboardData: UIDataTransfer;
+}
+
+export interface UIDragEvent<T = UIElement> extends UIMouseEvent<T> {
+  dataTransfer: UIDataTransfer;
+  /** @deprecated Read the dragged data from `dataTransfer`. */
+  payload: unknown;
+  /** @deprecated Use `clientX`. */
+  x: number;
+  /** @deprecated Use `clientY`. */
+  y: number;
+  /** @deprecated Use `dataTransfer.dropEffect`. */
+  dropped: boolean;
+}
+
+/** @deprecated Use `UIMouseEvent`, delivered by `onClick`. */
+export interface PressEvent extends UIEvent, Modifiers {
+  button: PointerButton;
+  detail: number;
+  x: number;
+  y: number;
+  pageX: number;
+  pageY: number;
+}
+
+/** @deprecated Use `UIMouseEvent`. */
+export type ContextMenuEvent = UIMouseEvent;
+
+/** @deprecated Use `UIKeyboardEvent`. */
+export type KeyEvent = UIKeyboardEvent;
+
+/** @deprecated Use `UIFocusEvent`. */
+export type FocusEvent = UIFocusEvent;
+
+/** @deprecated Use `UIMouseEvent`, delivered by `onMouseEnter` and `onMouseLeave`. */
 export interface HoverEvent extends UIEvent, Modifiers {
   pageX: number;
   pageY: number;

@@ -100,7 +100,7 @@ export function LinkPopup(props: LinkPopupProps) {
               onChangeText={(text) =>
                 (link.current = { ...link.current, title: text })
               }
-              onSubmit={handleDone}
+              onSubmitEditing={handleDone}
             />
           </>
         )}
@@ -124,7 +124,7 @@ export function LinkPopup(props: LinkPopupProps) {
             if (error) setError(null);
             link.current = { ...link.current, href: text };
           }}
-          onSubmit={handleDone}
+          onSubmitEditing={handleDone}
         />
         {error && (
           <Text

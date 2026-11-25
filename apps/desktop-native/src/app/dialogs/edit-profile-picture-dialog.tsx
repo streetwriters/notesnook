@@ -193,7 +193,7 @@ export const EditProfilePictureDialog = DialogManager.register(
               min={1}
               step={0.1}
               value={scale}
-              onChange={setScale}
+              onValueChange={setScale}
             />
           ) : null}
         </Flex>

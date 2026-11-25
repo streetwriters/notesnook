@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { q, useEditorQuery } from "../../queries/index.js";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Flex, Input, Text, type UIElement } from "@ui";
+import { Flex, Input, Text, type UIInputElement } from "@ui";
 import { ToolButton } from "../components/tool-button.js";
 import { Editor } from "../../types.js";
 import { useEditorSearchStore } from "../stores/search-store.js";
@@ -45,7 +45,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
     selectedIndex: 0
   });
   const isEditable = useEditorQuery(editor, q.editable(), true);
-  const searchInputRef = useRef<UIElement>(null);
+  const searchInputRef = useRef<UIInputElement>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const isMobile = useIsMobile();
 

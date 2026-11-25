@@ -17,6 +17,7 @@
     "bundle": "react-native bundle --platform desktop --entry-file index.js --bundle-output desktop/build/index.bundle --assets-dest desktop/build/assets --dev true",
     "parity": "node tools/parity/run.mjs",
     "check:testids": "node tools/check-testids.mjs",
+    "check:web-api": "node tools/ui-kit-web-api/index.mjs",
     "gen:assets": "node tools/gen-assets.mjs",
     "web": "vite --config vite.config.web.ts",
     "build:web": "vite build --config vite.config.web.ts",

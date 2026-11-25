@@ -20,4 +20,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import * as Contract from "../contracts";
 import * as target from "./index";
 
-export const conforms: typeof Contract = target;
+export const conforms: Omit<typeof Contract, Contract.PendingImplementation> =
+  target;

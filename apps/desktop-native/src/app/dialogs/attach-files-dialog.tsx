@@ -362,7 +362,7 @@ function FileRow({
               : ""}
           </Text>
         ) : showCompressionToggle && isImage ? (
-          <Switch checked={compress} onChange={() => onToggleCompress?.()} />
+          <Switch checked={compress} onCheckedChange={() => onToggleCompress?.()} />
         ) : showCompressionToggle && !isImage ? (
           <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
             N/A

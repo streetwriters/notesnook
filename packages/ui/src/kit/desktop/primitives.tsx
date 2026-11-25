@@ -37,7 +37,11 @@ import Animated from "react-native-reanimated";
 import Svg, { Path, SvgXml } from "react-native-svg";
 import { shell } from "@platform";
 import type * as Contract from "../contracts/primitives";
-import type { UIElement } from "../contracts/primitives";
+import type {
+  UIElement,
+  UIInputElement,
+  UITextAreaElement
+} from "../contracts/elements";
 import { useThemeContext } from "./theme";
 import {
   InheritedTextStyle,
@@ -67,7 +71,7 @@ const AnimatedView = Animated.View as any;
 const AnimatedText = Animated.Text as any;
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable) as any;
 
-function useElementRef(ref: ForwardedRef<UIElement>) {
+function useElementRef(ref: ForwardedRef<any>) {
   const inner = useRef<{
     focus?: () => void;
     blur?: () => void;
@@ -77,11 +81,13 @@ function useElementRef(ref: ForwardedRef<UIElement>) {
   }>(null);
   useImperativeHandle(
     ref,
-    () => ({
-      focus: () => inner.current?.focus?.(),
-      blur: () => inner.current?.blur?.(),
-      measureInWindow: (callback) => inner.current?.measureInWindow?.(callback)
-    }),
+    () =>
+      ({
+        focus: () => inner.current?.focus?.(),
+        blur: () => inner.current?.blur?.(),
+        measureInWindow: (callback) =>
+          inner.current?.measureInWindow?.(callback)
+      } as Pick<UIElement, "focus" | "blur" | "measureInWindow">),
     []
   );
   return inner;
@@ -269,7 +275,7 @@ export const Link = forwardRef<UIElement, Contract.LinkProps>(function Link(
   return (
     <Text
       ref={ref}
-      {...rest}
+      {...(rest as Contract.TextProps)}
       sx={{ color: "accent", textDecorationLine: "underline", ...props.sx }}
       onPress={(event) => {
         onPress?.(event);
@@ -290,7 +296,7 @@ export const Image = forwardRef<UIElement, Contract.ImageProps>(function Image(
       ref={inner as never}
       {...(nativeProps as object)}
       source={{ uri: props.src }}
-      onLoad={props.onLoad}
+      onLoad={props.onLoad as never}
       resizeMode={props.resizeMode}
       accessibilityLabel={props.alt}
       style={viewStyle as never}
@@ -300,7 +306,7 @@ export const Image = forwardRef<UIElement, Contract.ImageProps>(function Image(
 
 function TextField(
   props: Contract.InputProps & { multiline?: boolean; rows?: number },
-  ref: ForwardedRef<UIElement>,
+  ref: ForwardedRef<UIInputElement>,
   variant: "input" | "textarea"
 ) {
   const context = useThemeContext();
@@ -333,24 +339,27 @@ function TextField(
       numberOfLines={props.rows}
       onChangeText={props.onChangeText}
       onSubmitEditing={
-        props.onSubmit
+        props.onSubmitEditing
           ? (event: { nativeEvent: { text: string } }) =>
-              props.onSubmit?.(event.nativeEvent.text)
+              props.onSubmitEditing?.(event.nativeEvent.text)
           : undefined
       }
     />
   );
 }
 
-export const Input = forwardRef<UIElement, Contract.InputProps>(function Input(
-  props,
-  ref
-) {
-  return TextField(props, ref, "input");
-});
-export const Textarea = forwardRef<UIElement, Contract.TextareaProps>(
+export const Input = forwardRef<UIInputElement, Contract.InputProps>(
+  function Input(props, ref) {
+    return TextField(props, ref, "input");
+  }
+);
+export const Textarea = forwardRef<UITextAreaElement, Contract.TextareaProps>(
   function Textarea(props, ref) {
-    return TextField({ ...props, multiline: true }, ref, "textarea");
+    return TextField(
+      { ...(props as unknown as Contract.InputProps), multiline: true },
+      ref as ForwardedRef<UIInputElement>,
+      "textarea"
+    );
   }
 );
 
@@ -358,20 +367,20 @@ const CHECK_PATH = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z";
 
 function Toggle(
   props: Contract.CheckboxProps & { radio?: boolean },
-  ref: ForwardedRef<UIElement>
+  ref: ForwardedRef<UIInputElement>
 ) {
-  const { checked, onChange, disabled, radio } = props;
+  const { checked, onCheckedChange, disabled, radio } = props;
   const context = useThemeContext();
   const size = 18;
   return (
     <Box
-      ref={ref}
-      {...props}
+      ref={ref as ForwardedRef<UIElement>}
+      {...(props as unknown as Contract.BoxProps)}
       variant={undefined}
       onPress={(event) => {
         if (disabled) return;
         props.onPress?.(event);
-        onChange?.(radio ? true : !checked);
+        onCheckedChange?.(radio ? true : !checked);
       }}
       sx={{
         display: "flex",
@@ -406,15 +415,16 @@ function Toggle(
   );
 }
 
-export const Checkbox = forwardRef<UIElement, Contract.CheckboxProps>(Toggle);
-export const Radio = forwardRef<UIElement, Contract.RadioProps>(function Radio(
-  props,
-  ref
-) {
-  return Toggle({ ...props, radio: true }, ref);
-});
+export const Checkbox = forwardRef<UIInputElement, Contract.CheckboxProps>(
+  Toggle
+);
+export const Radio = forwardRef<UIInputElement, Contract.RadioProps>(
+  function Radio(props, ref) {
+    return Toggle({ ...props, radio: true }, ref);
+  }
+);
 
-export const Switch = forwardRef<UIElement, Contract.SwitchProps>(
+export const Switch = forwardRef<UIInputElement, Contract.SwitchProps>(
   function Switch(props, ref) {
     const context = useThemeContext();
     const { viewStyle, nativeProps } = useStyled(props);
@@ -433,7 +443,7 @@ export const Switch = forwardRef<UIElement, Contract.SwitchProps>(
         disabled={props.disabled}
         onPress={(event) => {
           event.stopPropagation();
-          props.onChange?.(!checked);
+          props.onCheckedChange?.(!checked);
         }}
         style={[
           viewStyle as object,
@@ -499,9 +509,15 @@ export const Progress = forwardRef<UIElement, Contract.ProgressProps>(
   }
 );
 
-export const Slider = forwardRef<UIElement, Contract.SliderProps>(
+export const Slider = forwardRef<UIInputElement, Contract.SliderProps>(
   function Slider(props, ref) {
-    const { value = 0, min = 0, max = 100, step = 1, onChange } = props;
+    const {
+      value = 0,
+      min = 0,
+      max = 100,
+      step = 1,
+      onValueChange: onChange
+    } = props;
     const width = useRef(0);
     const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
     const update = (x: number) => {

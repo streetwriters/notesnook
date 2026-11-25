@@ -35,7 +35,8 @@ import type {
   PointerMoveEvent,
   KeyEvent,
   PressEvent,
-  SxProp
+  SxProp,
+  WheelEvent
 } from "../../contracts";
 import { toPickedFile } from "../picked-file";
 import { mergeShorthands } from "../../shared/style/shorthand";
@@ -103,6 +104,10 @@ function rememberPointer(native: { pageX?: number; pageY?: number }) {
   }
 }
 
+function legacy<T>(event: object): T {
+  return event as T;
+}
+
 function press(event: any): PressEvent {
   const native = event?.nativeEvent ?? {};
   rememberPointer(native);
@@ -126,7 +131,7 @@ function press(event: any): PressEvent {
 
 export function key(event: any): KeyEvent {
   const native = event?.nativeEvent ?? event ?? {};
-  return {
+  return legacy<KeyEvent>({
     key: native.key,
     repeat: !!native.repeat,
     shiftKey: !!native.shiftKey,
@@ -139,7 +144,7 @@ export function key(event: any): KeyEvent {
     stopPropagation() {
       event?.stopPropagation?.();
     }
-  };
+  });
 }
 
 function pointer(event: any): PointerMoveEvent {
@@ -173,13 +178,13 @@ function hover(event: any): HoverEvent {
 
 function drag(event: any): DragEvent {
   const native = event?.nativeEvent ?? event ?? {};
-  return {
+  return legacy<DragEvent>({
     payload: DragDrop.getPayload(),
     x: native.x ?? 0,
     y: native.y ?? 0,
     pageX: native.pageX ?? 0,
     pageY: native.pageY ?? 0
-  };
+  });
 }
 
 function contextMenu(event: any): ContextMenuEvent {
@@ -188,7 +193,7 @@ function contextMenu(event: any): ContextMenuEvent {
     pageX: native.pageX ?? native.x,
     pageY: native.pageY ?? native.y
   });
-  return {
+  return legacy<ContextMenuEvent>({
     pageX: native.pageX ?? native.x ?? 0,
     pageY: native.pageY ?? native.y ?? 0,
     shiftKey: !!native.shiftKey,
@@ -201,11 +206,11 @@ function contextMenu(event: any): ContextMenuEvent {
     stopPropagation() {
       event?.stopPropagation?.();
     }
-  };
+  });
 }
 
 export function useStyled(
-  props: BaseProps & { variant?: string },
+  props: BaseProps<any> & { variant?: string },
   options: StyledOptions = {}
 ): StyledResult {
   const context = useThemeContext();
@@ -239,12 +244,15 @@ export function useStyled(
       droppable: props.droppable || undefined,
       acceptsFiles: props.onDropFiles ? true : undefined,
       onDragStart: props.onDragStart
-        ? () => DragDrop.setPayload(props.onDragStart?.())
+        ? (e: unknown) => DragDrop.setPayload(props.onDragStart?.(drag(e)))
         : props.draggable
         ? () => DragDrop.setPayload(undefined)
         : undefined,
       onDragEnd: props.onDragEnd
-        ? (e: any) => props.onDragEnd?.({ dropped: !!e?.nativeEvent?.dropped })
+        ? (e: any) =>
+            props.onDragEnd?.(
+              legacy<DragEvent>({ dropped: !!e?.nativeEvent?.dropped })
+            )
         : undefined,
       onDragEnter: props.onDragEnter
         ? (e: unknown) => props.onDragEnter?.(drag(e))
@@ -290,11 +298,13 @@ export function useStyled(
         : undefined,
       onWheel: props.onWheel
         ? (e: any) =>
-            props.onWheel?.({
-              deltaX: e?.nativeEvent?.deltaX ?? 0,
-              deltaY: e?.nativeEvent?.deltaY ?? 0,
-              preventDefault: () => e?.preventDefault?.()
-            })
+            props.onWheel?.(
+              legacy<WheelEvent>({
+                deltaX: e?.nativeEvent?.deltaX ?? 0,
+                deltaY: e?.nativeEvent?.deltaY ?? 0,
+                preventDefault: () => e?.preventDefault?.()
+              })
+            )
         : undefined,
       onPointerDown: props.onPointerDown
         ? (e: unknown) => props.onPointerDown?.(pointer(e))
@@ -329,7 +339,7 @@ export function useStyled(
   }, [resolved, props]);
 }
 
-export function pressHandler(props: BaseProps) {
+export function pressHandler(props: BaseProps<any>) {
   if (!props.onPress && !props.onDoubleClick) return undefined;
   let lastPress = 0;
   return (event: unknown) => {
@@ -339,7 +349,7 @@ export function pressHandler(props: BaseProps) {
     lastPress = isDouble ? 0 : now;
     if (isDouble) pressEvent.detail = 2;
     props.onPress?.(pressEvent);
-    if (isDouble) props.onDoubleClick?.(pressEvent);
+    if (isDouble) props.onDoubleClick?.(legacy<ContextMenuEvent>(pressEvent));
   };
 }
 

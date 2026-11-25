@@ -440,7 +440,7 @@ export function NotebookItem(props: {
             placeholder={strings.enterNotebookTitle()}
             value={subNotebookTitle}
             onChangeText={setSubNotebookTitle}
-            onSubmit={() => createSubNotebook()}
+            onSubmitEditing={() => createSubNotebook()}
             onKeyDown={(e) => {
               if (e.key === "Escape") {
                 e.stopPropagation();

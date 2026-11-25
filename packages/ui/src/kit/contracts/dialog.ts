@@ -18,9 +18,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ReactNode } from "react";
+import type { UIElement } from "./elements";
+import type { UIKeyboardEvent, UIMouseEvent } from "./events";
 import type { ButtonProps } from "./primitives";
-import type { SxProp } from "./style";
+import type { StyleProp, SxProp } from "./style";
 
+export interface ModalStyles {
+  content?: StyleProp;
+  overlay?: StyleProp;
+}
+
+export interface ModalProps {
+  isOpen: boolean;
+  onRequestClose?: (event: UIMouseEvent | UIKeyboardEvent) => void;
+  onAfterOpen?: () => void;
+  onAfterClose?: () => void;
+  shouldCloseOnEsc?: boolean;
+  shouldCloseOnOverlayClick?: boolean;
+  shouldFocusAfterRender?: boolean;
+  shouldReturnFocusAfterClose?: boolean;
+  style?: ModalStyles;
+  className?: string;
+  overlayClassName?: string;
+  contentLabel?: string;
+  id?: string;
+  testId?: string;
+  data?: Record<string, string | undefined>;
+  children?: ReactNode;
+}
+
+export declare const Modal: {
+  (props: ModalProps): JSX.Element | null;
+  setAppElement(element: string | UIElement): void;
+};
+
+/** @deprecated Build dialog buttons with `Button`, as apps/web's dialog does. */
 export interface DialogButtonProps {
   text: ReactNode;
   onClick?: () => void;
@@ -28,11 +60,16 @@ export interface DialogButtonProps {
   loading?: boolean;
   role?: string;
   variant?: ButtonProps["variant"];
+  "data-test-id"?: string;
+  /** @deprecated Use `data-test-id`. */
   testID?: string;
   sx?: SxProp;
 }
 
+/** @deprecated Use `Modal`. */
 export interface DialogProps {
+  "data-test-id"?: string;
+  /** @deprecated Use `data-test-id`. */
   testID?: string;
   isOpen?: boolean;
   onClose?: () => void;
@@ -53,5 +90,7 @@ export interface DialogProps {
   children?: ReactNode;
 }
 
+/** @deprecated Use `Modal`. */
 export declare function Dialog(props: DialogProps): JSX.Element | null;
+/** @deprecated Build dialog buttons with `Button`, as apps/web's dialog does. */
 export declare function DialogButton(props: DialogButtonProps): JSX.Element;

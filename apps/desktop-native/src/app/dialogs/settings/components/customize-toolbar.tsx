@@ -112,7 +112,7 @@ export function CustomizeToolbar() {
                 disabled={
                   preset.id === "custom" && !customToolbarPreset?.isAllowed
                 }
-                onChange={() =>
+                onCheckedChange={() =>
                   setCurrentPreset(getPreset(preset.id as PresetId))
                 }
               />

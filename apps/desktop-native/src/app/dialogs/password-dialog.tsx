@@ -117,7 +117,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
               values.current[id] = text;
               input.onChangeText?.(text);
             }}
-            onSubmit={() => onSubmit()}
+            onSubmitEditing={() => onSubmit()}
           />
         ))}
 
@@ -136,7 +136,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
                   testID={id}
                   defaultChecked={check.default}
                   sx={{ width: 18, height: 18 }}
-                  onChange={(value) => (checked.current[id] = value)}
+                  onCheckedChange={(value) => (checked.current[id] = value)}
                 />
                 <Text variant="body" sx={{ color: "paragraph" }}>
                   {check.text}

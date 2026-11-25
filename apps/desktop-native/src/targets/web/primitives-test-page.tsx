@@ -176,14 +176,14 @@ export function PrimitivesTestPage() {
                 />
               </Section>
               <Section title="Checkbox, Radio, Switch">
-                <Checkbox checked={checked} onChange={setChecked} />
-                <Radio checked={radio} onChange={setRadio} />
-                <Switch checked={on} onChange={setOn} />
+                <Checkbox checked={checked} onCheckedChange={setChecked} />
+                <Radio checked={radio} onCheckedChange={setRadio} />
+                <Switch checked={on} onCheckedChange={setOn} />
               </Section>
               <Section title="Select, Slider, Progress">
                 <Select
                   value={choice}
-                  onChange={setChoice}
+                  onValueChange={setChoice}
                   options={[
                     { value: "a", title: "Option A" },
                     { value: "b", title: "Option B" }
@@ -194,7 +194,7 @@ export function PrimitivesTestPage() {
                   value={slider}
                   min={0}
                   max={100}
-                  onChange={setSlider}
+                  onValueChange={setSlider}
                 />
                 <Progress value={slider} max={100} />
               </Section>

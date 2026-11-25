@@ -27,7 +27,7 @@ import {
   type InputProps,
   type PressEvent,
   type SxProp,
-  type UIElement
+  type UIInputElement
 } from "@ui";
 import { PasswordInvisible, PasswordVisible, type Icon } from "../icons";
 import { AuthErrorText } from "../error-text";
@@ -137,7 +137,7 @@ function InlineIcon(props: { icon: Icon; side: "left" | "right" }) {
   );
 }
 
-const Field = forwardRef<UIElement, FieldProps>(function Field(props, ref) {
+const Field = forwardRef<UIInputElement, FieldProps>(function Field(props, ref) {
   const {
     label,
     styles,

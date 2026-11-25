@@ -131,11 +131,11 @@ Top-level directories in `apps/desktop-native/`:
 
 - `src/app/`: the app itself, shared by every target (`views`, `dialogs`, `components`, `stores`, `navigation`, etc.)
 - `src/platform/`: the contracts for platform services (files, database, crypto, clipboard and so on)
-- `../../packages/ui/src/kit/`: the `@ui` contracts (`contracts`), their desktop and web implementations (`desktop`, `web`) and the code both share (`shared`). Source only, imported as `@notesnook/ui-kit/*`; the web build fails if `web` or `shared` imports a react-native package
+- `../../packages/ui/src/kit/`: the `@ui` contracts (`contracts`), their desktop and web implementations (`desktop`, `web`) and the code both share (`shared`). Source only, imported as `@notesnook/ui-kit/*`; the web build fails if `web` or `shared` imports a react-native package. The contracts follow the theme-ui, DOM, react-virtuoso and react-modal API that `apps/web` uses; [docs/ui-kit-web-api.md](docs/ui-kit-web-api.md) lists what is kept, what is a subset and what is deprecated
 - `src/targets/desktop/`: the desktop implementation of `@platform`, and `ui/`, which re-exports the kit's desktop implementation plus the app's `EditorSurface`
 - `src/targets/web/`: the same for the web target
 - `desktop/`: the native project: `desktop.json` (window, identifier, packaging), the Rust entry point, assets and the end-to-end tests in `desktop/e2e/`
-- `tools/`: asset and icon generators, the visual parity tools and performance scripts
+- `tools/`: asset and icon generators, the visual parity tools, performance scripts and `ui-kit-web-api/` (`npm run check:web-api`: scans `apps/web` for the UI APIs it uses, fails if the kit contract lacks one, and regenerates the table in `docs/ui-kit-web-api.md`)
 
 The app code only imports `@ui/*` and `@platform/*`; Metro resolves them to the active target.
 

@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { forwardRef, useRef } from "react";
 import type * as Contract from "../contracts/primitives";
-import type { UIElement } from "../contracts/primitives";
+import type { UIElement, UISelectElement } from "../contracts/elements";
 import { useMenuStore } from "../shared/menu-store";
 import { CaretDown } from "../shared/icons";
 import { Button, Flex, Text } from "./primitives";
 
-export const Select = forwardRef<UIElement, Contract.SelectProps>(
+export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
   function Select(props, ref) {
-    const { options, value, onChange } = props;
+    const { options = [], value, onValueChange: onChange } = props;
     const trigger = useRef<UIElement>(null);
     const selected = options.find((option) => option.value === value);
 
@@ -34,8 +34,8 @@ export const Select = forwardRef<UIElement, Contract.SelectProps>(
       <Button
         ref={(node) => {
           trigger.current = node;
-          if (typeof ref === "function") ref(node);
-          else if (ref) ref.current = node;
+          if (typeof ref === "function") ref(node as UISelectElement | null);
+          else if (ref) ref.current = node as UISelectElement | null;
         }}
         testID={props.testID}
         onPress={() => {

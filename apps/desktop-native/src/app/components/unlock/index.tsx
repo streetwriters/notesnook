@@ -106,7 +106,7 @@ export function UnlockView(props: UnlockViewProps) {
           setPassword(text);
           if (errorMessage) setErrorMessage(undefined);
         }}
-        onSubmit={submit}
+        onSubmitEditing={submit}
       />
       {errorMessage && <ErrorText sx={{ mt: 1 }} error={errorMessage} />}
       <Button

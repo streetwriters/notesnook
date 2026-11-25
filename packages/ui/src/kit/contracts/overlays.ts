@@ -17,10 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { IconProps } from "./primitives";
+import type { BoxProps, IconProps } from "./primitives";
 import type { ComponentType, ReactNode, RefObject } from "react";
-import type { UIElement } from "./primitives";
-import type { SxProp } from "./style";
+import type { UIElement } from "./elements";
+import type { SxProp, ThemeScopeName } from "./style";
+
+export type MenuIconComponent = ComponentType<Omit<IconProps, "path" | "svg">>;
+
+export type MenuItemComponentProps = {
+  onClick?: (event?: unknown) => void;
+};
 
 export type MenuItemTypes = "button" | "separator" | "popup" | "lazy-loader";
 export type BaseMenuItem<TType extends MenuItemTypes> = {
@@ -30,13 +36,17 @@ export type BaseMenuItem<TType extends MenuItemTypes> = {
   multiSelect?: boolean;
 };
 
-export type MenuSeparatorItem = BaseMenuItem<"separator">;
+export type MenuSeperatorItem = BaseMenuItem<"separator">;
+
+/** @deprecated Use `MenuSeperatorItem`, the name `@notesnook/ui` exports. */
+export type MenuSeparatorItem = MenuSeperatorItem;
 
 export type MenuPopupItem = BaseMenuItem<"popup"> & {
-  component: ComponentType<{ onClick?: () => void }>;
+  component: ComponentType<MenuItemComponentProps>;
 };
 
 export type LazyMenuItemsLoader = BaseMenuItem<"lazy-loader"> & {
+  loader?: ReactNode;
   items: () => Promise<MenuItem[]>;
 };
 
@@ -44,7 +54,7 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   onClick?: () => void;
   title: string;
   icon?: string;
-  iconComponent?: ComponentType<Omit<IconProps, "path" | "svg">>;
+  iconComponent?: MenuIconComponent;
   tooltip?: string;
   isDisabled?: boolean;
   isChecked?: boolean;
@@ -52,13 +62,54 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   menu?: { title?: string; items: MenuItem[] };
   premium?: boolean;
   variant?: "dangerous" | "normal";
+  styles?: {
+    title?: SxProp;
+    icon?: SxProp;
+  };
 };
 
 export type MenuItem =
   | MenuButtonItem
-  | MenuSeparatorItem
+  | MenuSeperatorItem
   | MenuPopupItem
   | LazyMenuItemsLoader;
+
+export type PositionOptions = {
+  target?: UIElement | "mouse" | null;
+  isTargetAbsolute?: boolean;
+  location?: "right" | "left" | "below" | "top";
+  align?: "center" | "start" | "end";
+  yOffset?: number;
+  xOffset?: number;
+  gap?: number;
+  yAnchor?: UIElement;
+  parent?: UIElement;
+};
+
+export interface PopupPresenterProps extends BoxProps {
+  isOpen: boolean;
+  onClose: () => void;
+  position: PositionOptions;
+  blocking?: boolean;
+  focusOnRender?: boolean;
+  movable?: boolean;
+  scope?: ThemeScopeName;
+  isMobile?: boolean;
+  container?: UIElement;
+}
+
+export interface MenuPresenterProps
+  extends Omit<PopupPresenterProps, "movable" | "scope" | "title"> {
+  items?: MenuItem[];
+  title?: string;
+}
+
+export declare function PopupPresenter(
+  props: PopupPresenterProps
+): JSX.Element | null;
+export declare function MenuPresenter(
+  props: MenuPresenterProps
+): JSX.Element | null;
 
 export type ToastType = "success" | "error" | "warn" | "info";
 export type ToastAction = {

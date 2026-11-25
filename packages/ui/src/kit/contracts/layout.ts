@@ -22,7 +22,10 @@ import type {
   ReactNode,
   RefAttributes
 } from "react";
-import type { SxProp } from "./style";
+import type { UIElement } from "./elements";
+import type { UISyntheticEvent, UIWheelEvent } from "./events";
+import type { DataAttributes } from "./primitives";
+import type { StyleProp, SxProp } from "./style";
 
 export interface SplitPaneHandle {
   collapse(index: number): void;
@@ -39,6 +42,8 @@ export interface SplitPaneProps {
   sashSize?: number;
   onChange?: (sizes: number[]) => void;
   sx?: SxProp;
+  "data-test-id"?: string;
+  /** @deprecated Use `data-test-id`. */
   testID?: string;
   children?: ReactNode;
 }
@@ -50,6 +55,8 @@ export interface PaneProps {
   maxSize?: number;
   snapSize?: number;
   sx?: SxProp;
+  "data-test-id"?: string;
+  /** @deprecated Use `data-test-id`. */
   testID?: string;
   children?: ReactNode;
 }
@@ -70,14 +77,24 @@ export interface TitleBarProps {
 
 export declare function TitleBar(props: TitleBarProps): JSX.Element | null;
 
-export interface ScrollContainerProps {
+export interface ScrollContainerProps extends DataAttributes {
+  id?: string;
+  className?: string;
+  style?: StyleProp;
   sx?: SxProp;
+  suppressScrollX?: boolean;
+  suppressScrollY?: boolean;
+  trackStyle?: (horizontal?: boolean) => StyleProp;
+  thumbStyle?: (horizontal?: boolean) => StyleProp;
+  onScroll?: (event: UISyntheticEvent) => void;
+  onWheel?: (event: UIWheelEvent) => void;
+  /** @deprecated Use `data-test-id`. */
   testID?: string;
   children?: ReactNode;
 }
 
 export declare function ScrollContainer(
-  props: ScrollContainerProps
+  props: ScrollContainerProps & RefAttributes<UIElement>
 ): JSX.Element;
 
 export interface LayoutRootProps {

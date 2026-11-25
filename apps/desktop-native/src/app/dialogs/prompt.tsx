@@ -56,7 +56,7 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
         defaultValue={props.defaultValue}
         autoFocus
         onChangeText={(text) => (value.current = text)}
-        onSubmit={(text) => props.onClose(text || "")}
+        onSubmitEditing={(text) => props.onClose(text || "")}
         sx={{ mt: "spacing6", mb: "spacing7" }}
       />
     </Dialog>

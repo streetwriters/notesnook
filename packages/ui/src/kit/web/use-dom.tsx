@@ -148,7 +148,7 @@ function toKey(event: ReactKeyboardEvent): KeyEvent {
     ...modifiers(event),
     preventDefault: () => event.preventDefault(),
     stopPropagation: () => event.stopPropagation()
-  };
+  } as unknown as KeyEvent;
 }
 
 function toPointer(event: ReactPointerEvent) {
@@ -185,19 +185,20 @@ function matchesAccept(file: File, accept: string[]) {
 }
 
 export function useUIElement(
-  ref: Ref<UIElement> | undefined,
+  ref: Ref<any> | undefined,
   element: React.RefObject<HTMLElement | null>
 ) {
   useImperativeHandle(
     ref,
-    () => ({
-      focus: () => element.current?.focus(),
-      blur: () => element.current?.blur(),
-      measureInWindow: (callback) => {
-        const rect = element.current?.getBoundingClientRect();
-        if (rect) callback(rect.left, rect.top, rect.width, rect.height);
-      }
-    }),
+    () =>
+      ({
+        focus: () => element.current?.focus(),
+        blur: () => element.current?.blur(),
+        measureInWindow: (callback) => {
+          const rect = element.current?.getBoundingClientRect();
+          if (rect) callback(rect.left, rect.top, rect.width, rect.height);
+        }
+      } as Pick<UIElement, "focus" | "blur" | "measureInWindow"> as UIElement),
     [element]
   );
 }
@@ -210,7 +211,7 @@ export interface DomOptions {
   pressable?: boolean;
 }
 
-export function useDom(props: BaseProps & Record<string, any>, options: DomOptions) {
+export function useDom(props: Record<string, any>, options: DomOptions) {
   const context = useThemeContext();
   const [dragOver, setDragOver] = useState(false);
   const dragDepth = useRef(0);

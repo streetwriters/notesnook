@@ -526,7 +526,7 @@ function SettingItem(props: { item: Setting }) {
                     testID={`setting-${item.key}-toggle-${index}`}
                     disabled={workIndex === index}
                     checked={component.isToggled()}
-                    onChange={withFeatureCheck(feature, () =>
+                    onCheckedChange={withFeatureCheck(feature, () =>
                       workWithLoading(index, component.toggle)
                     )}
                   />
@@ -599,7 +599,7 @@ export function SelectComponent(
       testID={props.testID}
       options={options}
       value={selected}
-      onChange={(value) => {
+      onValueChange={(value) => {
         setSelected(value);
         onSelectionChanged(value);
       }}

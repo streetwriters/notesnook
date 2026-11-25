@@ -26,28 +26,36 @@ import type {
 } from "react";
 import type { Theme, ThemeDefinition } from "@notesnook/theme";
 import type {
-  ContextMenuEvent,
-  FocusEvent,
+  UIElement,
+  UIInputElement,
+  UISelectElement,
+  UITextAreaElement
+} from "./elements";
+import type {
   HoverEvent,
-  KeyEvent,
-  PressEvent
+  PressEvent,
+  UIChangeEvent,
+  UIClipboardEvent,
+  UIDragEvent,
+  UIFocusEvent,
+  UIFormEvent,
+  UIKeyboardEvent,
+  UIMouseEvent,
+  UISyntheticEvent,
+  UITouchEvent,
+  UIWheelEvent
 } from "./events";
 import type {
   ColorProps,
   IconSizeToken,
   ColorValue,
   SpaceProps,
+  StyleProp,
   SxProp,
   ThemeScopeName
 } from "./style";
 
-export interface UIElement {
-  focus(): void;
-  blur(): void;
-  measureInWindow(
-    callback: (x: number, y: number, width: number, height: number) => void
-  ): void;
-}
+export type { UIElement } from "./elements";
 
 export interface DroppedFile {
   name: string;
@@ -66,48 +74,105 @@ export interface PointerMoveEvent {
   buttons: number;
 }
 
-export interface WheelEvent {
-  deltaX: number;
-  deltaY: number;
-  preventDefault(): void;
+/** @deprecated Use `UIWheelEvent`. */
+export type WheelEvent = UIWheelEvent;
+
+/** @deprecated Use `UIDragEvent`. */
+export type DragEvent = UIDragEvent;
+
+export type ElementTag =
+  | "a"
+  | "code"
+  | "div"
+  | "fieldset"
+  | "form"
+  | "input"
+  | "label"
+  | "legend"
+  | "li"
+  | "ol"
+  | "p"
+  | "pre"
+  | "span"
+  | "strong"
+  | "summary"
+  | "table"
+  | "tbody"
+  | "td"
+  | "textarea"
+  | "th"
+  | "thead"
+  | "time"
+  | "tr"
+  | "ul";
+
+export interface DataAttributes {
+  [name: `data-${string}`]: string | number | boolean | undefined;
 }
 
-export interface DragEvent {
-  payload: unknown;
-  x: number;
-  y: number;
-  pageX: number;
-  pageY: number;
+export interface AriaAttributes {
+  "aria-label"?: string;
+  "aria-hidden"?: boolean | "true" | "false";
+  "aria-invalid"?: boolean | "true" | "false";
+  "aria-describedby"?: string;
 }
 
-export interface BaseProps extends SpaceProps, ColorProps {
+export interface BaseProps<T = UIElement>
+  extends SpaceProps,
+    ColorProps,
+    DataAttributes,
+    AriaAttributes {
   sx?: SxProp;
+  style?: StyleProp;
+  className?: string;
+  as?: ElementTag;
   id?: string;
-  testID?: string;
   title?: string;
+  dir?: "ltr" | "rtl" | "auto";
+  tabIndex?: number;
   group?: string;
-  onPress?: (event: PressEvent) => void;
-  onDoubleClick?: (event: PressEvent) => void;
-  onContextMenu?: (event: ContextMenuEvent) => void;
-  onHoverIn?: (event: HoverEvent) => void;
-  onHoverOut?: (event: HoverEvent) => void;
-  onWheel?: (event: WheelEvent) => void;
+  onClick?: (event: UIMouseEvent<T>) => void;
+  onAuxClick?: (event: UIMouseEvent<T>) => void;
+  onDoubleClick?: (event: UIMouseEvent<T>) => void;
+  onContextMenu?: (event: UIMouseEvent<T>) => void;
+  onMouseDown?: (event: UIMouseEvent<T>) => void;
+  onMouseUp?: (event: UIMouseEvent<T>) => void;
+  onMouseMove?: (event: UIMouseEvent<T>) => void;
+  onMouseEnter?: (event: UIMouseEvent<T>) => void;
+  onMouseLeave?: (event: UIMouseEvent<T>) => void;
+  onTouchStart?: (event: UITouchEvent<T>) => void;
+  onTouchMove?: (event: UITouchEvent<T>) => void;
+  onTouchEnd?: (event: UITouchEvent<T>) => void;
+  onWheel?: (event: UIWheelEvent<T>) => void;
   onPointerDown?: (event: PointerMoveEvent) => void;
   onPointerMove?: (event: PointerMoveEvent) => void;
   onPointerUp?: (event: PointerMoveEvent) => void;
-  onFocus?: (event: FocusEvent) => void;
-  onBlur?: (event: FocusEvent) => void;
-  onKeyDown?: (event: KeyEvent) => void;
-  onKeyUp?: (event: KeyEvent) => void;
+  onFocus?: (event: UIFocusEvent<T>) => void;
+  onBlur?: (event: UIFocusEvent<T>) => void;
+  onKeyDown?: (event: UIKeyboardEvent<T>) => void;
+  onKeyUp?: (event: UIKeyboardEvent<T>) => void;
+  onKeyPress?: (event: UIKeyboardEvent<T>) => void;
+  onSubmit?: (event: UIFormEvent<T>) => void;
   draggable?: boolean;
-  onDragStart?: () => unknown;
-  onDragEnd?: (event: { dropped: boolean }) => void;
+  onDragStart?: (event: UIDragEvent<T>) => unknown;
+  onDragEnd?: (event: UIDragEvent<T>) => void;
+  onDragEnter?: (event: UIDragEvent<T>) => void;
+  onDragOver?: (event: UIDragEvent<T>) => void;
+  onDragLeave?: (event: UIDragEvent<T>) => void;
+  onDrop?: (event: UIDragEvent<T>) => void;
+  /** @deprecated Use `data-test-id`. */
+  testID?: string;
+  /** @deprecated Use `onClick`. */
+  onPress?: (event: PressEvent) => void;
+  /** @deprecated Use `onMouseEnter`. */
+  onHoverIn?: (event: HoverEvent) => void;
+  /** @deprecated Use `onMouseLeave`. */
+  onHoverOut?: (event: HoverEvent) => void;
+  /** @deprecated Every element with `onDrop` accepts drops. */
   droppable?: boolean;
-  onDragEnter?: (event: DragEvent) => void;
-  onDragOver?: (event: DragEvent) => void;
-  onDragLeave?: (event: DragEvent) => void;
-  onDrop?: (event: DragEvent) => void;
+  /** @deprecated Use `onDrop` and read `event.dataTransfer.files`. */
   acceptsFiles?: string[];
+  /** @deprecated Use `onDrop` and read `event.dataTransfer.files`. */
   onDropFiles?: (files: DroppedFile[]) => void;
 }
 
@@ -125,12 +190,18 @@ export interface GridProps extends BoxProps {
 export interface TextProps extends BaseProps {
   variant?: keyof Theme["text"];
   selectable?: boolean;
+  dangerouslySetInnerHTML?: { __html: string };
+  href?: string;
+  target?: "_blank" | "_self";
+  rel?: string;
+  /** @deprecated Use `sx.lineClamp`. */
   numberOfLines?: number;
   children?: ReactNode;
 }
 
 export interface ButtonProps extends BaseProps {
   variant?: keyof Theme["buttons"];
+  type?: "button" | "submit" | "reset";
   disabled?: boolean;
   /** `false` keeps focus where it was when the button is pressed. */
   focusable?: boolean;
@@ -139,77 +210,145 @@ export interface ButtonProps extends BaseProps {
 
 export interface LabelProps extends BaseProps {
   variant?: keyof Theme["forms"];
+  htmlFor?: string;
   children?: ReactNode;
 }
 
 export interface LinkProps extends BaseProps {
+  variant?: keyof Theme["variants"] | keyof Theme["text"];
   href?: string;
+  target?: "_blank" | "_self";
+  rel?: string;
   children?: ReactNode;
 }
 
 export interface ImageProps extends BaseProps {
   src: string;
   alt?: string;
+  onLoad?: (event: UISyntheticEvent) => void;
+  /** @deprecated Use `sx.objectFit`. */
   resizeMode?: "cover" | "contain" | "stretch";
-  onLoad?: () => void;
 }
 
-export interface InputProps extends BaseProps {
+export interface InputProps extends BaseProps<UIInputElement> {
   variant?: keyof Theme["forms"];
-  type?: "text" | "password" | "email" | "number" | "search";
-  value?: string;
-  defaultValue?: string;
+  type?:
+    | "text"
+    | "password"
+    | "email"
+    | "number"
+    | "search"
+    | "checkbox"
+    | "radio"
+    | "color"
+    | "hidden";
+  name?: string;
+  value?: string | number;
+  defaultValue?: string | number;
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
   maxLength?: number;
+  min?: number | string;
+  max?: number | string;
+  step?: number | string;
   selectTextOnFocus?: boolean;
+  required?: boolean;
+  pattern?: string;
+  autoComplete?: string;
+  inputMode?:
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal"
+    | "search";
+  onPaste?: (event: UIClipboardEvent<UIInputElement>) => void;
+  onChange?: (event: UIChangeEvent<UIInputElement>) => void;
+  /** @deprecated Use `onChange` and read `event.target.value`. */
   onChangeText?: (text: string) => void;
-  onSubmit?: (text: string) => void;
+  /** @deprecated Wrap the input in a `Box as="form"` and use its `onSubmit`. */
+  onSubmitEditing?: (text: string) => void;
 }
 
-export interface TextareaProps extends Omit<InputProps, "type" | "onSubmit"> {
+export interface TextareaProps extends BaseProps<UITextAreaElement> {
+  variant?: keyof Theme["forms"];
+  value?: string | number;
+  defaultValue?: string | number;
+  placeholder?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  autoFocus?: boolean;
+  maxLength?: number;
   rows?: number;
+  spellCheck?: boolean;
+  wrap?: "soft" | "hard" | "off";
+  selectTextOnFocus?: boolean;
+  onChange?: (event: UIChangeEvent<UITextAreaElement>) => void;
+  /** @deprecated Use `onChange` and read `event.target.value`. */
+  onChangeText?: (text: string) => void;
 }
 
-export interface CheckboxProps extends BaseProps {
+export interface CheckboxProps extends BaseProps<UIInputElement> {
+  variant?: keyof Theme["forms"];
+  name?: string;
+  checked?: boolean;
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  onChange?: (event: UIChangeEvent<UIInputElement>) => void;
+  /** @deprecated Use `onChange` and read `event.target.checked`. */
+  onCheckedChange?: (checked: boolean) => void;
+}
+
+export interface RadioProps extends BaseProps<UIInputElement> {
+  variant?: keyof Theme["forms"];
+  checked?: boolean;
+  defaultChecked?: boolean;
+  value?: string;
+  name?: string;
+  disabled?: boolean;
+  onChange?: (event: UIChangeEvent<UIInputElement>) => void;
+  /** @deprecated Use `onChange` and read `event.target.checked`. */
+  onCheckedChange?: (checked: boolean) => void;
+}
+
+export interface SwitchProps extends BaseProps<UIInputElement> {
   variant?: keyof Theme["forms"];
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
-  onChange?: (checked: boolean) => void;
+  onChange?: (event: UIChangeEvent<UIInputElement>) => void;
+  /** @deprecated Use `onChange` and read `event.target.checked`. */
+  onCheckedChange?: (checked: boolean) => void;
 }
 
-export interface RadioProps extends BaseProps {
-  variant?: keyof Theme["forms"];
-  checked?: boolean;
-  value?: string;
-  name?: string;
-  disabled?: boolean;
-  onChange?: (checked: boolean) => void;
-}
-
-export interface SwitchProps extends BaseProps {
-  variant?: keyof Theme["forms"];
-  checked?: boolean;
-  disabled?: boolean;
-  onChange?: (checked: boolean) => void;
-}
-
-export interface SliderProps extends BaseProps {
+export interface SliderProps extends BaseProps<UIInputElement> {
   variant?: keyof Theme["forms"];
   value?: number;
+  defaultValue?: number;
   min?: number;
   max?: number;
   step?: number;
   disabled?: boolean;
-  onChange?: (value: number) => void;
+  onChange?: (event: UIChangeEvent<UIInputElement>) => void;
+  /** @deprecated Use `onChange` and read `event.target.valueAsNumber`. */
+  onValueChange?: (value: number) => void;
 }
 
 export interface ProgressProps extends BaseProps {
   value?: number;
   max?: number;
+}
+
+export interface DonutProps extends BaseProps {
+  value: number;
+  min?: number;
+  max?: number;
+  size?: number;
+  strokeWidth?: number;
 }
 
 export interface IconProps extends BaseProps {
@@ -242,16 +381,25 @@ export interface QRCodeHandle {
   toPNG(): Promise<Uint8Array>;
 }
 
+/** @deprecated Pass `<option>` children to `Select`. */
 export interface SelectOption {
   value: string | number;
   title: string;
   disabled?: boolean;
 }
 
-export interface SelectProps extends BaseProps {
-  options: SelectOption[];
+export interface SelectProps extends BaseProps<UISelectElement> {
+  variant?: keyof Theme["forms"];
+  name?: string;
   value?: string | number;
-  onChange?: (value: string) => void;
+  defaultValue?: string | number;
+  disabled?: boolean;
+  onChange?: (event: UIChangeEvent<UISelectElement>) => void;
+  children?: ReactNode;
+  /** @deprecated Pass `<option>` children. */
+  options?: SelectOption[];
+  /** @deprecated Use `onChange` and read `event.target.value`. */
+  onValueChange?: (value: string) => void;
 }
 
 export interface ThemeScopeProps {
@@ -261,8 +409,8 @@ export interface ThemeScopeProps {
   children?: ReactNode;
 }
 
-type Primitive<P> = ForwardRefExoticComponent<
-  PropsWithChildren<P> & RefAttributes<UIElement>
+type Primitive<P, E = UIElement> = ForwardRefExoticComponent<
+  PropsWithChildren<P> & RefAttributes<E>
 >;
 
 export declare const Box: Primitive<BoxProps>;
@@ -273,17 +421,18 @@ export declare const Button: Primitive<ButtonProps>;
 export declare const Label: Primitive<LabelProps>;
 export declare const Link: Primitive<LinkProps>;
 export declare const Image: Primitive<ImageProps>;
-export declare const Input: Primitive<InputProps>;
-export declare const Textarea: Primitive<TextareaProps>;
-export declare const Checkbox: Primitive<CheckboxProps>;
-export declare const Radio: Primitive<RadioProps>;
-export declare const Select: Primitive<SelectProps>;
+export declare const Input: Primitive<InputProps, UIInputElement>;
+export declare const Textarea: Primitive<TextareaProps, UITextAreaElement>;
+export declare const Checkbox: Primitive<CheckboxProps, UIInputElement>;
+export declare const Radio: Primitive<RadioProps, UIInputElement>;
+export declare const Select: Primitive<SelectProps, UISelectElement>;
 export declare const QRCode: ForwardRefExoticComponent<
   QRCodeProps & RefAttributes<QRCodeHandle>
 >;
 export declare const ColorPicker: Primitive<ColorPickerProps>;
-export declare const Switch: Primitive<SwitchProps>;
-export declare const Slider: Primitive<SliderProps>;
+export declare const Switch: Primitive<SwitchProps, UIInputElement>;
+export declare const Slider: Primitive<SliderProps, UIInputElement>;
 export declare const Progress: Primitive<ProgressProps>;
+export declare const Donut: Primitive<DonutProps>;
 export declare const Icon: Primitive<IconProps>;
 export declare const ThemeScope: ComponentType<ThemeScopeProps>;

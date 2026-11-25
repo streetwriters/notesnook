@@ -784,7 +784,7 @@ function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
           }
         }}
         onChangeText={(text) => (code.current = text.trim())}
-        onSubmit={submit}
+        onSubmitEditing={submit}
       />
     </Flex>
   );

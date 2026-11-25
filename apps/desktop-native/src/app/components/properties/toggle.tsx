@@ -71,7 +71,7 @@ function Toggle(props: ToggleProps) {
       </Flex>
       <Switch
         checked={isOn}
-        onChange={onToggle}
+        onCheckedChange={onToggle}
         sx={{ m: 0, bg: isOn ? "accent" : "icon-disabled", flexShrink: 0 }}
       />
     </Flex>

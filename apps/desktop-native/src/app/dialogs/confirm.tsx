@@ -155,7 +155,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                   testID={id}
                   defaultChecked={check.default}
                   sx={{ width: 18, height: 18 }}
-                  onChange={(checked) => (checkedItems.current[id] = checked)}
+                  onCheckedChange={(checked) => (checkedItems.current[id] = checked)}
                 />
                 <Text
                   variant="body"

@@ -109,7 +109,7 @@ export const AddNotebookDialog = DialogManager.register(
             placeholder={strings.enterNotebookTitle()}
             id="title"
             onChangeText={(text) => (title.current = text)}
-            onSubmit={() => onSubmit()}
+            onSubmitEditing={() => onSubmit()}
           />
           <Field
             testID="description-input"

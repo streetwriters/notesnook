@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export * from "./avatar-editor";
 export * from "./dialog";
+export * from "./elements";
 export * from "./events";
 export * from "./hooks";
 export * from "./layout";
@@ -29,3 +30,4 @@ export * from "./webview";
 export * from "./pdf";
 export * from "./editor";
 export * from "./overlays";
+export * from "./pending";

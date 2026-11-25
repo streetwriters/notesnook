@@ -241,7 +241,7 @@ export const Image = forwardRef<Contract.UIElement, Contract.ImageProps>(
         ref={element}
         src={props.src}
         alt={props.alt ?? ""}
-        onLoad={() => props.onLoad?.()}
+        onLoad={props.onLoad as never}
       />
     );
   }
@@ -276,7 +276,8 @@ export const Input = forwardRef<Contract.UIElement, Contract.InputProps>(
         onChange={(event) => props.onChangeText?.(event.target.value)}
         onKeyDown={(event) => {
           (dom.onKeyDown as any)?.(event);
-          if (event.key === "Enter") props.onSubmit?.(event.currentTarget.value);
+          if (event.key === "Enter")
+            props.onSubmitEditing?.(event.currentTarget.value);
         }}
       />
     );
@@ -340,7 +341,7 @@ export const Checkbox = forwardRef<Contract.UIElement, Contract.CheckboxProps>(
         checked={props.checked}
         defaultChecked={props.defaultChecked}
         disabled={props.disabled}
-        onChange={(event) => props.onChange?.(event.target.checked)}
+        onChange={(event) => props.onCheckedChange?.(event.target.checked)}
       />
     );
   }
@@ -363,7 +364,7 @@ export const Radio = forwardRef<Contract.UIElement, Contract.RadioProps>(
         value={props.value}
         checked={props.checked}
         disabled={props.disabled}
-        onChange={(event) => props.onChange?.(event.target.checked)}
+        onChange={(event) => props.onCheckedChange?.(event.target.checked)}
       />
     );
   }
@@ -379,9 +380,10 @@ export const Select = forwardRef<Contract.UIElement, Contract.SelectProps>(
         {...(dom as Any)}
         ref={element}
         value={props.value}
-        onChange={(event) => props.onChange?.(event.target.value)}
+        onChange={(event) => props.onValueChange?.(event.target.value)}
       >
-        {props.options.map((option) => (
+        {props.children}
+        {props.options?.map((option) => (
           <option
             key={option.value}
             value={option.value}
@@ -417,7 +419,7 @@ export const Switch = forwardRef<Contract.UIElement, Contract.SwitchProps>(
           {...(dom as Any)}
           ref={element}
           disabled={props.disabled}
-          onClick={() => props.onChange?.(!checked)}
+          onClick={() => props.onCheckedChange?.(!checked)}
           style={{
             position: "relative",
             width: 34,
@@ -489,7 +491,9 @@ export const Slider = forwardRef<Contract.UIElement, Contract.SliderProps>(
         max={props.max}
         step={props.step}
         disabled={props.disabled}
-        onChange={(event) => props.onChange?.(Number(event.target.value))}
+        onChange={(event) =>
+          props.onValueChange?.(Number(event.target.value))
+        }
       />
     );
   }

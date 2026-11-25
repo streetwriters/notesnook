@@ -213,7 +213,7 @@ export function UnlockScreen(props: {
                 autoFocus
                 value={value}
                 onChangeText={setValue}
-                onSubmit={unlock}
+                onSubmitEditing={unlock}
                 sx={{ width: "100%" }}
                 styles={authFieldProps.styles}
               />

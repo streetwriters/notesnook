@@ -258,7 +258,7 @@ export function Attachment({
       <Cell width={ATTACHMENT_COLUMN_WIDTHS.select}>
         <Checkbox
           checked={isSelected}
-          onChange={() => onSelected?.()}
+          onCheckedChange={() => onSelected?.()}
           sx={{ width: 18, height: 18, color: isSelected ? "accent" : "icon" }}
         />
       </Cell>

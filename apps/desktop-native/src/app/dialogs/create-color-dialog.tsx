@@ -77,7 +77,7 @@ export const CreateColorDialog = DialogManager.register(
             testID="title-input"
             placeholder={strings.enterTitle()}
             onChangeText={(text) => (title.current = text)}
-            onSubmit={() => onSubmit()}
+            onSubmitEditing={() => onSubmit()}
           />
           <Field
             required
@@ -87,7 +87,7 @@ export const CreateColorDialog = DialogManager.register(
             testID="color-input"
             placeholder={strings.selectColor()}
             onChangeText={setColor}
-            onSubmit={() => onSubmit()}
+            onSubmitEditing={() => onSubmit()}
             rightActions={[
               {
                 component: (

@@ -89,7 +89,7 @@ export const BackupPasswordDialog = DialogManager.register(
             type="password"
             id={isEncryptionKey ? "key" : "password"}
             onChangeText={(text) => (value.current = text)}
-            onSubmit={() => onSubmit()}
+            onSubmitEditing={() => onSubmit()}
           />
           <Button
             variant="anchor"

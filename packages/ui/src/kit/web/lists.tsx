@@ -167,7 +167,7 @@ export const VirtualList = forwardRef<
             metaKey: event.metaKey,
             preventDefault: () => event.preventDefault(),
             stopPropagation: () => event.stopPropagation()
-          })
+          } as never)
         }
         style={{
           flex: 1,

@@ -20,4 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import * as Contract from "../contracts";
 import * as target from "./index";
 
-export const conforms: Omit<typeof Contract, "EditorSurface"> = target;
+export const conforms: Omit<
+  typeof Contract,
+  "EditorSurface" | Contract.PendingImplementation
+> = target;

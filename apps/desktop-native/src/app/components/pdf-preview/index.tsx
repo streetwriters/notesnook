@@ -184,7 +184,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             testID="pdf-page-input"
             value={pageText}
             onChangeText={setPageText}
-            onSubmit={(text) => {
+            onSubmitEditing={(text) => {
               const page = parseInt(text, 10);
               if (page >= 1) controller.current?.goToPage(page);
             }}
@@ -259,7 +259,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             testID="pdf-search-input"
             autoFocus
             placeholder={strings.search()}
-            onSubmit={(text) => controller.current?.search(text)}
+            onSubmitEditing={(text) => controller.current?.search(text)}
             sx={{ width: 240 }}
           />
           <Text variant="body">
@@ -308,7 +308,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             value={password}
             onChangeText={setPassword}
             placeholder={strings.enterPassword()}
-            onSubmit={(text) => controller.current?.unlock(text)}
+            onSubmitEditing={(text) => controller.current?.unlock(text)}
             sx={{ width: "95%", maxWidth: 400 }}
           />
           {state.passwordIncorrect ? (

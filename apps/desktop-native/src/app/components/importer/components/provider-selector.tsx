@@ -61,7 +61,7 @@ export function ProviderSelector(props: ProviderSelectorProps) {
           }))
         ]}
         value=""
-        onChange={(value) => {
+        onValueChange={(value) => {
           if (value === "") return;
           props.onProviderChanged(
             ProviderFactory.getProvider(value as Providers)

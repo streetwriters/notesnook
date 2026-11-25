@@ -122,7 +122,7 @@ export const EmailChangeDialog = DialogManager.register(
               type="text"
               required
               onChangeText={(text) => (values.current.code = text)}
-              onSubmit={() => onSubmit()}
+              onSubmitEditing={() => onSubmit()}
               action={{
                 disabled: isSending || !enabled,
                 component: (
@@ -156,7 +156,7 @@ export const EmailChangeDialog = DialogManager.register(
                 type="password"
                 required
                 onChangeText={(text) => (values.current.password = text)}
-                onSubmit={() => onSubmit()}
+                onSubmitEditing={() => onSubmit()}
               />
               <Text variant="subBody" sx={{ mt: 1 }}>
                 {strings.changeEmailNotice()}

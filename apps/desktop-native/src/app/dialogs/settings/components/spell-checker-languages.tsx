@@ -66,7 +66,7 @@ export function SpellCheckerLanguages() {
               <Checkbox
                 sx={{ width: 14, height: 14 }}
                 checked={enabledLanguages.includes(lang.code)}
-                onChange={async (checked) => {
+                onCheckedChange={async (checked) => {
                   const copiedLanguages = enabledLanguages.slice();
 
                   if (checked) copiedLanguages.push(lang.code);

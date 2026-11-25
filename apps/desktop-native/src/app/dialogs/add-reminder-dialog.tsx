@@ -766,7 +766,7 @@ function ReminderSelect(props: ReminderSelectProps) {
         testID={id}
         options={options}
         value={value}
-        onChange={onSelectionChanged}
+        onValueChange={onSelectionChanged}
         sx={{ height: 45 }}
       />
     </Flex>

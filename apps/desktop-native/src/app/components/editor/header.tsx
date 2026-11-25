@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, Input, type MenuItem, type UIElement } from "@ui";
+import { Flex, Input, type MenuItem, type UIInputElement } from "@ui";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -152,7 +152,7 @@ type AutosuggestProps<T> = {
 export function Autosuggest<T>(props: AutosuggestProps<T>) {
   const { sessionId, filter, onRemove, onAdd, defaultItems, toMenuItems } =
     props;
-  const inputRef = useRef<UIElement>(null);
+  const inputRef = useRef<UIInputElement>(null);
   const [value, setValue] = useState("");
   const [generation, setGeneration] = useState(0);
   const { openMenu, closeMenu } = useMenuTrigger();
@@ -217,7 +217,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
         const filtered = await filter(trimmed);
         if (latestText.current === trimmed) onOpenMenu(filtered, trimmed);
       }}
-      onSubmit={(text) => {
+      onSubmitEditing={(text) => {
         const trimmed = text.trim();
         if (!trimmed) return;
         onAdd(trimmed);

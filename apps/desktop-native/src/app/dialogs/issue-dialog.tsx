@@ -89,7 +89,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           placeholder={strings.issueTitlePlaceholder()}
           autoFocus
           onChangeText={(text) => (values.current.title = text)}
-          onSubmit={() => onSubmit()}
+          onSubmitEditing={() => onSubmit()}
         />
         <Field
           as="textarea"
