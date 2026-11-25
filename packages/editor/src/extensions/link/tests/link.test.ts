@@ -144,3 +144,45 @@ describe("paste text", () => {
     expect(editorElement.outerHTML).toMatchSnapshot();
   });
 });
+
+describe("input rule", () => {
+  function typeText(
+    editor: ReturnType<typeof createEditor>["editor"],
+    text: string
+  ) {
+    for (const char of text) {
+      const { from, to } = editor.state.selection;
+      const handled = editor.view.someProp("handleTextInput", (f) =>
+        f(editor.view, from, to, char)
+      );
+      if (!handled) editor.commands.insertContent(char);
+    }
+  }
+
+  function getLinks(editor: ReturnType<typeof createEditor>["editor"]) {
+    const links: { text: string; href: string }[] = [];
+    editor.state.doc.descendants((node) => {
+      const link = node.marks.find((mark) => mark.type.name === "link");
+      if (link && node.text)
+        links.push({ text: node.text, href: link.attrs.href });
+    });
+    return links;
+  }
+
+  test("sets href on every typed markdown link", () => {
+    const { editor } = createEditor({
+      extensions: {
+        link: Link
+      }
+    });
+
+    typeText(editor, "[first](https://example.com/first-link) ");
+    typeText(editor, "[second](https://example.com/2)");
+
+    expect(getLinks(editor)).toEqual([
+      { text: "first", href: "https://example.com/first-link" },
+      { text: "second", href: "https://example.com/2" }
+    ]);
+    expect(editor.getText()).toBe("first second");
+  });
+});
