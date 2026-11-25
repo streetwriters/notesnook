@@ -205,6 +205,13 @@ function addSource(source: NotesWidgetSource) {
   );
 }
 
+let pending: Promise<unknown> = Promise.resolve();
+function exclusive<T>(task: () => Promise<T> | T) {
+  const run = pending.then(task, task);
+  pending = run.catch(() => undefined);
+  return run;
+}
+
 const DEFAULT_DELAY = 500;
 let timer: NodeJS.Timeout | undefined;
 
@@ -216,7 +223,7 @@ export const NotesWidget = {
     timer = setTimeout(async () => {
       timer = undefined;
       try {
-        if (Platform.OS === "ios") await updateIOS();
+        if (Platform.OS === "ios") await exclusive(updateIOS);
         else await updateAndroid();
       } catch (err) {
         console.error("Failed to update notes widget:", err);
@@ -226,15 +233,16 @@ export const NotesWidget = {
 
   chooseSource: (source: NotesWidgetSource, slot?: string) => {
     if (Platform.OS !== "ios") return;
-    if (!BUILTIN_TYPES.includes(source.type)) addSource(source);
-    if (slot) {
-      const slots = IOSWidgets.read<Record<string, string>>(
-        "widgetSlotSources",
-        {}
-      );
-      IOSWidgets.write("widgetSlotSources", { ...slots, [slot]: source.key });
-    }
-    NotesWidget.updateNotes();
+    exclusive(() => {
+      if (!BUILTIN_TYPES.includes(source.type)) addSource(source);
+      if (slot) {
+        const slots = IOSWidgets.read<Record<string, string>>(
+          "widgetSlotSources",
+          {}
+        );
+        IOSWidgets.write("widgetSlotSources", { ...slots, [slot]: source.key });
+      }
+    }).then(() => NotesWidget.updateNotes());
   },
 
   configure: async (widgetId: number, source: NotesWidgetSource) => {
