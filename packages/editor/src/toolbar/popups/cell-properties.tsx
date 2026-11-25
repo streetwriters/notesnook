@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { Editor } from "../../types.js";
 import { Box } from "@theme-ui/components";
 import { Tab, Tabs } from "../../components/tabs/index.js";
@@ -30,7 +31,7 @@ import { strings } from "@notesnook/intl";
 type CellPropertiesProps = { editor: Editor; onClose: () => void };
 export function CellProperties(props: CellPropertiesProps) {
   const { editor, onClose } = props;
-  const attributes = editor.getAttributes("tableCell");
+  const attributes = useEditorQuery(editor, q.attributes("tableCell"), {});
   return (
     <Popup title={strings.cellProperties()} onClose={onClose}>
       <Tabs activeIndex={0}>

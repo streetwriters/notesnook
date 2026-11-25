@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { Editor } from "../../types.js";
 import { Dropdown } from "../components/dropdown.js";
@@ -34,10 +35,12 @@ const defaultLevels = [1, 2, 3, 4, 5, 6] as const;
 
 export function Headings(props: ToolProps) {
   const { editor } = props;
+  const heading = useEditorQuery(editor, q.attributes("heading"), {});
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   const toolbarLocation = useToolbarLocation();
 
-  const currentHeadingLevel = defaultLevels.find((level) =>
-    editor.isActive("heading", { level })
+  const currentHeadingLevel = defaultLevels.find(
+    (level) => level === heading.level
   );
   const items = useMemo(
     () => toMenuItems(editor, toolbarLocation, currentHeadingLevel),
@@ -56,7 +59,7 @@ export function Headings(props: ToolProps) {
       }
       items={items}
       menuWidth={130}
-      disabled={editor.isActive(CodeBlock.name)}
+      disabled={inCodeBlock}
     />
   );
 }

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
@@ -29,6 +30,7 @@ type AlignmentToolProps = ToolProps & {
 };
 function AlignmentTool(props: AlignmentToolProps) {
   const { editor, alignment } = props;
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   const alignmentRef = useRefValue(alignment);
 
   return (
@@ -38,7 +40,7 @@ function AlignmentTool(props: AlignmentToolProps) {
       onClick={() => {
         editor.chain().focus().setTextAlign(alignmentRef.current).run();
       }}
-      disabled={editor.isActive(CodeBlock.name)}
+      disabled={inCodeBlock}
       toggled={false}
     />
   );
@@ -46,9 +48,11 @@ function AlignmentTool(props: AlignmentToolProps) {
 
 export function Alignment(props: ToolProps) {
   const { editor } = props;
+  const paragraph = useEditorQuery(editor, q.attributes("paragraph"), {});
+  const heading = useEditorQuery(editor, q.attributes("heading"), {});
   const { textAlign } = {
-    ...editor.getAttributes("paragraph"),
-    ...editor.getAttributes("heading")
+    ...paragraph,
+    ...heading
   } as { textAlign: Alignment };
 
   const newAlignment: Alignment =

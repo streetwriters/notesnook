@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { Input } from "@theme-ui/components";
 import { useCallback, useEffect, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
-import { SearchStorage } from "../../extensions/search-replace/index.js";
 import { ToolButton } from "../components/tool-button.js";
 import { Editor } from "../../types.js";
 import { useEditorSearchStore } from "../stores/search-store.js";
@@ -40,8 +40,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
     searchTerm,
     replaceTerm
   } = useEditorSearchStore();
-  const { results, selectedIndex } = editor.storage
-    .searchreplace as SearchStorage;
+  const { count, selectedIndex } = useEditorQuery(editor, q.search(), {
+    count: 0,
+    selectedIndex: 0
+  });
+  const isEditable = useEditorQuery(editor, q.editable(), true);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const search = useCallback(
@@ -184,9 +187,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   px: 1
                 }}
               >
-                {results?.length
-                  ? `${selectedIndex + 1}/${results.length}`
-                  : "0/0"}
+                {count ? `${selectedIndex + 1}/${count}` : "0/0"}
               </Text>
             </Flex>
           </Flex>
@@ -203,7 +204,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
           <Flex sx={{ alignItems: "center", height: "33.2px" }}>
-            {editor.isEditable && (
+            {isEditable && (
               <ToolButton
                 toggled={isReplacing}
                 title={strings.toggleReplace()}

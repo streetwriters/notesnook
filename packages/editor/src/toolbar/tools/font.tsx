@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { Editor } from "../../types.js";
 import { Dropdown } from "../components/dropdown.js";
@@ -31,8 +32,9 @@ import { strings } from "@notesnook/intl";
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   const defaultFontSize = useToolbarStore((store) => store.fontSize);
-  const { fontSize } = editor.getAttributes("textStyle");
+  const { fontSize } = useEditorQuery(editor, q.attributes("textStyle"), {});
   const fontSizeAsNumber = useRefValue(
     fontSize ? parseInt(fontSize.replace("px", "")) || 14 : defaultFontSize
   );
@@ -48,7 +50,7 @@ export function FontSize(props: ToolProps) {
   return (
     <Counter
       title={strings.fontSize()}
-      disabled={editor.isActive(CodeBlock.name)}
+      disabled={inCodeBlock}
       onDecrease={() =>
         editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
       }
@@ -65,8 +67,13 @@ export function FontSize(props: ToolProps) {
 
 export function FontFamily(props: ToolProps) {
   const { editor } = props;
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   const defaultFontFamily = useToolbarStore((store) => store.fontFamily);
-  const currentFontFamily = editor.getAttributes("textStyle").fontFamily;
+  const currentFontFamily = useEditorQuery(
+    editor,
+    q.attributes("textStyle"),
+    {}
+  ).fontFamily;
   const selectedFont = currentFontFamily
     ? getFont(currentFontFamily)
     : getFontById(defaultFontFamily);
@@ -84,7 +91,7 @@ export function FontFamily(props: ToolProps) {
       selectedItem={selectedFont?.title || defaultFontFamily}
       items={items}
       menuWidth={130}
-      disabled={editor.isActive(CodeBlock.name)}
+      disabled={inCodeBlock}
     />
   );
 }

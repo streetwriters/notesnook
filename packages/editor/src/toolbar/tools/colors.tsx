@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { colord } from "colord";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
@@ -192,11 +193,12 @@ export function ColorTool(props: ColorToolProps) {
 
 export function Highlight(props: ToolProps) {
   const { editor } = props;
+  const textStyle = useEditorQuery(editor, q.attributes("textStyle"), {});
   return (
     <ColorTool
       {...props}
       cacheKey="highlight"
-      activeColor={editor.getAttributes("textStyle").backgroundColor}
+      activeColor={textStyle.backgroundColor}
       title={strings.backgroundColor()}
       type="background"
       onColorChange={(color) =>
@@ -210,11 +212,12 @@ export function Highlight(props: ToolProps) {
 
 export function TextColor(props: ToolProps) {
   const { editor } = props;
+  const textStyle = useEditorQuery(editor, q.attributes("textStyle"), {});
   return (
     <ColorTool
       {...props}
       cacheKey={"textColor"}
-      activeColor={editor.getAttributes("textStyle").color}
+      activeColor={textStyle.color}
       title={strings.textColor()}
       type="text"
       onColorChange={(color) =>

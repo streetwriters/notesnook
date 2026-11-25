@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useMemo, useRef, useState } from "react";
@@ -30,8 +31,9 @@ import { strings } from "@notesnook/intl";
 
 export function EmbedSettings(props: ToolProps) {
   const { editor } = props;
+  const isEmbed = useEditorQuery(editor, q.isActive("embed"), false);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("embed") || !isBottom) return null;
+  if (!isEmbed || !isBottom) return null;
 
   return (
     <MoreTools

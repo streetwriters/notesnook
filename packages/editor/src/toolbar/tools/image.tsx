@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useRef, useState } from "react";
@@ -24,14 +25,15 @@ import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { ImageProperties as ImagePropertiesPopup } from "../popups/image-properties.js";
-import { findSelectedNode } from "../../utils/prosemirror.js";
 import { ImageAttributes } from "../../extensions/image/index.js";
 
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;
+  const isImage = useEditorQuery(editor, q.isActive("image"), false);
+  const isEditable = useEditorQuery(editor, q.editable(), true);
   const isBottom = useToolbarLocation() === "bottom";
 
-  if (!editor.isActive("image") || !isBottom) return null;
+  if (!isImage || !isBottom) return null;
 
   return (
     <MoreTools
@@ -39,7 +41,7 @@ export function ImageSettings(props: ToolProps) {
       autoCloseOnUnmount
       popupId="imageSettings"
       tools={
-        editor.isEditable
+        isEditable
           ? [
               "downloadAttachment",
               "imageAlignLeft",
@@ -55,10 +57,10 @@ export function ImageSettings(props: ToolProps) {
 
 export function ImageAlignLeft(props: ToolProps) {
   const { editor } = props;
-  const image = findSelectedNode(editor, "image");
+  const image = useEditorQuery(editor, q.selectedNode("image"));
   if (!image) return null;
 
-  const { align } = image.attrs as ImageAttributes;
+  const { align } = image as ImageAttributes;
 
   return (
     <ToolButton
@@ -74,10 +76,10 @@ export function ImageAlignLeft(props: ToolProps) {
 
 export function ImageAlignRight(props: ToolProps) {
   const { editor } = props;
-  const image = findSelectedNode(editor, "image");
+  const image = useEditorQuery(editor, q.selectedNode("image"));
   if (!image) return null;
 
-  const { align } = image.attrs as ImageAttributes;
+  const { align } = image as ImageAttributes;
 
   return (
     <ToolButton
@@ -93,10 +95,10 @@ export function ImageAlignRight(props: ToolProps) {
 
 export function ImageAlignCenter(props: ToolProps) {
   const { editor } = props;
-  const image = findSelectedNode(editor, "image");
+  const image = useEditorQuery(editor, q.selectedNode("image"));
   if (!image) return null;
 
-  const { align } = image.attrs as ImageAttributes;
+  const { align } = image as ImageAttributes;
 
   return (
     <ToolButton

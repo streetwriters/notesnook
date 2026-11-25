@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
@@ -24,11 +25,12 @@ import { CodeBlock } from "../../extensions/code-block/index.js";
 
 export function Italic(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("italic"), false);
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("italic")}
+      toggled={isActive}
       onClick={() => editor.chain().focus().toggleItalic().run()}
     />
   );
@@ -36,11 +38,12 @@ export function Italic(props: ToolProps) {
 
 export function Strikethrough(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("strike"), false);
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("strike")}
+      toggled={isActive}
       onClick={() => editor.chain().focus().toggleStrike().run()}
     />
   );
@@ -48,11 +51,12 @@ export function Strikethrough(props: ToolProps) {
 
 export function Underline(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("underline"), false);
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("underline")}
+      toggled={isActive}
       onClick={() => editor.chain().focus().toggleUnderline().run()}
     />
   );
@@ -60,13 +64,15 @@ export function Underline(props: ToolProps) {
 
 export function Code(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("code"), false);
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
 
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("code")}
-      disabled={editor.isActive(CodeBlock.name)}
+      toggled={isActive}
+      disabled={inCodeBlock}
       onClick={() => editor.chain().focus().toggleCode().run()}
     />
   );
@@ -74,12 +80,13 @@ export function Code(props: ToolProps) {
 
 export function Bold(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("bold"), false);
 
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("bold")}
+      toggled={isActive}
       onClick={() => editor.chain().focus().toggleBold().run()}
     />
   );
@@ -87,12 +94,14 @@ export function Bold(props: ToolProps) {
 
 export function Subscript(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("subscript"), false);
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("subscript")}
-      disabled={editor.isActive(CodeBlock.name)}
+      toggled={isActive}
+      disabled={inCodeBlock}
       onClick={() => editor.chain().focus().toggleSubscript().run()}
     />
   );
@@ -100,12 +109,14 @@ export function Subscript(props: ToolProps) {
 
 export function Superscript(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("superscript"), false);
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      toggled={editor.isActive("superscript")}
-      disabled={editor.isActive(CodeBlock.name)}
+      toggled={isActive}
+      disabled={inCodeBlock}
       onClick={() => editor.chain().focus().toggleSuperscript().run()}
     />
   );
@@ -127,8 +138,9 @@ export function ClearFormatting(props: ToolProps) {
 
 export function CodeRemove(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("code"), false);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("code") || !isBottom) return null;
+  if (!isActive || !isBottom) return null;
   return (
     <ToolButton
       icon={props.icon}
@@ -141,13 +153,14 @@ export function CodeRemove(props: ToolProps) {
 
 export function Math(props: ToolProps) {
   const { editor } = props;
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
       toggled={false}
       onClick={() => editor.chain().focus().insertMathInline().run()}
-      disabled={editor.isActive(CodeBlock.name)}
+      disabled={inCodeBlock}
     />
   );
 }

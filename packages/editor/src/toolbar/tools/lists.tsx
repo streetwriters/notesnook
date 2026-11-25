@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { Box, Button, Flex } from "@theme-ui/components";
 import { IconNames } from "../icons.js";
@@ -123,6 +124,7 @@ function ListTool<TListStyleTypes extends string>(
 
 export function NumberedList(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("orderedList"), false);
 
   const onClick = useCallback(
     () => editor.chain().focus().toggleOrderedList().run(),
@@ -134,7 +136,7 @@ export function NumberedList(props: ToolProps) {
     <ListTool
       {...props}
       type="orderedList"
-      isActive={editor.isActive("orderedList")}
+      isActive={isActive}
       onClick={onClick}
       subTypes={[
         { type: "decimal", title: strings.decimal(), items: ["1", "2", "3"] },
@@ -158,6 +160,7 @@ export function NumberedList(props: ToolProps) {
 
 export function BulletList(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("bulletList"), false);
   const onClick = useCallback(
     () => editor.chain().focus().toggleBulletList().run(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,7 +172,7 @@ export function BulletList(props: ToolProps) {
       {...props}
       type="bulletList"
       onClick={onClick}
-      isActive={editor.isActive("bulletList")}
+      isActive={isActive}
       subTypes={[
         { type: "disc", title: strings.disc(), items: ["1", "2", "3"] },
         { type: "circle", title: strings.circle(), items: ["A", "B", "C"] },
