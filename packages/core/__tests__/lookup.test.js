@@ -344,6 +344,27 @@ describe("notesWithHighlighting", () => {
       expect(searchWithDiacritics.length).toBe(4);
     }));
 
+  test("search should find text inside strikethrough (<s>) tags", () =>
+    databaseTest().then(async (db) => {
+      const id = await db.notes.add({
+        title: "Todo",
+        content: {
+          type: "tiptap",
+          data: "<p><s>Read books</s> and clean desk.</p>"
+        }
+      });
+
+      for (const query of ["Read", "clean"]) {
+        const results = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        expect(await results.ids()).toEqual([id]);
+        const item = await results.item(0);
+        expect(item.item.content.length).toBeGreaterThan(0);
+      }
+    }));
+
   test("should not reuse filters (aka mutate selector) between searches", () =>
     databaseTest().then(async (db) => {
       const note1Id = await db.notes.add({ title: "note 1" });
