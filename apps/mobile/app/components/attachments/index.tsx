@@ -52,7 +52,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { AttachmentItem } from "./attachment-item";
 
 const DEFAULT_SORTING: SortOptions = {
-  sortBy: "dateEdited",
+  sortBy: "dateUploaded",
   sortDirection: "desc"
 };
 
@@ -154,24 +154,16 @@ export const AttachmentDialog = ({
     if (note) {
       db.attachments
         .ofNote(note.id, "all")
-        .sorted({
-          ...DEFAULT_SORTING,
-          sortBy: "dateModified"
-        })
+        .sorted(DEFAULT_SORTING)
         .then((attachments) => {
           setLoading(false);
           setAttachments(attachments);
         });
     } else {
-      db.attachments.all
-        .sorted({
-          ...DEFAULT_SORTING,
-          sortBy: "dateModified"
-        })
-        .then((attachments) => {
-          setAttachments(attachments);
-          setLoading(false);
-        });
+      db.attachments.all.sorted(DEFAULT_SORTING).then((attachments) => {
+        setAttachments(attachments);
+        setLoading(false);
+      });
     }
   }, [note]);
 
@@ -306,10 +298,7 @@ export const AttachmentDialog = ({
           : db.attachments.all;
     }
 
-    return await items.sorted({
-      ...DEFAULT_SORTING,
-      sortBy: "dateModified"
-    });
+    return await items.sorted(DEFAULT_SORTING);
   };
 
   db.attachments.orphaned.items().then((r) => {
