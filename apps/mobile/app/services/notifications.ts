@@ -267,6 +267,19 @@ const onEvent = async ({ type, detail }: Event) => {
 
 const RECENTLY_PASSED_WINDOW = 3 * 60 * 60 * 1000;
 
+const WIDGET_OCCURRENCES = 7;
+
+function getUpcomingOccurrences(reminder: Reminder) {
+  if (reminder.mode !== "repeat") return [];
+  const occurrences: number[] = [];
+  let next = getUpcomingReminderTime(reminder);
+  for (let i = 0; i < WIDGET_OCCURRENCES; i++) {
+    occurrences.push(next);
+    next = getUpcomingReminderTime(reminder, next);
+  }
+  return occurrences;
+}
+
 async function updateRemindersForWidget() {
   const reminders: Reminder[] = await db.reminders?.all.items(undefined, {
     sortBy: "dueDate",
@@ -293,6 +306,7 @@ async function updateRemindersForWidget() {
     widgetReminders.push({
       ...reminder,
       triggerDate,
+      occurrences: getUpcomingOccurrences(reminder),
       formattedTimeOfDay: getFormattedDate(triggerDate, "time"),
       formattedDateTime: getFormattedDate(triggerDate, "date-time"),
       formattedTime: getFormattedReminderTime(reminder)
@@ -308,6 +322,7 @@ async function updateRemindersForWidget() {
         description: reminder.description,
         mode: reminder.mode,
         triggerDate: reminder.triggerDate,
+        occurrences: reminder.occurrences,
         snoozeUntil: reminder.snoozeUntil,
         disabled: reminder.disabled
       })),

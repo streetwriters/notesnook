@@ -23,7 +23,8 @@ enum ReminderTimeLabel {
   static func text(for reminder: WidgetReminder, at now: Date, strings: WidgetStrings) -> String {
     if reminder.mode == .permanent { return strings[.ongoing] }
 
-    let time = format(reminder.triggerDate, date: .none, time: .short)
+    let trigger = reminder.trigger(at: now)
+    let time = format(trigger, date: .none, time: .short)
     if reminder.isSnoozed(at: now), let until = reminder.snoozeUntil {
       return strings.format(.snoozedUntil, format(until, date: .none, time: .short))
     }
@@ -32,7 +33,7 @@ enum ReminderTimeLabel {
     let days = calendar.dateComponents(
       [.day],
       from: calendar.startOfDay(for: now),
-      to: calendar.startOfDay(for: reminder.triggerDate)
+      to: calendar.startOfDay(for: trigger)
     ).day ?? 0
 
     let when: String
@@ -40,7 +41,7 @@ enum ReminderTimeLabel {
     case 0: when = strings.format(.today, time)
     case 1: when = strings.format(.tomorrow, time)
     case -1: when = strings.format(.yesterday, time)
-    default: when = format(reminder.triggerDate, date: .short, time: .short)
+    default: when = format(trigger, date: .short, time: .short)
     }
     return strings.format(reminder.isUpcoming(at: now) ? .upcoming : .last, when)
   }

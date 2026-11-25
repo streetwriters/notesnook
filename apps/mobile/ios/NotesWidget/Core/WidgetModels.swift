@@ -106,6 +106,7 @@ struct WidgetReminder: Decodable, Identifiable, Hashable {
   let description: String
   let mode: Mode
   let triggerDate: Date
+  let occurrences: [Date]
   let snoozeUntil: Date?
   let disabled: Bool
 
@@ -120,12 +121,15 @@ struct WidgetReminder: Decodable, Identifiable, Hashable {
     let trigger = try container.decodeIfPresent(Double.self, forKey: .triggerDate) ?? 0
     triggerDate = Date(timeIntervalSince1970: trigger / 1000)
 
+    let upcoming = (try? container.decodeIfPresent([Double].self, forKey: .occurrences)) ?? []
+    occurrences = upcoming.map { Date(timeIntervalSince1970: $0 / 1000) }
+
     let snooze = try container.decodeIfPresent(Double.self, forKey: .snoozeUntil) ?? 0
     snoozeUntil = snooze > 0 ? Date(timeIntervalSince1970: snooze / 1000) : nil
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id, title, description, mode, triggerDate, snoozeUntil, disabled
+    case id, title, description, mode, triggerDate, occurrences, snoozeUntil, disabled
   }
 
   func isSnoozed(at now: Date) -> Bool {
@@ -140,12 +144,17 @@ struct WidgetReminder: Decodable, Identifiable, Hashable {
     return triggerDate > now.addingTimeInterval(-Self.recentlyPassedWindow)
   }
 
+  func trigger(at now: Date) -> Date {
+    guard mode == .repeating, triggerDate <= now, !isSnoozed(at: now) else { return triggerDate }
+    return occurrences.first(where: { $0 > now }) ?? triggerDate
+  }
+
   func isUpcoming(at now: Date) -> Bool {
-    triggerDate > now
+    trigger(at: now) > now
   }
 
   var nextChange: [Date] {
-    var dates = [triggerDate, triggerDate.addingTimeInterval(Self.recentlyPassedWindow)]
+    var dates = [triggerDate, triggerDate.addingTimeInterval(Self.recentlyPassedWindow)] + occurrences
     if let snoozeUntil = snoozeUntil { dates.append(snoozeUntil) }
     return dates
   }
