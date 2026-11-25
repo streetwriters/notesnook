@@ -48,14 +48,32 @@ enum WidgetTheme {
   static let secondaryText = Color.secondary
 }
 
-extension View {
-  @ViewBuilder
-  func widgetBackground() -> some View {
-    if #available(iOS 17.0, *) {
-      containerBackground(for: .widget) { WidgetTheme.background }
-    } else {
-      padding(16).background(WidgetTheme.background)
+private struct WidgetBackgroundModifier: ViewModifier {
+  @Environment(\.widgetFamily) private var family
+
+  private var isAccessory: Bool {
+    if #available(iOS 16.0, *) {
+      return family == .accessoryCircular || family == .accessoryRectangular
+        || family == .accessoryInline
     }
+    return false
+  }
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if isAccessory {
+      content
+    } else if #available(iOS 17.0, *) {
+      content.containerBackground(for: .widget) { WidgetTheme.background }
+    } else {
+      content.padding(16).background(WidgetTheme.background)
+    }
+  }
+}
+
+extension View {
+  func widgetBackground() -> some View {
+    modifier(WidgetBackgroundModifier())
   }
 }
 
