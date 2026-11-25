@@ -420,10 +420,10 @@ async function restoreWithProgress(
   });
 }
 
-export async function verifyAccount() {
+export async function verifyAccount(title = strings.verifyItsYou()) {
   if (!(await db.user?.getUser())?.email) return true;
   return await showPasswordDialog({
-    title: strings.verifyItsYou(),
+    title,
     subtitle: strings.enterAccountPasswordDesc(),
     inputs: {
       password: {

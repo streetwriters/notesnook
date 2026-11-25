@@ -38,7 +38,7 @@ import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
 import Dialog from "../../../components/dialog";
 import { getFormattedDate } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
-import { confirmAccountPassword } from "../../password-dialog";
+import { verifyAccount } from "../../../common";
 import { useCopyToClipboard } from "../../../hooks/use-copy-to-clipboard";
 import { strings } from "@notesnook/intl";
 import { Select } from "../../../components/select";
@@ -211,9 +211,7 @@ function ApiKeyItem({ apiKey, onRevoke }: ApiKeyItemProps) {
   const [secondsLeft, setSecondsLeft] = useState(VIEW_KEY_TIMEOUT);
 
   async function viewKey() {
-    const result = await confirmAccountPassword(
-      strings.authenticateToViewApiKey()
-    );
+    const result = await verifyAccount(strings.authenticateToViewApiKey());
     if (!result) return;
 
     setViewing(true);

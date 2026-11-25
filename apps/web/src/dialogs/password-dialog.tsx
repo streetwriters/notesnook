@@ -26,7 +26,6 @@ import { Checkbox, Label } from "@theme-ui/components";
 import { mdToHtml } from "../utils/md";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { db } from "../common/db";
 
 type Check = { text: string; default?: boolean };
 export type PasswordDialogProps<
@@ -188,18 +187,4 @@ export function showPasswordDialog<
   return PasswordDialog.show(props) as Promise<
     string extends TCheckId ? boolean : false | Record<TCheckId, boolean>
   >;
-}
-
-export function confirmAccountPassword(title: string) {
-  return showPasswordDialog({
-    title,
-    subtitle: "Enter your password below",
-    inputs: {
-      password: {
-        label: strings.accountPassword(),
-        autoComplete: "current-password"
-      }
-    },
-    validate: ({ password }) => db.user.verifyPassword(password)
-  });
 }

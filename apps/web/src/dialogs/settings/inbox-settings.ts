@@ -28,7 +28,7 @@ import {
 } from "./components/inbox-api-keys";
 import { InboxPGPKeysDialog } from "../inbox-pgp-keys-dialog";
 import { db } from "../../common/db";
-import { confirmAccountPassword } from "../password-dialog";
+import { verifyAccount } from "../../common";
 import { strings } from "@notesnook/intl";
 import { InboxHistoryDialog } from "../inbox-history-dialog";
 import {
@@ -103,7 +103,7 @@ export const InboxSettings: SettingsGroup[] = [
           {
             type: "navigation",
             action: async () => {
-              const ok = await confirmAccountPassword(
+              const ok = await verifyAccount(
                 strings.authenticateToViewEditInboxPgpKeys()
               );
               if (!ok) return;
