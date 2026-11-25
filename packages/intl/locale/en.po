@@ -5382,6 +5382,10 @@ msgstr "Note locked"
 msgid "Note restored from history"
 msgstr "Note restored from history"
 
+#: src/strings.ts:2729
+msgid "Note preview"
+msgstr "Note preview"
+
 #: src/strings.ts:2720
 msgid "Note restored from trash"
 msgstr "Note restored from trash"

@@ -125,7 +125,7 @@ struct RemindersWidget: Widget {
     StaticConfiguration(kind: WidgetKind.reminders, provider: StoreProvider<RemindersSource>()) { entry in
       RemindersView(entry: entry)
     }
-    .configurationDisplayName("Reminders")
+    .configurationDisplayName(WidgetStrings.load()[.reminders])
     .description("Your upcoming reminders at a glance.")
     .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
   }

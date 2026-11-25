@@ -160,7 +160,7 @@ struct NotePreviewWidget: Widget {
     ) { entry in
       NotePreviewView(entry: entry)
     }
-    .configurationDisplayName("Note Preview")
+    .configurationDisplayName(WidgetStrings.load()[.notePreview])
     .description("Show a note on your home screen.")
     .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
   }

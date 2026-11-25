@@ -297,7 +297,7 @@ struct NotesListWidget: Widget {
     ) { entry in
       NotesListView(entry: entry)
     }
-    .configurationDisplayName("Notes")
+    .configurationDisplayName(WidgetStrings.load()[.notes])
     .description("Pinned, recent or favorite notes, or the notes of a notebook, tag or color.")
     .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
   }

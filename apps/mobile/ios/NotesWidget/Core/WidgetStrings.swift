@@ -2,6 +2,8 @@ import Foundation
 
 enum WidgetString: String, CaseIterable {
   case quickNote
+  case notes
+  case notePreview
   case addQuickNote
   case noNotes
   case reminders
@@ -21,6 +23,8 @@ enum WidgetString: String, CaseIterable {
   var fallback: String {
     switch self {
     case .quickNote: return "Quick note"
+    case .notes: return "Notes"
+    case .notePreview: return "Note preview"
     case .addQuickNote: return "Add a quick note"
     case .noNotes: return "No notes"
     case .reminders: return "Reminders"

@@ -42,6 +42,8 @@ function getStorage() {
 function getLocalizedStrings() {
   return {
     quickNote: strings.quickNoteTitle(),
+    notes: strings.dataTypesPluralCamelCase.note(),
+    notePreview: strings.notePreviewWidget(),
     addQuickNote: strings.addQuickNote(),
     noNotes: strings.emptyPlaceholders("note"),
     reminders: strings.reminders(),

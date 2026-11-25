@@ -56,7 +56,7 @@ struct QuickNoteWidget: Widget {
     StaticConfiguration(kind: WidgetKind.quickNote, provider: StoreProvider<QuickNoteSource>()) { entry in
       QuickNoteView(entry: entry)
     }
-    .configurationDisplayName("Quick Note")
+    .configurationDisplayName(WidgetStrings.load()[.quickNote])
     .description("A widget to add notes quickly.")
     .supportedFamilies(WidgetFamilies.withLockScreenCircular([.systemSmall, .systemMedium]))
   }
