@@ -60,6 +60,7 @@ import {
   VaultRequestType
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
@@ -793,6 +794,7 @@ export const useActions = ({
     const duplicateNote = async () => {
       await db.notes.duplicate(item.id);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
       ToastManager.show({
         heading: strings.noteDuplicated(),
         type: "success",
@@ -824,6 +826,7 @@ export const useActions = ({
       await db.notes.favorite(!item.favorite, item.id);
       setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
     }
 
     async function pinToNotifications() {
@@ -946,6 +949,7 @@ export const useActions = ({
       }
       try {
         await db.vault.add(item.id);
+        NotePreviewWidget.updateNotes();
         const locked = await db.vaults.itemExists(item);
         if (locked) {
           close();
