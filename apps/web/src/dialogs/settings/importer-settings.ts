@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
-import { Importer, importerStore } from "../../components/importer";
+import {
+  Importer,
+  importerStore,
+  useImporterStore
+} from "../../components/importer";
 import { SquaresFour } from "../../components/icons";
 import { strings } from "@notesnook/intl";
 import { ProviderFactory, Providers } from "@notesnook-importer/core";
@@ -43,9 +47,7 @@ export const ImporterSettings: SettingsGroup[] = [
         },
         keywords: ["import", "importer", "notes app", "provider"],
         onStateChange: (listener) =>
-          importerStore.subscribe(() =>
-            listener(importerStore.getState(), undefined)
-          ),
+          useImporterStore.subscribe((state) => listener(state, undefined)),
         components: [
           {
             type: "dropdown",
@@ -56,7 +58,7 @@ export const ImporterSettings: SettingsGroup[] = [
                 title: ProviderFactory.getProvider(provider as Providers).name
               }))
             ],
-            selectedOption: () => importerStore.getState().providerId || "",
+            selectedOption: () => useImporterStore.getState().providerId || "",
             onSelectionChanged: (value) => {
               if (!value) return;
               importerStore.selectProvider(value as Providers);

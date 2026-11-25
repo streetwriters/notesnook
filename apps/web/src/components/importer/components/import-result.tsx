@@ -20,31 +20,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { IProvider } from "@notesnook-importer/core";
 import { strings } from "@notesnook/intl";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { ReactNode } from "react";
 import { TransformResult } from "../types";
-import { CardTitle, ImporterCard, LogsBox } from "./card";
+import { LogMessage, LogsBox } from "./logs-box";
 import { ImportErrors } from "./import-errors";
+import { CardTitle } from "../../../dialogs/settings/components/card-title";
 
 type ImportResultProps = {
   result: TransformResult;
   provider: IProvider;
   filesCount?: number;
-  logs?: ReactNode;
+  logs?: LogMessage[];
   onReset: () => void;
 };
 
 export function ImportResult(props: ImportResultProps) {
-  const { result, onReset, logs, filesCount } = props;
-  const hasLogs = !!logs;
+  const { result, onReset, logs = [], filesCount } = props;
 
   if (result.totalNotes <= 0) {
     return (
-      <ImporterCard sx={{ p: "spacing6" }}>
+      <Flex variant="card" sx={{ p: "spacing6" }}>
         <CardTitle title={strings.importUnsuccessful()}>
           {strings.failedToImportSelectedFiles()}
         </CardTitle>
         {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
-        {hasLogs ? <LogsBox failed>{logs}</LogsBox> : null}
+        <LogsBox logs={logs} failed />
         <Flex sx={{ gap: "spacing4", alignItems: "center" }}>
           <Button
             variant="new_bordered"
@@ -66,12 +65,12 @@ export function ImportResult(props: ImportResultProps) {
             {strings.startOver()}
           </Button>
         </Flex>
-      </ImporterCard>
+      </Flex>
     );
   }
 
   return (
-    <ImporterCard>
+    <Flex variant="card">
       <CardTitle title={strings.importCompleted()}>
         {strings.notesSuccessfullyImported(result.totalNotes)}
       </CardTitle>
@@ -82,7 +81,7 @@ export function ImportResult(props: ImportResultProps) {
         {strings.foundNotes(result.totalNotes)}
       </Text>
       {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
-      {hasLogs ? <LogsBox>{logs}</LogsBox> : null}
+      <LogsBox logs={logs} />
       <Button
         variant="new_accent"
         sx={{ alignSelf: "flex-start", px: "spacing4" }}
@@ -90,6 +89,6 @@ export function ImportResult(props: ImportResultProps) {
       >
         {strings.startOver()}
       </Button>
-    </ImporterCard>
+    </Flex>
   );
 }

@@ -23,7 +23,6 @@ import Dialog from "../../../components/dialog";
 import { Checkbox } from "../../../components/checkbox";
 import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
 
-// The chosen reason is only collected for the UI. It is not sent anywhere.
 const CANCEL_REASONS = [
   "It’s too expensive",
   "I need more features",

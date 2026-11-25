@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IconBox, buttonProps } from "../components/settings-ui";
 import { useState } from "react";
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
@@ -237,9 +236,15 @@ function KeyOption(props: {
 }) {
   const { icon: OptionIcon, iconSize, title, description, selected } = props;
   return (
-    <Flex
-      {...buttonProps(props.onClick, props.disabled)}
+    <Button
+      variant="primary"
+      onClick={props.onClick}
+      disabled={props.disabled}
       sx={{
+        display: "flex",
+        width: "100%",
+        textAlign: "left",
+        whiteSpace: "normal",
         alignItems: "center",
         gap: "spacing3",
         px: "spacing3",
@@ -248,20 +253,21 @@ function KeyOption(props: {
         border: "1px solid",
         borderColor: selected ? "transparent" : "border",
         borderRadius: "radius2",
-        cursor: props.disabled ? "default" : "pointer",
-        ":hover:not([aria-disabled=true])": {
+        ":disabled": { opacity: 1, cursor: "default" },
+        ":hover:not(:disabled):not(:active)": {
           bg: "hover",
           borderColor: "transparent",
           ".option-icon": { bg: "hover-secondary" }
         }
       }}
     >
-      <IconBox
+      <Flex
+        variant="iconBox"
         className="option-icon"
         sx={selected ? { bg: "background" } : undefined}
       >
         <OptionIcon size={iconSize} />
-      </IconBox>
+      </Flex>
       <Flex sx={{ flexDirection: "column", gap: "spacing3", flex: 1 }}>
         <Text
           sx={{
@@ -277,6 +283,6 @@ function KeyOption(props: {
           {description}
         </Text>
       </Flex>
-    </Flex>
+    </Button>
   );
 }

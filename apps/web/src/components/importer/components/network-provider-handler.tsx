@@ -22,14 +22,15 @@ import {
   ProviderSettings,
   transform
 } from "@notesnook-importer/core";
-import { Button } from "@theme-ui/components";
+import { Button, Flex } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
 import { useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
-import { CardTitle, ImporterCard, LogsBox } from "./card";
+import { LogMessage, LogsBox } from "./logs-box";
 import { ImportResult } from "./import-result";
 import { TransformResult } from "../types";
 import { strings } from "@notesnook/intl";
+import { CardTitle } from "../../../dialogs/settings/components/card-title";
 
 type NetworkProviderHandlerProps = {
   provider: INetworkProvider<ProviderSettings>;
@@ -54,7 +55,7 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
   const { provider, result, onTransformFinished, onReset } = props;
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
-  const logs = useRef<string[]>([]);
+  const logs = useRef<LogMessage[]>([]);
 
   async function onStartImport() {
     let totalNotes = 0;
@@ -65,11 +66,11 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         clear: async () => undefined,
         get: async () => [],
         write: async (data) => {
-          logs.current.push(
-            `[${new Date().toLocaleString()}] Pushing ${
-              data.title
-            } into database`
-          );
+          logs.current.push({
+            type: "info",
+            date: Date.now(),
+            text: `Pushing ${data.title} into database`
+          });
 
           await importNote(data);
         },
@@ -78,9 +79,11 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         }
       },
       log: (message) => {
-        logs.current.push(
-          `[${new Date(message.date).toLocaleString()}] ${message.text}`
-        );
+        logs.current.push({
+          type: "info",
+          date: message.date,
+          text: message.text
+        });
         setCounter((s) => ++s);
       },
       reporter: () => {
@@ -99,14 +102,12 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
     });
   }
 
-  const logLines = logs.current.map((c, index) => <div key={index}>{c}</div>);
-
   if (result) {
     return (
       <ImportResult
         result={result}
         provider={provider}
-        logs={logLines.length > 0 ? logLines : undefined}
+        logs={logs.current}
         onReset={onReset}
       />
     );
@@ -114,17 +115,17 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
 
   if (totalNoteCount) {
     return (
-      <ImporterCard>
+      <Flex variant="card">
         <CardTitle title={strings.importingNotesFrom(provider.name)}>
           {strings.foundNotes(totalNoteCount)}
         </CardTitle>
-        {logLines.length > 0 && <LogsBox>{logLines}</LogsBox>}
-      </ImporterCard>
+        <LogsBox logs={logs.current} />
+      </Flex>
     );
   }
 
   return (
-    <ImporterCard>
+    <Flex variant="card">
       <CardTitle title={strings.connectYourAccount(provider.name)}>
         {strings.checkOutOurStepByStepGuideOn()}{" "}
         <a href={provider.helpLink} target="_blank" rel="noreferrer">
@@ -138,6 +139,6 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
       >
         {strings.startImporting()}
       </Button>
-    </ImporterCard>
+    </Flex>
   );
 }

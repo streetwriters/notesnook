@@ -60,6 +60,14 @@ const error: ThemeUIStyleObject = {
   color: "paragraph-error"
 };
 
+const sectionHeading: ThemeUIStyleObject = {
+  variant: "text.default",
+  fontSize: "xs",
+  fontWeight: 600,
+  lineHeight: 1,
+  color: "accent"
+};
+
 export const textVariants = {
   default: defaultVariant,
   heading,
@@ -67,5 +75,6 @@ export const textVariants = {
   subtitle,
   body,
   subBody,
-  error
+  error,
+  sectionHeading
 };

@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingsCard, buttonProps } from "../../../components/settings-ui";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
+import createStore from "../../../common/store";
+import BaseStore from "../../../stores";
 import { showToast } from "../../../utils/toast";
 import {
   Loading,
@@ -42,45 +43,30 @@ import { useCopyToClipboard } from "../../../hooks/use-copy-to-clipboard";
 import { strings } from "@notesnook/intl";
 import { Select } from "../../../components/select";
 
-type InboxApiKeysState = {
-  status: "pending" | "fulfilled" | "rejected";
-  keys: InboxApiKey[];
-};
+class InboxApiKeysStore extends BaseStore<InboxApiKeysStore> {
+  status: "pending" | "fulfilled" | "rejected" = "pending";
+  keys: InboxApiKey[] = [];
 
-// The rows card (in inbox-settings.ts) needs to know whether there are any
-// keys, so the list lives in a tiny shared store instead of component state.
-let apiKeysState: InboxApiKeysState = { status: "pending", keys: [] };
-const apiKeysListeners = new Set<(state: InboxApiKeysState) => void>();
-
-function setApiKeysState(state: InboxApiKeysState) {
-  apiKeysState = state;
-  apiKeysListeners.forEach((listener) => listener(state));
-}
-
-export const inboxApiKeysStore = {
-  getState: () => apiKeysState,
-  getKeys: () => apiKeysState.keys,
-  subscribe(listener: (state: InboxApiKeysState) => void) {
-    apiKeysListeners.add(listener);
-    return () => {
-      apiKeysListeners.delete(listener);
-    };
-  },
-  async refresh(reset = false) {
-    if (reset || apiKeysState.status !== "fulfilled")
-      setApiKeysState({ status: "pending", keys: apiKeysState.keys });
+  refresh = async (reset = false) => {
+    if (reset || this.get().status !== "fulfilled")
+      this.set({ status: "pending" });
     try {
       const keys = await db.inboxApiKeys.get();
-      setApiKeysState({ status: "fulfilled", keys: keys || [] });
+      this.set({ status: "fulfilled", keys: keys || [] });
     } catch (error) {
       console.error("Failed to load inbox API keys:", error);
-      setApiKeysState({ status: "rejected", keys: apiKeysState.keys });
+      this.set({ status: "rejected" });
     }
-  }
-};
+  };
+}
+
+const [useStore, store] = createStore<InboxApiKeysStore>(
+  (set, get) => new InboxApiKeysStore(set, get)
+);
+export { useStore as useInboxApiKeysStore, store as inboxApiKeysStore };
 
 export function createInboxApiKey() {
-  if (inboxApiKeysStore.getKeys().length >= 10) {
+  if (useStore.getState().keys.length >= 10) {
     return ConfirmDialog.show({
       title: strings.apiKeysLimitReached(),
       subtitle: strings.apiKeysLimitReachedMessage(),
@@ -88,7 +74,7 @@ export function createInboxApiKey() {
     });
   }
   return AddApiKeyDialog.show({
-    onAdd: () => inboxApiKeysStore.refresh()
+    onAdd: () => store.refresh()
   });
 }
 
@@ -172,32 +158,23 @@ function InboxApiKeysErrorState() {
       <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph-error" }}>
         {strings.failedToLoadApiKeys()}
       </Text>
-      <Button
-        variant="new_secondary"
-        onClick={() => inboxApiKeysStore.refresh(true)}
-      >
+      <Button variant="new_secondary" onClick={() => store.refresh(true)}>
         {strings.retry()}
       </Button>
     </Flex>
   );
 }
 
-/** The "API Keys" card's content while the keys load, fail to load, or are empty. */
 export function InboxApiKeysStatus() {
-  const { status } = useSyncExternalStore(
-    inboxApiKeysStore.subscribe,
-    inboxApiKeysStore.getState
-  );
+  const status = useStore((store) => store.status);
   if (status === "pending") return <InboxApiKeysLoadingState />;
   if (status === "rejected") return <InboxApiKeysErrorState />;
   return <InboxApiKeysEmptyState />;
 }
 
 export function InboxApiKeyCards() {
-  const { status, keys } = useSyncExternalStore(
-    inboxApiKeysStore.subscribe,
-    inboxApiKeysStore.getState
-  );
+  const status = useStore((store) => store.status);
+  const keys = useStore((store) => store.keys);
 
   if (status !== "fulfilled" || keys.length === 0) return null;
 
@@ -213,7 +190,7 @@ export function InboxApiKeyCards() {
         <ApiKeyItem
           key={key.key}
           apiKey={key}
-          onRevoke={() => inboxApiKeysStore.refresh()}
+          onRevoke={() => store.refresh()}
         />
       ))}
     </Flex>
@@ -268,7 +245,7 @@ function ApiKeyItem({ apiKey, onRevoke }: ApiKeyItemProps) {
     apiKey.expiryDate === -1 ? false : Date.now() > apiKey.expiryDate;
 
   return (
-    <SettingsCard>
+    <Flex variant="card">
       <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
         <Text
           sx={{
@@ -353,20 +330,20 @@ function ApiKeyItem({ apiKey, onRevoke }: ApiKeyItemProps) {
                   apiKey.key.length - 10
                 )}`}
           </Text>
-          <Flex
-            {...buttonProps(
-              viewing || isApiKeyExpired ? undefined : () => viewKey()
-            )}
+          <Button
+            variant="primary"
+            disabled={viewing || isApiKeyExpired}
+            onClick={() => viewKey()}
             sx={{
               width: 22,
               height: 22,
               my: "-3.5px",
+              p: 0,
               flexShrink: 0,
+              display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              borderRadius: "radius1",
-              cursor: viewing || isApiKeyExpired ? undefined : "pointer",
-              ":hover": viewing || isApiKeyExpired ? undefined : { bg: "hover" }
+              borderRadius: "radius1"
             }}
           >
             {viewing ? (
@@ -374,7 +351,7 @@ function ApiKeyItem({ apiKey, onRevoke }: ApiKeyItemProps) {
             ) : (
               <PasswordVisible size={15} />
             )}
-          </Flex>
+          </Button>
         </Flex>
 
         <Flex sx={{ alignItems: "center", gap: "spacing3", flexShrink: 0 }}>
@@ -439,7 +416,7 @@ function ApiKeyItem({ apiKey, onRevoke }: ApiKeyItemProps) {
           </Button>
         </Flex>
       </Flex>
-    </SettingsCard>
+    </Flex>
   );
 }
 

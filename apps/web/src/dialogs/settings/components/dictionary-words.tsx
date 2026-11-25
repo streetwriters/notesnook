@@ -28,7 +28,6 @@ export function DictionaryWords() {
   if (!words.length) return null;
 
   return (
-    // pull the chips up under the row description
     <Flex sx={{ flexWrap: "wrap", gap: "spacing4", ml: "37px", mt: "-7px" }}>
       {words.map((word) => (
         <Flex

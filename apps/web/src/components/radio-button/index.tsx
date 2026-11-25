@@ -21,7 +21,6 @@ import { ReactNode } from "react";
 import { Label, Text } from "@theme-ui/components";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 
-/** A pill-shaped radio option; call sites override the defaults via props. */
 type RadioButtonProps = {
   id: string;
   name: string;
@@ -30,20 +29,7 @@ type RadioButtonProps = {
   value?: string;
   testId?: string;
   disabled?: boolean;
-  /** Rendered next to the label, e.g. a Pro crown for premium options. */
   proIcon?: ReactNode;
-  /** "start" puts `proIcon` before the label, "end" after the radio. */
-  proIconPlacement?: "start" | "end";
-  /** Diameter of the radio in px. */
-  radioSize?: number;
-  /** Ring colour of an unselected radio (theme colour name). */
-  radioRingColor?: string;
-  /** Colour of the gap between the selected radio's ring and its dot. */
-  radioGapColor?: string;
-  /** "border" is a 1px border; "inset" is a box-shadow inside the padding. */
-  outline?: "border" | "inset";
-  /** Show the hover background on enabled options. */
-  hoverable?: boolean;
   sx?: ThemeUIStyleObject;
   onSelect?: () => void;
 };
@@ -58,12 +44,6 @@ export function RadioButton(props: RadioButtonProps) {
     testId,
     disabled,
     proIcon,
-    proIconPlacement = "start",
-    radioSize = 16,
-    radioRingColor = "paragraph",
-    radioGapColor = "background",
-    outline = "border",
-    hoverable = true,
     sx,
     onSelect
   } = props;
@@ -81,26 +61,16 @@ export function RadioButton(props: RadioButtonProps) {
         gap: "spacing4",
         px: "spacing4",
         py: "spacing5",
-        ...(outline === "border"
-          ? {
-              border: "1px solid",
-              borderColor: selected ? "transparent" : "border"
-            }
-          : {
-              boxShadow: selected ? "none" : "inset 0 0 0 1px var(--border)"
-            }),
+        border: "1px solid",
+        borderColor: selected ? "transparent" : "border",
         borderRadius: "radius2",
         bg: selected ? "background-selected" : "transparent",
         cursor: disabled ? "not-allowed" : "pointer",
-        ...(hoverable
-          ? {
-              ":hover:not(:active)": { bg: disabled ? "transparent" : "hover" }
-            }
-          : {}),
+        ":hover:not(:active)": { bg: disabled ? "transparent" : "hover" },
         ...sx
       }}
     >
-      {proIcon && proIconPlacement === "start" ? proIcon : null}
+      {proIcon}
       <Text
         sx={{
           overflow: "hidden",
@@ -125,19 +95,16 @@ export function RadioButton(props: RadioButtonProps) {
           appearance: "none",
           WebkitAppearance: "none",
           flexShrink: 0,
-          width: radioSize,
-          height: radioSize,
+          width: 16,
+          height: 16,
           margin: 0,
           borderRadius: "50%",
           cursor: "inherit",
-          border: `1px solid var(--${selected ? "accent" : radioRingColor})`,
+          border: `1px solid var(--${selected ? "accent" : "paragraph"})`,
           backgroundColor: selected ? "var(--accent)" : "transparent",
-          boxShadow: selected
-            ? `inset 0 0 0 3px var(--${radioGapColor})`
-            : "none"
+          boxShadow: selected ? "inset 0 0 0 3px var(--background)" : "none"
         }}
       />
-      {proIcon && proIconPlacement === "end" ? proIcon : null}
     </Label>
   );
 }

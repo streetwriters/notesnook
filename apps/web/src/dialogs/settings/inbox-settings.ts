@@ -23,7 +23,8 @@ import {
   InboxApiKeyCards,
   InboxApiKeysStatus,
   createInboxApiKey,
-  inboxApiKeysStore
+  inboxApiKeysStore,
+  useInboxApiKeysStore
 } from "./components/inbox-api-keys";
 import { InboxPGPKeysDialog } from "../inbox-pgp-keys-dialog";
 import { db } from "../../common/db";
@@ -45,7 +46,7 @@ const subscribeToInboxState = (
     (s) => s.isInboxEnabled,
     listener
   );
-  const unsubscribeKeys = inboxApiKeysStore.subscribe((state) =>
+  const unsubscribeKeys = useInboxApiKeysStore.subscribe((state) =>
     listener(state, undefined)
   );
   return () => {
@@ -163,8 +164,8 @@ export const InboxSettings: SettingsGroup[] = [
         onStateChange: subscribeToInboxState,
         isHidden: () =>
           !isInboxEnabled() ||
-          inboxApiKeysStore.getState().status !== "fulfilled" ||
-          inboxApiKeysStore.getKeys().length === 0,
+          useInboxApiKeysStore.getState().status !== "fulfilled" ||
+          useInboxApiKeysStore.getState().keys.length === 0,
         components: [
           {
             type: "navigation",
@@ -178,8 +179,8 @@ export const InboxSettings: SettingsGroup[] = [
         onStateChange: subscribeToInboxState,
         isHidden: () =>
           !isInboxEnabled() ||
-          (inboxApiKeysStore.getState().status === "fulfilled" &&
-            inboxApiKeysStore.getKeys().length > 0),
+          (useInboxApiKeysStore.getState().status === "fulfilled" &&
+            useInboxApiKeysStore.getState().keys.length > 0),
         components: [
           {
             type: "custom",

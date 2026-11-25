@@ -23,13 +23,13 @@ import { ThemeUIStyleObject } from "@theme-ui/css";
 import { Menu } from "../../hooks/use-menu";
 import { CaretDown, CaretDownOutline, Icon } from "../icons";
 
-export type SelectOption = {
+type SelectOption = {
   value: string;
   title: string;
   disabled?: boolean;
 };
 
-export type SelectProps = {
+type SelectProps = {
   variant: "outline" | "filled";
   value?: string;
   options: SelectOption[];
@@ -38,7 +38,6 @@ export type SelectProps = {
   menuPosition?: { align?: "start" | "end"; yOffset?: number };
   fallbackToFirst?: boolean;
   id?: string;
-  sx?: ThemeUIStyleObject;
 };
 
 const variantStyles: Record<SelectProps["variant"], ThemeUIStyleObject> = {
@@ -81,14 +80,13 @@ export function Select(props: SelectProps) {
     onChange,
     menuPosition,
     fallbackToFirst,
-    id,
-    sx
+    id
   } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isOutline = variant === "outline";
   const ActionIcon = props.icon || (isOutline ? CaretDownOutline : CaretDown);
   const selectedTitle =
-    options.find((o) => value !== undefined && o.value === value)?.title ??
+    options.find((o) => o.value === value)?.title ??
     (fallbackToFirst ? options[0]?.title : undefined);
 
   return (
@@ -103,7 +101,7 @@ export function Select(props: SelectProps) {
             key: o.value,
             title: o.title,
             isDisabled: o.disabled,
-            isChecked: value !== undefined && o.value === value,
+            isChecked: o.value === value,
             onClick: () => onChange(o.value)
           })),
           {
@@ -116,7 +114,7 @@ export function Select(props: SelectProps) {
           }
         );
       }}
-      sx={{ ...variantStyles[variant], ...sx }}
+      sx={variantStyles[variant]}
     >
       {isOutline ? (
         <Text

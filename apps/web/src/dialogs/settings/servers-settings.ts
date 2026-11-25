@@ -28,8 +28,6 @@ export const ServersSettings: SettingsGroup[] = [
     section: "servers",
     settings: [
       {
-        // The servers form is rendered by the group header, this setting only
-        // keeps the search keywords.
         key: "config",
         title: strings.serversConfiguration(),
         keywords: [

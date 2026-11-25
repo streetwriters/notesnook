@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Check, Copy, Loading } from "../../../components/icons";
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { db } from "../../../common/db";
@@ -26,27 +26,28 @@ import { useCopyToClipboard } from "../../../hooks/use-copy-to-clipboard";
 import { showToast } from "../../../utils/toast";
 import { TaskManager } from "../../../common/task-manager";
 import { ErrorText } from "../../../components/error-text";
-import { buttonProps } from "../../../components/settings-ui";
 
 function CopyIdIcon({ id }: { id: string }) {
   const { copied, copy } = useCopyToClipboard();
   const Icon = copied ? Check : Copy;
   return (
-    <Flex
-      {...buttonProps(() => copy(id))}
+    <Button
+      variant="primary"
+      onClick={() => copy(id)}
       aria-label={strings.copy()}
       sx={{
+        display: "flex",
         alignItems: "center",
         justifyContent: "center",
         size: 20,
+        p: 0,
         borderRadius: "3px",
         bg: "hover",
-        cursor: "pointer",
-        ":hover": { bg: "hover-secondary" }
+        ":hover:not(:disabled):not(:active)": { bg: "hover-secondary" }
       }}
     >
       <Icon size={15} />
-    </Flex>
+    </Button>
   );
 }
 

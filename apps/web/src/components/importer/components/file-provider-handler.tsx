@@ -23,18 +23,19 @@ import {
   ProviderSettings,
   transform
 } from "@notesnook-importer/core";
-import { formatBytes, getFormattedDate } from "@notesnook/common";
+import { formatBytes } from "@notesnook/common";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { importNote } from "../../../utils/importer";
 import { PromptDialog } from "../../../dialogs/prompt";
-import { CardTitle, ImporterCard, LogsBox } from "./card";
+import { LogMessage, LogsBox } from "./logs-box";
 import { ImportResult } from "./import-result";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
 import { strings } from "@notesnook/intl";
+import { CardTitle } from "../../../dialogs/settings/components/card-title";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -46,12 +47,6 @@ type FileProviderHandlerProps = {
 type Progress = {
   total: number;
   done: number;
-};
-
-type LogMessage = {
-  type: "info" | "error";
-  text: string;
-  date: number;
 };
 
 export function FileProviderHandler(props: FileProviderHandlerProps) {
@@ -164,22 +159,13 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
     });
   }
 
-  const logLines = logs.current.map((c, index) => (
-    <Box
-      key={index.toString()}
-      sx={{ color: c.type === "error" ? "paragraph-error" : "inherit" }}
-    >
-      [{getFormattedDate(c.date, "date-time")}] {c.text}
-    </Box>
-  ));
-
   if (result) {
     return (
       <ImportResult
         result={result}
         provider={provider}
         filesCount={filesProgress.total}
-        logs={logLines.length > 0 ? logLines : undefined}
+        logs={logs.current}
         onReset={onReset}
       />
     );
@@ -187,7 +173,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
 
   if (filesProgress.done) {
     return (
-      <ImporterCard>
+      <Flex variant="card">
         <CardTitle
           title={strings.processingFiles(
             filesProgress.done,
@@ -196,8 +182,8 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         >
           {strings.foundNotes(totalNoteCount)}
         </CardTitle>
-        {logLines.length > 0 && <LogsBox>{logLines}</LogsBox>}
-      </ImporterCard>
+        <LogsBox logs={logs.current} />
+      </Flex>
     );
   }
 
@@ -207,7 +193,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
 
   return (
     <>
-      <ImporterCard>
+      <Flex variant="card">
         <CardTitle title={strings.selectProviderFiles(provider.name)}>
           {strings.checkOutOurStepByStepGuideOn()}{" "}
           <a href={provider.helpLink} target="_blank" rel="noreferrer">
@@ -255,10 +241,10 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
             ) : null}
           </Text>
         </Flex>
-      </ImporterCard>
+      </Flex>
 
       {files.length > 0 ? (
-        <ImporterCard>
+        <Flex variant="card">
           <Text
             sx={{
               fontSize: "sm",
@@ -335,7 +321,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           >
             {strings.startImporting()}
           </Button>
-        </ImporterCard>
+        </Flex>
       ) : null}
     </>
   );

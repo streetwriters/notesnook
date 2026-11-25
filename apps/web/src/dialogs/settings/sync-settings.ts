@@ -111,8 +111,6 @@ export const SyncSettings: SettingsGroup[] = [
     header: SyncTroubleshooting,
     settings: [
       {
-        // The "Having sync issues?" card is rendered by the group header, this
-        // setting only keeps the search keywords/description.
         key: "force-sync",
         title: strings.havingProblemsWithSync(),
         description: strings.havingProblemsWithSyncDesc(),

@@ -16,7 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { SettingsCard } from "../../../components/settings-ui";
 import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
@@ -155,7 +154,7 @@ function ThemesList() {
 
   return (
     <>
-      <SettingsCard sx={{ gap: "spacing2" }}>
+      <Flex variant="card" sx={{ gap: "spacing2" }}>
         <Text
           variant="body"
           sx={{
@@ -192,7 +191,7 @@ function ThemesList() {
           }}
           onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
         />
-      </SettingsCard>
+      </Flex>
 
       <Flex
         sx={{
@@ -274,7 +273,6 @@ function ThemesList() {
         </Button>
       </Flex>
 
-      {/* clip the negative gutter margin so the settings pane does not scroll sideways */}
       <Box sx={{ mt: "spacing6", overflowX: "clip" }}>
         <Box sx={{ mx: "-7.5px" }}>
           {themes.isInitialLoading ? (

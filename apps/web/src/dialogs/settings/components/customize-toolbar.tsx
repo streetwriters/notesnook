@@ -128,12 +128,6 @@ export function CustomizeToolbar() {
                 proIcon={
                   disabled ? <Pro color="orange" size={18} /> : undefined
                 }
-                proIconPlacement="end"
-                radioSize={15}
-                radioRingColor="icon-disabled"
-                radioGapColor="background-selected"
-                outline="inset"
-                hoverable={false}
                 onSelect={() => setCurrentPreset(getPreset(preset.id))}
               />
             );
@@ -182,9 +176,6 @@ export function CustomizeToolbar() {
           );
         }}
         onDragStart={(event) => {
-          // Only convert to the (premium) custom preset if it is allowed.
-          // Otherwise leave the preset untouched; cancelDrop shows the upgrade
-          // dialog and cancels the drop so nothing is reordered or persisted.
           if (currentPreset.id !== "custom" && customToolbarPreset?.isAllowed) {
             setCurrentPreset({
               ...getPreset("custom"),

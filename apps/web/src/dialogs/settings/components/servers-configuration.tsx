@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingsCard } from "../../../components/settings-ui";
-import { SectionHeading } from "../../../components/settings-ui";
 import { Button, Flex, Text } from "@theme-ui/components";
 import {
   ArrowsClockwise,
@@ -147,7 +145,11 @@ export function ServersConfiguration() {
           />
         ) : null}
         {SERVERS.map((server) => (
-          <SettingsCard key={server.id} sx={{ opacity: isLoggedIn ? 0.5 : 1 }}>
+          <Flex
+            variant="card"
+            key={server.id}
+            sx={{ opacity: isLoggedIn ? 0.5 : 1 }}
+          >
             <Flex sx={{ gap: "spacing3", alignItems: "flex-start" }}>
               <Flex
                 sx={{
@@ -205,7 +207,7 @@ export function ServersConfiguration() {
                 })
               }
             />
-          </SettingsCard>
+          </Flex>
         ))}
         {error ? <Banner variant="error" message={error} /> : null}
         {success === true ? (
@@ -319,9 +321,7 @@ export function ServersConfiguration() {
 export function ServersHeader() {
   return (
     <Flex sx={{ flexDirection: "column", gap: "spacing6" }}>
-      <SectionHeading sx={{ m: 0 }}>
-        {strings.serversConfiguration()}
-      </SectionHeading>
+      <Text variant="sectionHeading">{strings.serversConfiguration()}</Text>
       <ServersConfiguration />
     </Flex>
   );

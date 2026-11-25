@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { buttonProps } from "../components/settings-ui";
 import { Fragment, useState } from "react";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { InboxItemsHistoryErrorContext } from "@notesnook/core";
@@ -283,13 +282,15 @@ function FailedItem(props: FailedItemProps) {
         </Text>
         <Flex sx={{ alignItems: "center", gap: "spacing7", flexShrink: 0 }}>
           {hasDetails ? (
-            <Flex
-              {...buttonProps(onToggle)}
+            <Button
+              variant="primary"
+              onClick={onToggle}
               aria-expanded={expanded}
               sx={{
+                display: "flex",
                 alignItems: "center",
                 gap: "spacing3",
-                cursor: "pointer",
+                p: 0,
                 color: "heading"
               }}
             >
@@ -304,7 +305,7 @@ function FailedItem(props: FailedItemProps) {
                 {strings.details()}
               </Text>
               <CaretIcon size={13} />
-            </Flex>
+            </Button>
           ) : null}
           <Button
             variant="primary"

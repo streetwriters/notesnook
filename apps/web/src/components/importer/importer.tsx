@@ -20,15 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex } from "@theme-ui/components";
 import { FileProviderHandler } from "./components/file-provider-handler";
 import { NetworkProviderHandler } from "./components/network-provider-handler";
-import { importerStore, useImporterState } from "./store";
+import { useImporterStore } from "./store";
 
-/**
- * The import steps shown below the "Select a notes app" row. The selected
- * provider lives in `importerStore` because the row itself is rendered by the
- * settings renderer.
- */
 export function Importer() {
-  const { provider, instanceKey, transformResult } = useImporterState();
+  const { provider, instanceKey, transformResult, setResult, startOver } =
+    useImporterStore();
   if (!provider) return null;
 
   return (
@@ -40,16 +36,16 @@ export function Importer() {
           key={instanceKey}
           provider={provider}
           result={transformResult}
-          onTransformFinished={importerStore.setResult}
-          onReset={importerStore.startOver}
+          onTransformFinished={setResult}
+          onReset={startOver}
         />
       ) : provider.type === "network" ? (
         <NetworkProviderHandler
           key={instanceKey}
           provider={provider}
           result={transformResult}
-          onTransformFinished={importerStore.setResult}
-          onReset={importerStore.startOver}
+          onTransformFinished={setResult}
+          onReset={startOver}
         />
       ) : null}
     </Flex>

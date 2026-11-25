@@ -74,7 +74,6 @@ function hasStatus(...statuses: SubscriptionStatusEnum[]) {
   return status !== undefined && statuses.includes(status);
 }
 
-// the old auto-renew toggle's visibility; cancel and resume subscription replace it
 function isAutoRenewHidden() {
   return (
     !isPaddleSubscriber() ||

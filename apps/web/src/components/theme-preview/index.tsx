@@ -24,17 +24,10 @@ import { ReactNode } from "react";
 
 export type ThemePreviewProps = {
   theme: ThemeMetadata;
-  /**
-   * Rendered in the bottom-right of the wireframe window in place of the
-   * three colour dots.
-   */
   badge?: ReactNode;
   selected?: boolean;
-  /** Total height of the preview frame. */
   height?: number;
-  /** Top offset of the wireframe window inside the frame. */
   windowTop?: number;
-  /** Height of the wireframe window. */
   windowHeight?: number;
 };
 
@@ -224,7 +217,6 @@ export function ThemePreview(props: ThemePreviewProps) {
                     flexShrink: 0,
                     borderRadius: "50%",
                     bg: color,
-                    // keeps a dot visible when it matches the window background
                     border: `1px solid ${colors.border}`,
                     ml: index === 0 ? 0 : "-13px"
                   }}

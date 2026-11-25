@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IconBox, buttonProps } from "../../components/settings-ui";
 import { Text, Flex, Button, Image, Link, Box } from "@notesnook/ui";
 import {
   CheckCircleOutline,
@@ -75,10 +74,6 @@ type PlansListProps = {
   loadAllPlans?: boolean;
   ignoreTrial?: boolean;
   recommendedPlan?: SubscriptionPlan;
-  /**
-   * "dialog" renders the compact look used inside dialogs (Change plan).
-   * Omit for the default full-page look.
-   */
   variant?: "dialog";
   onPlanSelected: (plan: Plan) => void;
 };
@@ -272,9 +267,9 @@ export function PlansList(props: PlansListProps) {
           }}
         >
           <Flex sx={{ alignItems: "flex-start", gap: "spacing6" }}>
-            <IconBox>
+            <Flex variant="iconBox">
               <ShieldCheck size={20} color="icon" />
-            </IconBox>
+            </Flex>
             <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
               <Text
                 sx={{
@@ -586,12 +581,7 @@ function OneTimePricing(props: PricingProps) {
 }
 
 type ComparePlansProps = {
-  /**
-   * "dialog" renders the compact card used inside dialogs (Change plan).
-   * Omit for the default full-page look.
-   */
   variant?: "dialog";
-  /** Only for the "dialog" variant: the feature table can be expanded/collapsed. */
   collapsible?: boolean;
 };
 
@@ -604,6 +594,7 @@ export function ComparePlans(props: ComparePlansProps = {}) {
   const { variant, collapsible } = props;
   const isDialog = variant === "dialog";
   const [isOpen, setIsOpen] = useState(!collapsible);
+  const HeaderContainer = collapsible ? Button : Flex;
   const rows = getFeaturesTable();
   const plans = [
     SubscriptionPlan.FREE,
@@ -778,21 +769,27 @@ export function ComparePlans(props: ComparePlansProps = {}) {
           borderRadius: "radius4"
         }}
       >
-        <Flex
-          {...buttonProps(
-            collapsible ? () => setIsOpen((open) => !open) : undefined
-          )}
+        <HeaderContainer
+          variant={collapsible ? "primary" : undefined}
+          onClick={collapsible ? () => setIsOpen((open) => !open) : undefined}
           aria-expanded={collapsible ? isOpen : undefined}
           sx={{
+            display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            cursor: collapsible ? "pointer" : "default"
+            ...(collapsible && {
+              width: "100%",
+              p: 0,
+              textAlign: "left",
+              whiteSpace: "normal",
+              ":hover:not(:disabled):not(:active)": { bg: "transparent" }
+            })
           }}
         >
           <Flex sx={{ alignItems: "flex-start", gap: "spacing3" }}>
-            <IconBox>
+            <Flex variant="iconBox">
               <Table size={15} color="icon" />
-            </IconBox>
+            </Flex>
             <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
               <Text
                 sx={{
@@ -823,7 +820,7 @@ export function ComparePlans(props: ComparePlansProps = {}) {
               sx={{ rotate: isOpen ? "180deg" : "0deg", flexShrink: 0 }}
             />
           )}
-        </Flex>
+        </HeaderContainer>
         {isOpen && table}
       </Flex>
     );

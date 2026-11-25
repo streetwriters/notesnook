@@ -32,7 +32,7 @@ import {
   SubscriptionProvider,
   SubscriptionStatus as SubscriptionStatusEnum
 } from "@notesnook/core";
-import { StatusPill } from "../../../components/settings-ui";
+import { StatusPill } from "./status-pill";
 
 function getUsageValue(feature: FeatureUsage, isFree: boolean) {
   const total =

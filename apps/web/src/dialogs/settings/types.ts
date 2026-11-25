@@ -99,7 +99,6 @@ export type Setting = {
     listener: (state: unknown, prevState: unknown) => void
   ) => () => void;
   featureId?: FeatureId;
-  /** Renders the title in the error colour, e.g. "Delete vault". */
   destructive?: boolean;
 };
 
@@ -128,9 +127,8 @@ export type BaseSettingComponent<TType extends SettingComponentType> = {
 export type ButtonSettingComponent = BaseSettingComponent<"button"> & {
   title: string;
   action: () => void | Promise<unknown>;
-  /** copies this text and swaps the label to "Copied" for a moment; `action` is not called */
   copyText?: string | (() => string);
-  variant: "primary" | "secondary" | "bordered" | "error" | "errorSecondary";
+  variant: "secondary" | "bordered" | "errorSecondary";
 };
 
 export type IconSettingComponent = BaseSettingComponent<"icon"> & {
@@ -180,10 +178,6 @@ export type TextInputSettingComponent = BaseSettingComponent<"input"> & {
 
 export type CustomSettingComponent = BaseSettingComponent<"custom"> & {
   component: () => JSX.Element | null;
-  /**
-   * "block" (default) renders the component full width below the row.
-   * "trailing" renders it at the row's top-right corner, e.g. a status badge.
-   */
   placement?: "block" | "trailing";
 };
 

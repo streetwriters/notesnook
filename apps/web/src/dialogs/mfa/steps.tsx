@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IconBox } from "../../components/settings-ui";
 import React, {
   Fragment,
   PropsWithChildren,
@@ -79,7 +78,6 @@ export type StepButtonContext = {
 };
 export type StepButton = {
   text: string;
-  // when omitted on the positive button, it submits the step's form
   onClick?: (context: StepButtonContext) => void;
 };
 
@@ -338,12 +336,13 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
               () => setSelected(index)
             )}
           >
-            <IconBox
+            <Flex
+              variant="iconBox"
               className="2fa-icon-box"
               sx={isSelected ? { bg: "background" } : undefined}
             >
               <auth.icon className="2fa-icon" size={15} color="icon" />
-            </IconBox>
+            </Flex>
             <Flex sx={{ flex: 1, flexDirection: "column", gap: "spacing3" }}>
               <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
                 <Text

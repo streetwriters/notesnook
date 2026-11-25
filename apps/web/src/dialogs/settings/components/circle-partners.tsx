@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SectionHeading } from "../../../components/settings-ui";
 import { useEffect, useState } from "react";
 import {
   CheckCircleSimple,
@@ -39,7 +38,7 @@ import { strings } from "@notesnook/intl";
 export function CircleHeader() {
   return (
     <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
-      <SectionHeading sx={{ m: 0 }}>{strings.notesnookCircle()}</SectionHeading>
+      <Text variant="sectionHeading">{strings.notesnookCircle()}</Text>
       <Flex sx={{ flexDirection: "column", gap: "spacing7" }}>
         <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
           <Text

@@ -17,26 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, FlexProps, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
 import { ScrollContainer } from "@notesnook/ui";
-import { PropsWithChildren, ReactNode } from "react";
-import { CardTitle, SettingsCard } from "../../settings-ui";
+import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 
-export function ImporterCard(props: PropsWithChildren<FlexProps>) {
-  const { sx, ...rest } = props;
-  return (
-    <SettingsCard
-      {...rest}
-      sx={{ alignItems: "stretch", bg: "background", ...sx }}
-    />
-  );
-}
+export type LogMessage = {
+  type: "info" | "error";
+  text: string;
+  date: number;
+};
 
-export { CardTitle };
-
-export function LogsBox(props: { children: ReactNode; failed?: boolean }) {
-  const { failed } = props;
+export function LogsBox(props: { logs: LogMessage[]; failed?: boolean }) {
+  const { logs, failed } = props;
+  if (logs.length === 0) return null;
   return (
     <Flex
       sx={{
@@ -71,7 +65,16 @@ export function LogsBox(props: { children: ReactNode; failed?: boolean }) {
             whiteSpace: "pre-wrap"
           }}
         >
-          {props.children}
+          {logs.map((log, index) => (
+            <Box
+              key={index.toString()}
+              sx={{
+                color: log.type === "error" ? "paragraph-error" : "inherit"
+              }}
+            >
+              [{getFormattedDate(log.date, "date-time")}] {log.text}
+            </Box>
+          ))}
         </Flex>
       </ScrollContainer>
     </Flex>

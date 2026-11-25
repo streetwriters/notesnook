@@ -22,54 +22,46 @@ import {
   ProviderFactory,
   Providers
 } from "@notesnook-importer/core";
-import { useSyncExternalStore } from "react";
+import createStore from "../../common/store";
+import BaseStore from "../../stores";
 import { TransformResult } from "./types";
 
-export type ImporterState = {
+const newKey = () => `${Math.random()}`;
+
+class ImporterStore extends BaseStore<ImporterStore> {
   providerId?: Providers;
   provider?: IProvider;
-  instanceKey: string;
+  instanceKey = newKey();
   transformResult?: TransformResult;
-};
 
-const newKey = () => `${Math.random()}`;
-let state: ImporterState = { instanceKey: newKey() };
-const listeners = new Set<() => void>();
-
-function setState(next: ImporterState) {
-  state = next;
-  listeners.forEach((l) => l());
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-export const importerStore = {
-  getState: () => state,
-  subscribe,
-  selectProvider(providerId: Providers) {
-    setState({
+  selectProvider = (providerId: Providers) => {
+    this.set({
       providerId,
       provider: ProviderFactory.getProvider(providerId),
       instanceKey: newKey(),
       transformResult: undefined
     });
-  },
-  setResult(transformResult?: TransformResult) {
-    setState({ ...state, transformResult });
-  },
-  startOver() {
-    setState({ ...state, transformResult: undefined, instanceKey: newKey() });
-  },
-  reset() {
-    setState({ instanceKey: newKey() });
-  }
-};
+  };
 
-export function useImporterState() {
-  return useSyncExternalStore(subscribe, () => state);
+  setResult = (transformResult?: TransformResult) => {
+    this.set({ transformResult });
+  };
+
+  startOver = () => {
+    this.set({ transformResult: undefined, instanceKey: newKey() });
+  };
+
+  reset = () => {
+    this.set({
+      providerId: undefined,
+      provider: undefined,
+      transformResult: undefined,
+      instanceKey: newKey()
+    });
+  };
 }
+
+const [useStore, store] = createStore<ImporterStore>(
+  (set, get) => new ImporterStore(set, get)
+);
+export { useStore as useImporterStore, store as importerStore };

@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { IconBox } from "../../../components/settings-ui";
 import { useState } from "react";
 import { Box, Button, Flex, Link, Text } from "@theme-ui/components";
 import { strings } from "@notesnook/intl";
@@ -164,9 +163,9 @@ function TroubleshootingAction(props: {
     <Flex
       sx={{ flex: 1, minWidth: 0, gap: "spacing3", alignItems: "flex-start" }}
     >
-      <IconBox>
+      <Flex variant="iconBox">
         <ActionIcon size={15} />
-      </IconBox>
+      </Flex>
       <Flex
         sx={{ flex: 1, minWidth: 0, flexDirection: "column", gap: "spacing6" }}
       >

@@ -103,11 +103,6 @@ import { InboxSettings } from "./inbox-settings";
 import { withFeatureCheck } from "../../common";
 import { NotesnookCircleSettings } from "./notesnook-circle-settings";
 import { Select } from "../../components/select";
-import {
-  IconBox,
-  SectionHeading,
-  buttonProps
-} from "../../components/settings-ui";
 import { hashNavigate } from "../../navigation";
 import { KeyboardShortcutsDialog } from "../keyboard-shortcuts-dialog";
 
@@ -362,7 +357,6 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
                   />
                 ) : activeSettings.length > 0 ? (
                   activeSettings.map((group, index) => (
-                    // group keys are not unique, match groups by position
                     <SettingsGroupComponent key={index} item={group} />
                   ))
                 ) : (
@@ -373,8 +367,9 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
               </Flex>
             </FlexScrollContainer>
           </Flex>
-          <Flex
-            {...buttonProps(() => props.onClose(false))}
+          <Button
+            variant="primary"
+            onClick={() => props.onClose(false)}
             aria-label={strings.close()}
             data-test-id="settings-close"
             sx={{
@@ -384,15 +379,15 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
               ml: ["spacing4", "spacing4", "spacing13"],
               width: 20,
               height: 20,
+              p: 0,
+              display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              borderRadius: "radius0",
-              cursor: "pointer",
-              ":hover": { bg: "hover" }
+              borderRadius: "radius0"
             }}
           >
             <Close size={15} />
-          </Flex>
+          </Button>
         </Flex>
       </Dialog>
     </SettingsNavigationContext.Provider>
@@ -444,7 +439,6 @@ function SettingsSubPageView(props: {
         {page.title}
       </Text>
       {page.groups?.map((group, index) => (
-        // group keys are not unique, match groups by position
         <SettingsGroupComponent key={index} item={group} />
       ))}
       {PageComponent ? <PageComponent /> : null}
@@ -587,15 +581,16 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                 key={group.key}
                 sx={{ flexDirection: "column", gap: "spacing3" }}
               >
-                <SectionHeading
+                <Text
+                  variant="sectionHeading"
                   sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    wordSpacing: "nowrap"
+                    whiteSpace: "nowrap"
                   }}
                 >
                   {group.title}
-                </SectionHeading>
+                </Text>
                 <Flex sx={{ flexDirection: "column" }}>
                   {group.sections.map((section) => {
                     if (section.isHidden?.()) return null;
@@ -669,7 +664,7 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
       }}
     >
       {typeof item.header === "string" ? (
-        <SectionHeading sx={{ m: 0 }}>{item.header}</SectionHeading>
+        <Text variant="sectionHeading">{item.header}</Text>
       ) : (
         <item.header />
       )}
@@ -696,10 +691,8 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
 }
 
 const BUTTON_VARIANTS: Record<ButtonSettingComponent["variant"], string> = {
-  primary: "new_accent",
   secondary: "new_secondary",
   bordered: "new_bordered",
-  error: "new_error",
   errorSecondary: "new_error_bordered"
 };
 
@@ -823,8 +816,7 @@ function SettingItem(props: { item: Setting }) {
         )
       : undefined;
   const ItemIcon = item.icon;
-  // a row with no title, icon or description that only holds block content
-  // (e.g. the inbox API keys empty state) renders just that content
+  const RowContainer = onNavigate ? Button : Flex;
   const headless =
     !item.title &&
     !ItemIcon &&
@@ -835,27 +827,30 @@ function SettingItem(props: { item: Setting }) {
   return (
     <Flex sx={{ flexDirection: "column" }} data-test-id={`setting-${item.key}`}>
       {headless ? null : (
-        <Flex
-          {...buttonProps(onNavigate)}
+        <RowContainer
+          variant={onNavigate ? "primary" : undefined}
+          onClick={onNavigate}
           sx={{
+            display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             px: "spacing5",
             py: "spacing6",
             gap: "spacing4",
-            cursor: onNavigate ? "pointer" : undefined,
-            ":hover": onNavigate ? { bg: "hover" } : undefined,
-            ":focus-visible": onNavigate
-              ? { outline: "none", bg: "hover" }
-              : undefined
+            ...(onNavigate && {
+              width: "100%",
+              textAlign: "left",
+              whiteSpace: "normal",
+              borderRadius: 0
+            })
           }}
         >
           <Flex sx={{ gap: "spacing3", alignItems: "flex-start", flex: 1 }}>
             {ItemIcon ? (
-              <IconBox>
+              <Flex variant="iconBox">
                 <ItemIcon size={15} />
-              </IconBox>
+              </Flex>
             ) : null}
             <Flex
               sx={{
@@ -992,7 +987,7 @@ function SettingItem(props: { item: Setting }) {
               }
             })}
           </Flex>
-        </Flex>
+        </RowContainer>
       )}
       {components.map((component, index) =>
         component.type === "custom" && component.placement !== "trailing" ? (
@@ -1024,7 +1019,6 @@ export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
   );
 }
 
-/** Like `debounce(fn, ms)`, but keeps one timer across renders and calls the latest `fn`. */
 function useDebouncedCallback<TArgs extends unknown[]>(
   fn: (...args: TArgs) => void,
   ms: number

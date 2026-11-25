@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { StatusPill } from "../../../components/settings-ui";
+import { StatusPill } from "./status-pill";
 
 export function EnabledBadge() {
   return <StatusPill label="Enabled" />;

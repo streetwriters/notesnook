@@ -190,7 +190,6 @@ export function showPasswordDialog<
   >;
 }
 
-/** Asks for the account password and resolves to true once it is verified. */
 export function confirmAccountPassword(title: string) {
   return showPasswordDialog({
     title,
