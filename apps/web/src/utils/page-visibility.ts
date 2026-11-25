@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export const PAGE_VISIBILITY_CHANGE = { ignore: false };
 function visibilityChange() {
   return "msHidden" in document
-    ? "msvisibilityChange"
+    ? "msvisibilitychange"
     : "webkitHidden" in document
-    ? "webkitvisibilityChange"
-    : "visibilityChange";
+    ? "webkitvisibilitychange"
+    : "visibilitychange";
 }
 
 function isDocumentHidden() {
