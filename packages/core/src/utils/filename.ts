@@ -30,7 +30,8 @@ export async function getFileNameWithExtension(
   if (!extensions || extensions.length === 0) return filename;
 
   for (const ext of extensions) {
-    if (filename.endsWith(ext)) return filename;
+    if (filename.toLowerCase().endsWith(`.${ext.toLowerCase()}`))
+      return filename;
   }
 
   const extension = extensions.values().next().value;
