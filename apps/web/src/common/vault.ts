@@ -168,7 +168,16 @@ class Vault {
     });
   }
 
-  static lockNote(id: string): Promise<boolean> {
+  static async lockNote(id: string): Promise<boolean> {
+    // locking a note should not leave the vault unlocked if it
+    // was locked before.
+    const wasUnlocked = db.vault.unlocked;
+    const result = await Vault.addToVault(id);
+    if (!wasUnlocked && db.vault.unlocked) await db.vault.lock();
+    return result;
+  }
+
+  private static addToVault(id: string): Promise<boolean> {
     return db.vault
       .add(id)
       .then(() => true)
@@ -176,11 +185,11 @@ class Vault {
         switch (message) {
           case VAULT_ERRORS.noVault:
             return Vault.createVault().then((result) =>
-              result ? Vault.lockNote(id) : false
+              result ? Vault.addToVault(id) : false
             );
           case VAULT_ERRORS.vaultLocked:
             return Vault.unlockVault().then((result) =>
-              result ? Vault.lockNote(id) : false
+              result ? Vault.addToVault(id) : false
             );
           default:
             showToast("error", message);
