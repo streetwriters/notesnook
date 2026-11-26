@@ -24,7 +24,6 @@ import { db } from "../common/db";
 import {
   ContentBlock,
   Note as NoteType,
-  VirtualizedGrouping,
   createInternalLink
 } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -32,7 +31,8 @@ import { LinkAttributes } from "@notesnook/editor";
 import {
   NoteResolvedData,
   ResolvedItem,
-  useIsFeatureAvailable
+  useIsFeatureAvailable,
+  usePromise
 } from "@notesnook/common";
 import {
   CheckIcon,
@@ -52,29 +52,47 @@ export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
 };
 const HEADING_TYPES = ["h1", "h2", "h3", "h4", "h5", "h6"];
 const NOTE_ITEM_HEIGHT = 35;
-const LIST_MAX_HEIGHT = 315;
 
 type ListContext = { header?: React.ReactNode };
 
 export const NoteLinkingDialog = DialogManager.register(
   function NoteLinkingDialog(props: NoteLinkingDialogProps) {
     const { attributes } = props;
-    const [notes, setNotes] = useState<VirtualizedGrouping<NoteType>>();
     const [noteQuery, setNoteQuery] = useState("");
     const [selectedNote, setSelectedNote] = useState<NoteType>();
     const [isNoteLocked, setIsNoteLocked] = useState(false);
-    const [blocks, setBlocks] = useState<ContentBlock[]>([]);
     const [filteredBlocks, setFilteredBlocks] = useState<
       ContentBlock[] | undefined
     >();
-    const [blocksHeight, setBlocksHeight] = useState(LIST_MAX_HEIGHT);
     const blockLinkingAvailability = useIsFeatureAvailable("blockLinking");
+
+    const notesResult = usePromise(
+      () =>
+        noteQuery
+          ? db.lookup.notes(noteQuery).sorted()
+          : db.notes.all.sorted(db.settings.getGroupOptions("home")),
+      [noteQuery]
+    );
+    const notes =
+      notesResult.status === "rejected" ? undefined : notesResult.value;
+
+    const blocksResult = usePromise(
+      () => (selectedNote ? db.notes.contentBlocks(selectedNote.id) : []),
+      [selectedNote?.id]
+    );
+    const blocksLoaded = blocksResult.status === "fulfilled";
+    const blocks = blocksLoaded ? blocksResult.value : [];
+
+    const selectNote = (note: NoteType, isLocked: boolean) => {
+      setSelectedNote(note);
+      setIsNoteLocked(isLocked);
+    };
 
     const deselectNote = () => {
       setSelectedNote(undefined);
       setIsNoteLocked(false);
       setFilteredBlocks(undefined);
-      setBlocks([]);
+      setNoteQuery("");
     };
 
     const selectedNoteRow = selectedNote ? (
@@ -86,7 +104,7 @@ export const NoteLinkingDialog = DialogManager.register(
         {blockLinkingAvailability &&
         !blockLinkingAvailability.isAllowed ? null : isNoteLocked ? (
           <HelperText>{strings.noteLockedBlockLink()}</HelperText>
-        ) : blocks.length <= 0 ? (
+        ) : blocksLoaded && blocks.length <= 0 ? (
           <HelperText>{strings.noBlocksOnNote()}</HelperText>
         ) : null}
       </SelectedNoteItem>
@@ -95,7 +113,7 @@ export const NoteLinkingDialog = DialogManager.register(
     const showBlocks =
       !!selectedNote &&
       !!blockLinkingAvailability?.isAllowed &&
-      blocks.length > 0;
+      (filteredBlocks || blocks).length > 0;
 
     return (
       <Dialog
@@ -104,12 +122,8 @@ export const NoteLinkingDialog = DialogManager.register(
           attributes ? strings.editInternalLink() : strings.newInternalLink()
         }
         width={460}
+        sx={{ height: ["100%", "80%", "70%"] }}
         onClose={() => props.onClose(false)}
-        onOpen={async () => {
-          setNotes(
-            await db.notes.all.sorted(db.settings.getGroupOptions("home"))
-          );
-        }}
         positiveButton={{
           text: attributes ? strings.done() : strings.insertLink(),
           disabled: !selectedNote,
@@ -133,6 +147,7 @@ export const NoteLinkingDialog = DialogManager.register(
             gap: "spacing7",
             p: "spacing7",
             overflow: "hidden",
+            flex: 1,
             minHeight: 0
           }}
         >
@@ -163,17 +178,7 @@ export const NoteLinkingDialog = DialogManager.register(
             <SearchField
               key="note-search"
               placeholder={strings.searchNoteToLinkPlaceholder()}
-              onChange={async (value) => {
-                const query = value.trim();
-                setNoteQuery(query);
-                setNotes(
-                  query
-                    ? await db.lookup.notes(value).sorted()
-                    : await db.notes.all.sorted(
-                        db.settings.getGroupOptions("home")
-                      )
-                );
-              }}
+              onChange={(value) => setNoteQuery(value.trim())}
             />
           )}
 
@@ -182,16 +187,14 @@ export const NoteLinkingDialog = DialogManager.register(
               <Virtuoso
                 key="block-list"
                 style={{
-                  height: Math.min(blocksHeight, LIST_MAX_HEIGHT),
                   width: "100%",
-                  flexShrink: 1,
+                  flex: 1,
                   minHeight: 0
                 }}
                 components={{
                   Scroller: CustomScrollbarsVirtualList,
                   Header: SelectedNoteHeader
                 }}
-                totalListHeightChanged={setBlocksHeight}
                 data={filteredBlocks || blocks}
                 context={{ header: selectedNoteRow } as ListContext}
                 itemContent={(_, item) => (
@@ -213,6 +216,12 @@ export const NoteLinkingDialog = DialogManager.register(
                 sx={{ flexDirection: "column", gap: "spacing4", flexShrink: 0 }}
               >
                 {selectedNoteRow}
+                {filteredBlocks?.length === 0 ? (
+                  <EmptyState
+                    title={strings.noResultsFound()}
+                    descriptionFontSize="sm"
+                  />
+                ) : null}
                 {blockLinkingAvailability &&
                 !blockLinkingAvailability.isAllowed ? (
                   <Flex
@@ -265,12 +274,8 @@ export const NoteLinkingDialog = DialogManager.register(
                   Scroller: CustomScrollbarsVirtualList
                 }}
                 style={{
-                  height: Math.min(
-                    notes.length * NOTE_ITEM_HEIGHT,
-                    LIST_MAX_HEIGHT
-                  ),
                   width: "100%",
-                  flexShrink: 1,
+                  flex: 1,
                   minHeight: 0
                 }}
                 itemContent={(index) => (
@@ -280,13 +285,12 @@ export const NoteLinkingDialog = DialogManager.register(
                         <NoteItem
                           note={note}
                           isLocked={!!(data as NoteResolvedData).locked}
-                          onClick={async () => {
-                            setSelectedNote(note);
-                            setIsNoteLocked(
+                          onClick={() =>
+                            selectNote(
+                              note,
                               !!(data as NoteResolvedData).locked
-                            );
-                            setBlocks(await db.notes.contentBlocks(note.id));
-                          }}
+                            )
+                          }
                         />
                       )}
                     </ResolvedItem>
@@ -408,8 +412,14 @@ function SelectedNoteItem(
   return (
     <Flex
       role="button"
+      tabIndex={0}
       data-test-id="selected-note"
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        onClick();
+      }}
       sx={{
         width: "100%",
         flexShrink: 0,
@@ -540,7 +550,7 @@ function BlockItem(props: { block: ContentBlock; onClick: () => void }) {
 
 function EmptyState(props: {
   title: string;
-  description: string;
+  description?: string;
   descriptionFontSize: "xs" | "sm";
 }) {
   return (
@@ -564,15 +574,17 @@ function EmptyState(props: {
       >
         {props.title}
       </Text>
-      <Text
-        sx={{
-          fontSize: props.descriptionFontSize,
-          lineHeight: props.descriptionFontSize === "sm" ? 1 : "normal",
-          color: "paragraph-secondary"
-        }}
-      >
-        {props.description}
-      </Text>
+      {props.description ? (
+        <Text
+          sx={{
+            fontSize: props.descriptionFontSize,
+            lineHeight: props.descriptionFontSize === "sm" ? 1 : "normal",
+            color: "paragraph-secondary"
+          }}
+        >
+          {props.description}
+        </Text>
+      ) : null}
     </Flex>
   );
 }
