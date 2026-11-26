@@ -23,12 +23,21 @@ import {
   useThemeEngineStore
 } from "@notesnook/theme";
 import React, { PropsWithChildren, useEffect, useState } from "react";
-import { Appearance, I18nManager, Linking, StatusBar } from "react-native";
+import {
+  Appearance,
+  I18nManager,
+  Linking,
+  Platform,
+  StatusBar
+} from "react-native";
 import Shortcuts from "react-native-actions-shortcuts";
 import RNBootSplash from "react-native-bootsplash";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider
+} from "react-native-safe-area-context";
 import AppLocked from "./components/app-lock";
 import DialogProvider from "./components/dialog-provider";
 import { withErrorBoundry } from "./components/exception-handler";
@@ -102,7 +111,7 @@ const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
   }, [props.configureMode]);
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <StatusBar translucent={true} backgroundColor="transparent" />
       <GestureHandlerRootView
         style={{
@@ -123,7 +132,7 @@ const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
         <ScopedThemeProvider value="dialog">
           <Toast />
         </ScopedThemeProvider>
-        {props.configureMode ? null : <WidgetPicker />}
+        {props.configureMode || Platform.OS !== "ios" ? null : <WidgetPicker />}
         <DialogProvider />
         <AppLocked />
       </GestureHandlerRootView>

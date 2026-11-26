@@ -111,7 +111,7 @@ export const WidgetPicker = () => {
   const close = useWidgetPicker((state) => state.close);
   const appLocked = useUserStore((state) => state.appLocked);
 
-  if (Platform.OS !== "ios" || !kind || root || appLocked) return null;
+  if (!kind || root || appLocked) return null;
 
   return (
     <Modal
