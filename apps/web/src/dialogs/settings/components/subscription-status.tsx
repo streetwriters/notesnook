@@ -88,9 +88,8 @@ export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
   const featuresUsage = usePromise(() => getFeaturesUsage(), [user]);
 
-  const { title, autoRenew, expiryDate, trialExpiryDate, trial } =
+  const { title, isFree, autoRenew, expiryDate, trialExpiryDate, trial } =
     getSubscriptionInfo(user);
-  const isFree = title === "Free";
   const subtitle = isFree
     ? ""
     : trial

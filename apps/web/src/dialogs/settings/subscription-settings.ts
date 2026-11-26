@@ -39,6 +39,7 @@ import { ChangePlanDialog } from "../buy-dialog/change-plan-dialog";
 import { hardNavigate } from "../../navigation";
 import { PromptDialog } from "../prompt";
 import { CancelSubscriptionDialog } from "./components/cancel-subscription-dialog";
+import { getSubscriptionInfo } from "./components/user-profile";
 import {
   ClockCounterClockwise,
   CrownSimple,
@@ -87,7 +88,7 @@ function isAutoRenewHidden() {
 }
 
 function isFreeUser() {
-  return !currentSubscription()?.expiry;
+  return getSubscriptionInfo().isFree;
 }
 
 const upgradeToPro: Setting = {
@@ -99,9 +100,7 @@ const upgradeToPro: Setting = {
   components: [
     {
       type: "navigation",
-      action: async () => {
-        hardNavigate("/plans");
-      }
+      action: () => hardNavigate("/plans")
     }
   ]
 };
@@ -121,17 +120,21 @@ const redeemGiftCode: Setting = {
           description: strings.redeemGiftCodeDesc(),
           label: strings.enterGiftCode()
         });
-        if (giftCode) {
-          await TaskManager.startTask({
-            type: "modal",
-            title: strings.redeemingGiftCode(),
-            subtitle: strings.pleaseWait() + "...",
-            action: () =>
-              db.subscriptions
-                .redeemCode(giftCode)
-                .catch((e) => showToast("error", e.message))
-          });
+        if (!giftCode) return;
+        const result = await TaskManager.startTask({
+          type: "modal",
+          title: strings.redeemingGiftCode(),
+          subtitle: strings.pleaseWait() + "...",
+          action: async () => {
+            await db.subscriptions.redeemCode(giftCode);
+            await useUserStore.getState().refreshUser();
+          }
+        });
+        if (result instanceof Error) {
+          showToast("error", result.message);
+          return;
         }
+        showToast("success", strings.codeRedeemedSuccessfully());
       }
     }
   ]
@@ -216,9 +219,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
         components: [
           {
             type: "navigation",
-            action: async () => {
-              ChangePlanDialog.show({});
-            }
+            action: () => ChangePlanDialog.show({})
           }
         ]
       },
@@ -301,16 +302,18 @@ export const SubscriptionSettings: SettingsGroup[] = [
                 negativeButtonText: strings.no(),
                 positiveButtonText: strings.yes()
               });
-              if (cancelTrial) {
-                await TaskManager.startTask({
-                  type: "modal",
-                  title: strings.cancellingYourTrial(),
-                  subtitle: strings.pleaseWait(),
-                  action: () => db.subscriptions.cancel()
-                })
-                  .catch((e) => showToast("error", e.message))
-                  .then(() => showToast("success", strings.trialCanceled()));
+              if (!cancelTrial) return;
+              const result = await TaskManager.startTask({
+                type: "modal",
+                title: strings.cancellingYourTrial(),
+                subtitle: strings.pleaseWait(),
+                action: () => db.subscriptions.cancel()
+              });
+              if (result instanceof Error) {
+                showToast("error", result.message);
+                return;
               }
+              showToast("success", strings.trialCanceled());
             }
           }
         ]

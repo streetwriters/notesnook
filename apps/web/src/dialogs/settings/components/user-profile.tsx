@@ -41,6 +41,7 @@ import {
 
 export function getSubscriptionInfo(user?: User): {
   title: string;
+  isFree: boolean;
   trial?: boolean;
   paused?: boolean;
   canceled?: boolean;
@@ -51,7 +52,7 @@ export function getSubscriptionInfo(user?: User): {
 } {
   user = user || useUserStore.getState().user;
   const { expiry, plan, status, provider } = user?.subscription || {};
-  if (!expiry) return { title: "Free" };
+  if (!expiry) return { title: "Free", isFree: true };
 
   const trial = status === SubscriptionStatus.TRIAL;
   const title =
@@ -88,6 +89,7 @@ export function getSubscriptionInfo(user?: User): {
 
   return {
     title,
+    isFree: title === "Free",
     trial,
     expiryDate,
     startDate,
