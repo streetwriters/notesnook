@@ -105,7 +105,7 @@ export function SyncTroubleshooting() {
       </Flex>
       <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
         <TroubleshootingAction
-          icon={CloudArrowDown}
+          icon={CloudArrowUp}
           title={strings.forcePushChanges()}
           description="Upload this device's changes to the server"
           isLoading={workIndex === 0}
@@ -115,7 +115,7 @@ export function SyncTroubleshooting() {
           sx={{ width: "1px", height: "70px", flexShrink: 0, bg: "border" }}
         />
         <TroubleshootingAction
-          icon={CloudArrowUp}
+          icon={CloudArrowDown}
           title={strings.forcePullChanges()}
           description="Replace local data with the latest server version."
           isLoading={workIndex === 1}
