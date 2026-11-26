@@ -68,6 +68,14 @@ const sectionHeading: ThemeUIStyleObject = {
   color: "accent"
 };
 
+const pageHeading: ThemeUIStyleObject = {
+  variant: "text.default",
+  fontSize: "lg",
+  fontWeight: 600,
+  lineHeight: 1,
+  color: "heading"
+};
+
 export const textVariants = {
   default: defaultVariant,
   heading,
@@ -76,5 +84,6 @@ export const textVariants = {
   body,
   subBody,
   error,
-  sectionHeading
+  sectionHeading,
+  pageHeading
 };

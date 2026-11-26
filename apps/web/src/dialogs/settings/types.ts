@@ -140,8 +140,7 @@ export type IconSettingComponent = BaseSettingComponent<"icon"> & {
 export type SettingsSubPage = {
   key: string;
   title: string;
-  groups?: SettingsGroup[];
-  component?: () => JSX.Element | null;
+  component: () => JSX.Element | null;
 };
 
 export type NavigationSettingComponent = BaseSettingComponent<"navigation"> &
