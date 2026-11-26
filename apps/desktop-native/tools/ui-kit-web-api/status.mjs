@@ -184,3 +184,67 @@ export const UNSUPPORTED = {
     reason: "the kit's ThemeScope provides the theme"
   }
 };
+
+const NO_SELECTORS =
+  "desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover";
+const NO_GRID = "desktop lays out with flexbox only; use Flex and widths";
+const NO_SCROLL_STYLE =
+  "scrollbars and scroll snapping are drawn by the platform; not styleable";
+const NO_TABLE = "desktop has no table layout";
+
+/** sx keys apps/web writes that desktop cannot draw, each with the reason. */
+export const SX_EXCEPTIONS = {
+  "-moz-appearance": "browser form-control styling; desktop inputs are drawn by the kit",
+  "::-webkit-inner-spin-button": "browser number-input spinner; desktop draws none",
+  "::-webkit-outer-spin-button": "browser number-input spinner; desktop draws none",
+  "::placeholder": "pseudo-element; the kit's Input draws its placeholder in the placeholder colour",
+  ":disabled": "not a kit state; style from the disabled prop instead",
+  ":first-of-type": NO_SELECTORS,
+  ":last-of-type": NO_SELECTORS,
+  ":not(:first-of-type)": NO_SELECTORS,
+  ":hover:not(:disabled):not(:active)": NO_SELECTORS,
+  ":hover #profile-picture-edit": NO_SELECTORS,
+  ":hover #remove-item, :hover #add-item": NO_SELECTORS,
+  "[data-viewport-type=\"element\"]": NO_SELECTORS,
+  "&:focus": "use the :focus state key",
+  "&:hover": "use the :hover state key",
+  input: NO_SELECTORS,
+  th: NO_TABLE,
+  "th, td": NO_TABLE,
+  backgroundImage: "use experimental_backgroundImage; CSS url()/gradient strings are not parsed",
+  backgroundPosition: "use experimental_backgroundPosition",
+  backgroundSize: "use experimental_backgroundSize",
+  borderCollapse: NO_TABLE,
+  tableLayout: NO_TABLE,
+  colorScheme: "native form controls follow the kit theme, not a colour scheme",
+  fieldSizing: "inputs do not size to their content on desktop",
+  gridColumn: NO_GRID,
+  gridRow: NO_GRID,
+  gridTemplateColumns: NO_GRID,
+  gridTemplateRows: NO_GRID,
+  justifySelf: "a grid property; flexbox has alignSelf only",
+  listStyle: "desktop has no list markers",
+  msOverflowStyle: NO_SCROLL_STYLE,
+  scrollbarWidth: NO_SCROLL_STYLE,
+  scrollBehavior: NO_SCROLL_STYLE,
+  scrollSnapAlign: NO_SCROLL_STYLE,
+  scrollSnapStop: NO_SCROLL_STYLE,
+  scrollSnapType: NO_SCROLL_STYLE,
+  postion: "a typo for position in apps/web; it has no effect there either",
+  resize: "desktop text areas have no resize handle",
+  scale: "use transform: [{ scale }]",
+  textWrap: "balance/pretty wrapping is not in the desktop text layout",
+  transformOrigin: "desktop transforms always use the element's centre",
+  WebkitBackgroundClip: "text clipping of a background is not drawn",
+  WebkitTextFillColor: "text clipping of a background is not drawn",
+  WebkitBoxOrient: "use lineClamp",
+  WebkitLineClamp: "use lineClamp",
+  wordSpacing: "the desktop text layout has letterSpacing only"
+};
+
+/** The reason an sx key is not drawn on desktop, or undefined. */
+export function sxException(key) {
+  if (key in SX_EXCEPTIONS) return SX_EXCEPTIONS[key];
+  if (/^[&.:[]/.test(key) || /[\s>+,]/.test(key)) return NO_SELECTORS;
+  return undefined;
+}

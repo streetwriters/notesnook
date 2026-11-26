@@ -196,6 +196,13 @@ type LayoutProps = {
   maxHeight?: Responsive<Length>;
   aspectRatio?: number;
   overflow?: "visible" | "hidden" | "scroll";
+  /** Desktop has one overflow for both axes; the last one written wins. */
+  overflowX?: "visible" | "hidden" | "scroll" | "auto";
+  overflowY?: "visible" | "hidden" | "scroll" | "auto";
+  /** Sets top, right, bottom and left to the same length. */
+  inset?: Length;
+  /** theme-ui's width + height shorthand. */
+  size?: Responsive<Length>;
 };
 
 type AppearanceProps = {
@@ -219,6 +226,17 @@ type AppearanceProps = {
   borderBottomColor?: ColorValue;
   borderLeftColor?: ColorValue;
   borderWidth?: number;
+  borderTopWidth?: number;
+  borderRightWidth?: number;
+  borderBottomWidth?: number;
+  borderLeftWidth?: number;
+  borderStyle?: BorderLineStyle;
+  /** A colour only; gradients and images are not drawn. */
+  background?: ColorValue;
+  /** "none", or width, style and colour together. */
+  outline?: "none" | `${number}px ${BorderLineStyle} ${ColorToken}`;
+  /** hidden draws nothing and takes no pointer events, but keeps its space. */
+  visibility?: "visible" | "hidden";
   outlineColor?: ColorValue;
   outlineWidth?: number;
   outlineOffset?: number;
@@ -240,6 +258,11 @@ type TextStyleProps = {
   letterSpacing?: number;
   textAlign?: "left" | "center" | "right" | "justify";
   textDecorationLine?: "none" | "underline" | "line-through";
+  textDecoration?: "none" | "underline" | "line-through";
+  textDecorationColor?: ColorValue;
+  /** Desktop always wraps long words; accepted for parity. */
+  overflowWrap?: "normal" | "break-word" | "anywhere";
+  wordWrap?: "normal" | "break-word";
   textTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
   textOverflow?: "clip" | "ellipsis";
   whiteSpace?: "normal" | "nowrap" | "pre" | "pre-wrap";

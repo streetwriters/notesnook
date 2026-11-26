@@ -577,94 +577,80 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 
 ### sx keys
 
-174 different keys are written in `sx` objects; 89 are in the contract. The rest are listed here and do not fail the check.
+174 different keys are written in `sx` objects; 103 are in the contract. The rest are listed here with the reason desktop does not draw them; they do not fail the check.
 
-| Key | Uses | Example |
-|---|---:|---|
-| `-moz-appearance` | 1 | src/components/otp-input/index.tsx |
-| `::-webkit-inner-spin-button` | 1 | src/components/otp-input/index.tsx |
-| `::-webkit-outer-spin-button` | 1 | src/components/otp-input/index.tsx |
-| `::placeholder` | 1 | src/components/editor/title-box.tsx |
-| `:disabled` | 1 | src/components/field/index.tsx |
-| `:first-of-type` | 1 | src/dialogs/mfa/steps.tsx |
-| `:hover #profile-picture-edit` | 1 | src/dialogs/settings/components/user-profile.tsx |
-| `:hover #remove-item, :hover #add-item` | 1 | src/dialogs/settings/components/customize-toolbar.tsx |
-| `:hover:not(:disabled):not(:active)` | 2 | src/dialogs/add-reminder-dialog.tsx |
-| `:last-of-type` | 1 | src/dialogs/settings/components/customize-toolbar.tsx |
-| `:not(:first-of-type)` | 1 | src/views/auth.tsx |
-| `.editor-container` | 1 | src/components/editor/tiptap.tsx |
-| `.editor-loading-container.hidden` | 1 | src/components/editor/tiptap.tsx |
-| `.match` | 2 | src/components/search-result/index.tsx |
-| `.rpv-core__popover-body, .rpv-core__arrow` | 1 | src/components/pdf-preview/index.tsx |
-| `.rpv-core__textbox` | 1 | src/components/pdf-preview/index.tsx |
-| `.rpv-search__popover .rpv-core__button` | 1 | src/components/pdf-preview/index.tsx |
-| `.rpv-search__popover .rpv-core__minimal-button` | 1 | src/components/pdf-preview/index.tsx |
-| `.rpv-search__popover .rpv-core__textbox` | 1 | src/components/pdf-preview/index.tsx |
-| `.rpv-search__popover label, .rpv-search__popover span` | 1 | src/components/pdf-preview/index.tsx |
-| `.rpv-search__popover-label-checkbox` | 1 | src/components/pdf-preview/index.tsx |
-| `.tiptap.ProseMirror` | 1 | src/components/editor/tiptap.tsx |
-| `[data-viewport-type="element"]` | 1 | src/views/notebooks.tsx |
-| `& + svg` | 1 | src/dialogs/settings/components/inbox-api-keys.tsx |
-| `& > *` | 1 | src/dialogs/settings/index.tsx |
-| `& > label` | 1 | src/dialogs/settings/index.tsx |
-| `& label` | 2 | src/components/properties/toggle.tsx |
-| `& path` | 1 | src/dialogs/buy-dialog/upgrade-dialog.tsx |
-| `& strong` | 1 | src/views/wrapped.tsx |
-| `&::-webkit-scrollbar` | 1 | src/views/wrapped.tsx |
-| `&:focus` | 1 | src/components/otp-input/index.tsx |
-| `&:hover` | 1 | src/components/monthly-activity-heatmap/index.tsx |
-| `&:hover .add-sub-notebook, &:focus-within .add-sub-notebook` | 1 | src/components/notebook-picker.tsx |
-| `&:hover .bar` | 1 | src/components/monthly-activity-heatmap/index.tsx |
-| `&:hover .tooltip` | 1 | src/components/monthly-activity-heatmap/index.tsx |
-| `&:hover svg path` | 5 | src/components/editor/action-bar.tsx |
-| `&.active` | 1 | src/components/editor/table-of-contents.tsx |
-| `&.active p` | 1 | src/components/editor/table-of-contents.tsx |
-| `&.active path` | 1 | src/components/editor/table-of-contents.tsx |
-| `background` | 11 | src/components/editor/index.tsx |
-| `backgroundImage` | 1 | src/views/wrapped.tsx |
-| `backgroundPosition` | 1 | src/views/wrapped.tsx |
-| `backgroundSize` | 2 | src/components/lightbox/index.tsx |
-| `borderBottomWidth` | 1 | src/components/diff-viewer/index.tsx |
-| `borderCollapse` | 1 | src/dialogs/inbox-history-dialog.tsx |
-| `borderRightWidth` | 1 | src/components/diff-viewer/index.tsx |
-| `borderStyle` | 1 | src/components/diff-viewer/index.tsx |
-| `colorScheme` | 1 | src/components/field/index.tsx |
-| `fieldSizing` | 1 | src/components/editor/title-box.tsx |
-| `gridColumn` | 2 | src/dialogs/settings/components/subscription-status.tsx |
-| `gridRow` | 2 | src/dialogs/settings/components/subscription-status.tsx |
-| `gridTemplateColumns` | 8 | src/components/announcements/body.jsx |
-| `gridTemplateRows` | 2 | src/dialogs/settings/components/subscription-status.tsx |
-| `input` | 13 | src/components/filtered-list/index.tsx |
-| `inset` | 1 | src/dialogs/buy-dialog/plan-list.tsx |
-| `justifySelf` | 2 | src/components/auth-container/index.jsx |
-| `listStyle` | 1 | src/components/notebook-picker.tsx |
-| `msOverflowStyle` | 1 | src/views/wrapped.tsx |
-| `outline` | 2 | src/components/otp-input/index.tsx |
-| `overflowWrap` | 6 | src/components/dialog/index.tsx |
-| `overflowX` | 3 | src/components/editor/action-bar.tsx |
-| `overflowY` | 16 | src/components/dialog/index.tsx |
-| `postion` | 1 | src/views/plans.tsx |
-| `resize` | 3 | src/components/editor/title-box.tsx |
-| `scale` | 1 | src/views/plans.tsx |
-| `scrollbarWidth` | 1 | src/views/wrapped.tsx |
-| `scrollBehavior` | 1 | src/views/wrapped.tsx |
-| `scrollSnapAlign` | 4 | src/app.tsx |
-| `scrollSnapStop` | 4 | src/app.tsx |
-| `scrollSnapType` | 1 | src/views/wrapped.tsx |
-| `size` | 6 | src/components/navigation-menu/index.tsx |
-| `tableLayout` | 1 | src/dialogs/inbox-history-dialog.tsx |
-| `textDecoration` | 19 | src/components/notebook-header.tsx |
-| `textDecorationColor` | 1 | src/views/wrapped.tsx |
-| `textWrap` | 2 | src/components/notice/index.tsx |
-| `th` | 3 | src/dialogs/attachments-dialog.tsx |
-| `th, td` | 1 | src/dialogs/inbox-history-dialog.tsx |
-| `transformOrigin` | 2 | src/components/auth-container/index.jsx |
-| `visibility` | 5 | src/app.tsx |
-| `WebkitBackgroundClip` | 1 | src/views/wrapped.tsx |
-| `WebkitBoxOrient` | 1 | src/components/list-item/index.tsx |
-| `WebkitLineClamp` | 1 | src/components/list-item/index.tsx |
-| `WebkitTextFillColor` | 1 | src/views/wrapped.tsx |
-| `wordSpacing` | 3 | src/components/dialog/index.tsx |
-| `wordWrap` | 4 | src/dialogs/migration-dialog.tsx |
+| Key | Uses | Example | Note |
+|---|---:|---|---|
+| `-moz-appearance` | 1 | src/components/otp-input/index.tsx | browser form-control styling; desktop inputs are drawn by the kit |
+| `::-webkit-inner-spin-button` | 1 | src/components/otp-input/index.tsx | browser number-input spinner; desktop draws none |
+| `::-webkit-outer-spin-button` | 1 | src/components/otp-input/index.tsx | browser number-input spinner; desktop draws none |
+| `::placeholder` | 1 | src/components/editor/title-box.tsx | pseudo-element; the kit's Input draws its placeholder in the placeholder colour |
+| `:disabled` | 1 | src/components/field/index.tsx | not a kit state; style from the disabled prop instead |
+| `:first-of-type` | 1 | src/dialogs/mfa/steps.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `:hover #profile-picture-edit` | 1 | src/dialogs/settings/components/user-profile.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `:hover #remove-item, :hover #add-item` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `:hover:not(:disabled):not(:active)` | 2 | src/dialogs/add-reminder-dialog.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `:last-of-type` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `:not(:first-of-type)` | 1 | src/views/auth.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.editor-container` | 1 | src/components/editor/tiptap.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.editor-loading-container.hidden` | 1 | src/components/editor/tiptap.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.match` | 2 | src/components/search-result/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-core__popover-body, .rpv-core__arrow` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-core__textbox` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-search__popover .rpv-core__button` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-search__popover .rpv-core__minimal-button` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-search__popover .rpv-core__textbox` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-search__popover label, .rpv-search__popover span` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.rpv-search__popover-label-checkbox` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `.tiptap.ProseMirror` | 1 | src/components/editor/tiptap.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `[data-viewport-type="element"]` | 1 | src/views/notebooks.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `& + svg` | 1 | src/dialogs/settings/components/inbox-api-keys.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `& > *` | 1 | src/dialogs/settings/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `& > label` | 1 | src/dialogs/settings/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `& label` | 2 | src/components/properties/toggle.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `& path` | 1 | src/dialogs/buy-dialog/upgrade-dialog.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `& strong` | 1 | src/views/wrapped.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&::-webkit-scrollbar` | 1 | src/views/wrapped.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&:focus` | 1 | src/components/otp-input/index.tsx | use the :focus state key |
+| `&:hover` | 1 | src/components/monthly-activity-heatmap/index.tsx | use the :hover state key |
+| `&:hover .add-sub-notebook, &:focus-within .add-sub-notebook` | 1 | src/components/notebook-picker.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&:hover .bar` | 1 | src/components/monthly-activity-heatmap/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&:hover .tooltip` | 1 | src/components/monthly-activity-heatmap/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&:hover svg path` | 5 | src/components/editor/action-bar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&.active` | 1 | src/components/editor/table-of-contents.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&.active p` | 1 | src/components/editor/table-of-contents.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `&.active path` | 1 | src/components/editor/table-of-contents.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `backgroundImage` | 1 | src/views/wrapped.tsx | use experimental_backgroundImage; CSS url()/gradient strings are not parsed |
+| `backgroundPosition` | 1 | src/views/wrapped.tsx | use experimental_backgroundPosition |
+| `backgroundSize` | 2 | src/components/lightbox/index.tsx | use experimental_backgroundSize |
+| `borderCollapse` | 1 | src/dialogs/inbox-history-dialog.tsx | desktop has no table layout |
+| `colorScheme` | 1 | src/components/field/index.tsx | native form controls follow the kit theme, not a colour scheme |
+| `fieldSizing` | 1 | src/components/editor/title-box.tsx | inputs do not size to their content on desktop |
+| `gridColumn` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
+| `gridRow` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
+| `gridTemplateColumns` | 8 | src/components/announcements/body.jsx | desktop lays out with flexbox only; use Flex and widths |
+| `gridTemplateRows` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
+| `input` | 13 | src/components/filtered-list/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `justifySelf` | 2 | src/components/auth-container/index.jsx | a grid property; flexbox has alignSelf only |
+| `listStyle` | 1 | src/components/notebook-picker.tsx | desktop has no list markers |
+| `msOverflowStyle` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
+| `postion` | 1 | src/views/plans.tsx | a typo for position in apps/web; it has no effect there either |
+| `resize` | 3 | src/components/editor/title-box.tsx | desktop text areas have no resize handle |
+| `scale` | 1 | src/views/plans.tsx | use transform: [{ scale }] |
+| `scrollbarWidth` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
+| `scrollBehavior` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
+| `scrollSnapAlign` | 4 | src/app.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
+| `scrollSnapStop` | 4 | src/app.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
+| `scrollSnapType` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
+| `tableLayout` | 1 | src/dialogs/inbox-history-dialog.tsx | desktop has no table layout |
+| `textWrap` | 2 | src/components/notice/index.tsx | balance/pretty wrapping is not in the desktop text layout |
+| `th` | 3 | src/dialogs/attachments-dialog.tsx | desktop has no table layout |
+| `th, td` | 1 | src/dialogs/inbox-history-dialog.tsx | desktop has no table layout |
+| `transformOrigin` | 2 | src/components/auth-container/index.jsx | desktop transforms always use the element's centre |
+| `WebkitBackgroundClip` | 1 | src/views/wrapped.tsx | text clipping of a background is not drawn |
+| `WebkitBoxOrient` | 1 | src/components/list-item/index.tsx | use lineClamp |
+| `WebkitLineClamp` | 1 | src/components/list-item/index.tsx | use lineClamp |
+| `WebkitTextFillColor` | 1 | src/views/wrapped.tsx | text clipping of a background is not drawn |
+| `wordSpacing` | 3 | src/components/dialog/index.tsx | the desktop text layout has letterSpacing only |
 
 <!-- generated:end -->

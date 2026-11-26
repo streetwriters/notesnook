@@ -20,6 +20,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { describe, expect, test } from "vitest";
 import { convertDeclarations, convertOutline, expandFlex } from "./convert";
 
+describe("sx keys taken from apps/web", () => {
+  test("overflowX/overflowY set overflow; auto scrolls", () => {
+    expect(convertDeclarations({ overflowY: "auto" }).style.overflow).toBe(
+      "scroll"
+    );
+    expect(convertDeclarations({ overflowX: "hidden" }).style.overflow).toBe(
+      "hidden"
+    );
+  });
+
+  test("inset sets every side", () => {
+    const { style } = convertDeclarations({ inset: 0 });
+    expect(style).toMatchObject({ top: 0, right: 0, bottom: 0, left: 0 });
+    expect(convertDeclarations({ inset: "4px" }).style.left).toBe(4);
+  });
+
+  test("size sets width and height", () => {
+    expect(convertDeclarations({ size: "20px" }).style).toMatchObject({
+      width: 20,
+      height: 20
+    });
+  });
+
+  test("textDecoration becomes textDecorationLine", () => {
+    expect(convertDeclarations({ textDecoration: "underline" }).style).toEqual(
+      expect.objectContaining({ textDecorationLine: "underline" })
+    );
+  });
+
+  test("visibility hidden draws nothing and takes no pointer events", () => {
+    const { style } = convertDeclarations({ visibility: "hidden" });
+    expect(style).toMatchObject({ opacity: 0, pointerEvents: "none" });
+    expect(
+      convertDeclarations({ visibility: "visible" }).style.opacity
+    ).toBeUndefined();
+  });
+
+  test("overflowWrap and wordWrap are dropped", () => {
+    const { style } = convertDeclarations({
+      overflowWrap: "anywhere",
+      wordWrap: "break-word"
+    });
+    expect(style.overflowWrap).toBeUndefined();
+    expect(style.wordWrap).toBeUndefined();
+  });
+
+  test("border side widths, style and textDecorationColor pass through", () => {
+    expect(
+      convertDeclarations({
+        borderBottomWidth: 1,
+        borderStyle: "dashed",
+        textDecorationColor: "red"
+      }).style
+    ).toMatchObject({
+      borderBottomWidth: 1,
+      borderStyle: "dashed",
+      textDecorationColor: "red"
+    });
+  });
+});
+
 describe("flex shorthand", () => {
   test("a bare number is grow with a 0% basis", () => {
     expect(expandFlex(1)).toEqual({

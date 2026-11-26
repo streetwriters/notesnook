@@ -275,12 +275,35 @@ export function convertDeclarations(
         continue;
       }
       case "wordBreak":
+      case "overflowWrap":
+      case "wordWrap":
       case "transition":
       case "animation":
         continue;
       case "overflowX":
       case "overflowY":
-        style.overflow = value;
+        style.overflow = value === "auto" ? "scroll" : value;
+        continue;
+      case "inset":
+        for (const side of ["top", "right", "bottom", "left"])
+          for (const [, v] of convertValue(side, value)) style[side] = v;
+        continue;
+      case "size":
+        for (const dimension of ["width", "height"])
+          for (const [, v] of convertValue(dimension, value))
+            style[dimension] = v;
+        continue;
+      case "textDecoration":
+        if (typeof value === "string" && !/\s/.test(value)) {
+          style.textDecorationLine = value;
+          continue;
+        }
+        break;
+      case "visibility":
+        if (value === "hidden") {
+          style.opacity = 0;
+          style.pointerEvents = "none";
+        }
         continue;
     }
     for (const [convertedKey, convertedValue] of convertValue(key, value)) {

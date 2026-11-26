@@ -53,7 +53,8 @@ const TEXT_KEYS = [
   "letterSpacing",
   "textAlign",
   "textTransform",
-  "textDecorationLine"
+  "textDecorationLine",
+  "textDecorationColor"
 ] as const;
 
 type Style = Record<string, unknown>;

@@ -22,7 +22,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadContract } from "./contract.mjs";
 import { scan } from "./scan.mjs";
-import { PLANNED_FIXES, SUBSET, UNSUPPORTED } from "./status.mjs";
+import {
+  PLANNED_FIXES,
+  SUBSET,
+  UNSUPPORTED,
+  sxException
+} from "./status.mjs";
 
 const START = "<!-- generated:start -->";
 const END = "<!-- generated:end -->";
@@ -243,11 +248,19 @@ function render({ files, rows, sx }) {
   out.push(
     `${sx.length} different keys are written in \`sx\` objects; ` +
       `${sx.length - missing.length} are in the contract. ` +
-      "The rest are listed here and do not fail the check."
+      "The rest are listed here with the reason desktop does not draw them; they do not fail the check."
   );
-  out.push("", "| Key | Uses | Example |", "|---|---:|---|");
+  out.push(
+    "",
+    "| Key | Uses | Example | Note |",
+    "|---|---:|---|---|"
+  );
   for (const row of missing)
-    out.push(`| \`${cell(row.name)}\` | ${row.uses} | ${cell(row.where)} |`);
+    out.push(
+      `| \`${cell(row.name)}\` | ${row.uses} | ${cell(row.where)} | ${cell(
+        sxException(row.name) ?? "no decision yet"
+      )} |`
+    );
   return out.join("\n");
 }
 

@@ -164,7 +164,7 @@ export const outline: SxProp = {
 };
 
 export const outlineShorthand: SxProp = {
-  // @ts-expect-error use outlineColor and outlineWidth
+  // @ts-expect-error outline needs a colour too
   outline: "2px solid"
 };
 
@@ -314,6 +314,25 @@ export const webShaped = [
   />,
   <Text key="3" as="a" href="https://notesnook.com" target="_blank" />,
   <Text key="4" sx={{ lineClamp: 2 }} />,
+  <Text
+    key="4b"
+    sx={{
+      textDecoration: "underline",
+      textDecorationColor: "accent",
+      overflowWrap: "anywhere",
+      wordWrap: "break-word",
+      overflowX: "auto",
+      overflowY: "hidden",
+      inset: 0,
+      size: 20,
+      background: "background",
+      borderStyle: "solid",
+      borderBottomWidth: 1,
+      borderRightWidth: 1,
+      outline: "none",
+      visibility: "hidden"
+    }}
+  />,
   <Text key="5" dangerouslySetInnerHTML={{ __html: "<b>bold</b>" }} />,
   <Image key="6" src="a.png" alt="A" sx={{ objectFit: "contain" }} />,
   <Input
