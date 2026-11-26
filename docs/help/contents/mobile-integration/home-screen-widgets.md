@@ -98,7 +98,7 @@ The Notes widget needs iOS 17 or later.
 
 ![The large Notes widget on an iOS home screen showing seven recent notes and page arrows](/static/mobile-integration/ios-notes-widget-large.png)
 
-On the medium and large widgets, tap `+` in the header to start a new note. When a source has more notes than fit, arrows with a page count such as `1/3` appear in the header. Tap them to move between pages. The small widget shows only the first note of the source.
+On the medium and large widgets, tap `+` in the header to start a new note. When the widget shows a notebook, tag or color, the note is created inside it. For `Recent`, `Pinned` and `Favorites` it is a regular new note. For a notebook, tag or color, an open icon next to `+` takes you to that notebook, tag or color in the app. When a source has more notes than fit, arrows with a page count such as `1/3` appear in the header. Tap them to move between pages. The small widget shows only the first note of the source.
 
 :::
 
