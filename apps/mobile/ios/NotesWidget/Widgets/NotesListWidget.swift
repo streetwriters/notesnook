@@ -6,9 +6,28 @@ struct NotesListSource: Codable, Hashable, Identifiable {
   let key: String
   let title: String
   let type: String?
+  var itemId: String? = nil
   var id: String { key }
 
+  private enum CodingKeys: String, CodingKey {
+    case key, title, type
+    case itemId = "id"
+  }
+
   static let recent = NotesListSource(key: "recent", title: "Recent", type: "recent")
+
+  private var scope: (type: String, id: String)? {
+    guard let type, let itemId, ["notebook", "tag", "color"].contains(type) else { return nil }
+    return (type, itemId)
+  }
+
+  var newNoteURL: URL {
+    scope.map { WidgetLink.newNote(type: $0.type, id: $0.id) } ?? WidgetLink.newNote
+  }
+
+  var openURL: URL? {
+    scope.map { WidgetLink.openSource(type: $0.type, id: $0.id) }
+  }
 }
 
 struct NotesListData {
@@ -111,10 +130,13 @@ struct NotesListView: View {
         WidgetHeader(
           title: data.source.title,
           actionIcon: "plus",
-          actionURL: WidgetLink.newNote,
+          actionURL: data.source.newNoteURL,
           titleURL: WidgetLink.pickSource(slot: data.slot)
         ) {
-          pager
+          HStack(spacing: 10) {
+            pager
+            openButton
+          }
         }
         if data.notes.isEmpty {
           WidgetEmptyState(systemImage: "doc.text", text: entry.strings[.noNotes])
@@ -131,6 +153,17 @@ struct NotesListView: View {
             )
           }
         }
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var openButton: some View {
+    if let url = data.source.openURL {
+      Link(destination: url) {
+        Image(systemName: "arrow.up.right.square")
+          .font(.system(size: 14, weight: .semibold))
+          .foregroundColor(WidgetTheme.accent)
       }
     }
   }
