@@ -22,7 +22,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadContract } from "./contract.mjs";
 import { scan } from "./scan.mjs";
-import { EXCEPTIONS, SUBSET, UNSUPPORTED } from "./status.mjs";
+import { PLANNED_FIXES, SUBSET, UNSUPPORTED } from "./status.mjs";
 
 const START = "<!-- generated:start -->";
 const END = "<!-- generated:end -->";
@@ -45,6 +45,7 @@ const docPath = path.resolve(
   option("--doc") ?? path.join(appDir, "docs/ui-kit-web-api.md")
 );
 const write = !args.includes("--check");
+const hasPlan = (row) => row.note.startsWith("planned fix:");
 
 function lookup(table, component, item) {
   return table[`${component}.${item}`] ?? table[`*.${item}`];
@@ -64,7 +65,7 @@ function build() {
   const add = (library, component, kind, name, item, entry, found) => {
     used.add(`${component}.${item}`);
     const unsupported = lookup(UNSUPPORTED, component, item);
-    const exception = lookup(EXCEPTIONS, component, item);
+    const planned = lookup(PLANNED_FIXES, component, item);
     const subset = lookup(SUBSET, component, item);
     let status;
     let note = "";
@@ -76,14 +77,13 @@ function build() {
     } else if (found && !found.deprecated) {
       status = subset ? "subset" : "kept";
       note = subset ?? "";
-    } else if (exception) {
-      status = "exception";
-      note = exception;
     } else {
       status = "MISSING";
-      note = found
-        ? "only a deprecated member of the contract has this name"
-        : "not in the contract";
+      if (planned) note = `planned fix: ${planned}`;
+      else
+        note = found
+          ? "only a deprecated member of the contract has this name"
+          : "not in the contract";
     }
     rows.push({
       library,
@@ -213,11 +213,13 @@ function cell(text) {
 function render({ files, rows, sx }) {
   const count = (status) => rows.filter((row) => row.status === status).length;
   const out = [];
+  const planned = rows.filter(hasPlan).length;
   out.push(
     `Scanned ${files} files in \`apps/web/src\`: ${rows.length} items, ` +
       `${count("kept")} kept, ${count("subset")} subset, ` +
-      `${count("exception")} exceptions, ${count("not supported")} not supported ` +
-      `(none of them used), ${count("MISSING")} missing.`
+      `${count("not supported")} not supported (none of them used), ` +
+      `${count("MISSING")} missing (${planned} with a planned fix). ` +
+      "A missing item fails the check."
   );
   const libraries = [
     ...LIBRARY_ORDER,
@@ -276,9 +278,8 @@ const total = (status) =>
   result.rows.filter((row) => row.status === status).length;
 console.log(
   `ui-kit web API: ${result.rows.length} items from ${result.files} files; ` +
-    `${total("kept")} kept, ${total("subset")} subset, ${total(
-      "exception"
-    )} exceptions, ${failures.length} missing`
+    `${total("kept")} kept, ${total("subset")} subset, ` +
+    `${failures.length} missing (${failures.filter(hasPlan).length} with a planned fix)`
 );
 for (const row of failures)
   console.error(

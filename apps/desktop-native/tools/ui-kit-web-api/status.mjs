@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 const RAW_DOM =
-  "raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit";
+  "move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods";
 
 export const SUBSET = {
   "*.sx":
@@ -65,14 +65,16 @@ export const SUBSET = {
   "style.display": "the values desktop can lay out; no grid or inline"
 };
 
-export const EXCEPTIONS = {
+// Used by apps/web but not in the kit. Each one fails the check until the kit
+// has it or the call site stops using it; the text is the planned fix.
+export const PLANNED_FIXES = {
   "*.ref>closest": RAW_DOM,
   "*.ref>querySelector": RAW_DOM,
   "*.ref>appendChild": RAW_DOM,
   "*.ref>classList": RAW_DOM,
   "*.ref>outerHTML": RAW_DOM,
   "Image.maxHeight":
-    "not a theme-ui prop either (a .jsx file passes it through to the DOM, where it does nothing); the call site moves it into sx"
+    "theme-ui 0.16.1's Image has no maxHeight prop, so the 150px cap in apps/web's announcements/body.jsx never applies; delete it, or move it into sx if that changes what web draws (a decision for the user)"
 };
 
 const VIRTUOSO = { library: "react-virtuoso" };

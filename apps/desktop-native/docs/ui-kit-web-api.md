@@ -12,7 +12,7 @@ npm run check:web-api
 npm run check:web-api -- --check
 ```
 
-The command exits with 1 when `apps/web` uses something the contract does not have, has only as a deprecated alias, or lists as not supported.
+The command exits with 1 when `apps/web` uses something the contract does not have, even when the note gives a planned fix; when it has the name only as a deprecated alias; or when it lists the item as not supported.
 
 ## What the statuses mean
 
@@ -20,7 +20,7 @@ The command exits with 1 when `apps/web` uses something the contract does not ha
 |---|---|
 | kept | Same name and the same shape as on the web. |
 | subset | Same name; the type accepts less than the web's, and the note says what. Everything `apps/web` passes today still fits. |
-| exception | `apps/web` uses it, and it stays out of the kit on purpose. The note gives the reason and where the code goes instead. |
+| missing | `apps/web` uses it and the contract does not have it, or has it only as a deprecated alias. The note is the planned fix: the kit gets the API, or the call site stops using it. The check fails until then. |
 | not supported | Not in the contract. Allowed only while nothing in `apps/web` uses it; the check fails as soon as something does. |
 
 ## The contract in short
@@ -82,14 +82,15 @@ Three of the old props had a web name with a different shape, so they could not 
 - **`measureInWindow` is still required on `UIElement`.** While it is, a real DOM element is not assignable to `UIElement`. It becomes assignable when the deprecated names are removed.
 - **DOM type names.** `apps/web` writes `useRef<HTMLDivElement>` and `React.MouseEvent<HTMLInputElement>`. Desktop is type-checked without the DOM library, so those names do not exist there. The desktop implementation has to supply them as aliases of the `UI*` types before shared files can use them unchanged.
 - **`sx` keys.** `apps/web` writes CSS in `sx` that the contract rejects (selectors, grid, animations and so on). They are listed in the last table. They do not fail the check: each one needs a decision when its file is aligned, either to draw it on desktop and add it, or to rewrite the call site.
-- **Shape is checked by name.** The check compares names: props, the members a handler reads from its event, the members used on a ref, the keys of `components` and of `Modal`'s `style`, and named imports. Whether every value `apps/web` passes fits the type is proved by type-checking `apps/web` against the kit.
+- **Shape is checked by name, not by type.** The check compares names only: props, the members a handler reads from its event, the members used on a ref, the keys of `components` and of `Modal`'s `style`, and named imports. It does not compare the type of a value `apps/web` passes with the type the contract declares. A `kept` row proves the name exists, not that the value fits. The value types are proved by type-checking `apps/web` against the kit (plan item 5.3).
+- **Planned fixes.** Seven items `apps/web` uses are not in the kit, so the check fails on them: five raw DOM methods read from refs (`closest`, `querySelector`, `appendChild`, `classList`, `outerHTML`) and `Image`'s `maxHeight`. The call sites are fixed when they are aligned. Deleting `maxHeight` or moving it into `sx` changes what web draws, so that choice is for the user.
 - **What the scan cannot see.** It reads the source without type-checking it. It follows app components whose props type extends a library's (`FieldProps = InputProps & …`), but not props that travel only through a spread of an untyped object, and not components chosen at runtime.
 
 ## Generated table
 
 <!-- generated:start -->
 
-Scanned 339 files in `apps/web/src`: 464 items, 353 kept, 70 subset, 7 exceptions, 34 not supported (none of them used), 0 missing.
+Scanned 339 files in `apps/web/src`: 464 items, 353 kept, 70 subset, 34 not supported (none of them used), 7 missing (7 with a planned fix). A missing item fails the check.
 
 ### theme-ui
 
@@ -123,9 +124,9 @@ Scanned 339 files in `apps/web/src`: 464 items, 353 kept, 70 subset, 7 exception
 | Box | `onKeyPress → key` | event | 2 | kept |  |
 | Box | `onSubmit → preventDefault` | event | 4 | kept |  |
 | Box | `onSubmit → target` | event | 4 | kept |  |
-| Box | `ref.current.closest` | ref | 2 | exception | raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit |
+| Box | `ref.current.closest` | ref | 2 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
 | Box | `ref.current.offsetTop` | ref | 2 | kept |  |
-| Box | `ref.current.outerHTML` | ref | 1 | exception | raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit |
+| Box | `ref.current.outerHTML` | ref | 1 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
 | Button | `aria-label` | prop | 4 | kept |  |
 | Button | `bg` | prop | 2 | kept |  |
 | Button | `children` | prop | 167 | kept |  |
@@ -224,18 +225,18 @@ Scanned 339 files in `apps/web/src`: 464 items, 353 kept, 70 subset, 7 exception
 | Flex | `onMouseDown → preventDefault` | event | 1 | kept |  |
 | Flex | `onSubmit → preventDefault` | event | 6 | kept |  |
 | Flex | `onSubmit → target` | event | 2 | kept |  |
-| Flex | `ref.current.appendChild` | ref | 1 | exception | raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit |
-| Flex | `ref.current.classList` | ref | 1 | exception | raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit |
-| Flex | `ref.current.closest` | ref | 1 | exception | raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit |
+| Flex | `ref.current.appendChild` | ref | 1 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
+| Flex | `ref.current.classList` | ref | 1 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
+| Flex | `ref.current.closest` | ref | 1 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
 | Flex | `ref.current.focus` | ref | 1 | kept |  |
 | Flex | `ref.current.getBoundingClientRect` | ref | 1 | kept |  |
-| Flex | `ref.current.querySelector` | ref | 2 | exception | raw DOM access; the code that needs it moves behind @platform or the native editor, not into the kit |
+| Flex | `ref.current.querySelector` | ref | 2 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
 | Grid | `children` | prop | 2 | kept |  |
 | Grid | `columns` | prop | 1 | kept |  |
 | Grid | `sx` | prop | 2 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
 | Image | `alt` | prop | 1 | kept |  |
 | Image | `draggable` | prop | 1 | kept |  |
-| Image | `maxHeight` | prop | 1 | exception | not a theme-ui prop either (a .jsx file passes it through to the DOM, where it does nothing); the call site moves it into sx |
+| Image | `maxHeight` | prop | 1 | MISSING | planned fix: theme-ui 0.16.1's Image has no maxHeight prop, so the 150px cap in apps/web's announcements/body.jsx never applies; delete it, or move it into sx if that changes what web draws (a decision for the user) |
 | Image | `onClick` | prop | 1 | kept |  |
 | Image | `onDoubleClick` | prop | 1 | kept |  |
 | Image | `onLoad` | prop | 1 | kept |  |

@@ -27,12 +27,17 @@ import type {
   UITextAreaElement
 } from "./elements";
 import type {
+  ContextMenuEvent,
+  FocusEvent,
+  HoverEvent,
+  KeyEvent,
+  PressEvent,
   UIChangeEvent,
   UIDragEvent,
   UIKeyboardEvent,
   UIMouseEvent
 } from "./events";
-import { Dialog, Modal } from "./dialog";
+import { Dialog, DialogButton, Modal } from "./dialog";
 import { Pane, ScrollContainer, SplitPane } from "./layout";
 import {
   GroupedVirtuoso,
@@ -40,6 +45,8 @@ import {
   VirtualList,
   Virtuoso,
   type Components,
+  type VirtualListHandle,
+  type VirtualListProps,
   type VirtuosoHandle
 } from "./lists";
 import {
@@ -491,12 +498,49 @@ export const deprecatedAliases = [
     onValueChange={(value) => value.length}
   />,
   <Box key="9" droppable onDropFiles={(files) => files.length} />,
-  <Dialog key="10" testID="dialog" isOpen />
+  <Dialog key="10" testID="dialog" isOpen />,
+  <Radio key="11" onCheckedChange={(checked) => !checked} />,
+  <Textarea key="12" onChangeText={(text) => text.length} />,
+  <Box key="13" acceptsFiles={["image/png"]} />,
+  <Box
+    key="14"
+    onDrop={(event) => [event.payload, event.x + event.y, event.dropped]}
+  />,
+  <VirtualList
+    key="15"
+    count={1}
+    renderItem={() => null}
+    itemKey={() => ""}
+    estimatedItemSize={10}
+    testID="list"
+  />,
+  <DialogButton key="16" text="OK" testID="ok" onClick={() => undefined} />
 ];
 
 export function deprecatedMeasure(element: UIElement) {
   element.measureInWindow((x, y, width, height) => x + y + width + height);
 }
+
+export function deprecatedEventTypes(
+  press: PressEvent,
+  hover: HoverEvent,
+  key: KeyEvent,
+  focus: FocusEvent,
+  menu: ContextMenuEvent
+) {
+  return [press.x + press.y, hover.pageX, key.key, focus.target, menu.clientX];
+}
+
+export function deprecatedListTypes(handle: VirtualListHandle) {
+  return handle.scrollToIndex;
+}
+
+export const deprecatedListProps: VirtualListProps = {
+  count: 1,
+  renderItem: () => null,
+  itemKey: () => "",
+  estimatedItemSize: 10
+};
 
 export const strict = [
   // @ts-expect-error onChange delivers an event, not the checked value
