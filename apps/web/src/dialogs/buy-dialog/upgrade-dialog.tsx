@@ -102,7 +102,6 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
       sx={{
         borderRadius: "radius3",
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-        // BaseDialog's empty header already provides the top padding
         pb: "spacing7"
       }}
     >
@@ -339,7 +338,6 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
                   alignSelf: "stretch",
                   px: "spacing4",
                   py: "spacing5",
-                  // Figma draws this stroke inside the button
                   border: "none",
                   boxShadow: "inset 0 0 0 1px var(--border)"
                 }}
