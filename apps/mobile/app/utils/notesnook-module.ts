@@ -65,6 +65,11 @@ interface NotesnookModuleInterface {
   ) => Promise<boolean>;
   removeAllShortcuts: () => Promise<boolean>;
   getAllShortcuts: () => Promise<ShortcutInfo[]>;
+  getBackupStorageInfo: (treeUri: string) => Promise<{
+    internalFree: number;
+    targetFree: number;
+    sameVolume: boolean;
+  }>;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({
@@ -90,7 +95,9 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     removeShortcut: () => Promise.resolve(false),
     updateShortcut: () => Promise.resolve(false),
     removeAllShortcuts: () => Promise.resolve(false),
-    getAllShortcuts: () => Promise.resolve([])
+    getAllShortcuts: () => Promise.resolve([]),
+    getBackupStorageInfo: () =>
+      Promise.resolve({ internalFree: -1, targetFree: -1, sameVolume: true })
   },
   android: NativeModules.NNativeModule
 });
