@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Virtualizer } from "@tanstack/react-virtual";
 import { Flex } from "@theme-ui/components";
-import React, { useLayoutEffect, useRef, useState } from "react";
-import { TableVirtuoso } from "react-virtuoso";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { TableComponents, TableVirtuoso } from "react-virtuoso";
 
 export type VirtualizedTableRowProps<T, C> = {
   item: T;
@@ -66,6 +66,23 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
     );
   }, [scrollElement]);
 
+  const components = useMemo<TableComponents<T, C>>(
+    () => ({
+      Table: (props) => (
+        <table {...props} style={{ ...style, ...props.style }} />
+      ),
+      TableRow: (props) => (
+        <Row
+          index={props["data-item-index"]}
+          item={props.item}
+          style={props.style || {}}
+          context={props.context}
+        />
+      )
+    }),
+    [Row, style]
+  );
+
   return (
     <Flex
       ref={containerRef}
@@ -81,21 +98,7 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
         defaultItemHeight={estimatedSize}
         fixedHeaderContent={() => <>{header}</>}
         fixedItemHeight={mode === "fixed" ? estimatedSize : undefined}
-        components={{
-          Table: (props) => (
-            <table {...props} style={{ ...style, ...props.style }} />
-          ),
-          TableRow: (props) => {
-            return (
-              <Row
-                index={props["data-item-index"]}
-                item={props.item}
-                style={props.style || {}}
-                context={props.context}
-              />
-            );
-          }
-        }}
+        components={components}
       />
     </Flex>
   );

@@ -17,12 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Checkbox, Flex, Label, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
 import { formatBytes } from "@notesnook/common";
+import { Checkbox } from "../checkbox";
 import {
   AttachmentError,
-  Checkmark,
-  DoubleCheckmark,
   Download,
   FileDocument,
   FileGeneral,
@@ -218,7 +217,29 @@ export function Attachment({
   return (
     <Box
       as="tr"
-      sx={{ height: 25, ":hover": { bg: "hover" } }}
+      sx={{
+        height: 29,
+        cursor: "pointer",
+        ":hover": { bg: "hover" },
+        td: {
+          p: 0,
+          fontSize: "xs",
+          color: "paragraph",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis"
+        },
+        "td:first-of-type": {
+          pl: "spacing3",
+          borderTopLeftRadius: "3px",
+          borderBottomLeftRadius: "3px"
+        },
+        "td:last-of-type": {
+          pr: "spacing3",
+          borderTopRightRadius: "3px",
+          borderBottomRightRadius: "3px"
+        }
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -235,49 +256,40 @@ export function Attachment({
       style={style}
       ref={rowRef}
     >
-      {!compact && (
-        <td>
-          <Label>
-            <Checkbox
-              sx={{
-                width: 18,
-                height: 18,
-                color: isSelected ? "accent" : "icon"
-              }}
-              checked={isSelected}
-              onChange={onSelected}
-            />
-          </Label>
-        </td>
-      )}
       <td>
-        <Flex
-          sx={{
-            alignItems: "center",
-            ml: 2
-          }}
-        >
+        <Flex sx={{ alignItems: "center" }}>
+          <Checkbox
+            checked={!!isSelected}
+            aria-label={item.filename}
+            size={15}
+            checkboxUncheckedIconColor="icon-disabled"
+            onToggle={() => onSelected?.()}
+          />
+        </Flex>
+      </td>
+      <td>
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
           {status ? (
             status.type === "download" ? (
-              <Download size={16} color="accent" />
+              <Download size={15} color="accent" />
             ) : (
-              <Uploading size={16} color="accent" />
+              <Uploading size={15} color="accent" />
             )
           ) : processing?.failed || item.failed ? (
             <AttachmentError
               color={"icon-error"}
-              size={16}
+              size={15}
               title={processing?.failed || item.failed}
             />
           ) : processing?.working ? (
-            <Loading size={16} />
+            <Loading size={15} />
           ) : (
-            <FileIcon size={16} />
+            <FileIcon size={15} />
           )}
           <Text
-            variant="body"
             sx={{
-              ml: 1,
+              fontSize: "xs",
+              color: "paragraph",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis"
@@ -287,30 +299,10 @@ export function Attachment({
           </Text>
         </Flex>
       </td>
-      <Text as="td" variant="body">
-        {item.dateUploaded ? (
-          <DoubleCheckmark
-            sx={{ flexShrink: 0 }}
-            color={"accent"}
-            size={16}
-            title={strings.uploaded()}
-          />
-        ) : (
-          <Checkmark
-            sx={{ flexShrink: 0 }}
-            size={16}
-            title={strings.waitingForUpload()}
-          />
-        )}
-      </Text>
       <Text
         as="td"
-        variant="body"
         sx={{
-          color: status ? "accent" : "paragraph",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis"
+          color: status ? "accent" : "paragraph"
         }}
       >
         {status ? (
@@ -321,13 +313,9 @@ export function Attachment({
           formatBytes(item.size, compact ? 1 : 2)
         )}
       </Text>
-      {!compact && (
-        <Text as="td" variant="body">
-          {item.dateUploaded
-            ? getFormattedDate(item.dateUploaded, "date")
-            : "-"}
-        </Text>
-      )}
+      <Text as="td">
+        {item.dateUploaded ? getFormattedDate(item.dateUploaded, "date") : "-"}
+      </Text>
     </Box>
   );
 }
