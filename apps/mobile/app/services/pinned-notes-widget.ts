@@ -16,12 +16,34 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { db } from "../common/database";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { Platform } from "react-native";
 
 let timer: NodeJS.Timeout;
+
+async function getLockedNoteIds(ids: string[]) {
+  if (!ids.length) return new Set<string>();
+  const rows = await db
+    .sql()
+    .selectFrom("content")
+    .where("noteId", "in", ids)
+    .select(["noteId", "locked"])
+    .execute();
+  return new Set(rows.filter((row) => row.locked).map((row) => row.noteId));
+}
+
+export async function toWidgetNotes(notes: Note[]) {
+  const locked = await getLockedNoteIds(notes.map((note) => note.id));
+  return notes.map((note) => ({
+    id: note.id,
+    title: note.title || strings.untitledNote(),
+    headline: locked.has(note.id) ? "" : note.headline || "",
+    locked: locked.has(note.id)
+  }));
+}
 
 /**
  * Service to synchronize pinned notes from the Notesnook database to the native

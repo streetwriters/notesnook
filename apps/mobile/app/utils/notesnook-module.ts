@@ -35,7 +35,7 @@ interface NotesnookModuleInterface {
   getString: (storeName: string, key: string) => Promise<string>;
   removeString: (key: string) => void;
   cancelAndFinish: () => void;
-  getWidgetId: () => void;
+  getWidgetId: () => number;
   getIntent: () => {
     "com.streetwriters.notesnook.OpenNoteId"?: string;
     "com.streetwriters.notesnook.OpenReminderId"?: string;
@@ -46,6 +46,8 @@ interface NotesnookModuleInterface {
   updateWidgetNote: (noteId: string, data: string) => void;
   updateReminderWidget: () => void;
   updatePinnedNotesWidget: () => void;
+  updateNotesWidget: () => void;
+  getNotesWidgetSources: () => Promise<string[]>;
   refreshWidgets: () => void;
   isGestureNavigationEnabled: () => boolean;
   addShortcut: (
@@ -77,13 +79,15 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     setString: () => {},
     removeString: () => {},
     cancelAndFinish: () => {},
-    getWidgetId: () => {},
+    getWidgetId: () => 0,
     getIntent: () => {},
     getWidgetNotes: () => {},
     hasWidgetNote: () => {},
     updateWidgetNote: () => {},
     updateReminderWidget: () => {},
     updatePinnedNotesWidget: () => {},
+    updateNotesWidget: () => {},
+    getNotesWidgetSources: () => Promise.resolve([]),
     refreshWidgets: () => {},
     isGestureNavigationEnabled: () => true,
     addShortcut: () => Promise.resolve(false),

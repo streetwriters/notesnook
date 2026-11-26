@@ -17,6 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  updateListWidgets,
+  updateNoteWidgets,
+  WidgetRefresh
+} from "../services/widgets/update-widgets";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
@@ -81,8 +87,13 @@ import {
   setUpdateAvailableMessage
 } from "../services/message";
 import Navigation from "../services/navigation";
-import { NotePreviewWidget } from "../services/note-preview-widget";
-import { PinnedNotesWidget } from "../services/pinned-notes-widget";
+import { openEditor, setOnFirstSave } from "../screens/notes/common";
+import {
+  getWidgetPickerKind,
+  getWidgetPickerSlot,
+  useWidgetPicker
+} from "../screens/widget-picker";
+import { WidgetTheme } from "../services/widgets/widget-theme";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -164,6 +175,55 @@ const onUserSessionExpired = async () => {
   eSendEvent(eLoginSessionExpired);
 };
 
+type SourceType = "notebook" | "tag" | "color";
+
+const openSource = async (type: SourceType, id: string) => {
+  if (type === "notebook") {
+    const notebook = await db.notebooks.notebook(id);
+    if (!notebook) return false;
+    fluidTabsRef.current?.goToPage("home");
+    Navigation.navigate("Notebook", {
+      id: notebook.id,
+      canGoBack: true,
+      item: notebook
+    });
+  } else if (type === "tag") {
+    const tag = await db.tags.tag(id);
+    if (!tag) return false;
+    fluidTabsRef.current?.goToPage("home");
+    Navigation.navigate("TaggedNotes", {
+      type: "tag",
+      id: tag.id,
+      item: tag,
+      canGoBack: true
+    });
+  } else {
+    const color = await db.colors.color(id);
+    if (!color) return false;
+    fluidTabsRef.current?.goToPage("home");
+    Navigation.navigate("ColoredNotes", {
+      type: "color",
+      id: color.id,
+      item: color,
+      canGoBack: true
+    });
+  }
+  return true;
+};
+
+const openSourceLink = async (
+  type: SourceType,
+  id: string,
+  url: string,
+  isInitialUrl?: boolean
+) => {
+  const opened = isInitialUrl ? true : await openSource(type, id);
+  if (opened && new URL(url).searchParams.get("new") === "1") {
+    setOnFirstSave({ type, id });
+    openEditor();
+  }
+};
+
 const onAppOpenedFromURL = async (event: {
   url: string;
   isInitialUrl?: boolean;
@@ -175,6 +235,10 @@ const onAppOpenedFromURL = async (event: {
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
+    } else if (getWidgetPickerKind(url)) {
+      useWidgetPicker
+        .getState()
+        .open(getWidgetPickerKind(url)!, getWidgetPickerSlot(url));
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
@@ -198,65 +262,36 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      (parsedLink?.type === "notebook" ||
-        url.startsWith("https://app.notesnook.com/open_notebook?")) &&
-      !event.isInitialUrl
+      parsedLink?.type === "notebook" ||
+      url.startsWith("https://app.notesnook.com/open_notebook?")
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) {
-        const notebook = await db.notebooks.notebook(id);
-        if (notebook) {
-          fluidTabsRef.current?.goToPage("home");
-          Navigation.navigate("Notebook", {
-            id: notebook.id,
-            canGoBack: true,
-            item: notebook
-          });
-        }
-      }
+      if (id) await openSourceLink("notebook", id, url, event.isInitialUrl);
     } else if (
-      (parsedLink?.type === "tag" ||
-        url.startsWith("https://app.notesnook.com/open_tag?")) &&
-      !event.isInitialUrl
+      parsedLink?.type === "tag" ||
+      url.startsWith("https://app.notesnook.com/open_tag?")
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) {
-        const tag = await db.tags.tag(id);
-        if (tag) {
-          fluidTabsRef.current?.goToPage("home");
-          Navigation.navigate("TaggedNotes", {
-            type: "tag",
-            id: tag.id,
-            item: tag,
-            canGoBack: true
-          });
-        }
-      }
+      if (id) await openSourceLink("tag", id, url, event.isInitialUrl);
     } else if (
-      (parsedLink?.type === "color" ||
-        url.startsWith("https://app.notesnook.com/open_color?")) &&
-      !event.isInitialUrl
+      parsedLink?.type === "color" ||
+      url.startsWith("https://app.notesnook.com/open_color?")
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) {
-        const color = await db.colors.color(id);
-        if (color) {
-          fluidTabsRef.current?.goToPage("home");
-          Navigation.navigate("ColoredNotes", {
-            type: "color",
-            id: color.id,
-            item: color,
-            canGoBack: true
-          });
-        }
-      }
-    } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
+      if (id) await openSourceLink("color", id, url, event.isInitialUrl);
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_reminder") ||
+      url.startsWith("nn://open_reminder")
+    ) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
         if (reminder) AddReminder.present(reminder);
       }
-    } else if (url.startsWith("https://app.notesnook.com/new_reminder")) {
+    } else if (
+      url.startsWith("https://app.notesnook.com/new_reminder") ||
+      url.startsWith("nn://new_reminder")
+    ) {
       const reminderFeature = await isFeatureAvailable("activeReminders");
       if (!reminderFeature.isAllowed) {
         ToastManager.show({
@@ -342,6 +377,10 @@ const onLogout = async (reason: string) => {
   MMKV.clearStore();
   resetTabStore();
   clearAllStores();
+  // the database is empty by now, so these write out empty lists
+  NotePreviewWidget.clear();
+  updateListWidgets();
+  Notifications.updateRemindersForWidget().catch(() => {});
   setImmediate(() => {
     refreshAllStores();
   });
@@ -582,8 +621,9 @@ export const useAppEvents = () => {
     // Widgets outlive the app process, so they can be left showing content the app no longer has
     // (most obviously after the user clears app data). Nothing can run at that moment, so the
     // first launch afterwards is the earliest chance to put them right.
-    NotePreviewWidget.updateNotes();
-    PinnedNotesWidget.updateNotes();
+    updateNoteWidgets();
+    WidgetTheme.watch();
+    WidgetRefresh.watch();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;

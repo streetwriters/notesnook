@@ -26,7 +26,7 @@ export { default as Database } from "./api/index.js";
 export { DefaultColors } from "./collections/colors.js";
 export { EMPTY_CONTENT } from "./collections/content.js";
 export { type BackupFile, type LegacyBackupFile } from "./database/backup.js";
-export { type DatabaseUpdatedEvent } from "./database/index.js";
+export { type DatabaseUpdatedEvent, isFalse } from "./database/index.js";
 export { FilteredSelector } from "./database/sql-collection.js";
 export {
   getUpcomingReminder,

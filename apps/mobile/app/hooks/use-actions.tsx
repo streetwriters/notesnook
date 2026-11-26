@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
+import {
+  updateListWidgets,
+  updateNoteWidgets
+} from "../services/widgets/update-widgets";
 import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
 import {
   Color,
@@ -59,8 +63,8 @@ import {
   VaultRequestType
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
-import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
@@ -279,7 +283,7 @@ export const useActions = ({
     close();
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
-    PinnedNotesWidget.updateNotes();
+    updateNoteWidgets();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
       heading:
@@ -295,7 +299,7 @@ export const useActions = ({
     if (item.type === "note") {
       await db.notes.pin(!item?.pinned, item.id);
       setItem((await db.notes.note(item.id)) as Item);
-      PinnedNotesWidget.updateNotes();
+      updateListWidgets();
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
       setItem((await db.notebooks.notebook(item.id)) as Item);
@@ -793,6 +797,7 @@ export const useActions = ({
     const duplicateNote = async () => {
       await db.notes.duplicate(item.id);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
       ToastManager.show({
         heading: strings.noteDuplicated(),
         type: "success",
@@ -824,6 +829,7 @@ export const useActions = ({
       await db.notes.favorite(!item.favorite, item.id);
       setItem((await db.notes.note(item.id)) as Item);
       Navigation.queueRoutesForUpdate();
+      updateListWidgets();
     }
 
     async function pinToNotifications() {
@@ -946,6 +952,7 @@ export const useActions = ({
       }
       try {
         await db.vault.add(item.id);
+        NotePreviewWidget.updateNotes();
         const locked = await db.vaults.itemExists(item);
         if (locked) {
           close();
@@ -1191,7 +1198,7 @@ export const useActions = ({
           setItem((await db.notes.note(item.id)) as Item);
           Navigation.queueRoutesForUpdate();
           useArchivedStore.getState().refresh();
-          PinnedNotesWidget.updateNotes();
+          updateListWidgets();
         },
         checked: item.archived,
         isToggle: true

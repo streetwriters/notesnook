@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { updateListWidgets } from "../../services/widgets/update-widgets";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -28,7 +29,6 @@ import { ToastManager, eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
-import { PinnedNotesWidget } from "../../services/pinned-notes-widget";
 import { eCloseSheet, eOnLoadNote } from "../../utils/events";
 import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
@@ -75,7 +75,7 @@ export default function NotePreview({
     if (note && note.type === "trash") {
       await db.trash.restore(note.id);
       Navigation.queueRoutesForUpdate();
-      PinnedNotesWidget.updateNotes();
+      updateListWidgets();
       useSelectionStore.getState().setSelectionMode();
       ToastManager.show({
         heading: strings.noteRestored(),

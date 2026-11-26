@@ -20,19 +20,100 @@ import { Note } from "@notesnook/core";
 import { db } from "../common/database";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { Platform } from "react-native";
+import { IOSWidgets } from "./widgets/ios-widgets";
+import { toWidgetNotes } from "./pinned-notes-widget";
+import { htmlToWidgetBlocks, NoteBlocks } from "./widgets/note-blocks";
+
+type PreviewNote = Awaited<ReturnType<typeof toWidgetNotes>>[number] &
+  Partial<NoteBlocks>;
+
+async function getContentBlocks(note: Note): Promise<Partial<NoteBlocks>> {
+  if (!note.contentId) return {};
+  try {
+    const content = await db.content.get(note.contentId);
+    if (!content || content.locked || typeof content.data !== "string") {
+      return {};
+    }
+    return htmlToWidgetBlocks(content.data);
+  } catch {
+    return {};
+  }
+}
+
+async function toPreviewNote(note: Note): Promise<PreviewNote> {
+  const [widgetNote] = await toWidgetNotes([note]);
+  return {
+    ...widgetNote,
+    ...(widgetNote.locked ? {} : await getContentBlocks(note))
+  };
+}
+
+async function serializeAndroidNote(note: Note) {
+  return JSON.stringify(await toPreviewNote(note));
+}
+
+const MAX_IOS_PREVIEW_NOTES = 20;
+
+function publishIOSNotes(notes: PreviewNote[]) {
+  IOSWidgets.publish("previewNotes", notes, ["NotePreviewWidget"]);
+}
+
+async function updateIOSNotes() {
+  const stored = IOSWidgets.read<PreviewNote[]>("previewNotes", []);
+  if (!stored.length) return;
+
+  const updated: PreviewNote[] = [];
+  for (const item of stored) {
+    const note = await db.notes.note(item.id);
+    if (note) updated.push(await toPreviewNote(note));
+    else if (await db.notes.trashed(item.id)) {
+      updated.push({ ...item, headline: "", blocks: [] });
+    }
+  }
+  publishIOSNotes(updated);
+}
 
 let timer: NodeJS.Timeout;
 export const NotePreviewWidget = {
+  /**
+   * Empties every note preview widget. updateNotes() skips notes that no longer
+   * exist, which leaves their stored content showing, so this is for when all of
+   * the notes are gone (logout).
+   */
+  clear: async () => {
+    try {
+      if (Platform.OS === "ios") {
+        publishIOSNotes([]);
+      } else if (Platform.OS === "android") {
+        for (const id of await NotesnookModule.getWidgetNotes()) {
+          NotesnookModule.updateWidgetNote(id, "");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to clear note preview widgets:", err);
+    }
+  },
   updateNotes: () => {
-    if (Platform.OS !== "android") return;
+    if (Platform.OS !== "android" && Platform.OS !== "ios") return;
     clearTimeout(timer);
     timer = setTimeout(async () => {
+      if (Platform.OS === "ios") {
+        try {
+          await updateIOSNotes();
+        } catch (err) {
+          console.error("Failed to update note widgets:", err);
+        }
+        return;
+      }
       const noteIds = await NotesnookModule.getWidgetNotes();
       for (const id of noteIds) {
         const newNote = await db.notes.note(id);
         if (!newNote) continue;
 
-        NotesnookModule.updateWidgetNote(id, JSON.stringify(newNote));
+        NotesnookModule.updateWidgetNote(
+          id,
+          await serializeAndroidNote(newNote)
+        );
       }
       // Redraw from the widgets that actually exist rather than only the ones we
       // have notes for. After app data is cleared there are none, and the widgets
@@ -40,10 +121,31 @@ export const NotePreviewWidget = {
       NotesnookModule.refreshWidgets();
     }, 500);
   },
+  addNote: async (note: Note) => {
+    if (Platform.OS !== "ios") return;
+    const stored = IOSWidgets.read<PreviewNote[]>("previewNotes", []);
+    publishIOSNotes(
+      [
+        await toPreviewNote(note),
+        ...stored.filter((item) => item.id !== note.id)
+      ].slice(0, MAX_IOS_PREVIEW_NOTES)
+    );
+  },
+  serializeNote: serializeAndroidNote,
   updateNote: async (id: string, note: Note) => {
+    if (Platform.OS === "ios") {
+      const isStored = (items: PreviewNote[]) =>
+        items.some((item) => item.id === id);
+      if (!isStored(IOSWidgets.read<PreviewNote[]>("previewNotes", []))) return;
+      const updated = await toPreviewNote((await db.notes.note(id)) || note);
+      const stored = IOSWidgets.read<PreviewNote[]>("previewNotes", []);
+      if (!isStored(stored)) return;
+      publishIOSNotes(stored.map((item) => (item.id === id ? updated : item)));
+      return;
+    }
     if (Platform.OS !== "android") return;
     if (id && (await NotesnookModule.hasWidgetNote(id))) {
-      NotesnookModule.updateWidgetNote(id, JSON.stringify(note));
+      NotesnookModule.updateWidgetNote(id, await serializeAndroidNote(note));
     }
   }
 };

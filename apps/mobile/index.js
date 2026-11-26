@@ -89,6 +89,16 @@ AppRegistry.registerComponent(
   () => NotePreviewConfigureProvider
 );
 
+const NotesWidgetConfigureProvider = () => {
+  const App = require("./app/app").default;
+  return <App configureMode="notes-widget" />;
+};
+
+AppRegistry.registerComponent(
+  "NotesWidgetConfigure",
+  () => NotesWidgetConfigureProvider
+);
+
 const ShareProvider = () => {
   let NotesnookShare = require("./app/share/index").default;
   return (

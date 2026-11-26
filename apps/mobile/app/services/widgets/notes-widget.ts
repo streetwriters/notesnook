@@ -1,0 +1,268 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+import { isFalse, Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { Platform } from "react-native";
+import { db } from "../../common/database";
+import { NotesnookModule } from "../../utils/notesnook-module";
+import { toWidgetNotes } from "../pinned-notes-widget";
+import { IOSWidgets } from "./ios-widgets";
+
+export type NotesWidgetSourceType =
+  | "recent"
+  | "pinned"
+  | "favorites"
+  | "notebook"
+  | "tag"
+  | "color";
+
+export type NotesWidgetSource = {
+  key: string;
+  type: NotesWidgetSourceType;
+  id?: string;
+  title: string;
+};
+
+const MAX_NOTES = 30;
+const MAX_IOS_SOURCES = 15;
+const BUILTIN_TYPES: NotesWidgetSourceType[] = [
+  "recent",
+  "pinned",
+  "favorites"
+];
+
+export const createNotesWidgetSource = (
+  type: NotesWidgetSourceType,
+  title: string,
+  id?: string
+): NotesWidgetSource => ({
+  key: id ? `${type}:${id}` : type,
+  type,
+  id,
+  title
+});
+
+export const getBuiltinNotesWidgetSources = (): NotesWidgetSource[] => [
+  createNotesWidgetSource("recent", strings.recent()),
+  createNotesWidgetSource("pinned", strings.pinned()),
+  createNotesWidgetSource(
+    "favorites",
+    strings.dataTypesPluralCamelCase.favorite()
+  )
+];
+
+function getSelector(source: NotesWidgetSource) {
+  switch (source.type) {
+    case "recent":
+      return db.notes.all;
+    case "pinned":
+      return db.notes.pinned;
+    case "favorites":
+      return db.notes.favorites;
+    default:
+      return db.relations.from({ id: source.id!, type: source.type }, "note")
+        .selector;
+  }
+}
+
+async function resolveTitle(source: NotesWidgetSource) {
+  switch (source.type) {
+    case "notebook":
+      return (await db.notebooks.notebook(source.id!))?.title;
+    case "tag":
+      return (await db.tags.tag(source.id!))?.title;
+    case "color":
+      return (await db.colors.color(source.id!))?.title;
+    default:
+      return source.title;
+  }
+}
+
+function getSortOptions(source: NotesWidgetSource) {
+  switch (source.type) {
+    case "favorites":
+      return db.settings.getGroupOptions("favorites");
+    case "notebook":
+    case "tag":
+    case "color":
+      return db.settings.getGroupOptionsById(source.id!, source.type);
+    default:
+      return db.settings.getGroupOptions("home");
+  }
+}
+
+async function fetchNotes(source: NotesWidgetSource) {
+  let selector = getSelector(source)
+    .where(isFalse("dateDeleted"))
+    .fields(["notes.id", "notes.title", "notes.headline"])
+    .limit(MAX_NOTES);
+  if (source.type === "recent") {
+    selector = selector.where(isFalse("pinned")).where(isFalse("conflicted"));
+  }
+  const notes = (await selector.items(
+    undefined,
+    getSortOptions(source)
+  )) as Note[];
+  return toWidgetNotes(notes);
+}
+
+async function updateIOS() {
+  const stored = IOSWidgets.read<NotesWidgetSource[]>("widgetSources", []);
+  const sources = getBuiltinNotesWidgetSources();
+
+  for (const source of stored) {
+    if (BUILTIN_TYPES.includes(source.type)) continue;
+    const title = await resolveTitle(source);
+    if (title === undefined) continue;
+    sources.push({ ...source, title });
+  }
+
+  let changed = false;
+  for (const source of sources) {
+    const written = IOSWidgets.write(
+      `notes.${source.key}`,
+      await fetchNotes(source)
+    );
+    changed = written || changed;
+  }
+
+  const keys = sources.map((source) => source.key);
+  for (const key of IOSWidgets.read<string[]>("notesListKeys", [])) {
+    if (keys.includes(key)) continue;
+    IOSWidgets.remove(`notes.${key}`);
+    IOSWidgets.remove(`notesPage.${key}`);
+    changed = true;
+  }
+  IOSWidgets.write("notesListKeys", keys);
+
+  const slots = IOSWidgets.read<Record<string, string>>(
+    "widgetSlotSources",
+    {}
+  );
+  const pruned = Object.fromEntries(
+    Object.entries(slots).filter(([, key]) => keys.includes(key))
+  );
+  if (Object.keys(pruned).length !== Object.keys(slots).length) {
+    IOSWidgets.write("widgetSlotSources", pruned);
+    changed = true;
+  }
+  IOSWidgets.publish("widgetSources", sources, ["NotesListWidget"], changed);
+}
+
+async function updateAndroid() {
+  const configured = (await NotesnookModule.getNotesWidgetSources())
+    .map((data) => {
+      try {
+        return JSON.parse(data) as NotesWidgetSource;
+      } catch {
+        return undefined;
+      }
+    })
+    .filter((source): source is NotesWidgetSource => !!source);
+
+  const sources = new Map<string, NotesWidgetSource>();
+  sources.set("recent", getBuiltinNotesWidgetSources()[0]);
+  for (const source of configured) sources.set(source.key, source);
+
+  for (const source of sources.values()) {
+    const title = await resolveTitle(source);
+    const notes = title === undefined ? [] : await fetchNotes(source);
+    if (title !== undefined) {
+      NotesnookModule.setString(
+        "appPreview",
+        `notesWidget.title.${source.key}`,
+        title
+      );
+    }
+    NotesnookModule.setString(
+      "appPreview",
+      `notesWidget.notes.${source.key}`,
+      JSON.stringify(notes)
+    );
+  }
+  NotesnookModule.updateNotesWidget();
+}
+
+function addSource(source: NotesWidgetSource) {
+  const stored = IOSWidgets.read<NotesWidgetSource[]>("widgetSources", []);
+  IOSWidgets.write(
+    "widgetSources",
+    [...stored.filter((item) => item.key !== source.key), source].slice(
+      -MAX_IOS_SOURCES
+    )
+  );
+}
+
+let pending: Promise<unknown> = Promise.resolve();
+function exclusive<T>(task: () => Promise<T> | T) {
+  const run = pending.then(task, task);
+  pending = run.catch(() => undefined);
+  return run;
+}
+
+const DEFAULT_DELAY = 500;
+let timer: NodeJS.Timeout | undefined;
+
+export const NotesWidget = {
+  updateNotes: (delay = DEFAULT_DELAY) => {
+    if (Platform.OS !== "android" && Platform.OS !== "ios") return;
+    if (timer && delay > DEFAULT_DELAY) return;
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      timer = undefined;
+      try {
+        if (Platform.OS === "ios") await exclusive(updateIOS);
+        else await updateAndroid();
+      } catch (err) {
+        console.error("Failed to update notes widget:", err);
+      }
+    }, delay);
+  },
+
+  chooseSource: (source: NotesWidgetSource, slot?: string) => {
+    if (Platform.OS !== "ios") return;
+    exclusive(() => {
+      if (!BUILTIN_TYPES.includes(source.type)) addSource(source);
+      if (slot) {
+        const slots = IOSWidgets.read<Record<string, string>>(
+          "widgetSlotSources",
+          {}
+        );
+        IOSWidgets.write("widgetSlotSources", { ...slots, [slot]: source.key });
+      }
+      IOSWidgets.reload(["NotesListWidget"]);
+    }).then(() => NotesWidget.updateNotes());
+  },
+
+  configure: async (widgetId: number, source: NotesWidgetSource) => {
+    if (Platform.OS !== "android") return;
+    NotesnookModule.setString(
+      "appPreview",
+      `notesWidget.config.${widgetId}`,
+      JSON.stringify(source)
+    );
+    // Updated right away instead of through the debounced timer: the configure
+    // activity finishes straight after this and JS timers stop running once it does.
+    try {
+      await updateAndroid();
+    } catch (err) {
+      console.error("Failed to update notes widget:", err);
+    }
+  }
+};

@@ -34,6 +34,7 @@ import {
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import { NotePreviewWidget } from "../../../services/note-preview-widget";
 import { getElevationStyle } from "../../../utils/elevation";
 import {
   eCloseActionSheet,
@@ -283,6 +284,7 @@ export const VaultDialog: React.FC = () => {
       return;
     } else {
       await db.vault.add(noteRef.current!.id);
+      NotePreviewWidget.updateNotes();
 
       eSendEvent(eUpdateNoteInEditor, noteRef.current, true);
 
@@ -301,6 +303,7 @@ export const VaultDialog: React.FC = () => {
     db.vault
       .remove(noteRef.current!.id, password)
       .then(async () => {
+        NotePreviewWidget.updateNotes();
         ToastManager.show({
           heading: strings.noteUnlocked(),
           type: "success",
@@ -445,6 +448,7 @@ export const VaultDialog: React.FC = () => {
     }
     if (noteRef.current?.id) {
       await db.vault.add(noteRef.current.id);
+      NotePreviewWidget.updateNotes();
       eSendEvent(eUpdateNoteInEditor, noteRef.current, true);
       setLoading(false);
       ToastManager.show({

@@ -194,10 +194,13 @@ export function isReminderToday(reminder: Reminder) {
   return dayjs(time).isToday();
 }
 
-export function getUpcomingReminderTime(reminder: Reminder) {
+export function getUpcomingReminderTime(
+  reminder: Reminder,
+  from: number = Date.now()
+) {
   if (reminder.mode === "once") return reminder.date;
 
-  const now = dayjs();
+  const now = dayjs(from);
   const today = now.startOf("day");
   // time of day at which the reminder fires
   const time = dayjs(reminder.date);
