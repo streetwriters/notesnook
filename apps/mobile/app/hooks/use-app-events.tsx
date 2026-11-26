@@ -87,6 +87,7 @@ import {
   setUpdateAvailableMessage
 } from "../services/message";
 import Navigation from "../services/navigation";
+import { openEditor, setOnFirstSave } from "../screens/notes/common";
 import {
   getWidgetPickerKind,
   getWidgetPickerSlot,
@@ -174,6 +175,45 @@ const onUserSessionExpired = async () => {
   eSendEvent(eLoginSessionExpired);
 };
 
+type SourceType = "notebook" | "tag" | "color";
+
+const isSourceType = (type: string | null): type is SourceType =>
+  type === "notebook" || type === "tag" || type === "color";
+
+const openSource = async (type: SourceType, id: string) => {
+  if (type === "notebook") {
+    const notebook = await db.notebooks.notebook(id);
+    if (!notebook) return false;
+    fluidTabsRef.current?.goToPage("home");
+    Navigation.navigate("Notebook", {
+      id: notebook.id,
+      canGoBack: true,
+      item: notebook
+    });
+  } else if (type === "tag") {
+    const tag = await db.tags.tag(id);
+    if (!tag) return false;
+    fluidTabsRef.current?.goToPage("home");
+    Navigation.navigate("TaggedNotes", {
+      type: "tag",
+      id: tag.id,
+      item: tag,
+      canGoBack: true
+    });
+  } else {
+    const color = await db.colors.color(id);
+    if (!color) return false;
+    fluidTabsRef.current?.goToPage("home");
+    Navigation.navigate("ColoredNotes", {
+      type: "color",
+      id: color.id,
+      item: color,
+      canGoBack: true
+    });
+  }
+  return true;
+};
+
 const onAppOpenedFromURL = async (event: {
   url: string;
   isInitialUrl?: boolean;
@@ -189,6 +229,19 @@ const onAppOpenedFromURL = async (event: {
       useWidgetPicker
         .getState()
         .open(getWidgetPickerKind(url)!, getWidgetPickerSlot(url));
+    } else if (url.startsWith("nn://open_source")) {
+      const params = new URL(url).searchParams;
+      const type = params.get("type");
+      const id = params.get("id");
+      if (isSourceType(type) && id) await openSource(type, id);
+    } else if (url.startsWith("nn://new_note")) {
+      const params = new URL(url).searchParams;
+      const type = params.get("type");
+      const id = params.get("id");
+      if (isSourceType(type) && id && (await openSource(type, id))) {
+        setOnFirstSave({ type, id });
+        openEditor();
+      }
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
@@ -217,53 +270,21 @@ const onAppOpenedFromURL = async (event: {
       !event.isInitialUrl
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) {
-        const notebook = await db.notebooks.notebook(id);
-        if (notebook) {
-          fluidTabsRef.current?.goToPage("home");
-          Navigation.navigate("Notebook", {
-            id: notebook.id,
-            canGoBack: true,
-            item: notebook
-          });
-        }
-      }
+      if (id) await openSource("notebook", id);
     } else if (
       (parsedLink?.type === "tag" ||
         url.startsWith("https://app.notesnook.com/open_tag?")) &&
       !event.isInitialUrl
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) {
-        const tag = await db.tags.tag(id);
-        if (tag) {
-          fluidTabsRef.current?.goToPage("home");
-          Navigation.navigate("TaggedNotes", {
-            type: "tag",
-            id: tag.id,
-            item: tag,
-            canGoBack: true
-          });
-        }
-      }
+      if (id) await openSource("tag", id);
     } else if (
       (parsedLink?.type === "color" ||
         url.startsWith("https://app.notesnook.com/open_color?")) &&
       !event.isInitialUrl
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) {
-        const color = await db.colors.color(id);
-        if (color) {
-          fluidTabsRef.current?.goToPage("home");
-          Navigation.navigate("ColoredNotes", {
-            type: "color",
-            id: color.id,
-            item: color,
-            canGoBack: true
-          });
-        }
-      }
+      if (id) await openSource("color", id);
     } else if (
       url.startsWith("https://app.notesnook.com/open_reminder") ||
       url.startsWith("nn://open_reminder")
