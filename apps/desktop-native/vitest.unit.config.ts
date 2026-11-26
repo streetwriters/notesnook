@@ -24,6 +24,7 @@ export default defineConfig({
     include: [
       "src/**/*.test.ts",
       "scripts/**/*.test.mjs",
+      "tools/divergence/**/*.test.mjs",
       "../../packages/ui/src/kit/{contracts,desktop,web,shared}/**/*.test.ts"
     ],
     environment: "node"
