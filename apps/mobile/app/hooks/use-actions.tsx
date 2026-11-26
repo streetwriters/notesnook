@@ -141,6 +141,10 @@ export type Action = {
   activeColor?: string;
   type?: ButtonProps["type"];
   locked?: boolean;
+  checkedState?: {
+    subscribe: (cb: () => void) => () => void;
+    get: () => boolean;
+  };
 };
 
 export const getDefaultDragAction = (): Action => ({

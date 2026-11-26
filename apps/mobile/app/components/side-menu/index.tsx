@@ -221,6 +221,36 @@ const TabBar = (props: SimpleTabBarProps) => {
     (state) => state.enabled
   );
   const isSelectionEnabled = notebookSelectionEnabled || tagSelectionEnabled;
+  const notebookSelectedCount = useSideMenuNotebookSelectionStore(
+    (state) =>
+      Object.values(state.selection).filter((v) => v === "selected").length
+  );
+  const tagSelectedCount = useSideMenuTagsSelectionStore(
+    (state) =>
+      Object.values(state.selection).filter((v) => v === "selected").length
+  );
+  const selectedCount = notebookSelectionEnabled
+    ? notebookSelectedCount
+    : tagSelectedCount;
+  const [total, setTotal] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!notebookSelectionEnabled && !tagSelectionEnabled) {
+      setTotal(0);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const result = notebookSelectionEnabled
+        ? await db.notebooks.all.count()
+        : await db.tags.all.count();
+      if (!cancelled) setTotal(result);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [notebookSelectionEnabled, tagSelectionEnabled]);
+  const allSelected = total > 0 && selectedCount === total;
 
   const getIcon = (key: string) => {
     switch (key) {
@@ -260,7 +290,8 @@ const TabBar = (props: SimpleTabBarProps) => {
               {
                 id: "selectAll",
                 title: strings.selectAll(),
-                icon: "checks"
+                icon: "checks",
+                isActive: allSelected
               },
               {
                 id: "delete",
@@ -285,6 +316,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                   key={item.id}
                   icon={item.icon}
                   label={item.title}
+                  isActive={item.isActive}
                   onPress={async () => {
                     switch (item.id) {
                       case "selectAll": {

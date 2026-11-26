@@ -45,9 +45,9 @@ export const GROUP = {
 };
 
 export const SORT = {
+  dateCreated: "Date created",
   dateModified: "Date modified",
   dateEdited: "Date edited",
-  dateCreated: "Date created",
   title: "Title",
   dueDate: "Due date",
   relevance: "Relevance",

@@ -144,10 +144,7 @@ export const NotebookItem = ({
 
               if (selected) {
                 state.markAs(item.notebook, "deselected");
-                return;
-              }
-
-              if (!state.multiSelect) {
+              } else if (!state.multiSelect) {
                 const keys = Object.keys(state.selection);
                 const nextState: any = {};
                 for (const key in keys) {
@@ -194,6 +191,7 @@ export const NotebookItem = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
+              flexShrink: 1,
               gap: Spacing.LEVEL_1
             }}
           >
@@ -243,6 +241,7 @@ export const NotebookItem = ({
                 isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
               fontSize="SM"
+              style={{ flexShrink: 1 }}
             >
               {notebook?.title}
             </Paragraph>
