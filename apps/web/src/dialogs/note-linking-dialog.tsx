@@ -24,7 +24,6 @@ import { db } from "../common/db";
 import {
   ContentBlock,
   Note as NoteType,
-  VirtualizedGrouping,
   createInternalLink
 } from "@notesnook/core";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -32,9 +31,15 @@ import { LinkAttributes } from "@notesnook/editor";
 import {
   NoteResolvedData,
   ResolvedItem,
-  useIsFeatureAvailable
+  useIsFeatureAvailable,
+  usePromise
 } from "@notesnook/common";
-import { Lock } from "../components/icons";
+import {
+  CheckIcon,
+  FileText,
+  Lock,
+  MagnifyingGlass
+} from "../components/icons";
 import { ellipsize } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
@@ -46,18 +51,69 @@ export type NoteLinkingDialogProps = BaseDialogProps<LinkAttributes | false> & {
   attributes?: LinkAttributes;
 };
 const HEADING_TYPES = ["h1", "h2", "h3", "h4", "h5", "h6"];
+const NOTE_ITEM_HEIGHT = 35;
+
+type ListContext = { header?: React.ReactNode };
 
 export const NoteLinkingDialog = DialogManager.register(
   function NoteLinkingDialog(props: NoteLinkingDialogProps) {
     const { attributes } = props;
-    const [notes, setNotes] = useState<VirtualizedGrouping<NoteType>>();
+    const [noteQuery, setNoteQuery] = useState("");
     const [selectedNote, setSelectedNote] = useState<NoteType>();
     const [isNoteLocked, setIsNoteLocked] = useState(false);
-    const [blocks, setBlocks] = useState<ContentBlock[]>([]);
     const [filteredBlocks, setFilteredBlocks] = useState<
       ContentBlock[] | undefined
     >();
     const blockLinkingAvailability = useIsFeatureAvailable("blockLinking");
+
+    const notesResult = usePromise(
+      () =>
+        noteQuery
+          ? db.lookup.notes(noteQuery).sorted()
+          : db.notes.all.sorted(db.settings.getGroupOptions("home")),
+      [noteQuery]
+    );
+    const notes =
+      notesResult.status === "rejected" ? undefined : notesResult.value;
+
+    const blocksResult = usePromise(
+      () => (selectedNote ? db.notes.contentBlocks(selectedNote.id) : []),
+      [selectedNote?.id]
+    );
+    const blocksLoaded = blocksResult.status === "fulfilled";
+    const blocks = blocksLoaded ? blocksResult.value : [];
+
+    const selectNote = (note: NoteType, isLocked: boolean) => {
+      setSelectedNote(note);
+      setIsNoteLocked(isLocked);
+    };
+
+    const deselectNote = () => {
+      setSelectedNote(undefined);
+      setIsNoteLocked(false);
+      setFilteredBlocks(undefined);
+      setNoteQuery("");
+    };
+
+    const selectedNoteRow = selectedNote ? (
+      <SelectedNoteItem
+        note={selectedNote}
+        isLocked={isNoteLocked}
+        onClick={deselectNote}
+      >
+        {blockLinkingAvailability &&
+        !blockLinkingAvailability.isAllowed ? null : isNoteLocked ? (
+          <HelperText>{strings.noteLockedBlockLink()}</HelperText>
+        ) : blocksLoaded && blocks.length <= 0 ? (
+          <HelperText>{strings.noBlocksOnNote()}</HelperText>
+        ) : null}
+      </SelectedNoteItem>
+    ) : null;
+
+    const showBlocks =
+      !!selectedNote &&
+      !!blockLinkingAvailability?.isAllowed &&
+      (filteredBlocks || blocks).length > 0;
 
     return (
       <Dialog
@@ -65,13 +121,9 @@ export const NoteLinkingDialog = DialogManager.register(
         title={
           attributes ? strings.editInternalLink() : strings.newInternalLink()
         }
-        width={500}
+        width={460}
+        sx={{ height: ["100%", "80%", "70%"] }}
         onClose={() => props.onClose(false)}
-        onOpen={async () => {
-          setNotes(
-            await db.notes.all.sorted(db.settings.getGroupOptions("home"))
-          );
-        }}
         positiveButton={{
           text: attributes ? strings.done() : strings.insertLink(),
           disabled: !selectedNote,
@@ -90,195 +142,449 @@ export const NoteLinkingDialog = DialogManager.register(
         noScroll
       >
         <Flex
-          variant="columnFill"
-          sx={{ mx: 3, overflow: "hidden", height: 500 }}
+          sx={{
+            flexDirection: "column",
+            gap: "spacing7",
+            p: "spacing7",
+            overflow: "hidden",
+            flex: 1,
+            minHeight: 0
+          }}
         >
           {selectedNote ? (
-            <>
-              <Field
-                autoFocus
-                placeholder={strings.searchSectionToLinkPlaceholder()}
-                sx={{ mx: 0 }}
-                onChange={async (e) => {
-                  const query = e.target.value.trim().toLowerCase();
-                  if (!query) {
-                    setFilteredBlocks(undefined);
-                  } else {
-                    setFilteredBlocks(
-                      query.startsWith("#")
-                        ? blocks.filter(
-                            (v) =>
-                              HEADING_TYPES.includes(v.type) &&
-                              v.content.toLowerCase().includes(query)
-                          )
-                        : blocks.filter((v) =>
-                            v.content.toLowerCase().includes(query)
-                          )
-                    );
-                  }
-                }}
-              />
-              <Button
-                variant="accentSecondary"
-                sx={{ mt: 1, textAlign: "left", flexShrink: 0 }}
-                onClick={() => {
-                  setSelectedNote(undefined);
-                  setIsNoteLocked(false);
+            <SearchField
+              key="block-search"
+              placeholder={strings.searchSectionToLinkPlaceholder()}
+              onChange={(value) => {
+                const query = value.trim().toLowerCase();
+                if (!query) {
                   setFilteredBlocks(undefined);
-                  setBlocks([]);
-                }}
-              >
-                {strings.linkNoteSelectedNote()}: {selectedNote.title} (
-                {strings.clickToDeselect()})
-              </Button>
-
-              {blockLinkingAvailability?.isAllowed ? (
-                <>
-                  {isNoteLocked ? (
-                    <Text variant="body" sx={{ mt: 1 }}>
-                      {strings.noteLockedBlockLink()}
-                    </Text>
-                  ) : blocks.length <= 0 ? (
-                    <Text variant="body" sx={{ mt: 1 }}>
-                      {strings.noBlocksOnNote()}
-                    </Text>
-                  ) : null}
-                  <Virtuoso
-                    style={{ height: "100%", width: "100%" }}
-                    components={{
-                      Scroller: CustomScrollbarsVirtualList
-                    }}
-                    data={filteredBlocks || blocks}
-                    context={{ items: filteredBlocks || blocks }}
-                    itemContent={(_, item) => (
-                      <Button
-                        variant="menuitem"
-                        sx={{
-                          p: 1,
-                          width: "100%",
-                          textAlign: "left",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          borderBottom: "1px solid var(--border)"
-                        }}
-                        onClick={() => {
-                          props.onClose({
-                            title: selectedNote.title,
-                            href: createInternalLink("note", selectedNote.id, {
-                              blockId: item.id
-                            })
-                          });
-                        }}
-                      >
-                        <Text
-                          variant="body"
-                          sx={{
-                            fontFamily: "monospace",
-                            whiteSpace: "pre-wrap"
-                          }}
-                        >
-                          {ellipsize(item.content, 200, "end").trim() ||
-                            strings.linkNoteEmptyBlock()}
-                        </Text>
-                        <Text
-                          variant="subBody"
-                          sx={{
-                            bg: "background-secondary",
-                            flexShrink: 0,
-                            p: "small",
-                            px: 1,
-                            borderRadius: "default",
-                            alignSelf: "flex-start"
-                          }}
-                        >
-                          {item.type.toUpperCase()}
-                        </Text>
-                      </Button>
-                    )}
-                  />
-                </>
-              ) : (
-                <Text variant="body" sx={{ mt: 1 }}>
-                  {blockLinkingAvailability?.error}{" "}
-                  <Button
-                    onClick={() =>
-                      blockLinkingAvailability
-                        ? UpgradeDialog.show({
-                            feature: blockLinkingAvailability
-                          })
-                        : null
-                    }
-                    variant="anchor"
-                  >
-                    {strings.upgradeNow()}
-                  </Button>
-                  .
-                </Text>
-              )}
-            </>
-          ) : (
-            <>
-              <Field
-                autoFocus
-                placeholder={strings.searchNoteToLinkPlaceholder()}
-                sx={{ mx: 0 }}
-                onChange={async (e) => {
-                  const query = e.target.value.trim();
-                  setNotes(
-                    query
-                      ? await db.lookup.notes(e.target.value).sorted()
-                      : await db.notes.all.sorted(
-                          db.settings.getGroupOptions("home")
+                } else {
+                  setFilteredBlocks(
+                    query.startsWith("#")
+                      ? blocks.filter(
+                          (v) =>
+                            HEADING_TYPES.includes(v.type) &&
+                            v.content.toLowerCase().includes(query)
+                        )
+                      : blocks.filter((v) =>
+                          v.content.toLowerCase().includes(query)
                         )
                   );
-                }}
-              />
-              {notes && (
-                <Virtuoso
-                  data={notes.placeholders}
-                  components={{
-                    Scroller: CustomScrollbarsVirtualList
-                  }}
-                  style={{ height: "100%", width: "100%" }}
-                  itemContent={(index) => (
-                    <div style={{ height: 28 }}>
-                      <ResolvedItem items={notes} index={index} type="note">
-                        {({ item: note, data }) => (
-                          <Button
-                            variant="menuitem"
-                            sx={{
-                              p: 1,
-                              width: "100%",
-                              textAlign: "left",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                              borderBottom: "1px solid var(--border)"
-                            }}
-                            onClick={async () => {
-                              setSelectedNote(note);
-                              setIsNoteLocked(
-                                !!(data as NoteResolvedData).locked
-                              );
-                              setBlocks(await db.notes.contentBlocks(note.id));
-                            }}
-                          >
-                            <Text variant="body">{note.title}</Text>
-                            {(data as NoteResolvedData).locked ? (
-                              <Lock size={14} />
-                            ) : null}
-                          </Button>
-                        )}
-                      </ResolvedItem>
-                    </div>
-                  )}
-                />
-              )}
-            </>
+                }
+              }}
+            />
+          ) : (
+            <SearchField
+              key="note-search"
+              placeholder={strings.searchNoteToLinkPlaceholder()}
+              onChange={(value) => setNoteQuery(value.trim())}
+            />
           )}
+
+          {selectedNote ? (
+            showBlocks ? (
+              <Virtuoso
+                key="block-list"
+                style={{
+                  width: "100%",
+                  flex: 1,
+                  minHeight: 0
+                }}
+                components={{
+                  Scroller: CustomScrollbarsVirtualList,
+                  Header: SelectedNoteHeader
+                }}
+                data={filteredBlocks || blocks}
+                context={{ header: selectedNoteRow } as ListContext}
+                itemContent={(_, item) => (
+                  <BlockItem
+                    block={item}
+                    onClick={() => {
+                      props.onClose({
+                        title: selectedNote.title,
+                        href: createInternalLink("note", selectedNote.id, {
+                          blockId: item.id
+                        })
+                      });
+                    }}
+                  />
+                )}
+              />
+            ) : (
+              <Flex
+                sx={{ flexDirection: "column", gap: "spacing4", flexShrink: 0 }}
+              >
+                {selectedNoteRow}
+                {filteredBlocks?.length === 0 ? (
+                  <EmptyState
+                    title={strings.noResultsFound()}
+                    descriptionFontSize="sm"
+                  />
+                ) : null}
+                {blockLinkingAvailability &&
+                !blockLinkingAvailability.isAllowed ? (
+                  <Flex
+                    sx={{
+                      p: "spacing2",
+                      borderRadius: "radius1",
+                      bg: "background-secondary"
+                    }}
+                  >
+                    <HelperText>
+                      {blockLinkingAvailability.error}{" "}
+                      <Button
+                        variant="anchor"
+                        sx={{ fontSize: "3xs", lineHeight: 1 }}
+                        onClick={() =>
+                          UpgradeDialog.show({
+                            feature: blockLinkingAvailability
+                          })
+                        }
+                      >
+                        {strings.upgradeNow()}
+                      </Button>
+                      .
+                    </HelperText>
+                  </Flex>
+                ) : null}
+              </Flex>
+            )
+          ) : notes ? (
+            notes.length <= 0 ? (
+              noteQuery ? (
+                <EmptyState
+                  title={strings.noResultsFound()}
+                  description={`We couldn’t find any note matching “${noteQuery}”.`}
+                  descriptionFontSize="sm"
+                />
+              ) : (
+                <EmptyState
+                  title={strings.notePlaceholder.title()}
+                  description="Create a note first, then you can link to it here."
+                  descriptionFontSize="xs"
+                />
+              )
+            ) : (
+              <Virtuoso
+                key="note-list"
+                data={notes.placeholders}
+                fixedItemHeight={NOTE_ITEM_HEIGHT}
+                components={{
+                  Scroller: CustomScrollbarsVirtualList
+                }}
+                style={{
+                  width: "100%",
+                  flex: 1,
+                  minHeight: 0
+                }}
+                itemContent={(index) => (
+                  <div style={{ height: NOTE_ITEM_HEIGHT }}>
+                    <ResolvedItem items={notes} index={index} type="note">
+                      {({ item: note, data }) => (
+                        <NoteItem
+                          note={note}
+                          isLocked={!!(data as NoteResolvedData).locked}
+                          onClick={() =>
+                            selectNote(
+                              note,
+                              !!(data as NoteResolvedData).locked
+                            )
+                          }
+                        />
+                      )}
+                    </ResolvedItem>
+                  </div>
+                )}
+              />
+            )
+          ) : null}
         </Flex>
       </Dialog>
     );
   }
 );
+
+function SelectedNoteHeader({ context }: { context?: ListContext }) {
+  return <Flex sx={{ pb: "spacing4" }}>{context?.header}</Flex>;
+}
+
+function SearchField(props: {
+  placeholder: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <Field
+      autoFocus
+      placeholder={props.placeholder}
+      leftIcon={MagnifyingGlass}
+      sx={{ flexShrink: 0 }}
+      styles={{
+        input: {
+          pl: "spacing10",
+          pr: "spacing4",
+          py: "spacing6",
+          height: 50,
+          fontSize: "sm",
+          lineHeight: 1,
+          color: "heading"
+        }
+      }}
+      onChange={(e) => props.onChange(e.target.value)}
+    />
+  );
+}
+
+function NoteIconTile(props: { selected?: boolean }) {
+  return (
+    <Flex
+      className="note-icon-tile"
+      sx={{
+        width: 25,
+        height: 25,
+        flexShrink: 0,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "radius1",
+        bg: props.selected ? "background" : "background-secondary"
+      }}
+    >
+      <FileText size={13} color="icon" />
+    </Flex>
+  );
+}
+
+function NoteItem(props: {
+  note: NoteType;
+  isLocked: boolean;
+  onClick: () => void;
+}) {
+  const { note, isLocked, onClick } = props;
+  return (
+    <Button
+      variant="menuitem"
+      title={note.title}
+      sx={{
+        p: "spacing2",
+        width: "100%",
+        height: NOTE_ITEM_HEIGHT,
+        textAlign: "left",
+        display: "flex",
+        alignItems: "center",
+        gap: "spacing3",
+        borderRadius: "radius1",
+        bg: "transparent",
+        ":hover": {
+          bg: "hover",
+          ".note-icon-tile": { bg: "hover-secondary" }
+        }
+      }}
+      onClick={onClick}
+    >
+      <NoteIconTile />
+      <Text
+        sx={{
+          fontSize: "xs",
+          color: "paragraph",
+          minWidth: 0,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap"
+        }}
+      >
+        {note.title}
+      </Text>
+      {isLocked ? (
+        <Lock size={13} color="icon-secondary" sx={{ flexShrink: 0 }} />
+      ) : null}
+    </Button>
+  );
+}
+
+function SelectedNoteItem(
+  props: React.PropsWithChildren<{
+    note: NoteType;
+    isLocked: boolean;
+    onClick: () => void;
+  }>
+) {
+  const { note, isLocked, onClick, children } = props;
+  return (
+    <Flex
+      role="button"
+      tabIndex={0}
+      data-test-id="selected-note"
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
+        onClick();
+      }}
+      sx={{
+        width: "100%",
+        flexShrink: 0,
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: "spacing3",
+        p: "spacing2",
+        borderRadius: "radius1",
+        bg: "background-selected",
+        cursor: "pointer"
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "spacing3"
+        }}
+      >
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
+          <NoteIconTile selected />
+          <Text
+            title={note.title}
+            sx={{
+              fontSize: "xs",
+              fontWeight: 500,
+              color: "paragraph-selected",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {note.title}
+          </Text>
+          {isLocked ? (
+            <Lock size={13} color="icon-secondary" sx={{ flexShrink: 0 }} />
+          ) : null}
+        </Flex>
+        <CheckIcon size={13} color="accent" sx={{ flexShrink: 0 }} />
+      </Flex>
+      <HelperText>{strings.clickToDeselect()}</HelperText>
+      {children}
+    </Flex>
+  );
+}
+
+function HelperText(props: React.PropsWithChildren) {
+  return (
+    <Text sx={{ fontSize: "3xs", lineHeight: 1, color: "paragraph" }}>
+      {props.children}
+    </Text>
+  );
+}
+
+function BlockItem(props: { block: ContentBlock; onClick: () => void }) {
+  const { block, onClick } = props;
+  return (
+    <Flex sx={{ flexDirection: "column", gap: "spacing2", pb: "spacing2" }}>
+      <Button
+        variant="menuitem"
+        sx={{
+          p: "spacing2",
+          width: "100%",
+          textAlign: "left",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "spacing3",
+          borderRadius: "radius1",
+          bg: "transparent",
+          ":hover": {
+            bg: "hover",
+            ".block-content": { color: "heading" },
+            ".block-type": { bg: "hover-secondary" }
+          }
+        }}
+        onClick={onClick}
+      >
+        <Flex
+          className="block-content"
+          sx={{
+            flexDirection: "column",
+            gap: "spacing3",
+            minWidth: 0,
+            color: "paragraph"
+          }}
+        >
+          {(
+            ellipsize(block.content, 200, "end").trim() ||
+            strings.linkNoteEmptyBlock()
+          )
+            .split("\n")
+            .map((line, index) => (
+              <Text
+                key={index}
+                sx={{
+                  fontSize: "xs",
+                  lineHeight: 1,
+                  color: "inherit",
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word"
+                }}
+              >
+                {line}
+              </Text>
+            ))}
+        </Flex>
+        <Text
+          className="block-type"
+          sx={{
+            flexShrink: 0,
+            p: "spacing1",
+            bg: "background-secondary",
+            borderRadius: "radius0",
+            fontSize: "xs",
+            lineHeight: 1,
+            color: "paragraph"
+          }}
+        >
+          {block.type.toUpperCase()}
+        </Text>
+      </Button>
+      <Flex sx={{ height: 1, bg: "separator", flexShrink: 0 }} />
+    </Flex>
+  );
+}
+
+function EmptyState(props: {
+  title: string;
+  description?: string;
+  descriptionFontSize: "xs" | "sm";
+}) {
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "spacing3",
+        py: "spacing9",
+        textAlign: "center"
+      }}
+    >
+      <Text
+        sx={{
+          fontSize: "sm",
+          fontWeight: 600,
+          lineHeight: "normal",
+          color: "heading"
+        }}
+      >
+        {props.title}
+      </Text>
+      {props.description ? (
+        <Text
+          sx={{
+            fontSize: props.descriptionFontSize,
+            lineHeight: props.descriptionFontSize === "sm" ? 1 : "normal",
+            color: "paragraph-secondary"
+          }}
+        >
+          {props.description}
+        </Text>
+      ) : null}
+    </Flex>
+  );
+}
