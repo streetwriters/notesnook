@@ -25,6 +25,7 @@ import {
   ClipboardEvent
 } from "react";
 import { Flex, Input } from "@notesnook/ui";
+import { ThemeUIStyleObject } from "@theme-ui/css";
 
 type OtpInputProps = {
   length?: number;
@@ -33,6 +34,7 @@ type OtpInputProps = {
   autoFocus?: boolean;
   disabled?: boolean;
   type?: "number" | "text";
+  sx?: ThemeUIStyleObject;
 };
 
 export function OtpInput({
@@ -40,7 +42,8 @@ export function OtpInput({
   value,
   onChange,
   autoFocus = true,
-  disabled = false
+  disabled = false,
+  sx
 }: OtpInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -130,7 +133,8 @@ export function OtpInput({
       sx={{
         gap: "15px",
         justifyContent: "left",
-        width: "100%"
+        width: "100%",
+        ...sx
       }}
     >
       {Array.from({ length }, (_, index) => (

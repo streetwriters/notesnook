@@ -89,6 +89,15 @@ const error: ThemeUIStyleObject = {
   }
 };
 
+const bordered: ThemeUIStyleObject = {
+  variant: "forms.input",
+  bg: "transparent",
+  border: "1px solid",
+  borderColor: "border",
+  borderRadius: "radius2",
+  lineHeight: 1
+};
+
 const radio: ThemeUIStyleObject = {
   "input:focus ~ &": {
     backgroundColor: `border-secondary`
@@ -115,5 +124,6 @@ export const inputVariants = {
   borderless,
   error,
   clean,
+  bordered,
   radio
 };

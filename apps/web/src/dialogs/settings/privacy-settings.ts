@@ -26,6 +26,13 @@ import Config from "../../utils/config";
 import { showToast } from "../../utils/toast";
 import { PromptDialog } from "../prompt";
 import { strings } from "@notesnook/intl";
+import {
+  Envelope,
+  EyeSlash,
+  HardDrives,
+  Network,
+  PasswordVisible
+} from "../../components/icons";
 
 export const PrivacySettings: SettingsGroup[] = [
   {
@@ -35,6 +42,7 @@ export const PrivacySettings: SettingsGroup[] = [
     settings: [
       {
         key: "marketing",
+        icon: Envelope,
         title: strings.marketingEmails(),
         description: strings.marketingEmailsDesc(),
         onStateChange: (listener) =>
@@ -55,6 +63,7 @@ export const PrivacySettings: SettingsGroup[] = [
       },
       {
         key: "hide-note-title",
+        icon: EyeSlash,
         title: strings.hideNoteTitle(),
         description: strings.hideNoteTitleDescription(),
         onStateChange: (listener) =>
@@ -69,6 +78,7 @@ export const PrivacySettings: SettingsGroup[] = [
       },
       {
         key: "privacy-mode",
+        icon: PasswordVisible,
         title: strings.privacyMode(),
         description: strings.privacyModeDesc(),
         onStateChange: (listener) =>
@@ -91,6 +101,7 @@ export const PrivacySettings: SettingsGroup[] = [
     settings: [
       {
         key: "custom-dns",
+        icon: HardDrives,
         title: strings.useCustomDns(),
         description: strings.customDnsDescription(),
         onStateChange: (listener) =>
@@ -106,12 +117,12 @@ export const PrivacySettings: SettingsGroup[] = [
       },
       {
         key: "custom-cors",
+        icon: Network,
         title: strings.corsBypass(),
         description: strings.corsBypassDesc(),
         components: [
           {
-            type: "button",
-            title: strings.changeProxy(),
+            type: "navigation",
             action: async () => {
               const result = await PromptDialog.show({
                 title: strings.corsBypass(),
@@ -130,24 +141,29 @@ export const PrivacySettings: SettingsGroup[] = [
                 console.error(e);
                 showToast("error", strings.invalidCors());
               }
-            },
-            variant: "secondary"
+            }
           }
         ]
       },
       {
         key: "proxy-config",
+        icon: Network,
         title: strings.proxy(),
-        description: strings.proxyDescription(),
+        description: strings.proxyDescription().split("\n")[0].trim(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((c) => c.proxyRules, listener),
         components: [
           {
-            type: "input",
-            inputType: "text",
-            defaultValue: () => useSettingStore.getState().proxyRules || "",
-            onChange: (value) => {
-              useSettingStore.getState().setProxyRules(value);
+            type: "navigation",
+            action: async () => {
+              const result = await PromptDialog.show({
+                title: strings.proxy(),
+                description: strings.proxyDescription(),
+                defaultValue: useSettingStore.getState().proxyRules || "",
+                label: strings.proxy()
+              });
+              if (result === false || result === undefined) return;
+              await useSettingStore.getState().setProxyRules(result);
             }
           }
         ]

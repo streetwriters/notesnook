@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text, Switch } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
+import ToggleSwitch from "../toggle-switch";
 import { Icon } from "../icons";
 
 type ToggleProps = {
@@ -77,15 +78,7 @@ function Toggle(props: ToggleProps) {
           {label}
         </Text>
       </Flex>
-      <Switch
-        sx={{
-          m: 0,
-          bg: isOn ? "accent" : "icon-disabled",
-          flexShrink: 0
-        }}
-        checked={isOn}
-        onClick={(e) => e.stopPropagation()}
-      />
+      <ToggleSwitch checked={isOn} onClick={(e) => e.stopPropagation()} />
     </Flex>
   );
 }

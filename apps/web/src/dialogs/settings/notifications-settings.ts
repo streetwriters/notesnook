@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
+import { Bell } from "../../components/icons";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { strings } from "@notesnook/intl";
 
@@ -29,6 +30,7 @@ export const NotificationsSettings: SettingsGroup[] = [
     settings: [
       {
         key: "reminders",
+        icon: Bell,
         title: strings.reminderNotification(),
         description: strings.reminderNotificationDesc(),
         onStateChange: (listener) =>

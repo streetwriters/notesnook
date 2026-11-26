@@ -17,38 +17,57 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text, Button, Input, Switch } from "@theme-ui/components";
+import { Flex, Text, Button, Input, Box } from "@theme-ui/components";
 import Dialog from "../../components/dialog";
+import Field from "../../components/field";
+import ToggleSwitch from "../../components/toggle-switch";
 import {
-  About,
-  Account,
-  Appearance,
-  Backup,
-  Behaviour,
-  CellphoneLock,
-  Desktop,
-  Documentation,
-  Editor,
-  Import,
-  Legal,
+  Palette,
+  ArrowsClockwise,
+  Bell,
+  CaretRight,
+  ChevronLeftSimple,
+  Close,
+  CloudArrowDown,
+  CloudOutline,
+  Compass,
+  Download,
+  EyeSlash,
+  Gavel,
+  Info,
+  Keyboard,
+  Keyhole,
+  Laptop,
   Loading,
-  Notification,
-  PasswordAndAuth,
-  Privacy,
+  Lock,
+  SearchIcon,
+  PencilSimple,
   Pro,
-  Servers,
-  ShieldLock,
-  Sync,
-  Inbox,
-  CircleEmpty
+  Question,
+  ShieldCheck,
+  Star,
+  TrayArrowDown,
+  UserProfileIcon,
+  Users
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { FlexScrollContainer } from "../../components/scroll-container";
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState
+} from "react";
+import {
+  ButtonSettingComponent,
   DropdownSettingComponent,
   Section,
   SectionGroup,
+  SettingsSubPage,
   SectionKeys,
   Setting,
   SettingsGroup
@@ -79,11 +98,14 @@ import { AppLockSettings } from "./app-lock-settings";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { ServersSettings } from "./servers-settings";
 import { strings } from "@notesnook/intl";
+import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
 import { mdToHtml } from "../../utils/md";
 import { InboxSettings } from "./inbox-settings";
 import { withFeatureCheck } from "../../common";
 import { NotesnookCircleSettings } from "./notesnook-circle-settings";
+import { Select } from "../../components/select";
 import { hashNavigate } from "../../navigation";
+import { KeyboardShortcutsDialog } from "../keyboard-shortcuts-dialog";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -94,35 +116,35 @@ const sectionGroups: SectionGroup[] = [
     key: "account",
     title: strings.account(),
     sections: [
-      { key: "profile", title: strings.profile(), icon: Account },
+      { key: "profile", title: strings.profile(), icon: UserProfileIcon },
       {
         key: "subscription",
         title: strings.subDetails(),
-        icon: Pro,
+        icon: Star,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "auth",
         title: strings.authentication(),
-        icon: PasswordAndAuth,
+        icon: ShieldCheck,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "sync",
         title: strings.sync(),
-        icon: Sync,
+        icon: ArrowsClockwise,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "circle",
         title: strings.notesnookCircle(),
-        icon: CircleEmpty,
+        icon: Users,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "inbox",
         title: strings.inbox(),
-        icon: Inbox,
+        icon: TrayArrowDown,
         isHidden: () => !useUserStore.getState().isLoggedIn
       }
     ]
@@ -131,47 +153,57 @@ const sectionGroups: SectionGroup[] = [
     key: "customization",
     title: strings.customization(),
     sections: [
-      { key: "appearance", title: strings.appearance(), icon: Appearance },
-      { key: "behaviour", title: strings.behaviour(), icon: Behaviour },
-      { key: "editor", title: strings.editor(), icon: Editor },
+      { key: "appearance", title: strings.appearance(), icon: Palette },
+      { key: "behaviour", title: strings.behaviour(), icon: Compass },
+      { key: "editor", title: strings.editor(), icon: PencilSimple },
       {
         key: "desktop",
         title: strings.desktopIntegration(),
-        icon: Desktop,
+        icon: Laptop,
         isHidden: () => !IS_DESKTOP_APP
       },
       {
         key: "notifications",
         title: strings.notifications(),
-        icon: Notification
+        icon: Bell
       },
-      { key: "servers", title: strings.servers(), icon: Servers }
+      { key: "servers", title: strings.servers(), icon: CloudOutline }
     ]
   },
   {
     key: "import-export",
     title: strings.importExport(),
     sections: [
-      { key: "backup-export", title: strings.backupExport(), icon: Backup },
-      { key: "importer", title: strings.notesnookImporter(), icon: Import }
+      {
+        key: "backup-export",
+        title: strings.backupExport(),
+        icon: CloudArrowDown
+      },
+      { key: "importer", title: strings.notesnookImporter(), icon: Download }
     ]
   },
   {
     key: "security",
     title: strings.privacyAndSecurity(),
     sections: [
-      { key: "app-lock", title: strings.appLock(), icon: CellphoneLock },
-      { key: "vault", title: strings.vault(), icon: ShieldLock },
-      { key: "privacy", title: strings.privacy(), icon: Privacy }
+      { key: "app-lock", title: strings.appLock(), icon: Lock },
+      { key: "vault", title: strings.vault(), icon: Keyhole },
+      { key: "privacy", title: strings.privacy(), icon: EyeSlash }
     ]
   },
   {
     key: "other",
     title: strings.other(),
     sections: [
-      { key: "legal", title: strings.legal(), icon: Legal },
-      { key: "support", title: strings.helpAndSupport(), icon: Documentation },
-      { key: "about", title: strings.about(), icon: About }
+      { key: "legal", title: strings.legal(), icon: Gavel },
+      { key: "support", title: strings.helpAndSupport(), icon: Question },
+      { key: "about", title: strings.about(), icon: Info },
+      {
+        key: "keyboard-shortcuts",
+        title: strings.keyboardShortcuts(),
+        icon: Keyboard,
+        action: () => KeyboardShortcutsDialog.show({})
+      }
     ]
   }
 ];
@@ -211,9 +243,46 @@ const SettingsGroups = [
 // 5. Settings will be stateful but independent such that any one setting
 // can appear independent of others (e.g. as a search result)
 
+type SettingsNavigation = {
+  push: (page: SettingsSubPage) => void;
+  pop: () => void;
+};
+
+const SettingsNavigationContext = createContext<SettingsNavigation | undefined>(
+  undefined
+);
+
+function useSettingsNavigation() {
+  const navigation = useContext(SettingsNavigationContext);
+  if (!navigation)
+    throw new Error(
+      "useSettingsNavigation must be used inside SettingsNavigationContext."
+    );
+  return navigation;
+}
+
 export const SettingsDialog = DialogManager.register(function SettingsDialog(
   props: SettingsDialogProps
 ) {
+  const [pages, setPages] = useState<SettingsSubPage[]>([]);
+  const scrollRef = useRef<HTMLElement>(null);
+  const scrollSettingsToTop = useCallback(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, []);
+  const navigation = useMemo<SettingsNavigation>(
+    () => ({
+      push: (page) => {
+        setPages((pages) => [...pages, page]);
+        scrollSettingsToTop();
+      },
+      pop: () => {
+        setPages((pages) => pages.slice(0, -1));
+        scrollSettingsToTop();
+      }
+    }),
+    [scrollSettingsToTop]
+  );
+  const currentPage = pages.at(-1);
   const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
     SettingsGroups.filter(
       (g) => g.section === (props.activeSection || "profile")
@@ -221,54 +290,137 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
   );
 
   return (
-    <Dialog
-      isOpen={true}
-      width={"968px"}
-      onClose={() => props.onClose(false)}
-      noScroll
-      sx={{ bg: "transparent" }}
-    >
-      <Flex
+    <SettingsNavigationContext.Provider value={navigation}>
+      <Dialog
+        isOpen={true}
+        width={"100%"}
+        height={"100%"}
+        onClose={() => props.onClose(false)}
+        noScroll
         sx={{
-          height: "80vw",
-          overflow: "hidden"
+          width: "100%",
+          maxWidth: "100%",
+          height: "100%",
+          maxHeight: "100%",
+          borderRadius: 0,
+          boxShadow: "none"
         }}
       >
-        <SettingsSideBar
-          activeSection={props.activeSection}
-          onNavigate={(settings) => {
-            const scrollbar = document.getElementById("settings-scrollbar");
-            if (scrollbar !== null) scrollbar.scrollTop = 0;
-            setActiveSettings(settings);
-          }}
-        />
-        <FlexScrollContainer
-          id="settings-scrollbar"
-          style={{
-            display: "flex",
-            backgroundColor: "var(--background)",
+        <Flex
+          sx={{
+            display: "grid",
+            gridTemplateColumns:
+              "minmax(20px, 1fr) minmax(0, 1165px) minmax(90px, 1fr)",
+            gridTemplateRows: "minmax(0, 1fr)",
+            mt: ["10px", "10px", "37px"],
+            mb: ["30px", "30px", "57px"],
             flex: 1,
-            flexDirection: "column",
-            padding: 20,
-            gap: 20,
-            minHeight: "auto",
-            overflow: "auto"
+            minHeight: 0
           }}
         >
-          {activeSettings.length > 0 ? (
-            activeSettings.map((group) => (
-              <SettingsGroupComponent item={group} />
-            ))
-          ) : (
-            <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-              {strings.noResultsFound()}
-            </Text>
-          )}
-        </FlexScrollContainer>
-      </Flex>
-    </Dialog>
+          <Flex
+            sx={{
+              gridColumn: 2,
+              minWidth: 0,
+              minHeight: 0,
+              gap: ["spacing4", "spacing4", "spacing9"],
+              overflow: "hidden"
+            }}
+          >
+            <SettingsSideBar
+              activeSection={props.activeSection}
+              onNavigate={(settings) => {
+                scrollSettingsToTop();
+                setPages([]);
+                setActiveSettings(settings);
+              }}
+            />
+            <Box
+              sx={{
+                width: "1px",
+                mr: "-1px",
+                flexShrink: 0,
+                bg: "separator"
+              }}
+            />
+            <FlexScrollContainer
+              scrollRef={scrollRef}
+              style={{
+                flex: 1,
+                maxWidth: 810,
+                minHeight: "auto",
+                padding: 0,
+                overflow: "auto"
+              }}
+            >
+              <Flex sx={{ flexDirection: "column", gap: "spacing7" }}>
+                {currentPage ? (
+                  <SettingsSubPageView
+                    page={currentPage}
+                    onBack={navigation.pop}
+                  />
+                ) : activeSettings.length > 0 ? (
+                  activeSettings.map((group, index) => (
+                    <SettingsGroupComponent key={index} item={group} />
+                  ))
+                ) : (
+                  <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+                    {strings.noResultsFound()}
+                  </Text>
+                )}
+              </Flex>
+            </FlexScrollContainer>
+          </Flex>
+          <Button
+            variant="primary"
+            onClick={() => props.onClose(false)}
+            aria-label={strings.close()}
+            data-test-id="settings-close"
+            sx={{
+              gridColumn: 3,
+              justifySelf: "start",
+              alignSelf: "start",
+              ml: ["spacing4", "spacing4", "spacing13"],
+              width: 20,
+              height: 20,
+              p: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "radius0"
+            }}
+          >
+            <Close size={15} />
+          </Button>
+        </Flex>
+      </Dialog>
+    </SettingsNavigationContext.Provider>
   );
 });
+
+function SettingsSubPageView(props: {
+  page: SettingsSubPage;
+  onBack: () => void;
+}) {
+  const { page, onBack } = props;
+  return (
+    <>
+      <Button
+        variant="new_bordered"
+        data-test-id="settings-go-back"
+        onClick={onBack}
+        sx={{ alignSelf: "flex-start", gap: "spacing3", color: "heading" }}
+      >
+        <ChevronLeftSimple size={14} />
+        {strings.goBack()}
+      </Button>
+      <Text variant="pageHeading" sx={{ fontSize: "sm" }}>
+        {page.title}
+      </Text>
+      <page.component />
+    </>
+  );
+}
 
 type SettingsSideBarProps = {
   onNavigate: (settings: SettingsGroup[]) => void;
@@ -283,137 +435,111 @@ function SettingsSideBar(props: SettingsSideBarProps) {
     hashNavigate(`/settings/${route}`, {
       notify: false
     });
-  }, [route, activeSection]);
+  }, [route]);
 
   return (
     <FlexScrollContainer
       id="settings-side-menu"
       className="theme-scope-navigationMenu"
       style={{
-        width: 240,
-        overflow: "auto",
-        backgroundColor: "var(--background)"
+        flexShrink: 0,
+        overflow: "auto"
       }}
       data-test-id="settings-navigation-menu"
     >
       <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
         <Flex
           sx={{
+            width: ["100%", "100%", "295px"],
             flexDirection: "column",
             display: "flex",
             overflow: "hidden",
-            gap: 2
+            gap: "spacing7",
+            pr: "spacing4"
           }}
         >
-          <Input
+          <Text variant="pageHeading">{strings.settings()}</Text>
+          <Field
             id="search"
             name="search"
+            variant="clean"
             autoFocus
-            placeholder={strings.search()}
+            leftIcon={SearchIcon}
+            placeholder="Search settings"
             data-test-id="settings-search"
-            sx={{
-              m: 1,
-              width: "auto",
-              bg: "background",
-              py: "7px"
+            sx={{ gap: 0, m: 0, width: "100%", height: "40px" }}
+            styles={{
+              input: {
+                m: 0,
+                py: "spacing6",
+                pr: "spacing4",
+                pl: "spacing10",
+                fontSize: "xs",
+                color: "paragraph",
+                bg: "background-secondary",
+                borderRadius: "dialog",
+                "::placeholder": {
+                  color: "paragraph-secondary",
+                  textAlign: "start"
+                }
+              }
             }}
             onChange={(e) => {
               const query = e.target.value.toLowerCase().trim();
-              if (!query)
-                return onNavigate(
-                  SettingsGroups.filter((g) => g.section === route)
-                );
-
-              let groups: SettingsGroup[] = [];
-              for (const group of SettingsGroups) {
-                const section = findSection(group.section);
-                if (section?.isHidden?.() || group.isHidden?.()) continue;
-
-                const isTitleMatch =
-                  typeof group.header === "string" &&
-                  group.header.toLowerCase().includes(query);
-                const isSectionMatch = group.section
-                  .toLowerCase()
-                  .includes(query);
-
-                if (isTitleMatch || isSectionMatch) {
-                  groups.push(group);
-                  continue;
-                }
-
-                const settings = group.settings.filter((setting) => {
-                  const description =
-                    typeof setting.description === "function"
-                      ? setting.description()
-                      : setting.description;
-
-                  return [
-                    description || "",
-                    setting.keywords?.join(" ") || "",
-                    setting.title
-                  ]
-                    .join(" ")
-                    ?.toLowerCase()
-                    .includes(query);
-                });
-                if (!settings.length) continue;
-                groups.push({ ...group, settings });
-              }
-              const matchedSections = findSections(query);
-              if (matchedSections.length > 0) {
-                const matchedGroups = SettingsGroups.filter((g) =>
-                  matchedSections.some((s) => s.key === g.section)
-                );
-                // remove groups whose sections were matched to avoid duplicate
-                // entries.
-                groups = groups.filter(
-                  (g) => !matchedGroups.some((mg) => mg.section === g.section)
-                );
-                groups.push(...matchedGroups);
-              }
-              onNavigate(groups);
+              onNavigate(
+                query
+                  ? searchSettings(query)
+                  : SettingsGroups.filter((g) => g.section === route)
+              );
             }}
           />
-          {sectionGroups.map((group) => (
-            <Flex
-              key={group.key}
-              sx={{ flexDirection: "column", mx: 1, gap: "small" }}
-            >
-              <Text
-                variant={"subBody"}
-                sx={{
-                  fontWeight: "bold",
-                  color: "heading",
-                  mb: 1,
-                  ml: 1,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  wordSpacing: "nowrap"
-                }}
+          <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+            {sectionGroups.map((group) => (
+              <Flex
+                key={group.key}
+                sx={{ flexDirection: "column", gap: "spacing3" }}
               >
-                {group.title}
-              </Text>
-              {group.sections.map(
-                (section) =>
-                  (!section.isHidden || !section.isHidden()) && (
-                    <NavigationItem
-                      key={section.key}
-                      icon={section.icon}
-                      title={section.title}
-                      selected={section.key === route}
-                      onClick={() => {
-                        onNavigate(
-                          SettingsGroups.filter(
-                            (g) => g.section === section.key
-                          )
-                        );
-                        setRoute(section.key);
-                      }}
-                    />
-                  )
-              )}
-            </Flex>
-          ))}
+                <Text
+                  variant="sectionHeading"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {group.title}
+                </Text>
+                <Flex sx={{ flexDirection: "column" }}>
+                  {group.sections.map((section) => {
+                    if (section.isHidden?.()) return null;
+                    const isAction = "action" in section;
+                    return (
+                      <NavigationItem
+                        key={section.key}
+                        icon={section.icon}
+                        iconSize={15}
+                        title={section.title}
+                        sx={{ p: "spacing4" }}
+                        selected={!isAction && section.key === route}
+                        onClick={
+                          "action" in section
+                            ? section.action
+                            : () => {
+                                onNavigate(
+                                  SettingsGroups.filter(
+                                    (g) => g.section === section.key
+                                  )
+                                );
+                                setRoute(section.key);
+                              }
+                        }
+                      />
+                    );
+                  })}
+                </Flex>
+              </Flex>
+            ))}
+          </Flex>
         </Flex>
       </ScopedThemeProvider>
     </FlexScrollContainer>
@@ -424,14 +550,14 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
   const { item } = props;
   const { onRender, onStateChange } = item;
 
-  const [_, setState] = useState<unknown>();
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
   useEffect(() => {
     onRender?.();
   }, [onRender]);
 
   useEffect(() => {
-    const unsubscribe = onStateChange?.(setState);
+    const unsubscribe = onStateChange?.(forceUpdate);
     return () => {
       unsubscribe?.();
     };
@@ -446,29 +572,112 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
       sx={{
         flexDirection: "column",
         flexShrink: 0,
-        gap: 2,
-        overflow: "hidden"
+        gap: "spacing6"
       }}
     >
       {typeof item.header === "string" ? (
-        <Text
-          variant="subBody"
-          sx={{
-            fontSize: 11,
-            fontWeight: "bold",
-            letterSpacing: 0.3,
-            color: "accent"
-          }}
-        >
-          {item.header.toUpperCase()}
-        </Text>
+        <Text variant="sectionHeading">{item.header}</Text>
       ) : (
         <item.header />
       )}
-      {item.settings.map((setting) => (
-        <SettingItem key={setting.key} item={setting} />
-      ))}
+      <Flex
+        sx={{
+          flexDirection: "column",
+          border: "1px solid",
+          borderColor: "border",
+          borderRadius: "radius2",
+          overflow: "hidden",
+          ":empty": { display: "none" },
+          "& > *:not(:last-child)": {
+            borderBottom: "1px solid",
+            borderColor: "border"
+          }
+        }}
+      >
+        {item.settings.map((setting) => (
+          <SettingItem key={setting.key} item={setting} />
+        ))}
+      </Flex>
     </Flex>
+  );
+}
+
+const BUTTON_VARIANTS: Record<ButtonSettingComponent["variant"], string> = {
+  secondary: "new_secondary",
+  bordered: "new_bordered",
+  errorSecondary: "new_error_bordered"
+};
+
+function SettingButton(props: {
+  component: ButtonSettingComponent;
+  loading: boolean;
+  onClick: () => void;
+}) {
+  const { component, loading, onClick } = props;
+  const { copied, copy } = useCopyToClipboard();
+  const label =
+    component.copyText && copied ? strings.copied() : component.title;
+  return (
+    <Button
+      disabled={loading}
+      title={component.title}
+      variant={BUTTON_VARIANTS[component.variant]}
+      sx={{
+        fontSize: "xs",
+        flexShrink: 0,
+        ...(component.variant === "errorSecondary"
+          ? { borderWidth: "1px" }
+          : {})
+      }}
+      onClick={() => {
+        if (component.copyText) {
+          const { copyText } = component;
+          copy(typeof copyText === "function" ? copyText() : copyText);
+          return;
+        }
+        onClick();
+      }}
+    >
+      <Flex
+        sx={{ display: "grid", placeItems: "center", position: "relative" }}
+      >
+        <Text
+          as="span"
+          sx={{
+            gridArea: "1 / 1",
+            color: "inherit",
+            visibility:
+              loading || label !== component.title ? "hidden" : "visible"
+          }}
+        >
+          {component.title}
+        </Text>
+        {component.copyText ? (
+          <Text
+            as="span"
+            sx={{
+              gridArea: "1 / 1",
+              color: "inherit",
+              visibility: copied ? "visible" : "hidden"
+            }}
+          >
+            {strings.copied()}
+          </Text>
+        ) : null}
+        {loading ? (
+          <Loading
+            size={15}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              marginTop: "-7.5px",
+              marginLeft: "-7.5px"
+            }}
+          />
+        ) : null}
+      </Flex>
+    </Button>
   );
 }
 
@@ -477,6 +686,7 @@ function SettingItem(props: { item: Setting }) {
   const [state, setState] = useState<unknown>();
   const [workIndex, setWorkIndex] = useState<number>();
   const feature = useIsFeatureAvailable(item.featureId);
+  const settingsNavigation = useSettingsNavigation();
 
   useEffect(() => {
     if (!item.onStateChange) return;
@@ -488,7 +698,7 @@ function SettingItem(props: { item: Setting }) {
 
   const workWithLoading = useCallback(
     async (index: number, action: () => Promise<unknown> | void) => {
-      if (workIndex) return;
+      if (workIndex !== undefined) return;
       try {
         setWorkIndex(index);
         await action();
@@ -506,143 +716,196 @@ function SettingItem(props: { item: Setting }) {
       ? item.components(state)
       : item.components;
 
-  return (
-    <Flex
-      sx={{
-        flexDirection: "column",
-        pb: 4,
-        borderBottom: "1px solid var(--separator)"
-      }}
-      data-test-id={`setting-${item.key}`}
-    >
-      <Flex
-        sx={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "start",
-          gap: 4
-        }}
-      >
-        <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Flex sx={{ alignItems: "center", gap: 1 }}>
-            <Text
-              variant={"body"}
-              sx={{ fontWeight: "medium", color: "heading" }}
-            >
-              {item.title}
-            </Text>
-            {feature && !feature.isAllowed ? (
-              <Pro size={14} color="orange" />
-            ) : null}
-          </Flex>
-          {item.description && (
-            <Text
-              as={"div"}
-              variant={"body"}
-              sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
-              dangerouslySetInnerHTML={{
-                __html: mdToHtml(
-                  typeof item.description === "function"
-                    ? item.description(state)
-                    : item.description
-                )
-              }}
-            />
-          )}
-        </Flex>
+  const navigationIndex = components.findIndex((c) => c.type === "navigation");
+  const navigation =
+    navigationIndex > -1 ? components[navigationIndex] : undefined;
+  const onNavigate =
+    navigation && navigation.type === "navigation"
+      ? withFeatureCheck(feature, () =>
+          "page" in navigation
+            ? settingsNavigation.push(navigation.page)
+            : workWithLoading(navigationIndex, navigation.action)
+        )
+      : undefined;
+  const ItemIcon = item.icon;
+  const RowContainer = onNavigate ? Button : Flex;
+  const headless =
+    !item.title &&
+    !ItemIcon &&
+    !item.description &&
+    components.length > 0 &&
+    components.every((c) => c.type === "custom" && c.placement !== "trailing");
 
-        <Flex
+  return (
+    <Flex sx={{ flexDirection: "column" }} data-test-id={`setting-${item.key}`}>
+      {headless ? null : (
+        <RowContainer
+          variant={onNavigate ? "primary" : undefined}
+          onClick={onNavigate}
           sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
             alignItems: "center",
-            justifyContent: "end",
-            gap: 2,
-            "& > label": { width: "auto" },
-            "& > *": { flexShrink: 0 }
+            px: "spacing5",
+            py: "spacing6",
+            gap: "spacing4",
+            ...(onNavigate && {
+              width: "100%",
+              textAlign: "left",
+              whiteSpace: "normal",
+              borderRadius: 0
+            })
           }}
         >
-          {components.map((component, index) => {
-            switch (component.type) {
-              case "button":
-                return (
-                  <Button
-                    disabled={workIndex === index}
-                    title={component.title}
-                    variant={component.variant}
-                    onClick={withFeatureCheck(feature, () =>
-                      workWithLoading(index, component.action)
-                    )}
-                  >
-                    {workIndex === index ? (
-                      <Loading size={18} sx={{ mr: 2 }} />
-                    ) : (
-                      component.title
-                    )}
-                  </Button>
-                );
-              case "toggle":
-                return (
-                  <Switch
-                    sx={{
-                      m: 0,
-                      background: component.isToggled()
-                        ? "accent"
-                        : "icon-secondary"
-                    }}
-                    disabled={workIndex === index}
-                    onChange={withFeatureCheck(feature, () =>
-                      workWithLoading(index, component.toggle)
-                    )}
-                    checked={component.isToggled()}
-                    data-checked={component.isToggled()}
-                  />
-                );
-              case "dropdown":
-                return (
-                  <SelectComponent
-                    {...component}
-                    onSelectionChanged={withFeatureCheck(feature, (value) =>
-                      component.onSelectionChanged(value)
-                    )}
-                  />
-                );
-              case "input":
-                return component.inputType === "number" ? (
-                  <NumberInput
-                    key={component.defaultValue()}
-                    min={component.min}
-                    max={component.max}
-                    step={component.step}
-                    defaultValue={component.defaultValue()}
-                    onChange={(value) => component.onChange(value)}
-                  />
-                ) : (
-                  <Input
-                    type={"text"}
-                    defaultValue={component.defaultValue()}
-                    sx={{ width: 250, mr: 1 }}
-                    onChange={debounce(
-                      (e) => component.onChange(e.target.value),
-                      500
-                    )}
-                    onBlur={(e) => component.onChange(e.target.value)}
-                  />
-                );
-              case "icon":
-                return (
-                  <component.icon
-                    size={component.size}
-                    color={component.color}
-                  />
-                );
-              default:
-                return null;
-            }
-          })}
-        </Flex>
-      </Flex>
-      {components.map((component) =>
-        component.type === "custom" ? (
-          <component.component key={item.key} />
+          <Flex sx={{ gap: "spacing3", alignItems: "flex-start", flex: 1 }}>
+            {ItemIcon ? (
+              <Flex variant="iconBox">
+                <ItemIcon size={15} />
+              </Flex>
+            ) : null}
+            <Flex
+              sx={{
+                flexDirection: "column",
+                flex: 1,
+                gap: onNavigate ? "spacing3" : "spacing2"
+              }}
+            >
+              <Flex sx={{ alignItems: "center", gap: 1 }}>
+                <Text
+                  variant={"body"}
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: 500,
+                    lineHeight: 1,
+                    color: item.destructive ? "paragraph-error" : "heading"
+                  }}
+                >
+                  {item.title}
+                </Text>
+                {feature && !feature.isAllowed ? (
+                  <Pro size={14} color="orange" />
+                ) : null}
+              </Flex>
+              {item.description && (
+                <Text
+                  as={"div"}
+                  variant={"body"}
+                  sx={{
+                    fontSize: "xs",
+                    lineHeight: 1.2,
+                    color: "paragraph",
+                    whiteSpace: "pre-wrap",
+                    "& p": { m: 0 }
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: mdToHtml(
+                      typeof item.description === "function"
+                        ? item.description(state)
+                        : item.description
+                    )
+                  }}
+                />
+              )}
+            </Flex>
+          </Flex>
+
+          <Flex
+            sx={{
+              alignItems: "center",
+              alignSelf: components.some(
+                (c) => c.type === "custom" && c.placement === "trailing"
+              )
+                ? "flex-start"
+                : undefined,
+              justifyContent: "end",
+              gap: "spacing4",
+              "& > label": { width: "auto" },
+              "& > *": { flexShrink: 0 }
+            }}
+          >
+            {components.map((component, index) => {
+              switch (component.type) {
+                case "button":
+                  return (
+                    <SettingButton
+                      key={index}
+                      component={component}
+                      loading={workIndex === index}
+                      onClick={withFeatureCheck(feature, () =>
+                        workWithLoading(index, component.action)
+                      )}
+                    />
+                  );
+                case "navigation":
+                  return workIndex === index ? (
+                    <Loading key={index} size={15} />
+                  ) : (
+                    <CaretRight key={index} size={15} />
+                  );
+                case "toggle":
+                  return (
+                    <ToggleSwitch
+                      key={index}
+                      disabled={workIndex === index}
+                      onChange={withFeatureCheck(feature, () =>
+                        workWithLoading(index, component.toggle)
+                      )}
+                      checked={component.isToggled()}
+                      data-checked={component.isToggled()}
+                    />
+                  );
+                case "dropdown":
+                  return (
+                    <SelectComponent
+                      key={index}
+                      {...component}
+                      onSelectionChanged={withFeatureCheck(feature, (value) =>
+                        component.onSelectionChanged(value)
+                      )}
+                    />
+                  );
+                case "input":
+                  return component.inputType === "number" ? (
+                    <NumberInput
+                      key={index}
+                      min={component.min}
+                      max={component.max}
+                      step={component.step}
+                      defaultValue={component.defaultValue()}
+                      onChange={(value) => component.onChange(value)}
+                    />
+                  ) : (
+                    <TextInput
+                      key={index}
+                      defaultValue={component.defaultValue()}
+                      onChange={component.onChange}
+                    />
+                  );
+                case "icon":
+                  return (
+                    <component.icon
+                      key={index}
+                      size={component.size}
+                      color={component.color}
+                    />
+                  );
+                case "custom":
+                  return component.placement === "trailing" ? (
+                    <component.component key={index} />
+                  ) : null;
+                default:
+                  return null;
+              }
+            })}
+          </Flex>
+        </RowContainer>
+      )}
+      {components.map((component, index) =>
+        component.type === "custom" && component.placement !== "trailing" ? (
+          <Box key={index} sx={{ px: "spacing5", pb: "spacing6" }}>
+            <component.component />
+          </Box>
         ) : null
       )}
     </Flex>
@@ -651,36 +914,59 @@ function SettingItem(props: { item: Setting }) {
 
 export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
   const { onSelectionChanged, options } = props;
-  const selectedOption = usePromise(() => props.selectedOption(), [props]);
+  const selectedOption = usePromise(
+    () => props.selectedOption(),
+    [props.selectedOption]
+  );
+  const selectedValue =
+    selectedOption.status === "fulfilled"
+      ? String(selectedOption.value)
+      : undefined;
 
   return (
-    <select
-      style={{
-        backgroundColor: "var(--background-secondary)",
-        outline: "none",
-        border: "1px solid var(--border-secondary)",
-        borderRadius: "5px",
-        color: "var(--paragraph)",
-        padding: "5px",
-        overflow: "hidden"
+    <Select
+      variant="outline"
+      value={selectedValue}
+      options={options.map((o) => ({ ...o, value: String(o.value) }))}
+      onChange={onSelectionChanged}
+      menuPosition={{ align: "end", yOffset: 5 }}
+    />
+  );
+}
+
+function useDebouncedCallback<TArgs extends unknown[]>(
+  fn: (...args: TArgs) => void,
+  ms: number
+) {
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+  return useMemo(
+    () => debounce((...args: TArgs) => fnRef.current(...args), ms),
+    [ms]
+  );
+}
+
+function TextInput(props: {
+  defaultValue: string;
+  onChange: (value: string) => void;
+}) {
+  const { defaultValue, onChange } = props;
+  const onChangeDebounced = useDebouncedCallback(onChange, 500);
+  return (
+    <Input
+      type={"text"}
+      variant="bordered"
+      defaultValue={defaultValue}
+      sx={{
+        width: 260,
+        px: "spacing4",
+        py: "spacing6",
+        fontSize: "sm",
+        outline: "none"
       }}
-      value={
-        selectedOption.status === "fulfilled" ? selectedOption.value : undefined
-      }
-      onChange={(e) =>
-        onSelectionChanged((e.target as HTMLSelectElement).value)
-      }
-    >
-      {options.map((option) => (
-        <option
-          key={option.value}
-          value={option.value}
-          disabled={option.disabled}
-        >
-          {option.title}
-        </option>
-      ))}
-    </select>
+      onChange={(e) => onChangeDebounced(e.target.value)}
+      onBlur={(e) => onChange(e.target.value)}
+    />
   );
 }
 
@@ -699,45 +985,50 @@ function NumberInput({
   defaultValue,
   onChange
 }: NumberInputProps) {
+  const [value, setValue] = useState(String(defaultValue));
   const [isInputValid, setIsInputValid] = useState(true);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const onValueChange = useDebouncedCallback((value: number) => {
+    const isValid = !Number.isNaN(value) && value >= min && value <= max;
+    setIsInputValid(isValid);
+    if (isValid) onChange(value);
+  }, 500);
+
+  useEffect(() => {
+    setValue(String(defaultValue));
+  }, [defaultValue]);
 
   return (
     <Flex sx={{ flexDirection: "column", alignItems: "flex-end" }}>
       <Input
-        ref={inputRef}
         type={"number"}
+        variant="bordered"
         min={min}
         max={max}
         step={step}
-        defaultValue={defaultValue}
+        value={value}
         sx={{
-          width: 80,
-          mr: 1,
+          width: 90,
+          p: "spacing5",
+          fontWeight: 600,
           outline: isInputValid
             ? undefined
             : "2px solid var(--accent-error) !important"
         }}
-        onChange={debounce((e) => {
-          const value = e.target.valueAsNumber;
-          const isValid = !Number.isNaN(value) && value >= min && value <= max;
-          setIsInputValid(isValid);
-          if (isValid) onChange(value);
-        }, 500)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onValueChange(e.target.valueAsNumber);
+        }}
         onBlur={(e) => {
           const raw = e.target.valueAsNumber;
           const clamped =
             Number.isNaN(raw) || raw < min ? min : raw > max ? max : raw;
-          if (inputRef.current) inputRef.current.value = String(clamped);
+          setValue(String(clamped));
           setIsInputValid(true);
           onChange(clamped);
         }}
       />
       {!isInputValid && (
-        <Text
-          variant="subBody"
-          sx={{ fontSize: 11, color: "error", mt: 1, mr: 1 }}
-        >
+        <Text variant="error" sx={{ mt: "spacing2", mr: "spacing2" }}>
           {strings.valueMustBeBetween(min, max)}
         </Text>
       )}
@@ -745,10 +1036,49 @@ function NumberInput({
   );
 }
 
+function searchSettings(query: string) {
+  const matchedSections = findSections(query);
+  const isMatchedSection = (group: SettingsGroup) =>
+    matchedSections.some((s) => s.key === group.section);
+
+  const groups: SettingsGroup[] = [];
+  for (const group of SettingsGroups) {
+    if (isMatchedSection(group)) continue;
+    if (findSection(group.section)?.isHidden?.() || group.isHidden?.())
+      continue;
+
+    if (
+      typeof group.header === "string" &&
+      group.header.toLowerCase().includes(query)
+    ) {
+      groups.push(group);
+      continue;
+    }
+
+    const settings = group.settings.filter((setting) => {
+      const description =
+        typeof setting.description === "function"
+          ? setting.description()
+          : setting.description;
+      return [
+        description || "",
+        setting.keywords?.join(" ") || "",
+        setting.title
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+    });
+    if (settings.length) groups.push({ ...group, settings });
+  }
+  groups.push(...SettingsGroups.filter(isMatchedSection));
+  return groups;
+}
+
 function findSection(key: SectionKeys) {
   for (const group of sectionGroups) {
     const section = group.sections.find((s) => s.key === key);
-    if (section) return section;
+    if (section && !("action" in section)) return section;
   }
   return null;
 }
@@ -757,6 +1087,7 @@ function findSections(query: string) {
   const sections: Section[] = [];
   for (const group of sectionGroups) {
     for (const section of group.sections) {
+      if ("action" in section) continue;
       if (section.isHidden?.()) continue;
       if (section.title.toLowerCase().includes(query)) sections.push(section);
     }

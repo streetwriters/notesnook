@@ -57,13 +57,21 @@ export type SectionGroupKeys =
 export type SectionGroup = {
   key: SectionGroupKeys;
   title: string;
-  sections: Section[];
+  sections: (Section | SectionAction)[];
 };
 
 export type Section = {
   key: SectionKeys;
   title: string;
   icon: Icon;
+  isHidden?: () => boolean;
+};
+
+export type SectionAction = {
+  key: "keyboard-shortcuts";
+  title: string;
+  icon: Icon;
+  action: () => void;
   isHidden?: () => boolean;
 };
 
@@ -83,6 +91,7 @@ export type Setting = {
   key: string;
   keywords?: string[];
   title: string;
+  icon?: Icon;
   description?: string | ((state?: any) => string);
   components: SettingComponent[] | ((state?: any) => SettingComponent[]);
   isHidden?: (state?: any) => boolean;
@@ -90,6 +99,7 @@ export type Setting = {
     listener: (state: unknown, prevState: unknown) => void
   ) => () => void;
   featureId?: FeatureId;
+  destructive?: boolean;
 };
 
 export type SettingComponentType =
@@ -98,6 +108,7 @@ export type SettingComponentType =
   | "button"
   | "input"
   | "icon"
+  | "navigation"
   | "custom";
 
 export type SettingComponent =
@@ -106,6 +117,7 @@ export type SettingComponent =
   | IconSettingComponent
   | DropdownSettingComponent
   | InputSettingComponent
+  | NavigationSettingComponent
   | CustomSettingComponent;
 
 export type BaseSettingComponent<TType extends SettingComponentType> = {
@@ -115,7 +127,8 @@ export type BaseSettingComponent<TType extends SettingComponentType> = {
 export type ButtonSettingComponent = BaseSettingComponent<"button"> & {
   title: string;
   action: () => void | Promise<unknown>;
-  variant: "primary" | "secondary" | "error" | "errorSecondary";
+  copyText?: string | (() => string);
+  variant: "secondary" | "bordered" | "errorSecondary";
 };
 
 export type IconSettingComponent = BaseSettingComponent<"icon"> & {
@@ -123,6 +136,15 @@ export type IconSettingComponent = BaseSettingComponent<"icon"> & {
   size: number;
   color: string;
 };
+
+export type SettingsSubPage = {
+  key: string;
+  title: string;
+  component: () => JSX.Element | null;
+};
+
+export type NavigationSettingComponent = BaseSettingComponent<"navigation"> &
+  ({ action: () => void | Promise<unknown> } | { page: SettingsSubPage });
 
 export type ToggleSettingComponent = BaseSettingComponent<"toggle"> & {
   isToggled: () => boolean;
@@ -155,6 +177,7 @@ export type TextInputSettingComponent = BaseSettingComponent<"input"> & {
 
 export type CustomSettingComponent = BaseSettingComponent<"custom"> & {
   component: () => JSX.Element | null;
+  placement?: "block" | "trailing";
 };
 
 export function isSectionKey(key: string): key is SectionKeys {

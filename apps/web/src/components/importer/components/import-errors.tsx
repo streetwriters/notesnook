@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@theme-ui/components";
-import Accordion from "../../accordion";
-import { strings } from "@notesnook/intl";
+import { Flex, Text } from "@theme-ui/components";
 
 type ImportErrorsProps = {
   errors: Error[];
@@ -27,36 +25,27 @@ type ImportErrorsProps = {
 
 export function ImportErrors(props: ImportErrorsProps) {
   return (
-    <Accordion
-      isClosed={false}
-      title={strings.errorsOccured(props.errors.length)}
-      sx={{ bg: "background-error", borderRadius: "default", mt: 2 }}
-      color="paragraph-error"
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing2",
+        p: "spacing4",
+        bg: "background-error",
+        border: "1px solid",
+        borderColor: "border-error",
+        borderRadius: "radius1",
+        fontSize: "xxs",
+        lineHeight: "normal",
+        color: "paragraph-error",
+        overflowX: "auto"
+      }}
     >
-      <Flex sx={{ flexDirection: "column", px: 2, pb: 2, overflowX: "auto" }}>
-        {props.errors.map((error, index) => (
-          <Text
-            key={index}
-            variant="body"
-            sx={{ color: "paragraph-error", my: 1, fontFamily: "monospace" }}
-          >
-            {index + 1}. {error.message}
-            <br />
-          </Text>
-        ))}
-        <Button
-          variant="error"
-          sx={{ alignSelf: "start", mt: 2 }}
-          onClick={() =>
-            window.open(
-              "https://github.com/streetwriters/notesnook-importer/issues/new",
-              "_blank"
-            )
-          }
-        >
-          {strings.sendUsABugReport()}
-        </Button>
-      </Flex>
-    </Accordion>
+      <Text sx={{ fontWeight: 500, color: "inherit" }}>Error details</Text>
+      {props.errors.map((error, index) => (
+        <Text key={index} sx={{ whiteSpace: "pre-wrap", color: "inherit" }}>
+          {error.message}
+        </Text>
+      ))}
+    </Flex>
   );
 }

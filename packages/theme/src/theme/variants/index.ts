@@ -21,6 +21,7 @@ import { buttonVariants } from "./button.js";
 import { inputVariants } from "./input.js";
 import { textVariants } from "./text.js";
 import { createFlexVariants } from "./flex.js";
+import { boxVariants } from "./box.js";
 
 export const variants = {
   buttons: buttonVariants,
@@ -28,6 +29,7 @@ export const variants = {
   text: textVariants,
   variants: {
     ...createFlexVariants("row"),
-    ...createFlexVariants("column")
+    ...createFlexVariants("column"),
+    ...boxVariants
   }
 };

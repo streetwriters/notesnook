@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Language, useSpellChecker } from "../../../hooks/use-spell-checker";
-import { Input, Label } from "@theme-ui/components";
+import { Box, Flex, Input, Text } from "@theme-ui/components";
 import { useCallback, useEffect, useState } from "react";
 import { deleteItem } from "@notesnook/core";
 import { FlexScrollContainer } from "../../../components/scroll-container";
+import { Checkbox } from "../../../components/checkbox";
 import { strings } from "@notesnook/intl";
 
 export function SpellCheckerLanguages() {
@@ -50,39 +51,94 @@ export function SpellCheckerLanguages() {
     [spellChecker]
   );
 
+  const toggleLanguage = async (code: string, checked: boolean) => {
+    const copiedLanguages = enabledLanguages.slice();
+
+    if (checked) copiedLanguages.push(code);
+    else deleteItem(copiedLanguages, code);
+
+    await spellChecker.setLanguages(copiedLanguages);
+  };
+
   return (
     <>
       <Input
         placeholder={strings.filterLanguages()}
-        sx={{ mx: "2px", my: 2, width: "auto" }}
+        sx={{
+          ml: "37px",
+          width: "calc(100% - 37px)",
+          boxSizing: "border-box",
+          px: "spacing4",
+          py: "spacing6",
+          fontSize: "sm",
+          lineHeight: 1,
+          bg: "background-secondary",
+          border: "none",
+          borderRadius: "radius2",
+          outline: "none",
+          "::placeholder": { color: "placeholder" }
+        }}
         onChange={(e) => filter(e.currentTarget.value.toLowerCase().trim())}
       />
-      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
-        {languages.map((lang) => (
-          <Label key={lang.code} variant="text.body" sx={{ mb: 1 }}>
-            <input
-              type="checkbox"
-              style={{
-                accentColor: "var(--accent)",
-                marginRight: 1,
-                width: 14,
-                height: 14
-              }}
-              checked={enabledLanguages.includes(lang.code)}
-              onChange={async (e) => {
-                const { checked } = e.currentTarget;
-                const copiedLanguages = enabledLanguages.slice();
-
-                if (checked) copiedLanguages.push(lang.code);
-                else deleteItem(copiedLanguages, lang.code);
-
-                await spellChecker.setLanguages(copiedLanguages);
-              }}
-            />
-            <span style={{ marginLeft: 5 }}>{lang.name}</span>
-          </Label>
-        ))}
-      </FlexScrollContainer>
+      <Box
+        sx={{
+          mt: "spacing6",
+          mx: "-13px",
+          borderTop: "1px solid",
+          borderColor: "separator"
+        }}
+      >
+        <FlexScrollContainer
+          suppressAutoHide
+          style={{ maxHeight: 215, paddingTop: 15 }}
+        >
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "max-content max-content",
+              columnGap: "80px",
+              rowGap: "spacing4",
+              justifyContent: "start",
+              px: "spacing5"
+            }}
+          >
+            {languages.map((lang) => {
+              const checked = enabledLanguages.includes(lang.code);
+              return (
+                <Flex
+                  key={lang.code}
+                  sx={{
+                    alignItems: "center",
+                    gap: "spacing4",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => toggleLanguage(lang.code, !checked)}
+                >
+                  <Checkbox
+                    checked={checked}
+                    aria-label={lang.name}
+                    size={15}
+                    checkboxUncheckedIconColor="icon-disabled"
+                    onToggle={() => toggleLanguage(lang.code, !checked)}
+                  />
+                  <Text
+                    variant="body"
+                    sx={{
+                      fontSize: "sm",
+                      lineHeight: 1,
+                      color: checked
+                        ? "paragraph-selected"
+                        : "paragraph-secondary"
+                    }}
+                  >
+                    {lang.name}
+                  </Text>
+                </Flex>
+              );
+            })}
+          </Box>
+        </FlexScrollContainer>
+      </Box>
     </>
   );
 }

@@ -21,7 +21,6 @@ import NoteItem from "../components/note";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { Box, Button, Flex, Label, Text } from "@theme-ui/components";
-import { ThemeUIStyleObject } from "@theme-ui/css";
 import dayjs, { type Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useRef, useState } from "react";
@@ -30,12 +29,12 @@ import { useStore } from "../stores/reminder-store";
 import { useStore as useSettingsStore } from "../stores/setting-store";
 import { showToast } from "../utils/toast";
 import { CalendarDots, CaretDown, Clock, Pro } from "../components/icons";
+import { RadioButton } from "../components/radio-button";
 import { usePersistentState } from "../hooks/use-persistent-state";
 import { DayPicker } from "../components/day-picker";
 import { PopupPresenter } from "@notesnook/ui";
-import type { MenuItem } from "@notesnook/ui";
 import { useStore as useThemeStore } from "../stores/theme-store";
-import { useMenuTrigger } from "../hooks/use-menu";
+import { Select } from "../components/select";
 import {
   getFormattedDate,
   useIsFeatureAvailable,
@@ -288,17 +287,22 @@ export const AddReminderDialog = DialogManager.register(
         <ReminderSection title={strings.reminderModes("repeat")}>
           <Flex sx={{ gap: "spacing4", alignItems: "center" }}>
             {modes.map((m) => (
-              <ReminderRadioButton
+              <RadioButton
                 key={m.id}
                 id={`mode-${m.id}`}
                 name="mode"
                 testId={`mode-${m.id}`}
                 label={strings.reminderModes(m.id)}
                 selected={m.id === mode}
-                premium={
+                disabled={
                   m.id === "repeat" && !repeatModeAvailability?.isAllowed
                 }
-                onClick={() => {
+                proIcon={
+                  m.id === "repeat" && !repeatModeAvailability?.isAllowed ? (
+                    <Pro size={13} />
+                  ) : undefined
+                }
+                onSelect={() => {
                   setMode(m.id);
                   setRecurringMode(RecurringModes.DAY);
                   setSelectedDays([]);
@@ -318,7 +322,7 @@ export const AddReminderDialog = DialogManager.register(
                 }}
               >
                 {recurringModes.map((mode) => (
-                  <ReminderRadioButton
+                  <RadioButton
                     key={mode.id}
                     id={`recurring-mode-${mode.id}`}
                     name={`recurring-mode-${mode.id}`}
@@ -326,7 +330,7 @@ export const AddReminderDialog = DialogManager.register(
                     label={strings.recurringModes(mode.id)}
                     selected={mode.id === recurringMode}
                     sx={{ flex: 1 }}
-                    onClick={() => {
+                    onSelect={() => {
                       setRecurringMode(mode.id);
                       setSelectedDays([]);
                     }}
@@ -649,14 +653,14 @@ export const AddReminderDialog = DialogManager.register(
         <ReminderSection title={strings.alertMode()}>
           <Flex sx={{ gap: 2 }}>
             {priorities.map((p) => (
-              <ReminderRadioButton
+              <RadioButton
                 key={p.id}
                 id={`priority-${p.id}`}
                 name="priority"
                 testId={`priority-${p.id}`}
                 label={strings.reminderNotificationModes(p.title)}
                 selected={p.id === priority}
-                onClick={() => setPriority(p.id)}
+                onSelect={() => setPriority(p.id)}
               />
             ))}
           </Flex>
@@ -766,103 +770,6 @@ function ReminderSection(props: ReminderSectionProps) {
   );
 }
 
-type ReminderRadioButtonProps = {
-  id: string;
-  name: string;
-  testId: string;
-  label: string;
-  selected: boolean;
-  premium?: boolean;
-  sx?: ThemeUIStyleObject;
-  onClick: () => void;
-};
-
-function ReminderRadioButton(props: ReminderRadioButtonProps) {
-  const { id, name, testId, label, selected, premium, sx, onClick } = props;
-
-  return (
-    <Button
-      data-test-id={testId}
-      onClick={premium ? undefined : onClick}
-      sx={{
-        minWidth: 0,
-        border: "1px solid",
-        borderColor: selected ? "transparent" : "border",
-        borderRadius: "radius2",
-        py: "spacing5",
-        px: "spacing4",
-        flexShrink: 0,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        bg: selected ? "background-selected" : "transparent",
-        gap: "spacing4",
-        cursor: premium ? "not-allowed" : "pointer",
-        ":hover:not(:disabled):not(:active)": {
-          background: premium ? "transparent" : "hover"
-        },
-        ...sx
-      }}
-    >
-      {premium && <Pro size={13} />}
-      <Text
-        sx={{
-          color: selected ? "paragraph-selected" : "paragraph",
-          fontWeight: selected ? 500 : 400,
-          fontSize: "sm",
-          lineHeight: 1
-        }}
-      >
-        {label}
-      </Text>
-      <CustomRadio
-        id={id}
-        name={name}
-        checked={selected}
-        onChange={premium ? undefined : onClick}
-      />
-    </Button>
-  );
-}
-
-type CustomRadioProps = {
-  id: string;
-  name: string;
-  checked: boolean;
-  disabled?: boolean;
-  onChange?: () => void;
-};
-
-function CustomRadio(props: CustomRadioProps) {
-  const { id, name, checked, disabled, onChange } = props;
-
-  return (
-    <input
-      type="radio"
-      id={id}
-      name={name}
-      checked={checked}
-      disabled={disabled}
-      onChange={onChange}
-      style={{
-        appearance: "none",
-        WebkitAppearance: "none",
-        flexShrink: 0,
-        width: 16,
-        height: 16,
-        borderRadius: "50%",
-        border: checked
-          ? "1px solid var(--accent)"
-          : "1px solid var(--paragraph)",
-        background: checked ? "var(--accent)" : "none",
-        boxShadow: checked ? "inset 0 0 0 3px var(--background)" : "none",
-        cursor: disabled ? "not-allowed" : "pointer",
-        margin: 0
-      }}
-    />
-  );
-}
-
 function timeFormat() {
   return getTimeFormat(db.settings.getTimeFormat());
 }
@@ -955,11 +862,6 @@ type ReminderSelectProps = {
 
 function ReminderSelect(props: ReminderSelectProps) {
   const { id, label, options, value, action, onSelectionChanged } = props;
-  const ActionIcon = action || CaretDown;
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const { openMenu } = useMenuTrigger();
-  const selectedTitle =
-    options.find((o) => o.value === value)?.title ?? options[0]?.title;
 
   return (
     <Flex
@@ -980,42 +882,15 @@ function ReminderSelect(props: ReminderSelectProps) {
       >
         {label}
       </Label>
-      <Button
+      <Select
+        variant="filled"
         id={id}
-        ref={buttonRef}
-        variant="secondary"
-        onClick={() => {
-          const items: MenuItem[] = options.map((o) => ({
-            type: "button",
-            key: o.value,
-            title: o.title,
-            isChecked: o.value === value,
-            onClick: () => onSelectionChanged(o.value)
-          }));
-          openMenu(items, {
-            position: {
-              target: buttonRef.current,
-              isTargetAbsolute: true,
-              location: "below"
-            }
-          });
-        }}
-        sx={{
-          height: "45px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderRadius: "radius2",
-          px: "spacing4",
-          py: "spacing5",
-          bg: "background-secondary",
-          color: "paragraph",
-          fontSize: "sm"
-        }}
-      >
-        {selectedTitle}
-        <ActionIcon size={15} color="icon" />
-      </Button>
+        value={value}
+        options={options}
+        onChange={onSelectionChanged}
+        icon={action}
+        fallbackToFirst
+      />
     </Flex>
   );
 }

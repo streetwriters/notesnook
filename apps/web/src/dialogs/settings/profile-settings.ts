@@ -18,22 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { createBackup, logout, verifyAccount } from "../../common";
+import { logout, verifyAccount } from "../../common";
 import { db } from "../../common/db";
-import { TaskManager } from "../../common/task-manager";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { logger } from "../../utils/logger";
 import { showToast } from "../../utils/toast";
 import { AttachmentsDialog } from "../attachments-dialog";
-import {
-  ConfirmDialog,
-  showClearSessionsConfirmation,
-  showLogoutConfirmation
-} from "../confirm";
+import { ConfirmDialog, showClearSessionsConfirmation } from "../confirm";
 import { EmailChangeDialog } from "../email-change-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { UserProfile } from "./components/user-profile";
+import {
+  Email,
+  KeyIcon,
+  PaperclipHorizontal,
+  SignOut,
+  TrashSimple
+} from "../../components/icons";
 import { SettingsGroup } from "./types";
 import Config from "../../utils/config";
 
@@ -48,43 +49,40 @@ export const ProfileSettings: SettingsGroup[] = [
     settings: [
       {
         key: "email",
+        icon: Email,
         title: strings.changeEmail(),
         description: strings.changeEmailDesc(),
         keywords: [strings.changeEmail(), strings.newEmail()],
         isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
-            type: "button",
-            title: strings.changeEmail(),
-            variant: "secondary",
+            type: "navigation",
             action: () => EmailChangeDialog.show({})
           }
         ]
       },
       {
         key: "manage-attachments",
+        icon: PaperclipHorizontal,
         title: strings.attachments(),
         description: strings.manageAttachments(),
         components: [
           {
-            type: "button",
-            title: strings.open(),
-            variant: "secondary",
+            type: "navigation",
             action: () => AttachmentsDialog.show({})
           }
         ]
       },
       {
         key: "recovery-key",
+        icon: KeyIcon,
         title: strings.saveDataRecoveryKey(),
         description: strings.saveDataRecoveryKeyDesc(),
         keywords: ["data recovery", "lost your password", "backup"],
         isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
-            type: "button",
-            title: strings.save(),
-            variant: "secondary",
+            type: "navigation",
             action: async () => {
               if (await verifyAccount()) await RecoveryKeyDialog.show({});
             }
@@ -93,6 +91,7 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "delete-data-for-not-logged-in-user",
+        icon: TrashSimple,
         title: strings.deleteData(),
         description: strings.deleteAccountDesc(),
         keywords: [
@@ -103,9 +102,7 @@ export const ProfileSettings: SettingsGroup[] = [
         isHidden: () => Boolean(useUserStore.getState().isLoggedIn),
         components: [
           {
-            type: "button",
-            variant: "error",
-            title: strings.deleteData(),
+            type: "navigation",
             action: async () => {
               const ok = await ConfirmDialog.show({
                 title: strings.deleteData(),
@@ -119,35 +116,6 @@ export const ProfileSettings: SettingsGroup[] = [
                 window.location.reload();
               }
             }
-          }
-        ]
-      },
-      {
-        key: "account-removal",
-        title: strings.deleteAccount(),
-        description: strings.deleteAccountDesc(),
-        keywords: [strings.deleteAccount(), strings.clear()],
-        isHidden: () => !useUserStore.getState().isLoggedIn,
-        components: [
-          {
-            type: "button",
-            variant: "error",
-            title: strings.deleteAccount(),
-            action: () =>
-              showPasswordDialog({
-                title: strings.deleteAccount(),
-                message: strings.deleteAccountDesc(),
-                inputs: {
-                  password: {
-                    label: strings.password(),
-                    autoComplete: "current-password"
-                  }
-                },
-                validate: async ({ password }) => {
-                  await db.user.deleteUser(password);
-                  return true;
-                }
-              })
           }
         ]
       }
@@ -165,34 +133,60 @@ export const ProfileSettings: SettingsGroup[] = [
     settings: [
       {
         key: "logout",
+        icon: SignOut,
         title: strings.logout(),
         description: strings.logoutDesc(),
         keywords: [],
         components: [
           {
-            type: "button",
-            variant: "errorSecondary",
-            title: strings.logout(),
+            type: "navigation",
             action: () => logout()
           }
         ]
       },
       {
         key: "logout-all-sessions",
+        icon: SignOut,
         title: strings.logoutAllOtherDevices(),
         description: strings.logoutAllOtherDevicesDescription(),
         keywords: [strings.clearSessions()],
         components: [
           {
-            type: "button",
-            variant: "errorSecondary",
-            title: strings.logoutAllOtherDevices(),
+            type: "navigation",
             action: async () => {
               if (!(await showClearSessionsConfirmation())) return;
 
               await db.user.clearSessions();
               showToast("success", strings.loggedOutAllOtherDevices());
             }
+          }
+        ]
+      },
+      {
+        key: "account-removal",
+        icon: TrashSimple,
+        title: strings.deleteAccount(),
+        description: strings.deleteAccountDesc(),
+        keywords: [strings.deleteAccount(), strings.clear()],
+        isHidden: () => !useUserStore.getState().isLoggedIn,
+        components: [
+          {
+            type: "navigation",
+            action: () =>
+              showPasswordDialog({
+                title: strings.deleteAccount(),
+                subtitle: strings.deleteAccountDesc(),
+                inputs: {
+                  password: {
+                    label: strings.password(),
+                    autoComplete: "current-password"
+                  }
+                },
+                validate: async ({ password }) => {
+                  await db.user.deleteUser(password);
+                  return true;
+                }
+              })
           }
         ]
       }

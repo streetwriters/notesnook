@@ -20,16 +20,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { DATE_FORMATS, WeekFormat } from "@notesnook/core";
 import { SettingsGroup } from "./types";
 import {
+  GlobeSimple,
+  SidebarSimple,
+  Picture,
+  CalendarBlank,
+  Clock,
+  CalendarDot,
+  CalendarDots,
+  TrashSimple,
+  ArrowsClockwise
+} from "../../components/icons";
+import {
   ImageCompressionOptions,
   useStore as useSettingStore
 } from "../../stores/setting-store";
 import dayjs from "dayjs";
 import { TimeFormat, DayFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
-import {
-  strings,
-  AVAILABLE_LANGUAGES
-} from "@notesnook/intl";
+import { strings, AVAILABLE_LANGUAGES } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import { ConfirmDialog } from "../confirm";
 import { checkFeature } from "../../common";
@@ -42,6 +50,7 @@ export const BehaviourSettings: SettingsGroup[] = [
     settings: [
       {
         key: "app-language",
+        icon: GlobeSimple,
         title: strings.selectLanguage(),
         description: strings.changeLanguage(),
         keywords: ["language", "locale", "select language", "change language"],
@@ -91,6 +100,7 @@ export const BehaviourSettings: SettingsGroup[] = [
       },
       {
         key: "default-sidebar-tab",
+        icon: SidebarSimple,
         title: strings.defaultSidebarTab(),
         description: strings.defaultSidebarTabDesc(),
         keywords: ["default sidebar tab"],
@@ -113,6 +123,7 @@ export const BehaviourSettings: SettingsGroup[] = [
       },
       {
         key: "image-compression",
+        icon: Picture,
         title: strings.imageCompression(),
         description: strings.imageCompressionDesc(),
         keywords: ["compress images", "image quality"],
@@ -158,6 +169,7 @@ export const BehaviourSettings: SettingsGroup[] = [
     settings: [
       {
         key: "date-format",
+        icon: CalendarBlank,
         title: strings.dateFormat(),
         description: strings.dateFormatDesc(),
         keywords: [],
@@ -178,6 +190,7 @@ export const BehaviourSettings: SettingsGroup[] = [
       },
       {
         key: "time-format",
+        icon: Clock,
         title: strings.timeFormat(),
         description: strings.timeFormatDesc(),
         keywords: [],
@@ -198,6 +211,7 @@ export const BehaviourSettings: SettingsGroup[] = [
       },
       {
         key: "day-format",
+        icon: CalendarDot,
         title: strings.dayFormat(),
         description: strings.dayFormatDesc(),
         keywords: [],
@@ -228,6 +242,7 @@ export const BehaviourSettings: SettingsGroup[] = [
       },
       {
         key: "week-format",
+        icon: CalendarDots,
         title: strings.weekFormat(),
         description: strings.weekFormatDesc(),
         keywords: [],
@@ -265,6 +280,7 @@ export const BehaviourSettings: SettingsGroup[] = [
     settings: [
       {
         key: "trash-cleanup-interval",
+        icon: TrashSimple,
         title: strings.clearTrashInterval(),
         description: strings.clearTrashIntervalDesc(),
         keywords: ["clear trash", "trash cleanup interval"],
@@ -308,6 +324,7 @@ export const BehaviourSettings: SettingsGroup[] = [
     settings: [
       {
         key: "auto-updates",
+        icon: ArrowsClockwise,
         title: strings.automaticUpdates(),
         description: strings.automaticUpdatesDesc(),
         onStateChange: (listener) =>

@@ -24,6 +24,13 @@ import Vault from "../../common/vault";
 import { showToast } from "../../utils/toast";
 import { db } from "../../common/db";
 import { strings } from "@notesnook/intl";
+import {
+  Broom,
+  Keyhole,
+  Lock,
+  PencilSimple,
+  TrashSimple
+} from "../../components/icons";
 
 export const VaultSettings: SettingsGroup[] = [
   {
@@ -33,30 +40,40 @@ export const VaultSettings: SettingsGroup[] = [
     settings: [
       {
         key: "create-vault",
+        icon: Keyhole,
         title: strings.createVault(),
+        description: strings.createVaultDesc(),
         isHidden: () => useAppStore.getState().isVaultCreated,
         onStateChange: (listener) =>
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
-            type: "button",
-            title: strings.create(),
+            type: "navigation",
             action: async () => {
               await Vault.createVault();
-            },
-            variant: "secondary"
+            }
           }
         ]
       },
       {
         key: "lock-vault-after",
+        icon: Lock,
         title: strings.lockVaultAfter(),
         description: strings.lockVaultAfterDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
         onStateChange: (listener) => {
-          const unsub1 = useAppStore.subscribe((s) => s.vaultLockAfter, listener);
-          const unsub2 = useAppStore.subscribe((s) => s.isVaultCreated, listener);
-          return () => { unsub1(); unsub2(); };
+          const unsub1 = useAppStore.subscribe(
+            (s) => s.vaultLockAfter,
+            listener
+          );
+          const unsub2 = useAppStore.subscribe(
+            (s) => s.isVaultCreated,
+            listener
+          );
+          return () => {
+            unsub1();
+            unsub2();
+          };
         },
         components: [
           {
@@ -122,6 +139,7 @@ export const VaultSettings: SettingsGroup[] = [
       },
       {
         key: "change-vault-password",
+        icon: PencilSimple,
         title: strings.changeVaultPassword(),
         description: strings.changeVaultPasswordDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
@@ -129,15 +147,14 @@ export const VaultSettings: SettingsGroup[] = [
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
-            type: "button",
-            title: strings.change(),
-            action: () => Vault.changeVaultPassword(),
-            variant: "secondary"
+            type: "navigation",
+            action: () => Vault.changeVaultPassword()
           }
         ]
       },
       {
         key: "clear-vault",
+        icon: Broom,
         title: strings.clearVault(),
         description: strings.clearVaultDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
@@ -145,20 +162,20 @@ export const VaultSettings: SettingsGroup[] = [
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
-            type: "button",
-            title: strings.clear(),
+            type: "navigation",
             action: async () => {
               if (await Vault.clearVault()) {
                 useNotesStore.getState().refresh();
                 showToast("success", strings.vaultCleared());
               }
-            },
-            variant: "errorSecondary"
+            }
           }
         ]
       },
       {
         key: "delete-vault",
+        destructive: true,
+        icon: TrashSimple,
         title: strings.deleteVault(),
         description: strings.deleteVaultDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
@@ -166,16 +183,14 @@ export const VaultSettings: SettingsGroup[] = [
           useAppStore.subscribe((s) => s.isVaultCreated, listener),
         components: [
           {
-            type: "button",
-            title: strings.delete(),
+            type: "navigation",
             action: async () => {
               if ((await Vault.deleteVault()) && !(await db.vault.exists())) {
                 useAppStore.getState().setIsVaultCreated(false);
                 await useAppStore.getState().refresh();
                 showToast("success", strings.vaultDeleted());
               }
-            },
-            variant: "errorSecondary"
+            }
           }
         ]
       }

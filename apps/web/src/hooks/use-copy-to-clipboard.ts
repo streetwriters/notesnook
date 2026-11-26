@@ -34,8 +34,10 @@ export function useCopyToClipboard(resetAfter = 2000) {
     try {
       await writeText(text);
       setCopiedAt(Date.now());
+      return true;
     } catch (e) {
       console.error(e);
+      return false;
     }
   }, []);
 
