@@ -177,9 +177,6 @@ const onUserSessionExpired = async () => {
 
 type SourceType = "notebook" | "tag" | "color";
 
-const isSourceType = (type: string | null): type is SourceType =>
-  type === "notebook" || type === "tag" || type === "color";
-
 const openSource = async (type: SourceType, id: string) => {
   if (type === "notebook") {
     const notebook = await db.notebooks.notebook(id);
@@ -214,6 +211,19 @@ const openSource = async (type: SourceType, id: string) => {
   return true;
 };
 
+const openSourceLink = async (
+  type: SourceType,
+  id: string,
+  url: string,
+  isInitialUrl?: boolean
+) => {
+  const opened = isInitialUrl ? true : await openSource(type, id);
+  if (opened && new URL(url).searchParams.get("new") === "1") {
+    setOnFirstSave({ type, id });
+    openEditor();
+  }
+};
+
 const onAppOpenedFromURL = async (event: {
   url: string;
   isInitialUrl?: boolean;
@@ -229,19 +239,6 @@ const onAppOpenedFromURL = async (event: {
       useWidgetPicker
         .getState()
         .open(getWidgetPickerKind(url)!, getWidgetPickerSlot(url));
-    } else if (url.startsWith("nn://open_source")) {
-      const params = new URL(url).searchParams;
-      const type = params.get("type");
-      const id = params.get("id");
-      if (isSourceType(type) && id) await openSource(type, id);
-    } else if (url.startsWith("nn://new_note")) {
-      const params = new URL(url).searchParams;
-      const type = params.get("type");
-      const id = params.get("id");
-      if (isSourceType(type) && id && (await openSource(type, id))) {
-        setOnFirstSave({ type, id });
-        openEditor();
-      }
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
@@ -265,26 +262,23 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      (parsedLink?.type === "notebook" ||
-        url.startsWith("https://app.notesnook.com/open_notebook?")) &&
-      !event.isInitialUrl
+      parsedLink?.type === "notebook" ||
+      url.startsWith("https://app.notesnook.com/open_notebook?")
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) await openSource("notebook", id);
+      if (id) await openSourceLink("notebook", id, url, event.isInitialUrl);
     } else if (
-      (parsedLink?.type === "tag" ||
-        url.startsWith("https://app.notesnook.com/open_tag?")) &&
-      !event.isInitialUrl
+      parsedLink?.type === "tag" ||
+      url.startsWith("https://app.notesnook.com/open_tag?")
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) await openSource("tag", id);
+      if (id) await openSourceLink("tag", id, url, event.isInitialUrl);
     } else if (
-      (parsedLink?.type === "color" ||
-        url.startsWith("https://app.notesnook.com/open_color?")) &&
-      !event.isInitialUrl
+      parsedLink?.type === "color" ||
+      url.startsWith("https://app.notesnook.com/open_color?")
     ) {
       const id = parsedLink?.id || new URL(url).searchParams.get("id");
-      if (id) await openSource("color", id);
+      if (id) await openSourceLink("color", id, url, event.isInitialUrl);
     } else if (
       url.startsWith("https://app.notesnook.com/open_reminder") ||
       url.startsWith("nn://open_reminder")

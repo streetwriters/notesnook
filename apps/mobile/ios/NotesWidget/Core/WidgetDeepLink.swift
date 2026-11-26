@@ -12,12 +12,12 @@ enum WidgetLink {
     URL(string: "nn://open_reminder?id=\(encode(id))")!
   }
 
-  static func newNote(type: String, id: String) -> URL {
-    sourceURL("new_note", type: type, id: id)
+  static func newNote(type: String, id: String) -> URL? {
+    sourceURL(type: type, id: id, newNote: true)
   }
 
-  static func openSource(type: String, id: String) -> URL {
-    sourceURL("open_source", type: type, id: id)
+  static func openSource(type: String, id: String) -> URL? {
+    sourceURL(type: type, id: id, newNote: false)
   }
 
   static let pickNote = URL(string: "nn://pick_widget_note")!
@@ -25,12 +25,13 @@ enum WidgetLink {
     URL(string: "nn://pick_widget_source?slot=\(encode(slot))")!
   }
 
-  private static func sourceURL(_ host: String, type: String, id: String) -> URL {
+  private static func sourceURL(type: String, id: String, newNote: Bool) -> URL? {
     var components = URLComponents()
-    components.scheme = "nn"
-    components.host = host
-    components.queryItems = [URLQueryItem(name: "type", value: type), URLQueryItem(name: "id", value: id)]
-    return components.url!
+    components.scheme = "https"
+    components.host = "app.notesnook.com"
+    components.path = "/open_\(type)"
+    components.queryItems = [URLQueryItem(name: "id", value: id)] + (newNote ? [URLQueryItem(name: "new", value: "1")] : [])
+    return components.url
   }
 
   private static func encode(_ value: String) -> String {

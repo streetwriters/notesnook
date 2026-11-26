@@ -22,11 +22,11 @@ struct NotesListSource: Codable, Hashable, Identifiable {
   }
 
   var newNoteURL: URL {
-    scope.map { WidgetLink.newNote(type: $0.type, id: $0.id) } ?? WidgetLink.newNote
+    scope.flatMap { WidgetLink.newNote(type: $0.type, id: $0.id) } ?? WidgetLink.newNote
   }
 
   var openURL: URL? {
-    scope.map { WidgetLink.openSource(type: $0.type, id: $0.id) }
+    scope.flatMap { WidgetLink.openSource(type: $0.type, id: $0.id) }
   }
 }
 
