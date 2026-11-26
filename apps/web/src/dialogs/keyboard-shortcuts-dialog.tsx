@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { formatKey, getGroupedKeybindings } from "@notesnook/common";
-import { Flex, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
+import { Fragment } from "react";
 import { DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
 import { isMac } from "../utils/platform";
@@ -32,46 +33,71 @@ export const KeyboardShortcutsDialog = DialogManager.register(
       <Dialog
         isOpen={true}
         title={strings.keyboardShortcuts()}
-        width={750}
+        width={605}
         onClose={() => props.onClose(false)}
       >
         <Flex
           sx={{
             flexDirection: "column",
             flexWrap: "nowrap",
-            mt: 2,
-            gap: 1
+            mt: "spacing6",
+            pb: "spacing7",
+            gap: "spacing6"
           }}
         >
-          {groupedKeybindings.map((group) => {
+          {groupedKeybindings.map((group, index) => {
             return (
-              <Flex key={group.category} sx={{ flexDirection: "column" }}>
-                <Text
-                  variant="subtitle"
-                  sx={{
-                    borderBottom: "1px solid var(--border)",
-                    mb: 1,
-                    pb: 1
-                  }}
-                >
-                  {group.category}
-                </Text>
-                {group.shortcuts.map((shortcut) => {
-                  return (
-                    <Flex
-                      key={shortcut.description}
-                      sx={{
-                        mb: 2,
-                        flexDirection: "row",
-                        justifyContent: "space-between"
-                      }}
-                    >
-                      <Text variant="body">{shortcut.description}</Text>
-                      <Keys keys={shortcut.keys} />
-                    </Flex>
-                  );
-                })}
-              </Flex>
+              <Fragment key={group.category}>
+                {index > 0 && (
+                  <Box
+                    sx={{
+                      flexShrink: 0,
+                      height: "1px",
+                      bg: "separator"
+                    }}
+                  />
+                )}
+                <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+                  <Text
+                    sx={{
+                      fontSize: "3xs",
+                      fontWeight: 500,
+                      lineHeight: 1,
+                      letterSpacing: "0.33px",
+                      textTransform: "capitalize",
+                      color: "heading-secondary"
+                    }}
+                  >
+                    {group.category}
+                  </Text>
+                  <Flex sx={{ flexDirection: "column", gap: "spacing2" }}>
+                    {group.shortcuts.map((shortcut) => {
+                      return (
+                        <Flex
+                          key={shortcut.description}
+                          sx={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: "spacing3"
+                          }}
+                        >
+                          <Text
+                            sx={{
+                              fontSize: "xs",
+                              lineHeight: 1,
+                              color: "paragraph"
+                            }}
+                          >
+                            {shortcut.description}
+                          </Text>
+                          <Keys keys={shortcut.keys} />
+                        </Flex>
+                      );
+                    })}
+                  </Flex>
+                </Flex>
+              </Fragment>
             );
           })}
         </Flex>
@@ -82,31 +108,37 @@ export const KeyboardShortcutsDialog = DialogManager.register(
 
 function Keys({ keys }: { keys: string[] }) {
   return (
-    <Flex sx={{ gap: 1 }}>
+    <Flex sx={{ alignItems: "center", gap: "spacing2", flexShrink: 0 }}>
       {keys.map((key, index) => (
-        <>
-          {key.split(" ").map((k) => (
-            <Text
-              key={k}
-              as="code"
-              sx={{
-                bg: "background",
-                color: "paragraph",
-                px: 1,
-                borderRadius: 5,
-                fontSize: "body",
-                border: "1px solid var(--border)"
-              }}
-            >
-              {formatKey(k, isMac())}
-            </Text>
-          ))}
+        <Fragment key={key}>
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "spacing2",
+              px: "spacing2",
+              py: "spacing1",
+              border: "1px solid var(--border)",
+              borderRadius: "radius1"
+            }}
+          >
+            {formatKey(key, isMac())
+              .split(" ")
+              .map((k, i) => (
+                <Text
+                  key={k + i}
+                  sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}
+                >
+                  {k}
+                </Text>
+              ))}
+          </Flex>
           {keys.length - 1 !== index && (
-            <Text as="span" sx={{ fontSize: "0.8em" }}>
+            <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
               /
             </Text>
           )}
-        </>
+        </Fragment>
       ))}
     </Flex>
   );
