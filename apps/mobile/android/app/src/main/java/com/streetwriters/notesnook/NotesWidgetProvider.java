@@ -3,6 +3,9 @@ package com.streetwriters.notesnook;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.net.Uri;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
@@ -61,7 +64,32 @@ public class NotesWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, RemoteViews views) {
         NotesWidgetSource source = WidgetUtils.getNotesWidgetSource(context, appWidgetId);
         views.setTextViewText(R.id.widget_title, WidgetUtils.getNotesWidgetTitle(context, source));
+        setButtonIntents(context, views, appWidgetId, source);
         WidgetUtils.updateNotesListWidget(context, appWidgetManager, appWidgetId, views,
                 WidgetUtils.getNotesWidgetNotes(context, source.getKey()));
+    }
+
+    private static void setButtonIntents(Context context, RemoteViews views, int appWidgetId, NotesWidgetSource source) {
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        if (source.hasScope()) {
+            String link = "nn://" + source.getType() + "/" + Uri.encode(source.getId());
+            views.setViewVisibility(R.id.open_source_button, android.view.View.VISIBLE);
+            views.setOnClickPendingIntent(R.id.open_source_button,
+                    linkIntent(context, appWidgetId * 2, link, flags));
+            views.setOnClickPendingIntent(R.id.new_note_button,
+                    linkIntent(context, appWidgetId * 2 + 1, link + "?new=1", flags));
+        } else {
+            views.setViewVisibility(R.id.open_source_button, android.view.View.GONE);
+            Intent intent = new Intent(context, ShareActivity.class);
+            views.setOnClickPendingIntent(R.id.new_note_button, PendingIntent.getActivity(
+                    context, appWidgetId * 2 + 1, intent, flags, WidgetUtils.getActivityOptionsBundle()));
+        }
+    }
+
+    private static PendingIntent linkIntent(Context context, int requestCode, String link, int flags) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(link));
+        return PendingIntent.getActivity(context, requestCode, intent, flags, WidgetUtils.getActivityOptionsBundle());
     }
 }

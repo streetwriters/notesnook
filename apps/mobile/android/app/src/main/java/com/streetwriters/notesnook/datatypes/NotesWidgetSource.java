@@ -29,6 +29,10 @@ public class NotesWidgetSource {
         return id;
     }
 
+    public boolean hasScope() {
+        return id != null && ("notebook".equals(type) || "tag".equals(type) || "color".equals(type));
+    }
+
     public String getTitle() {
         return title == null ? "" : title;
     }

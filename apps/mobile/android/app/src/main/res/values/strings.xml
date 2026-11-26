@@ -16,6 +16,8 @@
     <string name="notes_widget_title">Notes</string>
     <string name="notes_widget_description">Show pinned, recent or favorite notes, or the notes of a notebook, tag or color</string>
     <string name="notes_widget_default_source">Recent</string>
+    <string name="notes_widget_open_source">Open</string>
+    <string name="notes_widget_new_note">New note</string>
     <string name="widget_notes_empty">No notes</string>
 
     <!-- Sample content, only ever shown in the widget picker's preview. -->

@@ -4,19 +4,44 @@
     android:layout_height="match_parent"
     android:background="@drawable/layout_bg">
 
-    <TextView
-        android:id="@+id/widget_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:ellipsize="end"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingHorizontal="12dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:textColor="@color/text"
-        android:text="@string/notes_widget_default_source"/>
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/text"
+            android:text="@string/notes_widget_default_source"/>
+
+        <ImageButton
+            android:id="@+id/open_source_button"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="12dp"
+            android:padding="3dp"
+            android:visibility="gone"
+            android:contentDescription="@string/notes_widget_open_source"
+            android:background="@drawable/ic_open_source" />
+
+        <ImageButton
+            android:id="@+id/new_note_button"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:contentDescription="@string/notes_widget_new_note"
+            android:background="@drawable/ic_newnote" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
