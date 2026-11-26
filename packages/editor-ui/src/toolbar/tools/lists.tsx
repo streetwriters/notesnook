@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { q } from "../../queries/queries.js";
 import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
 import { ToolProps } from "../types.js";
-import { Box, Button, Flex, Text, type UIElement } from "@ui";
+import { Box, Button, Flex, Text, type UIElement } from "@notesnook/ui-kit";
 import { IconNames } from "../icons.js";
 import { useCallback, useRef } from "react";
 import { SplitButton } from "../components/split-button.js";

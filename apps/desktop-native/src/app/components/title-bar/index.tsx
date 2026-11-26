@@ -23,7 +23,7 @@ import {
   TITLE_BAR_HEIGHT as UI_TITLE_BAR_HEIGHT,
   TitleBar as UITitleBar,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import type { Icon } from "../icons";
 
 export const TITLE_BAR_HEIGHT = UI_TITLE_BAR_HEIGHT;

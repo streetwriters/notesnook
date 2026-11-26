@@ -25,7 +25,7 @@ import {
   ResponsivePresenter as UIResponsivePresenter,
   Text,
   type MenuItem
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { Icons } from "../../toolbar/icons.js";
 import { MenuButton, MenuSeparator } from "../menu/index.js";
 
@@ -62,18 +62,18 @@ export type ActionSheetPresenterProps = {
   items?: MenuItem[];
   isOpen: boolean;
   onClose?: () => void;
-  /** @deprecated the `@ui` sheet is always modal. Kept for API compatibility. */
+  /** @deprecated the `@notesnook/ui-kit` sheet is always modal. Kept for API compatibility. */
   blocking?: boolean;
-  /** @deprecated focus is handled by the `@ui` sheet. Kept for API compatibility. */
+  /** @deprecated focus is handled by the `@notesnook/ui-kit` sheet. Kept for API compatibility. */
   focusOnRender?: boolean;
-  /** @deprecated swipe to dismiss is handled by the `@ui` sheet. Kept for API compatibility. */
+  /** @deprecated swipe to dismiss is handled by the `@notesnook/ui-kit` sheet. Kept for API compatibility. */
   draggable?: boolean;
   title?: string;
 };
 
 /**
  * A bottom sheet listing `items` (or `children`), with title and submenu
- * navigation. It is drawn by `@ui`'s `ResponsivePresenter` pinned to the
+ * navigation. It is drawn by `@notesnook/ui-kit`'s `ResponsivePresenter` pinned to the
  * sheet layout (`sheetBreakpoint={Infinity}`), so it needs no anchor and no
  * DOM of its own.
  */

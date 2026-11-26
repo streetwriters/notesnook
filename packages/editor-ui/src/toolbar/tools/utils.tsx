@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { EditorController } from "../../controller.js";
-import type { MenuButtonItem } from "@ui";
+import type { MenuButtonItem } from "@notesnook/ui-kit";
 import { ToolButton } from "../components/tool-button.js";
 import { ToolDefinition, ToolProps } from "../types.js";
 import { IconNames, Icons } from "../icons.js";

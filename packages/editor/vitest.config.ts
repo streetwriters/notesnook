@@ -32,9 +32,9 @@ export default defineConfig({
   resolve: {
     mainFields: ["module", "jsnext:main", "jsnext"],
     alias: [
-      // the editor UI's web target of the `@ui` contracts, as in apps/web
+      // the editor UI's web target of the `@notesnook/ui-kit` contracts, as in apps/web
       {
-        find: /^@ui$/,
+        find: /^@notesnook\/ui-kit$/,
         replacement: path.resolve(__dirname, "../ui/src/kit/web/index.ts")
       },
       {

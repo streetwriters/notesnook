@@ -189,7 +189,10 @@ export default defineConfig({
         find: /^@notesnook\/ui$/,
         replacement: path.join(root, "../../packages/ui/dist/index.mjs")
       },
-      { find: /^@ui$/, replacement: path.join(webTarget, "ui/index.ts") },
+      {
+        find: /^@notesnook\/ui-kit$/,
+        replacement: path.join(webTarget, "ui/index.ts")
+      },
       { find: /^@notesnook\/ui-kit\/(.*)$/, replacement: path.join(uiKit, "$1") },
       { find: /^@platform$/, replacement: path.join(webTarget, "platform/index.ts") },
       {

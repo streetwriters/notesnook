@@ -28,7 +28,7 @@ import {
   DragGhostHost,
   PopoverHost,
   ToastHost
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { ActionBar } from "./components/action-bar";
 import { MenuHost } from "./components/menu";
 import { DialogHost } from "./common/dialog-manager";

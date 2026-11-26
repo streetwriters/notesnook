@@ -28,7 +28,14 @@ import {
   type ReactNode
 } from "react";
 import { environment, shell } from "@platform";
-import { Box, Button, Flex, Label, ScrollContainer, Text } from "@ui";
+import {
+  Box,
+  Button,
+  Flex,
+  Label,
+  ScrollContainer,
+  Text
+} from "@notesnook/ui-kit";
 import {
   CaretRight,
   Chat,

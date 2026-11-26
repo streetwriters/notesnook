@@ -81,9 +81,9 @@ npm run web
 npm run build:web
 ```
 
-The web target (`src/targets/web`) implements the same `@ui` and `@platform` contracts with `react-dom` and browser APIs. It is for development and parity work and is never shipped. The shared `@notesnook/*` packages must be built first (`npm run build` in each, as for the native app). The app starts on the notes screen with a local database (wa-sqlite on IndexedDB); you can sign in or create local notes.
+The web target (`src/targets/web`) implements the same `@notesnook/ui-kit` and `@platform` contracts with `react-dom` and browser APIs. It is for development and parity work and is never shipped. The shared `@notesnook/*` packages must be built first (`npm run build` in each, as for the native app). The app starts on the notes screen with a local database (wa-sqlite on IndexedDB); you can sign in or create local notes.
 
-Vite resolves `@ui` and `@platform` only to `src/targets/web`. Importing anything that resolves into `src/targets/desktop` fails the build, and `@react-native-gpui/*` and `react-native` imports become a stub that throws "... is not implemented on web" when used.
+Vite resolves `@notesnook/ui-kit` and `@platform` only to `src/targets/web`. Importing anything that resolves into `src/targets/desktop` fails the build, and `@react-native-gpui/*` and `react-native` imports become a stub that throws "... is not implemented on web" when used.
 
 What works: layout, navigation, theming, dialogs and popovers, lists, the local database (shared with `apps/web`'s wa-sqlite dialect), crypto (`globalThis.crypto`, sodium wasm), config and key-value storage (localStorage), clipboard, file pick and download, window title and fullscreen.
 
@@ -131,13 +131,13 @@ Top-level directories in `apps/desktop-native/`:
 
 - `src/app/`: the app itself, shared by every target (`views`, `dialogs`, `components`, `stores`, `navigation`, etc.)
 - `src/platform/`: the contracts for platform services (files, database, crypto, clipboard and so on)
-- `../../packages/ui/src/kit/`: the `@ui` contracts (`contracts`), their desktop and web implementations (`desktop`, `web`) and the code both share (`shared`). Source only, imported as `@notesnook/ui-kit/*`; the web build fails if `web` or `shared` imports a react-native package. The contracts follow the theme-ui, DOM, react-virtuoso and react-modal API that `apps/web` uses; [docs/ui-kit-web-api.md](docs/ui-kit-web-api.md) lists what is kept, what is a subset and what is deprecated
+- `../../packages/ui/src/kit/`: the `@notesnook/ui-kit` contracts (`contracts`), their desktop and web implementations (`desktop`, `web`) and the code both share (`shared`). Source only: app code imports the active target's kit as `@notesnook/ui-kit` (each target's tsconfig, Metro and Vite config map it), and target code reaches files in the kit as `@notesnook/ui-kit/<dir>/...`; the web build fails if `web` or `shared` imports a react-native package. The contracts follow the theme-ui, DOM, react-virtuoso and react-modal API that `apps/web` uses; [docs/ui-kit-web-api.md](docs/ui-kit-web-api.md) lists what is kept, what is a subset and what is deprecated
 - `src/targets/desktop/`: the desktop implementation of `@platform`, and `ui/`, which re-exports the kit's desktop implementation plus the app's `EditorSurface`
 - `src/targets/web/`: the same for the web target
 - `desktop/`: the native project: `desktop.json` (window, identifier, packaging), the Rust entry point, assets and the end-to-end tests in `desktop/e2e/`
 - `tools/`: asset and icon generators, the visual parity tools, performance scripts and `ui-kit-web-api/` (`npm run check:web-api`: scans `apps/web` for the UI APIs it uses, fails if the kit contract lacks one, and regenerates the table in `docs/ui-kit-web-api.md`) and `divergence/` (`npm run report:divergence`: pairs every file in `src/app` with its `apps/web/src` counterpart, removes imports, and lists the changed lines per file; `-- --show <path>` prints one pair's diff, `-- --json` the whole report. `divergence/allowlist.json` lists the files allowed to differ, each with its category (platform, native-editor, desktop-only) and reason. A report only, it exits 0 whatever it finds)
 
-The app code only imports `@ui/*` and `@platform/*`; Metro resolves them to the active target.
+The app code only imports `@notesnook/ui-kit` and `@platform/*`; Metro resolves them to the active target.
 
 ## Running tests
 

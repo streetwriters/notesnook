@@ -22,7 +22,7 @@ import {
   ProviderSettings,
   transform
 } from "@notesnook-importer/core";
-import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { xxhash64 } from "../xxhash";
 import { LinkText } from "../../../dialogs/components/link-text";
 import { useRef, useState } from "react";

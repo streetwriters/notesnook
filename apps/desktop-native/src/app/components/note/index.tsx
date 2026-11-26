@@ -43,7 +43,7 @@ import {
   type ColorValue,
   type MenuItem,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";

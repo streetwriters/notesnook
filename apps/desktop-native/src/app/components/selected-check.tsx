@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import type { PressEvent } from "@ui";
+import type { PressEvent } from "@notesnook/ui-kit";
 import { CheckboxRemove } from "./icons";
 import { Checkbox } from "./checkbox";
 import {

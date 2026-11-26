@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { ColorPicker, Dialog, Flex } from "@ui";
+import { ColorPicker, Dialog, Flex } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";

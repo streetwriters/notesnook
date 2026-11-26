@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text, type MenuItem, type SxProp } from "@ui";
+import {
+  Button,
+  Flex,
+  Text,
+  type MenuItem,
+  type SxProp
+} from "@notesnook/ui-kit";
 import { Menu } from "../../hooks/use-menu";
 import { ChevronDown } from "../icons";
 

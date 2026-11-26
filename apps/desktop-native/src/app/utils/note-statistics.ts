@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { EditorStatistics } from "@ui";
+import type { EditorStatistics } from "@notesnook/ui-kit";
 
 const BLOCK =
   /<\/?(p|div|br|li|ul|ol|h[1-6]|tr|table|pre|blockquote|hr)\b[^>]*>/gi;

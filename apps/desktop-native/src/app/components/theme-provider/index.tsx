@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, type ReactNode } from "react";
-import { Flex, ThemeScope, type SxProp, type ThemeScopeName } from "@ui";
+import {
+  Flex,
+  ThemeScope,
+  type SxProp,
+  type ThemeScopeName
+} from "@notesnook/ui-kit";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useSystemTheme } from "../../hooks/use-system-theme";
 

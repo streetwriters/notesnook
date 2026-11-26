@@ -21,7 +21,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
 import type { GroupingKey } from "@notesnook/core";
 import { usePromise } from "@notesnook/common";
-import { Box, Button, Flex, Input, Text } from "@ui";
+import { Box, Button, Flex, Input, Text } from "@notesnook/ui-kit";
 import { showGroupOptionsMenu } from "../group-header";
 import Config from "../../utils/config";
 import { useDatabaseReady } from "../../stores/boot-store";

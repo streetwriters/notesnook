@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dialog, Flex, Text } from "@ui";
+import { Dialog, Flex, Text } from "@notesnook/ui-kit";
 import { environment, shell } from "@platform";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";

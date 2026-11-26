@@ -22,7 +22,7 @@ import { EVENTS } from "@notesnook/core";
 import { getFeature, planToAvailability } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import dayjs from "dayjs";
-import { Box, Button, Flex, Text } from "@ui";
+import { Box, Button, Flex, Text } from "@notesnook/ui-kit";
 import Field from "../components/field";
 import { Logo } from "../components/navigation-menu/logo";
 import { hardNavigate, useQueryParams } from "../navigation";

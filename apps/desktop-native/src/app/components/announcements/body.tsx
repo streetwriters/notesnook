@@ -28,7 +28,7 @@ import {
   type ButtonProps,
   type SxProp,
   type TextProps
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   Attachment,
   Backup,

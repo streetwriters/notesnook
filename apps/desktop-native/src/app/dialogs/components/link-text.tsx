@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ReactNode } from "react";
-import { Text, type SxProp } from "@ui";
+import { Text, type SxProp } from "@notesnook/ui-kit";
 import { shell } from "@platform";
 
 export function LinkText(props: {

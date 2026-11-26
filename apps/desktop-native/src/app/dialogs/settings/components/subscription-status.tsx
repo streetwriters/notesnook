@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useStore as useUserStore } from "../../../stores/user-store";
-import { Button, Flex, Text } from "@ui";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";
 import { getSubscriptionInfo } from "./user-profile";
 import { BuyDialog } from "../../buy-dialog";

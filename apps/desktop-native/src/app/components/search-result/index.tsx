@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo, useState } from "react";
 import type { HighlightedResult, Match as TMatch } from "@notesnook/core";
-import { Button, Flex, Text, type MenuItem } from "@ui";
+import { Button, Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import { ChevronDown, ChevronRight } from "../icons";
 import { useEditorStore } from "../../stores/editor-store";

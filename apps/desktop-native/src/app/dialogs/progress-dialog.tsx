@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { Box, Flex, Text } from "@ui";
-import { Dialog } from "@ui";
+import { Box, Flex, Text } from "@notesnook/ui-kit";
+import { Dialog } from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 

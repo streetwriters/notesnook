@@ -28,7 +28,7 @@ import {
   ScrollContainer,
   Text,
   useWindowSize
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { clipboard } from "@platform";
 import { strings } from "@notesnook/intl";
 import { db } from "../common/db";

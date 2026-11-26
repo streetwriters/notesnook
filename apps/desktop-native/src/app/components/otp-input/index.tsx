@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef } from "react";
-import { Flex, Input, type KeyEvent, type UIElement } from "@ui";
+import { Flex, Input, type KeyEvent, type UIElement } from "@notesnook/ui-kit";
 
 type OtpInputProps = {
   length?: number;

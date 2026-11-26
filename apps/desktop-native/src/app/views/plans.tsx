@@ -27,7 +27,7 @@ import {
   ScrollContainer,
   Text,
   type ColorValue
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   ComparePlans,
   Footer,

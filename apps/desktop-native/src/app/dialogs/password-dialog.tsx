@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Checkbox, Flex, Text } from "@ui";
-import { Dialog } from "@ui";
+import { Checkbox, Flex, Text } from "@notesnook/ui-kit";
+import { Dialog } from "@notesnook/ui-kit";
 import { Field, type FieldProps } from "./components/field";
 import { Warning } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";

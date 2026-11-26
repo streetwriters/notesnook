@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useMemo } from "react";
 import { getThemeScope } from "@notesnook/theme";
-import { Flex, Icon, Image, type SxProp } from "@ui";
+import { Flex, Icon, Image, type SxProp } from "@notesnook/ui-kit";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { svgAssets, type SvgAssetName } from "../../assets/svg.generated";
 import {

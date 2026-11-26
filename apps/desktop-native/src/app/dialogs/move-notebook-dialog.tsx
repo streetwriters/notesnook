@@ -22,7 +22,7 @@ import { strings } from "@notesnook/intl";
 import { useCallback } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { Dialog } from "@ui";
+import { Dialog } from "@notesnook/ui-kit";
 import { store as notebookStore } from "../stores/notebook-store";
 import { useRelationChangesStore } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";

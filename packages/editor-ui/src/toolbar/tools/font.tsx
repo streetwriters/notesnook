@@ -22,7 +22,7 @@ import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js
 import { ToolProps } from "../types.js";
 import type { EditorController } from "../../controller.js";
 import { Dropdown } from "../components/dropdown.js";
-import type { MenuItem } from "@ui";
+import type { MenuItem } from "@notesnook/ui-kit";
 import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";

@@ -26,7 +26,7 @@ import {
   Icon,
   Input,
   SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { Icons } from "../icons.js";
 import { useCallback, useState } from "react";
 import { colord } from "colord";

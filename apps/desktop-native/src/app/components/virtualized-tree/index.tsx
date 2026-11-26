@@ -26,7 +26,11 @@ import {
   type ReactNode,
   type Ref
 } from "react";
-import { VirtualList, type PressEvent, type VirtualListHandle } from "@ui";
+import {
+  VirtualList,
+  type PressEvent,
+  type VirtualListHandle
+} from "@notesnook/ui-kit";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import {
   ListSelectionContext,

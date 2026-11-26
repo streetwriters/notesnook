@@ -86,7 +86,7 @@ describe("comparePair", () => {
       "import {",
       "  Button,",
       "  Flex",
-      '} from "@ui";',
+      '} from "@notesnook/ui-kit";',
       "export function X() {",
       "  return <Flex><Button /></Flex>;",
       "}   "
@@ -202,7 +202,8 @@ describe("buildReport", () => {
 
   it("separates identical, allowlisted and unexplained files", () => {
     const appSrc = tree({
-      "same.tsx": 'import { Box } from "@ui";\nexport const a = 1;\n',
+      "same.tsx":
+        'import { Box } from "@notesnook/ui-kit";\nexport const a = 1;\n',
       "drift.ts": "export const b = 2;\n",
       "editor.ts": "export const c = 3;\n",
       "smoke.tsx": "export const d = 4;\n",

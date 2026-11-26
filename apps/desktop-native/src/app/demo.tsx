@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Box, Button, Flex, Grid, Input, Text } from "@ui";
+import { Box, Button, Flex, Grid, Input, Text } from "@notesnook/ui-kit";
 import type { BootState } from "./boot";
 
 export type Status =

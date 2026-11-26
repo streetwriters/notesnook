@@ -24,7 +24,7 @@ import type {
 } from "@notesnook/core";
 import { debounce } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Box, Flex } from "@ui";
+import { Box, Flex } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
 import { store as selectionStore } from "../stores/selection-store";

@@ -36,7 +36,7 @@ import {
   type DragEvent,
   type SxProp,
   type VirtualListHandle
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { store as selectionStore } from "../../stores/selection-store";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";

@@ -106,11 +106,11 @@ export default defineConfig({
     alias: [
       {
         // the shared editor UI's web target (packages/ui/src/kit/web)
-        find: /^@ui$/,
+        find: /^@notesnook\/ui-kit$/,
         replacement: path.join(__dirname, "../../packages/ui/src/kit/web/index.ts")
       },
       {
-        // the slice of @platform the web target of @ui needs
+        // the slice of @platform the web target of @notesnook/ui-kit needs
         find: /^@platform$/,
         replacement: path.join(
           __dirname,

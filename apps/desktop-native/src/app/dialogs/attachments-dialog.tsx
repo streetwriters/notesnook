@@ -29,7 +29,7 @@ import {
   ThemeScope,
   useWindowSize,
   VirtualList
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { store, useStore } from "../stores/attachment-store";
 import { formatBytes, usePromise, useResolvedItem } from "@notesnook/common";
 import {

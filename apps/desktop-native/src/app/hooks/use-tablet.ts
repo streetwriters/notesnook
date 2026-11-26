@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { matchMediaQuery, useMediaQuery } from "@ui";
+import { matchMediaQuery, useMediaQuery } from "@notesnook/ui-kit";
 
 const TABLET_MEDIA_QUERY = "(min-width: 480px) and (max-width: 1000px)";
 export const useTablet = () => useMediaQuery(TABLET_MEDIA_QUERY);

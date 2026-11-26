@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useMemo } from "react";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text } from "@ui";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { NoticesData } from "../../common/notices";
 import { Dismiss } from "../icons";

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { EV, EVENTS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, Text } from "@ui";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { boot, prepareBoot, type BootOptions } from "./boot";
 import { Demo, type Status } from "./demo";
 import { PlatformSmoke } from "./platform-smoke";

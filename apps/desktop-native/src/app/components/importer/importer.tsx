@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import { useState } from "react";
 import { ProviderSelector } from "./components/provider-selector";
 import { FileProviderHandler } from "./components/file-provider-handler";

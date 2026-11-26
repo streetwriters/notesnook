@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { getTimeAgo } from "@notesnook/common";
 import type { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, ThemeScope, type ColorValue } from "@ui";
+import { Flex, ThemeScope, type ColorValue } from "@notesnook/ui-kit";
 import { StatusBarItem } from "./status-bar-item";
 import EditorFooter from "../editor/footer";
 import {

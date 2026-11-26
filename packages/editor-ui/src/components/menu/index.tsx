@@ -32,7 +32,7 @@ import {
   type PopoverPlacement,
   type SxProp,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { Icons } from "../../toolbar/icons.js";
 
 export type { MenuItem, MenuButtonItem };

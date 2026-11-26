@@ -18,7 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Flex, ScrollContainer, Text, WebView, type WebViewHandle } from "@ui";
+import {
+  Flex,
+  ScrollContainer,
+  Text,
+  WebView,
+  type WebViewHandle
+} from "@notesnook/ui-kit";
 import { environment } from "@platform";
 import { strings } from "@notesnook/intl";
 import { Period } from "@notesnook/core";

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { Dialog, Flex, Image, Switch, Text } from "@ui";
+import { Dialog, Flex, Image, Switch, Text } from "@notesnook/ui-kit";
 import { imageCompressor, type PickedFile } from "@platform";
 import { formatBytes } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";

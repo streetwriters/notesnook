@@ -31,7 +31,7 @@ import {
   type MenuButtonItem,
   type MenuItem,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   Ellipse,
   OrderAlphabeticalAscending,

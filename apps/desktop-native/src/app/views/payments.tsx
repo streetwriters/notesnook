@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect } from "react";
 import { strings } from "@notesnook/intl";
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import { hardNavigate, useQueryParams } from "../navigation";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";

@@ -26,7 +26,7 @@ import {
   Slider,
   Text,
   type AvatarEditorHandle
-} from "@ui";
+} from "@notesnook/ui-kit";
 
 import { Profile } from "@notesnook/core";
 import { User } from "../components/icons";

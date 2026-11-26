@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Icon, Text } from "@ui";
+import { Button, Flex, Icon, Text } from "@notesnook/ui-kit";
 import { Plus } from "../icons";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { illustrations } from "./illustrations.generated";

@@ -62,7 +62,7 @@ import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { House } from "../components/icons";
-import type { MenuItem } from "@ui";
+import type { MenuItem } from "@notesnook/ui-kit";
 import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 import { setToolbarPreset } from "./toolbar-config";

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Dialog, Flex, Text } from "@ui";
+import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
 
 import { useState } from "react";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";

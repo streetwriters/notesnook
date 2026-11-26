@@ -39,7 +39,7 @@ import {
   SplitPane,
   Text,
   ThemeScope
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { EVENTS } from "@notesnook/core";
 import {
   SaveState,

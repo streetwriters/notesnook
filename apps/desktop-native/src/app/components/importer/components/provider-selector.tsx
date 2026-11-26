@@ -22,7 +22,7 @@ import {
   ProviderFactory,
   Providers
 } from "@notesnook-importer/core";
-import { Flex, Select, Text } from "@ui";
+import { Flex, Select, Text } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";
 import { LinkText } from "../../../dialogs/components/link-text";
 

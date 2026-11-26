@@ -24,7 +24,7 @@ import {
   transform
 } from "@notesnook-importer/core";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
-import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { files as platformFiles, type PickedFile } from "@platform";
 import { xxhash64 } from "../xxhash";
 import { useEffect, useRef, useState } from "react";

@@ -21,7 +21,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { formatDate } from "@notesnook/common";
 import type { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text, type UIElement } from "@ui";
+import { Button, Flex, Text, type UIElement } from "@notesnook/ui-kit";
 import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate, navigate } from "../navigation";
 import {

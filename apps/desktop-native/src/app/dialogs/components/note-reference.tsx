@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { Note } from "@notesnook/core";
-import { Flex, Text, type SxProp } from "@ui";
+import { Flex, Text, type SxProp } from "@notesnook/ui-kit";
 import { formatDate } from "@notesnook/common";
 
 export function NoteReference(props: {

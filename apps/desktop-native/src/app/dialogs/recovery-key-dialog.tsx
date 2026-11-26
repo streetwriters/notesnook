@@ -26,7 +26,7 @@ import {
   Text,
   dataColor,
   type QRCodeHandle
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { clipboard, files } from "@platform";
 import { rasterAssets } from "../assets/raster.generated";
 import { db } from "../common/db";

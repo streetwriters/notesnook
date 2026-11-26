@@ -34,7 +34,7 @@ import {
   type ContextMenuEvent,
   type KeyEvent,
   type MenuItem
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   AttachmentError,
   CheckIcon,

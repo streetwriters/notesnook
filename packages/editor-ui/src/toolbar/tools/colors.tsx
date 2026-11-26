@@ -21,7 +21,7 @@ import { q } from "../../queries/queries.js";
 import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
 import { useEffect, useRef, useState } from "react";
 import { colord } from "colord";
-import type { UIElement } from "@ui";
+import type { UIElement } from "@notesnook/ui-kit";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { config } from "../../utils/config.js";
 import { SplitButton } from "../components/split-button.js";

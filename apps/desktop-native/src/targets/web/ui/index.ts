@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// The `@ui` implementation lives in packages/ui/src/kit. Only the editor surface
+// The `@notesnook/ui-kit` implementation lives in packages/ui/src/kit. Only the editor surface
 // stays here: it imports `apps/web`'s editor, which the kit must not depend on.
 export * from "@notesnook/ui-kit/web";
 export { EditorSurface } from "./editor";

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Box, Button, Flex, ScrollContainer, Text } from "@ui";
+import { Box, Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { hardNavigate, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import { Loader } from "../components/loader";

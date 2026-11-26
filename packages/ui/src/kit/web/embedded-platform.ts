@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * The slice of `@platform` the web target of `@ui` needs when it is embedded
+ * The slice of `@platform` the web target of `@notesnook/ui-kit` needs when it is embedded
  * in an app that is not desktop-native (`apps/web`, `editor-mobile`). Those
- * apps alias `@ui` to `web/index.ts` and `@platform` to this file, so they do
+ * apps alias `@notesnook/ui-kit` to `web/index.ts` and `@platform` to this file, so they do
  * not pull in desktop-native's platform services.
  */
 

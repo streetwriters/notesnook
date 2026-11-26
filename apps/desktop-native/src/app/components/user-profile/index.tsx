@@ -25,7 +25,7 @@ import {
   type User
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, Image, Text } from "@ui";
+import { Flex, Image, Text } from "@notesnook/ui-kit";
 import { User as UserIcon, UserProfileIcon } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";

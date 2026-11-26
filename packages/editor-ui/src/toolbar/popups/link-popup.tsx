@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Input, Text } from "@ui";
+import { Flex, Input, Text } from "@notesnook/ui-kit";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { Popup } from "../components/popup.js";
 import { strings } from "@notesnook/intl";

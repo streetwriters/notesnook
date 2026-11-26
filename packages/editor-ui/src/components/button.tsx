@@ -22,7 +22,7 @@ import {
   Button as UIButton,
   type ButtonProps as UIButtonProps,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 
 export type ButtonProps = UIButtonProps & { onClick?: () => void };
 

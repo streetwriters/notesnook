@@ -57,7 +57,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
 import { noteMenuItems } from "../../components/note";
-import type { MenuItem } from "@ui";
+import type { MenuItem } from "@notesnook/ui-kit";
 import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";

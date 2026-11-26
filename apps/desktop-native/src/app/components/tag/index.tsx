@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { areFeaturesAvailable } from "@notesnook/common";
 import { createInternalLink, type Tag as TagType } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, Text, type MenuItem } from "@ui";
+import { Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import { navigate } from "../../navigation";
 import { store as appStore } from "../../stores/app-store";

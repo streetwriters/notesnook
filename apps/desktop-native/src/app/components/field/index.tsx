@@ -28,7 +28,7 @@ import {
   type PressEvent,
   type SxProp,
   type UIInputElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { PasswordInvisible, PasswordVisible, type Icon } from "../icons";
 import { AuthErrorText } from "../error-text";
 

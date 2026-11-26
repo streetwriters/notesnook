@@ -30,7 +30,7 @@ import {
   useThemeColor,
   useWindowSize,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { ArrowDown, ArrowLeft, Loading } from "../components/icons";
 import { hardNavigate } from "../navigation";

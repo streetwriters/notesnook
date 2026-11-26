@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";
 import type { Notebook } from "@notesnook/core";
 import { CaretDown, CaretRight, Check, Close, Plus, SearchIcon } from "./icons";

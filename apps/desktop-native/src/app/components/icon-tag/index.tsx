@@ -25,7 +25,7 @@ import {
   type ColorValue,
   type PressEvent,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { Close, type Icon } from "../icons";
 
 type IconTagProps = {

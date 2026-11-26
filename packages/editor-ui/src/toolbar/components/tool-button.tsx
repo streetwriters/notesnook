@@ -24,7 +24,7 @@ import {
   type IconSizeToken,
   type SxProp,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { IconNames, Icons } from "../icons.js";
 import { ToolButtonVariant } from "../types.js";
 import { Button } from "../../components/button.js";

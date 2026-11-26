@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { pluralize } from "@notesnook/common";
-import { Flex, Text, type DragPayload } from "@ui";
+import { Flex, Text, type DragPayload } from "@notesnook/ui-kit";
 
 export type ItemsDragPayload = DragPayload & { type: string; ids: string[] };
 

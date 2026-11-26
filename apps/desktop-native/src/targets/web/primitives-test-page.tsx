@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // Dev-only page: `npm run web`, then open `/?page=primitives`. It renders every
-// `@ui` primitive, list and overlay in the web target with the app theme, and
+// `@notesnook/ui-kit` primitive, list and overlay in the web target with the app theme, and
 // a light/dark toggle. It is not part of the app.
 
 import { useRef, useState, type ReactNode } from "react";
@@ -56,7 +56,7 @@ import {
   WebThemeProvider,
   showToast
 } from "./ui";
-import type { UIElement } from "@ui";
+import type { UIElement } from "@notesnook/ui-kit";
 import { THEME_DARK, THEME_LIGHT } from "../../app/common/theme";
 
 const STAR_PATH =
@@ -121,7 +121,7 @@ export function PrimitivesTestPage() {
           >
             <Flex sx={{ p: 3, gap: 2, alignItems: "center" }}>
               <Text sx={{ color: "heading", fontWeight: "bold", flex: 1 }}>
-                @ui primitives (web target)
+                @notesnook/ui-kit primitives (web target)
               </Text>
               <Button testID="theme-toggle" onPress={() => setDark(!dark)}>
                 <Text>{dark ? "Dark" : "Light"} theme</Text>

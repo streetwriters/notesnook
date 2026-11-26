@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import { Cross } from "../icons";
 import AnnouncementBody, { ANNOUNCEMENT_DISMISS_COLORS } from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";

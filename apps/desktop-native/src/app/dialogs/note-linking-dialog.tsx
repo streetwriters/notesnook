@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Dialog, Flex, Text, VirtualList } from "@ui";
+import { Button, Dialog, Flex, Text, VirtualList } from "@notesnook/ui-kit";
 import {
   ContentBlock,
   Note as NoteType,

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { dataColor, Flex, Text, type ColorValue } from "@ui";
+import { dataColor, Flex, Text, type ColorValue } from "@notesnook/ui-kit";
 import { Circle, Notebook, Notes, Plus, StarOutline, Tag } from "../icons";
 
 type PreviewColors = {

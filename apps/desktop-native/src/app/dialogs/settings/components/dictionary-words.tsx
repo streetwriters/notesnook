@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, ScrollContainer, Text } from "@ui";
+import { Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { useSpellChecker } from "../../../hooks/use-spell-checker";
 import { strings } from "@notesnook/intl";
 

@@ -34,7 +34,7 @@ import {
   Text,
   type MenuItem,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { db } from "../../common/db";
 import { handleDrop } from "../../common/drop-handler";
 import { Notebooks } from "../../views/notebooks";

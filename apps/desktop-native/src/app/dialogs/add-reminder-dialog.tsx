@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useRef, useState } from "react";
 import dayjs, { type Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Dialog, Flex, Select, Text, type UIElement } from "@ui";
+import { Dialog, Flex, Select, Text, type UIElement } from "@notesnook/ui-kit";
 import { notifications, environment } from "@platform";
 import {
   getFormattedDate,

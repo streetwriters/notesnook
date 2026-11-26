@@ -26,7 +26,7 @@ import {
 import { EVENTS, type Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { shell } from "@platform";
-import { Button, Dialog, Flex, Switch, Text } from "@ui";
+import { Button, Dialog, Flex, Switch, Text } from "@notesnook/ui-kit";
 import {
   ArrowCounterClockwise,
   Check,

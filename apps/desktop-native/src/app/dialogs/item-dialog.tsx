@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Dialog, Flex } from "@ui";
+import { Dialog, Flex } from "@notesnook/ui-kit";
 import { ErrorText } from "../components/error-text";
 import { Field } from "./components/field";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";

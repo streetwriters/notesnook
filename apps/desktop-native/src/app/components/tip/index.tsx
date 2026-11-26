@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, type ColorValue, type SxProp } from "@ui";
+import { Text, type ColorValue, type SxProp } from "@notesnook/ui-kit";
 
 type TextWithTipProps = {
   text: string;

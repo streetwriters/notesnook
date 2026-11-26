@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren } from "react";
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import { ToolButton, ToolButtonProps } from "./tool-button.js";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store.js";
 import React from "react";

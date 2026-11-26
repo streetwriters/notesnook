@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ReactNode, RefObject } from "react";
-import { Popover, type SxProp, type UIElement } from "@ui";
+import { Popover, type SxProp, type UIElement } from "@notesnook/ui-kit";
 
 export function AnchoredPopover(props: {
   isOpen: boolean;

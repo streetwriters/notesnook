@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ReactNode } from "react";
 import { strings } from "@notesnook/intl";
-import { Box, Button, Flex, Icon, Image, Text } from "@ui";
+import { Box, Button, Flex, Icon, Image, Text } from "@notesnook/ui-kit";
 import { rasterAssets } from "../../assets/raster.generated";
 import { SettingsDialog } from "../../dialogs/settings";
 import { authWaves } from "./auth-art.generated";

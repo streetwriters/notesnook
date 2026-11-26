@@ -32,7 +32,7 @@ import {
   type MenuItem,
   type PressEvent,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { useListSelection } from "../list-container/selection";
 import {
   store as selectionStore,

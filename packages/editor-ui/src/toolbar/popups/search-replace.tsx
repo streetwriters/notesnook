@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { q, useEditorQuery } from "../../queries/index.js";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Flex, Input, Text, type UIInputElement } from "@ui";
+import { Flex, Input, Text, type UIInputElement } from "@notesnook/ui-kit";
 import { ToolButton } from "../components/tool-button.js";
 import { Editor } from "../../types.js";
 import { useEditorSearchStore } from "../stores/search-store.js";

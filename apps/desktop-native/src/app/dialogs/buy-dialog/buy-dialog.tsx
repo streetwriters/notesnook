@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect } from "react";
-import { Button, Dialog, Flex, Text, ThemeScope } from "@ui";
+import { Button, Dialog, Flex, Text, ThemeScope } from "@notesnook/ui-kit";
 import { Loading, Coupon } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";

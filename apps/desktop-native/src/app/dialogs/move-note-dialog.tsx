@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback } from "react";
 import { db } from "../common/db";
-import { Dialog } from "@ui";
+import { Dialog } from "@notesnook/ui-kit";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";

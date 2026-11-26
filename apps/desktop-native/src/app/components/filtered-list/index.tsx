@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useState } from "react";
 import { strings } from "@notesnook/intl";
-import { Button, Text } from "@ui";
+import { Button, Text } from "@notesnook/ui-kit";
 import Field from "../field";
 import { Close, Plus, SearchIcon } from "../icons";
 import {

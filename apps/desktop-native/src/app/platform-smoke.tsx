@@ -37,7 +37,7 @@ import {
   updater,
   webauthn
 } from "@platform";
-import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { createPickedFile } from "./utils/picked-file";
 import { assertSecureRandom } from "./utils/secure-random";
 

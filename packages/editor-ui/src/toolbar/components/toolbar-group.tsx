@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, type SxProp } from "@ui";
+import { Flex, type SxProp } from "@notesnook/ui-kit";
 import { ToolbarGroupDefinition, ToolButtonVariant } from "../types.js";
 import { findTool } from "../tools/index.js";
 import { MoreTools } from "./more-tools.js";

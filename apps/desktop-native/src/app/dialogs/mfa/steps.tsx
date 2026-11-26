@@ -24,9 +24,9 @@ import {
   useState,
   type PropsWithChildren
 } from "react";
-import { Button, Flex, Text } from "@ui";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { clipboard, files, shell } from "@platform";
-import { QRCode } from "@ui";
+import { QRCode } from "@notesnook/ui-kit";
 import { useSessionState } from "../../hooks/use-session-state";
 import {
   Loading,

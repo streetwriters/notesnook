@@ -5,7 +5,7 @@
     "jsx": "react-jsx",
     "outDir": "./dist/",
     "paths": {
-      "@ui": ["./node_modules/@notesnook/ui/src/kit/contracts/index.ts"],
+      "@notesnook/ui-kit": ["./node_modules/@notesnook/ui/src/kit/contracts/index.ts"],
       "@platform/files": ["./typings/platform-files.d.ts"],
       "react": ["./node_modules/@types/react"],
       "react/*": ["./node_modules/@types/react/*"]

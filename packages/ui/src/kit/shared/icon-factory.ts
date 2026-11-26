@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { createElement, type ComponentType } from "react";
-import { Icon as UIIcon, type IconProps } from "@ui";
+import { Icon as UIIcon, type IconProps } from "@notesnook/ui-kit";
 
 export type Icon = ComponentType<Omit<IconProps, "path" | "svg">>;
 

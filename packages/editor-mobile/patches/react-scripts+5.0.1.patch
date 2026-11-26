@@ -45,7 +45,7 @@ index e465d8e..86e5d2f 100644
 +        "@mdi/js": path.resolve(path.join(__dirname,'../../@mdi/js')),
 +        "@mdi/react": path.resolve(path.join(__dirname,'../../@mdi/react')),
 +        "@emotion/react": path.resolve(path.join(__dirname,'../../@emotion/react')),
-+        "@ui$": path.resolve(path.join(__dirname,'../../../../ui/src/kit/web/index.ts')),
++        "@notesnook/ui-kit$": path.resolve(path.join(__dirname,'../../../../ui/src/kit/web/index.ts')),
 +        "@platform$": path.resolve(path.join(__dirname,'../../../../ui/src/kit/web/embedded-platform.ts')),
 +
          // Support React Native Web

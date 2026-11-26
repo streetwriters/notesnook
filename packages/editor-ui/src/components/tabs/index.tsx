@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { Children, PropsWithChildren, useMemo, useState } from "react";
-import { Button, Flex, type FlexProps } from "@ui";
+import { Button, Flex, type FlexProps } from "@notesnook/ui-kit";
 
 export type TabProps = { title: string | React.ReactElement };
 export function Tab(props: PropsWithChildren<TabProps>) {

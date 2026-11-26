@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo } from "react";
 import { useTimeAgo } from "@notesnook/common";
-import { Text, type TextProps } from "@ui";
+import { Text, type TextProps } from "@notesnook/ui-kit";
 
 type TDate = Parameters<typeof useTimeAgo>[0];
 

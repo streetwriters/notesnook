@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { forwardRef, useCallback, type ReactNode } from "react";
-import { Box, VirtualList, type SxProp, type VirtualListHandle } from "@ui";
+import {
+  Box,
+  VirtualList,
+  type SxProp,
+  type VirtualListHandle
+} from "@notesnook/ui-kit";
 
 export type VirtualizedListProps<T, C> = {
   items: T[];

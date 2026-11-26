@@ -28,7 +28,7 @@ import {
   type SxProp,
   type TextareaProps,
   type UIInputElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   PasswordInvisible,
   PasswordVisible,

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
 import { databaseHost, shell } from "@platform";
-import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { Logo } from "../navigation-menu/logo";
 import { ErrorText } from "../error-text";
 import { db } from "../../common/db";

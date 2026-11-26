@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { create } from "zustand";
-import type { MenuItem } from "@ui";
+import type { MenuItem } from "@notesnook/ui-kit";
 
 export type MenuAnchor = {
   x: number;

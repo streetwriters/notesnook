@@ -29,7 +29,7 @@ import {
   type KeyEvent,
   type PressEvent,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   Close,
   Reset,

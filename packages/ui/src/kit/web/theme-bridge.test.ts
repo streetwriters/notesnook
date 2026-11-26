@@ -22,7 +22,7 @@ import { ThemeDark, ThemeLight, useThemeEngineStore } from "@notesnook/theme";
 import { syncThemeEngine } from "./theme-bridge";
 
 describe("syncThemeEngine", () => {
-  it("points the emotion theme engine at the @ui theme", () => {
+  it("points the emotion theme engine at the @notesnook/ui-kit theme", () => {
     syncThemeEngine(ThemeDark);
     expect(useThemeEngineStore.getState().theme).toBe(ThemeDark);
     syncThemeEngine(ThemeLight);

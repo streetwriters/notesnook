@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import type { MenuItem, SxProp, UIElement } from "@ui";
+import type { MenuItem, SxProp, UIElement } from "@notesnook/ui-kit";
 import {
   Box,
   Button,
@@ -29,7 +29,7 @@ import {
   ScrollContainer,
   ThemeScope,
   useWindowSize
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { CaretRight, Check, Pro } from "../icons";
 import { environment, keyboard } from "@platform";
 import { useMenuStore } from "./store";

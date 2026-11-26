@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { q, useEditorQuery } from "../../queries/index.js";
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import { Popup } from "../components/popup.js";
 import { ImageAttributes } from "../../extension-types.js";
 import { Editor } from "../../types.js";

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createContext, useContext } from "react";
-import type { PressEvent } from "@ui";
+import type { PressEvent } from "@notesnook/ui-kit";
 
 export type ListSelection = {
   focusedIndex: number;

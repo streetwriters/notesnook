@@ -23,7 +23,7 @@ import {
   Popover,
   ResponsivePresenter as UIResponsivePresenter,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import {
   useIsMobile,
   useToolbarStore

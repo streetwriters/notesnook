@@ -33,7 +33,7 @@ import {
   Text,
   ThemeScope,
   useWindowSize
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import {
   About,

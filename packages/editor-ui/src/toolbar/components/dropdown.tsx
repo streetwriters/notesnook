@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Icon, Text, type MenuItem, type UIElement } from "@ui";
+import { Icon, Text, type MenuItem, type UIElement } from "@notesnook/ui-kit";
 import { Icons } from "../icons.js";
 import {
   toolbarRef,

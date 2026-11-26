@@ -22,7 +22,14 @@ import { environment } from "@platform";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
-import { Box, Button, Flex, SortableList, Text, type DragEvent } from "@ui";
+import {
+  Box,
+  Button,
+  Flex,
+  SortableList,
+  Text,
+  type DragEvent
+} from "@notesnook/ui-kit";
 import { getDragData } from "../../utils/data-transfer";
 import { Menu } from "../../hooks/use-menu";
 import { useStore as useAppStore } from "../../stores/app-store";

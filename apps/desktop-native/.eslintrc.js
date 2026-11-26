@@ -40,7 +40,7 @@ module.exports = {
               {
                 group: RESTRICTED_PACKAGES,
                 message:
-                  "Shared code imports only @ui, @platform, @notesnook/* and platform-free libraries."
+                  "Shared code imports only @notesnook/ui-kit, @platform, @notesnook/* and platform-free libraries."
               },
               {
                 group: TARGET_PATHS,

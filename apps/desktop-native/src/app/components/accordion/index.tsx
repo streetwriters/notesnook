@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState, type ReactNode } from "react";
-import { Flex, Text, type ColorValue, type SxProp } from "@ui";
+import { Flex, Text, type ColorValue, type SxProp } from "@notesnook/ui-kit";
 import { CaretDown, ChevronDown, ChevronUp } from "../icons";
 
 export type AccordionProps = {

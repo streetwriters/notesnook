@@ -22,7 +22,13 @@ import { getFormattedDate } from "@notesnook/common";
 import type { ContentItem, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { diff } from "diffblazer";
-import { Button, EditorSurface, Flex, ScrollContainer, Text } from "@ui";
+import {
+  Button,
+  EditorSurface,
+  Flex,
+  ScrollContainer,
+  Text
+} from "@notesnook/ui-kit";
 import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
 import { UnlockView } from "../unlock";

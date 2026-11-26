@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Flex, Grid, Image, Text } from "@ui";
+import { Button, Flex, Grid, Image, Text } from "@notesnook/ui-kit";
 import { Copy, Loading } from "../../../components/icons";
 import { usePromise } from "@notesnook/common";
 import { db } from "../../../common/db";

@@ -7,10 +7,14 @@ const base = makeMetroConfig({ projectRoot: __dirname });
 const packagesDir = path.resolve(__dirname, "../../packages");
 const target = path.join(__dirname, "src/targets/desktop");
 const uiKit = path.resolve(packagesDir, "ui/src/kit");
+// `@notesnook/ui-kit` is the active target's kit; its subpaths
+// (`@notesnook/ui-kit/desktop/...`, `/shared/...`) are files in the kit.
 const targetAliases = {
-  "@ui": path.join(target, "ui"),
   "@platform": path.join(target, "platform"),
   "@notesnook/ui-kit": uiKit
+};
+const exactAliases = {
+  "@notesnook/ui-kit": path.join(target, "ui")
 };
 
 const pdfModuleRoot = path.dirname(
@@ -59,7 +63,6 @@ const config = mergeConfig(base, {
         context.originModulePath.startsWith(uiKit + path.sep) &&
         !moduleName.startsWith(".") &&
         !moduleName.startsWith("/") &&
-        !moduleName.startsWith("@ui") &&
         !moduleName.startsWith("@platform") &&
         !moduleName.startsWith("@notesnook/ui-kit")
       ) {
@@ -67,6 +70,13 @@ const config = mergeConfig(base, {
           ...context,
           originModulePath: path.join(__dirname, "index.js")
         };
+      }
+      if (Object.hasOwn(exactAliases, moduleName)) {
+        return context.resolveRequest(
+          context,
+          exactAliases[moduleName],
+          platform
+        );
       }
       for (const [alias, dir] of Object.entries(targetAliases)) {
         if (moduleName === alias || moduleName.startsWith(alias + "/")) {

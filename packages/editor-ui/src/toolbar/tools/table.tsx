@@ -24,7 +24,7 @@ import type { EditorController } from "../../controller.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
-import type { MenuButtonItem, MenuItem, UIElement } from "@ui";
+import type { MenuButtonItem, MenuItem, UIElement } from "@notesnook/ui-kit";
 import { MoreTools } from "../components/more-tools.js";
 import { menuButtonToTool, toolToMenuButton } from "./utils.js";
 import { getToolDefinition } from "../tool-definitions.js";

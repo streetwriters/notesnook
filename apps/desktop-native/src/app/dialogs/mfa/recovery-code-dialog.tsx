@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Dialog } from "@ui";
+import { Dialog } from "@notesnook/ui-kit";
 import { steps } from "./steps";
 import { ErrorText } from "../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";

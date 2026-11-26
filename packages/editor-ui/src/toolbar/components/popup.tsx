@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Icon, Text, ThemeScope } from "@ui";
+import { Button, Flex, Icon, Text, ThemeScope } from "@notesnook/ui-kit";
 import { PropsWithChildren } from "react";
 import { DesktopOnly, MobileOnly } from "../../components/responsive/index.js";
 import { Icons } from "../icons.js";

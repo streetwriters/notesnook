@@ -32,7 +32,7 @@ import {
   useWindowSize,
   VirtualList,
   type VirtualListHandle
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { environment } from "@platform";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { decodeHTML, escapeUTF8 } from "entities";

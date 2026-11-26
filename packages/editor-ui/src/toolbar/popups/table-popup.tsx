@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@ui";
+import { Box, Flex, Text } from "@notesnook/ui-kit";
 import { useEffect, useState } from "react";
 import { Popup } from "../components/popup.js";
 import { useIsMobile } from "../stores/toolbar-store.js";

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DialogManager } from "../../common/dialog-manager";
-import { Dialog, Flex, Text } from "@ui";
+import { Dialog, Flex, Text } from "@notesnook/ui-kit";
 import { PLAN_METADATA } from "./plans";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";

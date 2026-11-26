@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@ui";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { shell } from "@platform";
 import Accordion from "../../accordion";
 import { strings } from "@notesnook/intl";

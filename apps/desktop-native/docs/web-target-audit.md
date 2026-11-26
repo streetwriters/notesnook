@@ -1,4 +1,4 @@
-# Web target audit against the `@ui` contracts
+# Web target audit against the `@notesnook/ui-kit` contracts
 
 Plan item 3.2 of "Shared editor UI and native editor in desktop-native".
 Audited at commit `cb81efae2` (`src/ui/*.ts` against `src/targets/web/ui/*`).
@@ -194,7 +194,7 @@ shared declarations in `src/shared/style`. No web file imports
 `@notesnook/ui`, `theme-ui` components or emotion except `editor.tsx`
 (`EmotionThemeProvider`). So "wrappers over theme-ui" is not how the target is
 built; whether it should be is a decision for 4.1, which has to replace
-`theme-ui` and `@notesnook/ui` imports in the editor UI with `@ui`.
+`theme-ui` and `@notesnook/ui` imports in the editor UI with `@notesnook/ui-kit`.
 
 ## Missing for the editor UI (input to 3.3, 3.4, 4.1)
 

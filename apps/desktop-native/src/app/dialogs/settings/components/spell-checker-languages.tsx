@@ -18,7 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { Checkbox, Flex, Input, ScrollContainer, Text } from "@ui";
+import {
+  Checkbox,
+  Flex,
+  Input,
+  ScrollContainer,
+  Text
+} from "@notesnook/ui-kit";
 import { deleteItem } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Language, useSpellChecker } from "../../../hooks/use-spell-checker";

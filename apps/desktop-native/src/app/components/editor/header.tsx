@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, Input, type MenuItem, type UIInputElement } from "@ui";
+import {
+  Flex,
+  Input,
+  type MenuItem,
+  type UIInputElement
+} from "@notesnook/ui-kit";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useNoteStore } from "../../stores/note-store";

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text, type SxProp } from "@ui";
+import { Button, Flex, Text, type SxProp } from "@notesnook/ui-kit";
 
 type ContentToggleProps = {
   isSelected: boolean;

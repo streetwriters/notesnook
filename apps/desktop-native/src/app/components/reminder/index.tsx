@@ -27,7 +27,7 @@ import {
   type Reminder as ReminderType
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex, Text, type MenuItem } from "@ui";
+import { Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import { Checkbox } from "../checkbox";
 import {

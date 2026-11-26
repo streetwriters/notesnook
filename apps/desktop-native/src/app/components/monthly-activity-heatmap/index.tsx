@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text, type SxProp } from "@ui";
+import { Box, Flex, Text, type SxProp } from "@notesnook/ui-kit";
 
 type MonthlyActivityHeatmapProps = {
   monthlyStats: Record<string, number>;

@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
-import { Button, Flex, Icon, Radio, SortableList, Text } from "@ui";
+import {
+  Button,
+  Flex,
+  Icon,
+  Radio,
+  SortableList,
+  Text
+} from "@notesnook/ui-kit";
 import { getId } from "@notesnook/core";
 import { useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";

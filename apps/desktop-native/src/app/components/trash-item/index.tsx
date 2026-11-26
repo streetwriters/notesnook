@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import type { TrashItem as TrashItemType } from "@notesnook/core";
-import { Flex, Text, type MenuItem } from "@ui";
+import { Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import IconTag from "../icon-tag";
 import TimeAgo from "../time-ago";

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { create } from "zustand";
 import { DownloadOptions } from "../../utils/downloader.js";
 import { useCallback } from "react";
-import type { UIElement } from "@ui";
+import type { UIElement } from "@notesnook/ui-kit";
 
 export type ToolbarLocation = "top" | "bottom";
 

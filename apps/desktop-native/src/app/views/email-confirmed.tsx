@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect } from "react";
 import { strings } from "@notesnook/intl";
 import { shell } from "@platform";
-import { dataColor, Flex, ScrollContainer, Text } from "@ui";
+import { dataColor, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
 import { hardNavigate, useQueryParams } from "../navigation";
 import {
   Chat as Discord,

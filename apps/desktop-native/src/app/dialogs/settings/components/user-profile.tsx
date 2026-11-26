@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { dataColor, Flex, Image, Progress, Text } from "@ui";
+import { dataColor, Flex, Image, Progress, Text } from "@notesnook/ui-kit";
 import {
   Edit,
   User as UserIcon,

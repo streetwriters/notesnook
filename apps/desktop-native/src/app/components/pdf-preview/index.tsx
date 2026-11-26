@@ -27,7 +27,7 @@ import {
   Text,
   type PdfViewerHandle,
   type PdfViewerState
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,

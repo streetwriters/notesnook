@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useMemo, useRef, useState } from "react";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Box, Flex, Popover, Text, type UIElement } from "@ui";
+import { Box, Flex, Popover, Text, type UIElement } from "@notesnook/ui-kit";
 import { StatusBarItem } from "../status-bar/status-bar-item";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";

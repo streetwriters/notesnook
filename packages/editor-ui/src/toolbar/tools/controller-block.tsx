@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useMemo, useRef, useState } from "react";
-import { Icon, type MenuItem, type UIElement } from "@ui";
+import { Icon, type MenuItem, type UIElement } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";
 import { keybindings } from "@notesnook/common";
 import { q } from "../../queries/queries.js";

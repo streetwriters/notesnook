@@ -24,7 +24,7 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@ui$/,
+        find: /^@notesnook\/ui-kit$/,
         replacement: path.join(__dirname, "../../packages/ui/src/kit/web/index.ts")
       },
       {

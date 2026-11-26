@@ -26,7 +26,7 @@ import {
   type PopoverPlacement,
   type SxProp,
   type UIElement
-} from "@ui";
+} from "@notesnook/ui-kit";
 import { toolbarRef, useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { MenuPresenter } from "../menu/index.js";
 import type { AnyEditor } from "../../controller.js";

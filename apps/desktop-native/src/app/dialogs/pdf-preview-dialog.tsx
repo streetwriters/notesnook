@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dialog } from "@ui";
+import { Dialog } from "@notesnook/ui-kit";
 import { Suspense, lazy } from "react";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { Loading } from "../components/icons";

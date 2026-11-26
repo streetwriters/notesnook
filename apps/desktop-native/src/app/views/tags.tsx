@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import type { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import ListContainer from "../components/list-container";
 import { SidebarPlaceholder } from "../components/placeholders";
 import { ListLoader } from "../components/loaders/list-loader";

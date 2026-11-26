@@ -26,7 +26,7 @@ Deep `dist/cjs/...` imports are used by `apps/mobile` for plain data (`toolbar/t
 
 ## UI primitives and popup positioning
 
-Components import their primitives and theming from the `@ui` contracts, not from `theme-ui`, `@notesnook/ui` or emotion.
+Components import their primitives and theming from the `@notesnook/ui-kit` contracts, not from `theme-ui`, `@notesnook/ui` or emotion.
 
 Popups (`ResponsivePresenter`, `PopupWrapper`, `showPopup`) take one of:
 

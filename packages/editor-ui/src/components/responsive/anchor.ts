@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { AnchorRect, PopoverPlacement, UIElement } from "@ui";
+import type {
+  AnchorRect,
+  PopoverPlacement,
+  UIElement
+} from "@notesnook/ui-kit";
 import type { AnchorRect as QueryAnchorRect } from "../../queries/queries.js";
 
 export type PopupAnchorRef = { current: UIElement | null };
@@ -28,7 +32,7 @@ export type ResolvedAnchor = {
   placement: PopoverPlacement;
 };
 
-/** The `anchor` query answers in edges; `@ui` popovers take a position and a size. */
+/** The `anchor` query answers in edges; `@notesnook/ui-kit` popovers take a position and a size. */
 export function toPopoverRect(
   measured: QueryAnchorRect | null | undefined
 ): AnchorRect | undefined {

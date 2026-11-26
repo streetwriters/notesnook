@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Activity, memo, useEffect, useRef, type ComponentType } from "react";
-import { Flex } from "@ui";
+import { Flex } from "@notesnook/ui-kit";
 import useRoutes from "../../hooks/use-routes";
 import { getHomeRoute, navigate, NavigationEvents } from "../../navigation";
 import routes from "../../navigation/routes";

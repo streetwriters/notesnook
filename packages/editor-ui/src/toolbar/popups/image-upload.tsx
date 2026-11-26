@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Flex, Input, Text } from "@ui";
+import { Flex, Input, Text } from "@notesnook/ui-kit";
 import { ImageAttributes } from "../../extension-types.js";
 import { Popup } from "../components/popup.js";
 import { downloadImage, toDataURL } from "../../utils/downloader.js";

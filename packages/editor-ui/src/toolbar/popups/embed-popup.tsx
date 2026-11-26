@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { convertUrlToEmbedUrl, isValidUrl } from "@social-embed/lib";
-import { Flex, Input, Text, Textarea } from "@ui";
+import { Flex, Input, Text, Textarea } from "@notesnook/ui-kit";
 import { useCallback, useState } from "react";
 import { InlineInput } from "../../components/inline-input/index.js";
 import { Tab, Tabs } from "../../components/tabs/index.js";

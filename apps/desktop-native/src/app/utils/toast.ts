@@ -17,5 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { showToast } from "@ui";
-export type { ToastAction, ToastType } from "@ui";
+export { showToast } from "@notesnook/ui-kit";
+export type { ToastAction, ToastType } from "@notesnook/ui-kit";

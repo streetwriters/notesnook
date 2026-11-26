@@ -41,7 +41,7 @@ import { Icons } from "../icons.js";
 import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
 import { LinkData } from "../../types.js";
 import { callHostAction, getHostAction } from "../../host.js";
-import { Flex, Icon, Link, Text, dataColor } from "@ui";
+import { Flex, Icon, Link, Text, dataColor } from "@notesnook/ui-kit";
 
 /**
  * The link the tool acts on: the node the hover popup is over, otherwise the

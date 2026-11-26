@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { EditorHandle, EditorHeading, EditorStatistics } from "@ui";
+import type {
+  EditorHandle,
+  EditorHeading,
+  EditorStatistics
+} from "@notesnook/ui-kit";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
 import Config from "../../utils/config";

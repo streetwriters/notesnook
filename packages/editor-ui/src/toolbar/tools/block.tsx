@@ -24,7 +24,7 @@ import { Icons } from "../icons.js";
 import { useMemo, useRef, useState } from "react";
 import { EmbedPopup } from "../popups/embed-popup.js";
 import { TablePopup } from "../popups/table-popup.js";
-import { Icon, type MenuItem, type UIElement } from "@ui";
+import { Icon, type MenuItem, type UIElement } from "@notesnook/ui-kit";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { showPopup } from "../../components/popup-presenter/index.js";

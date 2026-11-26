@@ -21,7 +21,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import { debounceWithId } from "@notesnook/common";
 import { NEWLINE_STRIP_REGEX } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Textarea } from "@ui";
+import { Textarea } from "@notesnook/ui-kit";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";

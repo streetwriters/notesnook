@@ -25,7 +25,7 @@ import {
   type ContextMenuEvent,
   type DragEvent,
   type MenuItem
-} from "@ui";
+} from "@notesnook/ui-kit";
 import type { Icon } from "../icons";
 import { Menu } from "../../hooks/use-menu";
 import { AppEventManager, AppEvents } from "../../common/app-events";

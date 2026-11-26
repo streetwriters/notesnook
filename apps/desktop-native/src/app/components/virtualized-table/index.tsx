@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, type ReactNode } from "react";
-import { VirtualList, type SxProp } from "@ui";
+import { VirtualList, type SxProp } from "@notesnook/ui-kit";
 
 export type VirtualizedTableRowProps<T, C> = {
   item: T;

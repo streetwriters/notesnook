@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
 import { Icons } from "../../toolbar/index.js";
-import { Flex, Icon, type ColorValue } from "@ui";
+import { Flex, Icon, type ColorValue } from "@notesnook/ui-kit";
 import { getEditorDOM } from "../../toolbar/utils/dom.js";
 
 type ResizerProps = {

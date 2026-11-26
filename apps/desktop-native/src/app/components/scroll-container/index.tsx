@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ScrollContainer as UIScrollContainer, type SxProp } from "@ui";
+import {
+  ScrollContainer as UIScrollContainer,
+  type SxProp
+} from "@notesnook/ui-kit";
 import type { ReactNode } from "react";
 
 export type ScrollContainerProps = {

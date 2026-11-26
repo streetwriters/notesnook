@@ -28,7 +28,7 @@ import { useThemeContext } from "./theme";
 
 /**
  * Points the `@notesnook/theme` engine store (which the emotion-based editor
- * UI reads) at a `@ui` theme definition. Does nothing when it already matches.
+ * UI reads) at a `@notesnook/ui-kit` theme definition. Does nothing when it already matches.
  */
 export function syncThemeEngine(definition: ThemeDefinition) {
   const state = useThemeEngineStore.getState();
@@ -36,9 +36,9 @@ export function syncThemeEngine(definition: ThemeDefinition) {
 }
 
 /**
- * Bridges the `@ui` theme (`WebThemeProvider`/`ThemeScope`) to the
+ * Bridges the `@notesnook/ui-kit` theme (`WebThemeProvider`/`ThemeScope`) to the
  * `@notesnook/theme` emotion theme used by `packages/editor`. Whatever theme
- * the surrounding `@ui` provider holds drives the emotion theme, and changes
+ * the surrounding `@notesnook/ui-kit` provider holds drives the emotion theme, and changes
  * to it are applied before the next paint.
  */
 export function ThemeBridge(props: {

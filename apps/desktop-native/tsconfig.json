@@ -7,11 +7,8 @@
       "node"
     ],
     "paths": {
-      "@ui": [
+      "@notesnook/ui-kit": [
         "../../packages/ui/src/kit/contracts/index.ts"
-      ],
-      "@ui/*": [
-        "../../packages/ui/src/kit/contracts/*"
       ],
       "@notesnook/ui-kit/*": [
         "../../packages/ui/src/kit/*"

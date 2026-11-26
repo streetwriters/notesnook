@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { Flex, Text } from "@ui";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { ToolButton } from "./tool-button.js";
 import { useIsMobile } from "../stores/toolbar-store.js";
 import { strings } from "@notesnook/intl";

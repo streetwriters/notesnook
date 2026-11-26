@@ -17,5 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { SplitPane, Pane } from "@ui";
-export type { SplitPaneHandle, SplitPaneProps, PaneProps } from "@ui";
+export { SplitPane, Pane } from "@notesnook/ui-kit";
+export type {
+  SplitPaneHandle,
+  SplitPaneProps,
+  PaneProps
+} from "@notesnook/ui-kit";

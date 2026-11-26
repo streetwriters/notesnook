@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { IProvider } from "@notesnook-importer/core";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text } from "@ui";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { CheckCircleOutline } from "../../icons";
 import { TransformResult } from "../types";
 import { ImportErrors } from "./import-errors";

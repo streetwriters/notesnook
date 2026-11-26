@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { q } from "../../queries/queries.js";
 import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
 import type { EditorController } from "../../controller.js";
-import { Box, Icon } from "@ui";
+import { Box, Icon } from "@notesnook/ui-kit";
 import { Tab, Tabs } from "../../components/tabs/index.js";
 import { Popup } from "../components/popup.js";
 import { Icons } from "../icons.js";

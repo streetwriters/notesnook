@@ -24,7 +24,7 @@ import {
   type ButtonProps,
   type ColorValue,
   type SxProp
-} from "@ui";
+} from "@notesnook/ui-kit";
 import type { Icon } from "../icons";
 
 type StatusBarIconProps = {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useRef } from "react";
-import type { KeyEvent, PressEvent } from "@ui";
+import type { KeyEvent, PressEvent } from "@notesnook/ui-kit";
 
 enum DIRECTION {
   UP = -1,

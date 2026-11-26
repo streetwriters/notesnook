@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo } from "react";
 import { getRandomArbitrary } from "@notesnook/common";
-import { Box, Flex, type SxProp } from "@ui";
+import { Box, Flex, type SxProp } from "@notesnook/ui-kit";
 
 const SHIMMER: SxProp = {
   animation: {

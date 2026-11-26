@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Flex, Input, Text } from "@ui";
+import { Button, Flex, Input, Text } from "@notesnook/ui-kit";
 import { CheckCircleOutline, Loading } from "../../../components/icons";
 import {
   THEME_COMPATIBILITY_VERSION,

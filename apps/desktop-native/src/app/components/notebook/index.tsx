@@ -24,7 +24,14 @@ import {
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useRef } from "react";
-import { Box, Button, Flex, Text, type MenuItem, type PressEvent } from "@ui";
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  type MenuItem,
+  type PressEvent
+} from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import {
   ArrowCounterClockwise,

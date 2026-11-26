@@ -38,7 +38,14 @@ import {
   type VirtualizedGrouping
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Box, Button, dataColor, Flex, Text, type SxProp } from "@ui";
+import {
+  Box,
+  Button,
+  dataColor,
+  Flex,
+  Text,
+  type SxProp
+} from "@notesnook/ui-kit";
 import {
   Bell,
   BoxArrowDown,

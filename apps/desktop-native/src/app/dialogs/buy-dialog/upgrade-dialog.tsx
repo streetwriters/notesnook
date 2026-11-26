@@ -26,7 +26,7 @@ import {
 } from "@notesnook/common";
 import { DialogManager } from "../../common/dialog-manager";
 import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
-import { Button, Dialog, Flex, Text } from "@ui";
+import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
 import { FeatureCaption } from "./feature-caption";
 import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { formatRecurringPeriodShort } from "./plan-list";

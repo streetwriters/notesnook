@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getPointerPosition, type MenuItem } from "@ui";
+import { getPointerPosition, type MenuItem } from "@notesnook/ui-kit";
 import { useMenuStore, type MenuAnchor } from "../components/menu/store";
 
 export type MenuPosition = { x: number; y: number };

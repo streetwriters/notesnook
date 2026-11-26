@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState, useEffect } from "react";
-import { Button, Dialog, Flex, Input, Select, Text } from "@ui";
+import { Button, Dialog, Flex, Input, Select, Text } from "@notesnook/ui-kit";
 import { clipboard } from "@platform";
 import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
