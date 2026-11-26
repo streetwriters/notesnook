@@ -17,8 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Image, Progress, Text } from "@theme-ui/components";
-import { Edit, User as UserIcon } from "../../../components/icons";
+import { Flex, Image, Text } from "@theme-ui/components";
+import {
+  PencilSimple,
+  User as UserIcon,
+  UserProfileIcon
+} from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useSettingStore } from "../../../stores/setting-store";
 import { getObjectIdTimestamp } from "@notesnook/core";
@@ -37,6 +41,7 @@ import {
 
 export function getSubscriptionInfo(user?: User): {
   title: string;
+  isFree: boolean;
   trial?: boolean;
   paused?: boolean;
   canceled?: boolean;
@@ -47,7 +52,7 @@ export function getSubscriptionInfo(user?: User): {
 } {
   user = user || useUserStore.getState().user;
   const { expiry, plan, status, provider } = user?.subscription || {};
-  if (!expiry) return { title: "Free" };
+  if (!expiry) return { title: "Free", isFree: true };
 
   const trial = status === SubscriptionStatus.TRIAL;
   const title =
@@ -84,6 +89,7 @@ export function getSubscriptionInfo(user?: User): {
 
   return {
     title,
+    isFree: title === "Free",
     trial,
     expiryDate,
     startDate,
@@ -104,60 +110,168 @@ export function UserProfile({ minimal }: Props) {
 
   const { title, trial } = getSubscriptionInfo(user);
 
-  if (!user || !user.id)
+  if (!user || !user.id) {
+    if (minimal)
+      return (
+        <Flex
+          sx={{
+            alignItems: "flex-start",
+            gap: "spacing3",
+            px: "spacing4"
+          }}
+        >
+          <Flex
+            variant="columnCenter"
+            sx={{
+              bg: "background-tertiary",
+              boxShadow: "0 4px 34px 0 rgba(0, 0, 0, 0.10)",
+              size: 25,
+              borderRadius: "12.5px"
+            }}
+          >
+            <UserProfileIcon size={15} color="icon-secondary" />
+          </Flex>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing1",
+              lineHeight: 1
+            }}
+          >
+            <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
+              {strings.loginMessage()}
+            </Text>
+            <Text sx={{ fontSize: "3xs", color: "paragraph" }}>
+              {strings.loginMessageActionText()}
+            </Text>
+          </Flex>
+        </Flex>
+      );
+
     return (
       <Flex
         sx={{
-          borderRadius: "default",
+          borderRadius: "radius2",
           alignItems: "center",
-          bg: "var(--background-secondary)",
-          p: 1,
-          mb: minimal ? 0 : 4,
-          gap: 1
+          bg: "background-secondary",
+          p: "spacing4",
+          gap: "spacing4",
+          mb: "spacing2"
+        }}
+      >
+        <Flex
+          variant="columnCenter"
+          sx={{
+            bg: "background-selected",
+            size: 60,
+            borderRadius: "50px",
+            flexShrink: 0
+          }}
+        >
+          <UserProfileIcon size={18} />
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing1" }}>
+          <Text
+            sx={{
+              fontSize: "sm",
+              fontWeight: 600,
+              lineHeight: 1,
+              color: "heading"
+            }}
+          >
+            {strings.loginMessage()}
+          </Text>
+          <Text sx={{ fontSize: "xs", lineHeight: 1.2, color: "paragraph" }}>
+            {strings.loginMessageActionText()}
+          </Text>
+        </Flex>
+      </Flex>
+    );
+  }
+
+  if (minimal)
+    return (
+      <Flex
+        sx={{
+          alignItems: "flex-start",
+          gap: "spacing3",
+          px: "spacing4"
+        }}
+      >
+        <Flex
+          variant="columnCenter"
+          sx={{
+            size: 25,
+            borderRadius: 80,
+            overflow: "hidden"
+          }}
+        >
+          {profile?.profilePicture ? (
+            <Image
+              sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+              src={profile.profilePicture}
+            />
+          ) : (
+            <UserIcon size={20} />
+          )}
+        </Flex>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flex: 1,
+            gap: "spacing1",
+            fontSize: "3xs",
+            lineHeight: 1,
+            wordBreak: "break-word"
+          }}
+        >
+          <Text sx={{ color: "accent", fontSize: "3xs", fontWeight: 500 }}>
+            {`${title}${trial ? " (trial)" : ""}`}
+          </Text>
+          <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
+            {profile?.fullName || strings.yourFullName()}
+          </Text>
+          <Text sx={{ fontSize: "3xs", color: "paragraph" }}>{user.email}</Text>
+        </Flex>
+      </Flex>
+    );
+
+  const storagePercent =
+    user.totalStorage && user.totalStorage > 0
+      ? Math.min(100, ((user.storageUsed || 0) / user.totalStorage) * 100)
+      : 0;
+
+  return (
+    <Flex
+      sx={{
+        borderRadius: "radius2",
+        alignItems: "center",
+        bg: "background-secondary",
+        px: "spacing5",
+        py: "spacing6",
+        gap: "spacing7",
+        mb: "spacing2"
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "center",
+          flex: "1 1 auto",
+          gap: "spacing4",
+          minWidth: 0
         }}
       >
         <Flex
           variant="columnCenter"
           sx={{
             bg: "shade",
-            size: minimal ? 30 : 40,
-            borderRadius: 80
-          }}
-        >
-          <UserIcon size={minimal ? 15 : 20} />
-        </Flex>
-        <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={minimal ? "body" : "subtitle"}>
-            {strings.loginMessage()}
-          </Text>
-          <Text variant={"subBody"}>{strings.loginMessageActionText()}</Text>
-        </Flex>
-      </Flex>
-    );
-
-  return (
-    <Flex
-      sx={{
-        borderRadius: "default",
-        alignItems: "center",
-        justifyContent: "space-between",
-        bg: "var(--background-secondary)",
-        p: 1,
-        mb: minimal ? 0 : 4
-      }}
-    >
-      <Flex sx={{ alignItems: "center", flex: 1 }}>
-        <Flex
-          variant="columnCenter"
-          sx={{
-            bg: "shade",
-            mr: 2,
-            size: minimal ? 40 : 50,
+            size: 80,
+            flexShrink: 0,
             borderRadius: 80,
             overflow: "hidden",
             position: "relative",
             ":hover #profile-picture-edit": {
-              visibility: minimal ? "hidden" : "visible"
+              visibility: "visible"
             }
           }}
         >
@@ -167,7 +281,7 @@ export function UserProfile({ minimal }: Props) {
               src={profile.profilePicture}
             />
           ) : (
-            <UserIcon size={minimal ? 20 : 24} />
+            <UserIcon size={32} />
           )}
           <Flex
             id="profile-picture-edit"
@@ -189,95 +303,119 @@ export function UserProfile({ minimal }: Props) {
               await EditProfilePictureDialog.show({ profile });
             }}
           >
-            <Text variant="subBody" sx={{ color: "white" }}>
+            <Text sx={{ fontSize: "xs", lineHeight: 1, color: "white" }}>
               {strings.edit()}
             </Text>
           </Flex>
         </Flex>
-        <Flex sx={{ flexDirection: "column", flex: 1 }}>
+        <Flex sx={{ flexDirection: "column", gap: "spacing1" }}>
+          <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+            <Text
+              sx={{
+                fontSize: "sm",
+                fontWeight: 600,
+                lineHeight: 1,
+                color: "heading"
+              }}
+            >
+              {profile?.fullName || strings.yourFullName()}
+            </Text>
+            <PencilSimple
+              sx={{ cursor: "pointer", flexShrink: 0 }}
+              size={15}
+              title={strings.editFullName()}
+              onClick={async () => {
+                const fullName = await PromptDialog.show({
+                  title: strings.editFullName(),
+                  description: strings.setFullNameDesc(),
+                  defaultValue: profile?.fullName,
+                  label: strings.enterFullName()
+                });
+
+                if (fullName === profile?.fullName) return;
+
+                try {
+                  await db.settings.setProfile({
+                    fullName: fullName || undefined
+                  });
+                  await useSettingStore.getState().refresh();
+                  showToast("success", strings.fullNameUpdated());
+                } catch (e) {
+                  showToast("error", (e as Error).message);
+                }
+              }}
+            />
+          </Flex>
+          <Text sx={{ fontSize: "xs", lineHeight: 1.2, color: "paragraph" }}>
+            {strings.memberSince(
+              getFormattedDate(getObjectIdTimestamp(user.id), "date")
+            )}
+          </Text>
           <Text
-            variant="subBody"
             sx={{
-              color: "accent"
+              fontSize: "xs",
+              lineHeight: 1.2,
+              color: "paragraph",
+              wordBreak: "break-word"
             }}
           >
-            {`${title}${trial ? " (trial)" : ""}`}
-          </Text>
-
-          <Text variant={minimal ? "body" : "subtitle"}>
-            {profile?.fullName || strings.yourFullName()}{" "}
-            {minimal ? null : (
-              <Edit
-                sx={{ display: "inline-block", cursor: "pointer" }}
-                size={12}
-                title={strings.editFullName()}
-                onClick={async () => {
-                  const fullName = await PromptDialog.show({
-                    title: strings.editFullName(),
-                    description: strings.setFullNameDesc(),
-                    defaultValue: profile?.fullName
-                  });
-
-                  if (fullName === profile?.fullName) return;
-
-                  try {
-                    await db.settings.setProfile({
-                      fullName: fullName || undefined
-                    });
-                    await useSettingStore.getState().refresh();
-                    showToast("success", strings.fullNameUpdated());
-                  } catch (e) {
-                    showToast("error", (e as Error).message);
-                  }
-                }}
-              />
-            )}
-          </Text>
-          <Text variant={"subBody"}>
             {user.email}
-            {minimal ? null : (
-              <>
-                {" "}
-                •{" "}
-                {strings.memberSince(
-                  getFormattedDate(getObjectIdTimestamp(user.id), "date")
-                )}
-              </>
-            )}
           </Text>
-          {user.totalStorage && !minimal ? (
-            <Flex sx={{ maxWidth: 300, alignItems: "center", gap: 1 }}>
-              <Progress
-                max={user.totalStorage === -1 ? Infinity : user.totalStorage}
-                value={user.storageUsed || 0}
-                color="var(--accent)"
-              />
-              <Text variant="subBody" sx={{ flexShrink: 0 }}>
-                {formatBytes(user.storageUsed || 0)}/
-                {user.totalStorage === -1
-                  ? strings.unlimited()
-                  : formatBytes(user.totalStorage)}{" "}
-                {strings.used()}
-              </Text>
-            </Flex>
-          ) : null}
         </Flex>
       </Flex>
-      {/* <Button
-        variant="icon"
+      <Flex
         sx={{
-          borderRadius: 50,
-          p: 0,
-          m: 0,
-          width: 30,
-          height: 30,
-          alignSelf: "end"
+          flexDirection: "column",
+          gap: "spacing3",
+          flex: "0 1 223px",
+          minWidth: "140px"
         }}
-        title="Edit profile"
-        onClick={() => showEditProfileDialog(profile)}
       >
-        <Edit size={18} />
-      </Button> */}
+        <Text
+          sx={{
+            fontSize: "xs",
+            fontWeight: 500,
+            lineHeight: 1,
+            color: "accent"
+          }}
+        >
+          {`${title}${trial ? " (trial)" : ""}`}
+        </Text>
+        {user.totalStorage ? (
+          <>
+            <Flex
+              sx={{
+                height: 8,
+                borderRadius: "140px",
+                bg: "background-tertiary",
+                overflow: "hidden"
+              }}
+            >
+              <Flex
+                sx={{
+                  width: `${storagePercent}%`,
+                  height: "100%",
+                  borderRadius: "140px",
+                  bg: "accent"
+                }}
+              />
+            </Flex>
+            <Text
+              sx={{
+                fontSize: "xs",
+                lineHeight: 1.1,
+                color: "paragraph-secondary"
+              }}
+            >
+              {formatBytes(user.storageUsed || 0)} /{" "}
+              {user.totalStorage === -1
+                ? strings.unlimited()
+                : formatBytes(user.totalStorage)}{" "}
+              {strings.used()}
+            </Text>
+          </>
+        ) : null}
+      </Flex>
     </Flex>
   );
 }

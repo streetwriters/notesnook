@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useMemo, useState } from "react";
 import {
@@ -30,11 +31,11 @@ import {
 } from "react-native";
 import isEmail from "validator/lib/isEmail";
 import isURL from "validator/lib/isURL";
-import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
+import { AppFontSize } from "../../../utils/size";
 import AppIcon from "../AppIcon";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
+import { Radius, Spacing } from "../../../common/design/spacing";
 
 export type FormValues = Record<string, string>;
 export type FormErrors = Partial<Record<string, string>>;
@@ -198,6 +199,11 @@ export const validators = {
       ? undefined
       : message || `Must be at least ${length} characters`,
 
+  number:
+    (message = strings.enterValidNumber()) =>
+    (value: string) =>
+      !value?.trim() || !Number.isNaN(Number(value)) ? undefined : message,
+
   url:
     (message = "Please enter a valid URL") =>
     (value: string) =>
@@ -208,7 +214,9 @@ export const validators = {
   matchField:
     (fieldName: string, message = "Values do not match") =>
     (value: string, values: FormValues) =>
-      value === values[fieldName] ? undefined : message
+      value === values[fieldName] ? undefined : message,
+  custom: (validator: (value: any) => string | undefined) => (value: any) =>
+    validator(value)
 };
 
 interface FormInputProps extends TextInputProps {
@@ -236,6 +244,7 @@ interface FormInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   wrapperStyle?: ViewStyle;
   errorStyle?: TextStyle;
+  label?: string;
 }
 
 export function FormInput({
@@ -247,12 +256,12 @@ export function FormInput({
   error,
   secureTextEntry,
   customColor,
-  marginBottom = 10,
+  marginBottom = 0,
   marginRight,
   button,
   buttonLeft,
   buttons,
-  height = 45,
+  height,
   fontSize = AppFontSize.sm,
   inputStyle = {},
   containerStyle = {},
@@ -262,6 +271,7 @@ export function FormInput({
   onPress,
   onChangeText,
   errorStyle,
+  label,
   ...restProps
 }: FormInputProps) {
   const { colors, isDark } = useThemeColors();
@@ -287,31 +297,33 @@ export function FormInput({
   const fieldError = error || formRef.current.getError(name);
 
   const borderColor = useMemo(() => {
-    if (fieldError) return colors.error.accent;
+    if (fieldError) return colors.error.border;
     if (focused) return customColor || colors.selected.border;
-    return colors.primary.border;
+    return "transparent";
   }, [colors, customColor, fieldError, focused]);
 
   const style: ViewStyle = {
     borderWidth: 1,
-    borderRadius: defaultBorderRadius,
-    borderColor,
+    borderRadius: Radius.XS,
+    backgroundColor: colors.secondary.background,
+    borderColor: borderColor,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: DefaultAppStyles.GAP,
+    paddingHorizontal: Spacing.LEVEL_2,
     ...containerStyle
   };
 
   const textStyle: TextInputProps["style"] = {
     paddingHorizontal: 0,
-    fontSize,
+    fontSize: fontSize,
     color:
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
+    paddingTop: Spacing.LEVEL_3,
+    paddingBottom: Spacing.LEVEL_3,
+    lineHeight: fontSize + fontSize * 0.2,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL,
     fontFamily: "Inter-Regular",
     ...(inputStyle as ViewStyle)
   };
@@ -330,6 +342,17 @@ export function FormInput({
         ...wrapperStyle
       }}
     >
+      {label ? (
+        <Paragraph
+          style={{
+            marginBottom: Spacing.LEVEL_1
+          }}
+          color={colors.secondary.paragraph}
+          fontSize="XS"
+        >
+          {label}
+        </Paragraph>
+      ) : undefined}
       <TouchableOpacity
         disabled={!loading}
         onPress={onPress}
@@ -362,14 +385,15 @@ export function FormInput({
           style={{
             flexDirection: "row",
             justifyContent: "center",
-            height: 35 > height ? height : 35,
+            height: height ? (35 > height ? height : 35) : undefined,
             alignItems: "center"
           }}
         >
           {secureTextEntry && (
             <IconButton
-              name="eye"
-              size={20}
+              name={!secureEntry ? "eye-closed" : "eye-open"}
+              iconFamily="notesnook"
+              size={18}
               top={10}
               bottom={10}
               onPress={() => {
@@ -377,12 +401,9 @@ export function FormInput({
                 setSecureEntry(!secureEntry);
               }}
               style={{
-                width: 25,
                 marginLeft: 5
               }}
-              color={
-                secureEntry ? colors.secondary.icon : colors.primary.accent
-              }
+              color={colors.primary.icon}
             />
           )}
 
@@ -392,7 +413,7 @@ export function FormInput({
             <IconButton
               testID={button.testID}
               name={button.icon}
-              size={button.size || AppFontSize.xl}
+              size={button.size || 16}
               top={10}
               bottom={10}
               onPress={button.onPress}

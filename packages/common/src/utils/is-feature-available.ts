@@ -186,7 +186,7 @@ const features = {
   taskList: createFeature({
     id: "taskList",
     get title() {
-      return strings.taskList();
+      return strings.taskListFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -199,7 +199,7 @@ const features = {
   outlineList: createFeature({
     id: "outlineList",
     get title() {
-      return strings.outlineList();
+      return strings.outlineListFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -348,7 +348,7 @@ const features = {
   defaultSidebarTab: createFeature({
     id: "defaultSidebarTab",
     get title() {
-      return strings.defaultSidebarTab();
+      return strings.defaultSidebarTabFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -374,7 +374,7 @@ const features = {
   markdownShortcuts: createFeature({
     id: "markdownShortcuts",
     get title() {
-      return strings.mardownShortcuts();
+      return strings.markdownShortcutsFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -387,7 +387,7 @@ const features = {
   fontLigatures: createFeature({
     id: "fontLigatures",
     get title() {
-      return strings.fontLigatures();
+      return strings.fontLigaturesFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -439,7 +439,7 @@ const features = {
   appLock: createFeature({
     id: "appLock",
     get title() {
-      return strings.appLock();
+      return strings.appLockFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -452,7 +452,7 @@ const features = {
   maxNoteVersions: createFeature({
     id: "maxNoteVersions",
     get title() {
-      return strings.noteHistory();
+      return strings.maxNoteVersionsFeatureTitle();
     },
     availability: {
       free: createLimit(100),
@@ -465,7 +465,7 @@ const features = {
   fullOfflineMode: createFeature({
     id: "fullOfflineMode",
     get title() {
-      return strings.fullOfflineMode();
+      return strings.fullOfflineModeFeatureTitle();
     },
     availability: {
       free: createLimit(false),
@@ -478,7 +478,7 @@ const features = {
   syncControls: createFeature({
     id: "syncControls",
     get title() {
-      return strings.sync();
+      return strings.syncControlsFeatureTitle();
     },
     availability: {
       free: createLimit(false),

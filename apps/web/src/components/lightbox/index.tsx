@@ -20,17 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Button, Flex, Image } from "@theme-ui/components";
 import React from "react";
 import {
+  ArrowClockwise,
+  ArrowCounterClockwise,
+  ArrowsClockwise,
   Close,
   Icon,
   Loading,
-  Reset,
-  RotateACW,
-  RotateCW,
-  ZoomIn,
-  ZoomOut
+  MagnifyingGlassMinus,
+  MagnifyingGlassPlus
 } from "../icons";
-import { getPlatform } from "../../utils/platform";
-import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { strings } from "@notesnook/intl";
 
 const DEFAULT_ZOOM_STEP = 0.3;
@@ -275,38 +273,38 @@ export class Lightbox extends React.Component<LightboxProps> {
     }[] = [
       {
         title: strings.reset(),
-        icon: Reset,
+        icon: ArrowsClockwise,
         enabled: true,
         hidden: !allowReset,
         onClick: (e) => this.reset(e)
       },
       {
-        title: strings.rotateLeft(),
-        icon: RotateACW,
-        enabled: true,
-        hidden: !allowRotate,
-        onClick: () => this.applyRotate("acw")
-      },
-      {
         title: strings.rotateRight(),
-        icon: RotateCW,
+        icon: ArrowClockwise,
         enabled: true,
         hidden: !allowRotate,
         onClick: () => this.applyRotate("cw")
       },
       {
-        title: strings.zoomOut(),
-        icon: ZoomOut,
-        enabled: zoom > 1,
-        hidden: !allowZoom,
-        onClick: () => this.applyZoom("out")
+        title: strings.rotateLeft(),
+        icon: ArrowCounterClockwise,
+        enabled: true,
+        hidden: !allowRotate,
+        onClick: () => this.applyRotate("acw")
       },
       {
         title: strings.zoomIn(),
-        icon: ZoomIn,
+        icon: MagnifyingGlassPlus,
         enabled: true,
         hidden: !allowZoom,
         onClick: () => this.applyZoom("in")
+      },
+      {
+        title: strings.zoomOut(),
+        icon: MagnifyingGlassMinus,
+        enabled: zoom > 1,
+        hidden: !allowZoom,
+        onClick: () => this.applyZoom("out")
       },
       {
         title: strings.close(),
@@ -324,56 +322,55 @@ export class Lightbox extends React.Component<LightboxProps> {
           top: 0,
           width: "100%",
           height: "100%",
-          bg: "#000000a1",
+          bg: "rgba(0, 0, 0, 0.4)",
           flexDirection: "column"
         }}
       >
         <Flex
           sx={{
-            justifyContent: "flex-end",
-            zIndex: 10
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 10,
+            bg: "background",
+            gap: "spacing4",
+            px: "spacing4",
+            py: "spacing3",
+            alignItems: "center",
+            borderBottomLeftRadius: "radius2",
+            borderBottomRightRadius: "radius2"
           }}
+          style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
         >
-          <Flex
-            bg="var(--background-secondary)"
-            sx={{
-              borderRadius: "0px 0px 0px 5px",
-              overflow: "hidden",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              height: !hasNativeTitlebar ? TITLE_BAR_HEIGHT : "auto",
-              pr:
-                !hasNativeTitlebar && getPlatform() !== "darwin"
-                  ? "calc(100vw - env(titlebar-area-width))"
-                  : 0
-            }}
-          >
-            {tools.map((tool) => (
+          {tools.map((tool) =>
+            tool.hidden ? null : (
               <Button
                 key={tool.title}
                 data-test-id={tool.title}
                 disabled={!tool.enabled}
-                variant="secondary"
-                bg="transparent"
+                variant="primary"
                 title={tool.title}
                 sx={{
-                  height: "100%",
-                  borderRadius: 0,
-                  display: [
-                    tool.hideOnMobile ? "none" : "flex",
-                    tool.hidden ? "none" : "flex"
-                  ],
-                  cursor: tool.enabled ? "pointer" : "not-allowed",
-                  flexDirection: "row",
+                  display: "flex",
                   flexShrink: 0,
-                  alignItems: "center"
+                  alignItems: "center",
+                  justifyContent: "center",
+                  p: "spacing3",
+                  borderRadius: "radius1",
+                  ":hover:not(:disabled):not(:active)": {
+                    bg: "hover-selected"
+                  },
+                  ":active:not(:disabled)": {
+                    bg: "hover-selected"
+                  }
                 }}
                 onClick={tool.onClick}
               >
-                <tool.icon size={18} color={"icon"} />
+                <tool.icon size={13} color="icon" />
               </Button>
-            ))}
-          </Flex>
+            )
+          )}
         </Flex>
         <Flex
           sx={{

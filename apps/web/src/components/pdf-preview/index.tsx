@@ -20,19 +20,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Worker, Viewer, PasswordStatus } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
-import { Button, Flex, Text } from "@theme-ui/components";
-import { searchPlugin } from "@react-pdf-viewer/search";
+import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
+import { RenderSearchProps, searchPlugin } from "@react-pdf-viewer/search";
 import "@react-pdf-viewer/search/lib/styles/index.css";
+import React, { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { ThemeUIStyleObject } from "@theme-ui/core";
 import {
-  ChevronDown,
-  ChevronUp,
-  Download,
-  Fullscreen,
-  Icon,
-  ZoomIn,
-  ZoomOut,
+  ArrowDownSvgIcon,
+  ArrowUp,
+  CaretDownSvgIcon,
+  CaretUp,
+  CheckIcon,
   Close,
-  Search
+  CornersIn,
+  CornersOut,
+  Icon,
+  Loading,
+  MagnifyingGlass,
+  MagnifyingGlassMinus,
+  MagnifyingGlassPlus
 } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Field from "../field";
@@ -40,6 +46,9 @@ import { LinkPlugin } from "./links-plugin";
 import Config from "../../utils/config";
 import { ErrorText } from "../error-text";
 import { strings } from "@notesnook/intl";
+import { ScopedThemeProvider } from "../theme-provider";
+import { useWindowControls } from "../../hooks/use-window-controls";
+import { isMac } from "../../utils/platform";
 
 export type PdfPreviewProps = {
   fileUrl: string | Uint8Array;
@@ -49,16 +58,77 @@ export type PdfPreviewProps = {
 export function PdfPreview(props: PdfPreviewProps) {
   const { fileUrl, onClose, hash } = props;
 
-  const toolbarInstance = toolbarPlugin();
+  const toolbarInstance = toolbarPlugin({
+    fullScreenPlugin: {
+      renderExitFullScreenButton: (props) => (
+        <Flex
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 2,
+            alignItems: "center",
+            bg: "background",
+            px: "spacing4",
+            py: "spacing3"
+          }}
+        >
+          <ToolbarButton
+            icon={CornersIn}
+            title={strings.exitFullScreen()}
+            size={25}
+            onClick={props.onClick}
+          />
+        </Flex>
+      )
+    }
+  });
   const { Toolbar } = toolbarInstance;
   const searchPluginInstance = searchPlugin();
-  const { ShowSearchPopover } = searchPluginInstance;
+  const { Search } = searchPluginInstance;
 
   const theme = useThemeStore((state) => state.colorScheme);
+  const { isFullscreen, hasNativeWindowControls } = useWindowControls();
+  const showTrafficLights =
+    IS_DESKTOP_APP && isMac() && !isFullscreen && !window.hasNativeTitlebar;
+
+  const topBarRef = useRef<HTMLDivElement>(null);
+  const searchButtonRef = useRef<HTMLDivElement>(null);
+  const [searchPopoverLeft, setSearchPopoverLeft] = useState<number>();
+  const isSearchOpen = searchPopoverLeft !== undefined;
+
+  function toggleSearch() {
+    if (isSearchOpen) return setSearchPopoverLeft(undefined);
+    const topBar = topBarRef.current?.getBoundingClientRect();
+    const searchButton = searchButtonRef.current?.getBoundingClientRect();
+    if (!topBar || !searchButton) return;
+    setSearchPopoverLeft(searchButton.left - topBar.left);
+  }
 
   return (
     <Worker workerUrl="/pdf.worker.min.js">
-      <Flex sx={{ p: 1, pt: 0, justifyContent: "space-between" }}>
+      <ScopedThemeProvider
+        ref={topBarRef}
+        scope="titleBar"
+        sx={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexShrink: 0,
+          bg: "transparent",
+          borderBottom: "1px solid",
+          borderBottomColor: "border",
+          // the macOS traffic lights are positioned at (10, 14) for a 45px
+          // title bar (see trafficLightPosition in apps/desktop), so the bar
+          // is sized and padded to make them land centered inside the
+          // reserved slot of the first pill.
+          pl: showTrafficLights ? "spacing2" : "spacing4",
+          pr: "spacing4",
+          py: showTrafficLights ? "spacing2" : "spacing3"
+        }}
+      >
         <Toolbar>
           {(props: ToolbarSlot) => {
             const {
@@ -72,159 +142,148 @@ export function PdfPreview(props: PdfPreviewProps) {
 
             return (
               <>
-                <Flex
+                <ToolbarGroup
                   sx={{
-                    bg: "var(--background-secondary)",
-                    borderRadius: "default",
-                    overflow: "hidden",
-                    alignItems: "center",
-
-                    ".rpv-search__popover label, .rpv-search__popover span": {
-                      fontFamily: "body",
-                      fontSize: "body",
-                      color: "paragraph"
-                    },
-
-                    ".rpv-core__popover-body, .rpv-core__arrow": {
-                      bg: "background",
-                      borderColor: "border",
-                      color: "paragraph"
-                    },
-
-                    ".rpv-search__popover .rpv-core__minimal-button": {
-                      color: "icon",
-                      ":hover": {
-                        bg: "hover"
-                      }
-                    },
-
-                    ".rpv-search__popover .rpv-core__button": {
-                      bg: "background-secondary",
-                      color: "paragraph",
-                      border: "none",
-                      ":hover": {
-                        bg: "hover"
-                      }
-                    },
-
-                    ".rpv-search__popover-label-checkbox": {
-                      accentColor: "var(--accent)"
-                    },
-
                     ".rpv-core__textbox": {
-                      width: "45px",
-                      mr: 1,
-                      borderRadius: "default",
-                      px: 1,
-                      py: "2px",
-                      height: "auto",
+                      width: "50px",
+                      height: "21px",
+                      p: "spacing2",
+                      borderRadius: "radius1",
                       bg: "background",
                       border: "none",
-                      outline: "1.5px solid var(--border)",
+                      outline: "none",
                       fontFamily: "body",
-                      fontWeight: "body",
-                      fontSize: "input",
-                      color: "paragraph",
+                      fontWeight: 500,
+                      fontSize: "3xs",
+                      lineHeight: 1,
+                      color: "paragraph-selected",
+                      textAlign: "left",
+                      WebkitAppRegion: "no-drag",
                       ":focus": {
-                        outline: "2px solid var(--accent)"
-                      },
-                      ":hover:not(:focus)": {
-                        outline: "1.5px solid var(--accent)"
+                        outline: "1px solid var(--accent)"
                       }
-                    },
-
-                    ".rpv-search__popover .rpv-core__textbox": {
-                      width: "85% !important"
                     }
                   }}
                 >
-                  <ShowSearchPopover>
-                    {(props) => (
-                      <ToolbarButton
-                        icon={Search}
-                        title={strings.search()}
-                        onClick={props.onClick}
+                  {showTrafficLights ? (
+                    <>
+                      <Box
+                        sx={{ width: "53px", height: "13px", flexShrink: 0 }}
                       />
-                    )}
-                  </ShowSearchPopover>
+                      <ToolbarSeparator />
+                    </>
+                  ) : null}
+                  <Flex ref={searchButtonRef}>
+                    <ToolbarButton
+                      icon={MagnifyingGlass}
+                      title={strings.search()}
+                      size={20}
+                      filled={isSearchOpen}
+                      onClick={toggleSearch}
+                    />
+                  </Flex>
+                  <ToolbarSeparator />
                   <GoToPreviousPage>
                     {(props) => (
                       <ToolbarButton
-                        icon={ChevronUp}
+                        icon={CaretUp}
                         disabled={props.isDisabled}
                         title={strings.goToPreviousPage()}
+                        size={20}
                         onClick={props.onClick}
                       />
                     )}
                   </GoToPreviousPage>
                   <CurrentPageInput />
-                  <NumberOfPages>
-                    {(props) => (
-                      <Text variant="body" sx={{ mr: 1 }}>
-                        / {props.numberOfPages}
-                      </Text>
-                    )}
-                  </NumberOfPages>
-                  <GoToNextPage>
-                    {(props) => (
-                      <ToolbarButton
-                        icon={ChevronDown}
-                        disabled={props.isDisabled}
-                        title={strings.goToNextPage()}
-                        onClick={props.onClick}
-                      />
-                    )}
-                  </GoToNextPage>
-                </Flex>
+                  <Flex
+                    sx={{
+                      width: "86px",
+                      p: "spacing2",
+                      borderRadius: "radius2",
+                      alignItems: "center",
+                      justifyContent: "space-between"
+                    }}
+                  >
+                    <NumberOfPages>
+                      {(props) => (
+                        <Text
+                          sx={{
+                            fontFamily: "body",
+                            fontSize: "3xs",
+                            fontWeight: 500,
+                            lineHeight: 1,
+                            color: "icon-secondary"
+                          }}
+                        >
+                          / {props.numberOfPages}
+                        </Text>
+                      )}
+                    </NumberOfPages>
+                    <GoToNextPage>
+                      {(props) => (
+                        <ToolbarButton
+                          icon={CaretDownSvgIcon}
+                          disabled={props.isDisabled}
+                          title={strings.goToNextPage()}
+                          size={20}
+                          sx={{ m: "-3.5px" }}
+                          onClick={props.onClick}
+                        />
+                      )}
+                    </GoToNextPage>
+                  </Flex>
+                </ToolbarGroup>
 
-                <Flex
-                  sx={{
-                    bg: "var(--background-secondary)",
-                    borderRadius: "default",
-                    overflow: "hidden",
-                    alignItems: "center"
-                  }}
-                >
-                  <props.ZoomOut>
-                    {(props) => (
-                      <ToolbarButton
-                        icon={ZoomOut}
-                        title={strings.zoomOut()}
-                        onClick={props.onClick}
-                      />
-                    )}
-                  </props.ZoomOut>
-                  <CurrentScale>
-                    {(props) => (
-                      <Text variant="body" sx={{ mx: 1 }}>{`${Math.round(
-                        props.scale * 100
-                      )}%`}</Text>
-                    )}
-                  </CurrentScale>
+                <ToolbarGroup>
                   <props.ZoomIn>
                     {(props) => (
                       <ToolbarButton
-                        icon={ZoomIn}
+                        icon={MagnifyingGlassPlus}
                         title={strings.zoomIn()}
+                        size={25}
                         onClick={props.onClick}
                       />
                     )}
                   </props.ZoomIn>
-                </Flex>
+                  <CurrentScale>
+                    {(props) => (
+                      <Text
+                        sx={{
+                          fontFamily: "body",
+                          fontSize: "xs",
+                          fontWeight: 400,
+                          lineHeight: 1,
+                          color: "paragraph"
+                        }}
+                      >{`${Math.round(props.scale * 100)}%`}</Text>
+                    )}
+                  </CurrentScale>
+                  <props.ZoomOut>
+                    {(props) => (
+                      <ToolbarButton
+                        icon={MagnifyingGlassMinus}
+                        title={strings.zoomOut()}
+                        size={25}
+                        onClick={props.onClick}
+                      />
+                    )}
+                  </props.ZoomOut>
+                </ToolbarGroup>
 
-                <Flex
+                <ToolbarGroup
                   sx={{
-                    bg: "var(--background-secondary)",
-                    borderRadius: "default",
-                    overflow: "hidden",
-                    alignItems: "center"
+                    mr:
+                      hasNativeWindowControls && !isMac()
+                        ? `calc(100vw - env(titlebar-area-width))`
+                        : 0
                   }}
                 >
                   <props.Download>
                     {(props) => (
                       <ToolbarButton
-                        icon={Download}
+                        icon={ArrowDownSvgIcon}
                         title={strings.network.download()}
+                        size={25}
                         onClick={props.onClick}
                       />
                     )}
@@ -232,8 +291,9 @@ export function PdfPreview(props: PdfPreviewProps) {
                   <EnterFullScreen>
                     {(props) => (
                       <ToolbarButton
-                        icon={Fullscreen}
+                        icon={CornersOut}
                         title={strings.enterFullScreen()}
+                        size={25}
                         onClick={props.onClick}
                       />
                     )}
@@ -243,15 +303,27 @@ export function PdfPreview(props: PdfPreviewProps) {
                     <ToolbarButton
                       icon={Close}
                       title={strings.close()}
+                      size={25}
                       onClick={onClose}
                     />
                   )}
-                </Flex>
+                </ToolbarGroup>
               </>
             );
           }}
         </Toolbar>
-      </Flex>
+        {isSearchOpen ? (
+          <Search>
+            {(props) => (
+              <SearchPopover
+                {...props}
+                left={searchPopoverLeft}
+                onClose={() => setSearchPopoverLeft(undefined)}
+              />
+            )}
+          </Search>
+        ) : null}
+      </ScopedThemeProvider>
       <Viewer
         fileUrl={fileUrl}
         theme={theme}
@@ -337,37 +409,311 @@ export function PdfPreview(props: PdfPreviewProps) {
 }
 export default PdfPreview;
 
+function ToolbarGroup(
+  props: PropsWithChildren<{ sx?: ThemeUIStyleObject }>
+) {
+  const { sx, children } = props;
+  return (
+    <ScopedThemeProvider
+      scope="base"
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        gap: "spacing3",
+        p: "spacing2",
+        bg: "background-secondary",
+        borderRadius: "radius2",
+        ...sx
+      }}
+    >
+      {children}
+    </ScopedThemeProvider>
+  );
+}
+
+function ToolbarSeparator() {
+  return (
+    <ScopedThemeProvider
+      scope="titleBar"
+      sx={{ width: "1px", height: "13px", flexShrink: 0, bg: "border" }}
+    />
+  );
+}
+
 type ToolbarButtonProps = {
   title: string;
   disabled?: boolean;
-  hideOnMobile?: boolean;
-  hidden?: boolean;
   onClick: () => void;
   icon: Icon;
-  iconSize?: number;
+  size: 20 | 25;
+  filled?: boolean;
+  sx?: React.ComponentProps<typeof Button>["sx"];
 };
 function ToolbarButton(props: ToolbarButtonProps) {
-  const { title, disabled, hideOnMobile, hidden, onClick, iconSize } = props;
+  const { title, disabled, onClick, size, filled, sx } = props;
 
   return (
     <Button
       data-test-id={title}
       disabled={disabled}
-      variant="secondary"
-      bg="transparent"
+      variant="primary"
       title={title}
       sx={{
-        borderRadius: 0,
-        display: [hideOnMobile ? "none" : "flex", hidden ? "none" : "flex"],
-        cursor: !disabled ? "pointer" : "not-allowed",
-        flexDirection: "row",
+        display: "flex",
         flexShrink: 0,
-        alignItems: "center"
+        alignItems: "center",
+        justifyContent: "center",
+        width: `${size}px`,
+        height: `${size}px`,
+        p: 0,
+        borderRadius: "radius1",
+        bg: filled ? "hover" : "transparent",
+        ":hover:not(:disabled):not(:active)": {
+          bg: filled ? "hover-secondary" : "hover"
+        },
+        ...sx
       }}
       onClick={onClick}
     >
-      <props.icon size={iconSize || 18} />
+      <props.icon size={13} color="icon" />
     </Button>
+  );
+}
+
+type SearchPopoverProps = RenderSearchProps & {
+  left: number;
+  onClose: () => void;
+};
+function SearchPopover(props: SearchPopoverProps) {
+  const {
+    left,
+    onClose,
+    clearKeyword,
+    changeMatchCase,
+    changeWholeWords,
+    currentMatch,
+    jumpToNextMatch,
+    jumpToPreviousMatch,
+    keyword,
+    matchCase,
+    numberOfMatches,
+    wholeWords,
+    search,
+    setKeyword
+  } = props;
+  const [isQuerying, setIsQuerying] = useState(false);
+  const [searchDone, setSearchDone] = useState(false);
+
+  useEffect(() => () => clearKeyword(), []);
+
+  function performSearch() {
+    setIsQuerying(true);
+    search()
+      .then(() => setSearchDone(true))
+      .catch(console.error)
+      .finally(() => setIsQuerying(false));
+  }
+
+  function findNext() {
+    if (searchDone) jumpToNextMatch();
+    else performSearch();
+  }
+
+  return (
+    <ScopedThemeProvider
+      scope="base"
+      sx={{
+        position: "absolute",
+        // positioned against the bar's padding box, so skip its bottom border
+        top: "calc(100% + 1px)",
+        left,
+        zIndex: 10,
+        width: "180px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "spacing4",
+        py: "spacing4",
+        bg: "background",
+        border: "1px solid",
+        borderColor: "border-secondary",
+        borderRadius: "radius2",
+        boxShadow: "0px 4px 12.5px rgba(0, 0, 0, 0.05)",
+        WebkitAppRegion: "no-drag"
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          e.stopPropagation();
+          onClose();
+        }
+      }}
+    >
+      <Flex sx={{ flexDirection: "column" }}>
+        <Flex
+          sx={{
+            alignItems: "center",
+            gap: "spacing3",
+            px: "spacing4",
+            py: "spacing3",
+            bg: "background-secondary",
+            border: "1px solid",
+            borderColor: "accent",
+            borderRadius: "radius2"
+          }}
+        >
+          <MagnifyingGlass size={13} color="icon" />
+          <Input
+            autoFocus
+            placeholder={strings.search()}
+            value={keyword}
+            onChange={(e) => {
+              setSearchDone(false);
+              setKeyword(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && keyword) findNext();
+            }}
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              height: "12px",
+              p: 0,
+              border: "none",
+              outline: "none",
+              bg: "transparent",
+              fontFamily: "body",
+              fontSize: "xxs",
+              lineHeight: 1,
+              color: "heading",
+              ":focus": { outline: "none" },
+              ":hover:not(:focus)": { outline: "none" }
+            }}
+          />
+          <Flex
+            sx={{ flexShrink: 0, height: "20px", alignItems: "center" }}
+          >
+            {isQuerying ? (
+              <Loading size={11} color="icon-secondary" />
+            ) : (
+              <Text
+                sx={{
+                  fontFamily: "body",
+                  fontSize: "3xs",
+                  fontWeight: 500,
+                  lineHeight: 1,
+                  color: "icon-secondary"
+                }}
+              >
+                {currentMatch}/{numberOfMatches}
+              </Text>
+            )}
+          </Flex>
+        </Flex>
+        <SearchOption
+          label={strings.matchCase()}
+          checked={matchCase}
+          onChange={(checked) => {
+            setSearchDone(false);
+            changeMatchCase(checked);
+          }}
+        />
+        <SearchOption
+          label={strings.matchWholeWord()}
+          checked={wholeWords}
+          onChange={(checked) => {
+            setSearchDone(false);
+            changeWholeWords(checked);
+          }}
+        />
+      </Flex>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: "spacing4"
+        }}
+      >
+        <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+          <ToolbarButton
+            icon={ArrowUp}
+            title={strings.previousMatch()}
+            size={20}
+            filled
+            disabled={currentMatch <= 1}
+            onClick={jumpToPreviousMatch}
+          />
+          <ToolbarButton
+            icon={ArrowDownSvgIcon}
+            title={strings.nextMatch()}
+            size={20}
+            filled
+            disabled={
+              !keyword || isQuerying || (searchDone && numberOfMatches === 0)
+            }
+            onClick={findNext}
+          />
+        </Flex>
+        <ToolbarButton
+          icon={Close}
+          title={strings.close()}
+          size={20}
+          onClick={onClose}
+        />
+      </Flex>
+    </ScopedThemeProvider>
+  );
+}
+
+function SearchOption(props: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  const { label, checked, onChange } = props;
+  return (
+    <Flex
+      as="label"
+      sx={{
+        alignItems: "center",
+        gap: "spacing3",
+        px: "spacing4",
+        py: "spacing3",
+        cursor: "pointer"
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ position: "absolute", opacity: 0, width: 0, height: 0 }}
+      />
+      <Flex
+        sx={{
+          width: "15px",
+          height: "15px",
+          flexShrink: 0,
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "radius0",
+          ...(checked
+            ? { bg: "accent" }
+            : { border: "1px solid var(--icon-disabled)" })
+        }}
+      >
+        {checked ? <CheckIcon size={11} color="accentForeground" /> : null}
+      </Flex>
+      <Text
+        sx={{
+          fontFamily: "body",
+          fontSize: "xxs",
+          lineHeight: 1,
+          color: "paragraph"
+        }}
+      >
+        {label}
+      </Text>
+    </Flex>
   );
 }
 

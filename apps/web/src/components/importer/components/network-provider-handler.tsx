@@ -22,18 +22,21 @@ import {
   ProviderSettings,
   transform
 } from "@notesnook-importer/core";
-import { ScrollContainer } from "@notesnook/ui";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
 import { useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
-import Accordion from "../../accordion";
+import { LogMessage, LogsBox } from "./logs-box";
+import { ImportResult } from "./import-result";
 import { TransformResult } from "../types";
 import { strings } from "@notesnook/intl";
+import { CardTitle } from "../../../dialogs/settings/components/card-title";
 
 type NetworkProviderHandlerProps = {
   provider: INetworkProvider<ProviderSettings>;
+  result?: TransformResult;
   onTransformFinished: (result: TransformResult) => void;
+  onReset: () => void;
 };
 
 type Progress = {
@@ -49,10 +52,10 @@ function getProviderSettings(
 }
 
 export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
-  const { provider, onTransformFinished } = props;
+  const { provider, result, onTransformFinished, onReset } = props;
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
-  const logs = useRef<string[]>([]);
+  const logs = useRef<LogMessage[]>([]);
 
   async function onStartImport() {
     let totalNotes = 0;
@@ -63,11 +66,11 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         clear: async () => undefined,
         get: async () => [],
         write: async (data) => {
-          logs.current.push(
-            `[${new Date().toLocaleString()}] Pushing ${
-              data.title
-            } into database`
-          );
+          logs.current.push({
+            type: "info",
+            date: Date.now(),
+            text: `Pushing ${data.title} into database`
+          });
 
           await importNote(data);
         },
@@ -76,9 +79,11 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         }
       },
       log: (message) => {
-        logs.current.push(
-          `[${new Date(message.date).toLocaleString()}] ${message.text}`
-        );
+        logs.current.push({
+          type: "info",
+          date: message.date,
+          text: message.text
+        });
         setCounter((s) => ++s);
       },
       reporter: () => {
@@ -97,71 +102,43 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
     });
   }
 
+  if (result) {
+    return (
+      <ImportResult
+        result={result}
+        provider={provider}
+        logs={logs.current}
+        onReset={onReset}
+      />
+    );
+  }
+
+  if (totalNoteCount) {
+    return (
+      <Flex variant="card">
+        <CardTitle title={strings.importingNotesFrom(provider.name)}>
+          {strings.foundNotes(totalNoteCount)}
+        </CardTitle>
+        <LogsBox logs={logs.current} />
+      </Flex>
+    );
+  }
+
   return (
-    <Flex
-      sx={{
-        flexDirection: "column",
-        alignItems: "stretch"
-      }}
-    >
-      {totalNoteCount ? (
-        <>
-          <Text variant="title">
-            {strings.importingNotesFrom(provider.name)}
-          </Text>
-          <Text variant="body" sx={{ mt: 4 }}>
-            {strings.foundNotes(totalNoteCount)}
-          </Text>
-          {logs.current.length > 0 && (
-            <Accordion
-              isClosed={false}
-              title={strings.logs()}
-              sx={{
-                border: "1px solid var(--border)",
-                mt: 2
-              }}
-            >
-              <ScrollContainer>
-                <Text
-                  as="pre"
-                  variant="body"
-                  sx={{
-                    fontFamily: "monospace",
-                    maxHeight: 250,
-                    p: 2
-                  }}
-                >
-                  {logs.current.map((c, index) => (
-                    <>
-                      <span key={index.toString()}>{c}</span>
-                      <br />
-                    </>
-                  ))}
-                </Text>
-              </ScrollContainer>
-            </Accordion>
-          )}
-        </>
-      ) : (
-        <>
-          <Text variant="title">
-            {strings.connectYourAccount(provider.name)}
-          </Text>
-          <Text variant="body" sx={{ color: "fontTertiary", mt: [2, 0] }}>
-            {strings.checkOutOurStepByStepGuideOn()}{" "}
-            <a href={provider.helpLink} target="_blank" rel="noreferrer">
-              {strings.howToImportFrom(provider.name)}
-            </a>
-          </Text>
-          <Button
-            variant="accent"
-            onClick={onStartImport}
-            sx={{ my: 4, alignSelf: "center" }}
-          >
-            {strings.startImporting()}
-          </Button>
-        </>
-      )}
+    <Flex variant="card">
+      <CardTitle title={strings.connectYourAccount(provider.name)}>
+        {strings.checkOutOurStepByStepGuideOn()}{" "}
+        <a href={provider.helpLink} target="_blank" rel="noreferrer">
+          {strings.howToImportFrom(provider.name)}
+        </a>
+      </CardTitle>
+      <Button
+        variant="new_accent"
+        onClick={onStartImport}
+        sx={{ alignSelf: "flex-start", px: "spacing4" }}
+      >
+        {strings.startImporting()}
+      </Button>
     </Flex>
   );
 }

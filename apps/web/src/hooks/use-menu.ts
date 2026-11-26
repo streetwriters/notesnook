@@ -31,6 +31,7 @@ type MenuOptions = {
 };
 type MenuStore = {
   isOpen: boolean;
+  isNative: boolean;
   items: MenuItem[];
   title?: string;
   options: MenuOptions;
@@ -40,12 +41,13 @@ type MenuStore = {
 
 const [useMenuStore] = createStore<MenuStore>((set) => ({
   isOpen: false,
+  isNative: false,
   items: [],
   title: undefined,
   options: {
     blocking: false
   },
-  open: async (items, options) => {
+  open: async (items, options = {}) => {
     if (
       IS_DESKTOP_APP &&
       canShowNativeMenu(items) &&
@@ -60,18 +62,19 @@ const [useMenuStore] = createStore<MenuStore>((set) => ({
         {
           onData(ids) {
             if (ids.length > 0) findAndCallAction(resolvedItems, ids);
-            set({ isOpen: false });
+            set({ isOpen: false, isNative: false });
           }
         }
       );
-      set({ options, isOpen: true });
+      set({ options, isOpen: true, isNative: true });
     } else {
-      set({ isOpen: true, items, options });
+      set({ isOpen: true, isNative: false, items, options });
     }
   },
   close: () =>
     set({
       isOpen: false,
+      isNative: false,
       items: [],
       title: undefined
     })
@@ -102,11 +105,12 @@ export const Menu = {
 };
 
 export function useMenu() {
-  const [items, options] = useMenuStore((store) => [
+  const [items, options, isNative] = useMenuStore((store) => [
     store.items,
-    store.options
+    store.options,
+    store.isNative
   ]);
-  return { items, options };
+  return { items, options, isNative };
 }
 
 async function resolveMenuItems(items: MenuItem[]): Promise<MenuItem[]> {

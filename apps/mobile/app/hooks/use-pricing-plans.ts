@@ -36,24 +36,32 @@ function numberWithCommas(x: string) {
 
 export const PlanOverView = {
   free: {
-    storage: `50 MB/mo`,
+    storage: `50 MB`,
     fileSize: `1 MB`,
-    hdImages: false
+    get hdImages() {
+      return strings.no();
+    }
   },
   essential: {
     storage: `1 GB`,
-    fileSize: `100 MB/mo`,
-    hdImages: false
+    fileSize: `100 MB`,
+    get hdImages() {
+      return strings.no();
+    }
   },
   pro: {
-    storage: `10 GB/mo`,
+    storage: `10 GB`,
     fileSize: `1 GB`,
-    hdImages: true
+    get hdImages() {
+      return strings.yes();
+    }
   },
   believer: {
-    storage: `25 GB/mo`,
+    storage: `25 GB`,
     fileSize: `5 GB`,
-    hdImages: true
+    get hdImages() {
+      return strings.yes();
+    }
   }
 };
 
@@ -759,7 +767,10 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     },
     regionalDiscount: regionalDiscount.result,
     isGithubRelease: isGithubRelease,
-    isSubscribed: () => user?.subscription?.plan !== SubscriptionPlan.FREE,
+    isSubscribed: () =>
+      user &&
+      user.subscription &&
+      user?.subscription?.plan !== SubscriptionPlan.FREE,
     finish: () => options?.onBuy?.()
   };
 };

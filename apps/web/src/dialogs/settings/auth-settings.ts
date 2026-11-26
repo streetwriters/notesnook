@@ -27,6 +27,8 @@ import { RecoveryCodesDialog } from "../mfa/recovery-code-dialog";
 import { MultifactorDialog } from "../mfa/multi-factor-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { strings } from "@notesnook/intl";
+import { EnabledBadge } from "./components/enabled-badge";
+import { Lock, Numpad, ShieldCheck, ShieldPlus } from "../../components/icons";
 
 export const AuthenticationSettings: SettingsGroup[] = [
   {
@@ -37,13 +39,12 @@ export const AuthenticationSettings: SettingsGroup[] = [
       {
         key: "change-password",
         title: strings.changePassword(),
-        description: strings.changePassword(),
+        icon: Lock,
+        description: strings.changePasswordDesc(),
         keywords: [strings.changePassword(), strings.newPassword()],
         components: [
           {
-            type: "button",
-            title: strings.changePassword(),
-            variant: "secondary",
+            type: "navigation",
             action: async () => {
               const result = await showPasswordDialog({
                 title: strings.changePassword(),
@@ -96,43 +97,41 @@ export const AuthenticationSettings: SettingsGroup[] = [
         title: strings.twoFactorAuthEnabled(),
         description: strings.accountIsSecure(),
         keywords: [],
-        components: []
+        components: [
+          { type: "custom", component: EnabledBadge, placement: "trailing" }
+        ]
       },
       {
         key: "primary-2fa-method",
         title: strings.change2faMethod(),
+        icon: ShieldCheck,
         keywords: ["primary 2fa method"],
-        description: strings.twoFactorAuthDesc(),
+        description: strings.change2faMethodDesc(),
         onStateChange: (listener) =>
           useUserStore.subscribe((s) => s.user?.mfa.primaryMethod, listener),
         components: [
           {
-            type: "button",
-            title: strings.change(),
+            type: "navigation",
             action: async () => {
               if (await verifyAccount()) {
                 await MultifactorDialog.show({});
                 await useUserStore.getState().refreshUser();
               }
-            },
-            variant: "secondary"
+            }
           }
         ]
       },
       {
         key: "fallback-2fa-method",
         title: strings.addFallback2faMethod(),
+        icon: ShieldPlus,
         description: strings.addFallback2faMethodDesc(),
         keywords: ["backup 2fa methods"],
         onStateChange: (listener) =>
           useUserStore.subscribe((s) => s.user?.mfa.secondaryMethod, listener),
         components: () => [
           {
-            type: "button",
-            title: useUserStore.getState().user?.mfa.secondaryMethod
-              ? strings.change2faFallbackMethod()
-              : strings.addFallback2faMethod(),
-            variant: "secondary",
+            type: "navigation",
             action: async () => {
               if (await verifyAccount()) {
                 await MultifactorDialog.show({
@@ -148,13 +147,12 @@ export const AuthenticationSettings: SettingsGroup[] = [
       {
         key: "recovery-codes",
         title: strings.viewRecoveryCodes(),
+        icon: Numpad,
         description: strings.viewRecoveryCodesDesc(),
         keywords: ["recovery codes"],
         components: [
           {
-            type: "button",
-            title: strings.viewRecoveryCodes(),
-            variant: "secondary",
+            type: "navigation",
             action: async () => {
               if (await verifyAccount()) {
                 await RecoveryCodesDialog.show({

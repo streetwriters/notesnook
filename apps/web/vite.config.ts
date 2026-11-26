@@ -44,6 +44,7 @@ const isTesting =
 const isDesktop = process.env.PLATFORM === "desktop";
 const isThemeBuilder = process.env.THEME_BUILDER === "true";
 const isAnalyzing = process.env.ANALYZING === "true";
+const isQAMocks = process.env.QA_MOCKS === "true";
 
 export default defineConfig({
   envPrefix: "NN_",
@@ -93,6 +94,10 @@ export default defineConfig({
       "@mdi/js",
       "@mdi/react",
       "@emotion/react",
+      "@theme-ui/core",
+      "@theme-ui/components",
+      "@theme-ui/css",
+      "@theme-ui/color",
       "katex",
       "react-modal",
       "dayjs",
@@ -105,6 +110,10 @@ export default defineConfig({
         replacement: isDesktop
           ? "/desktop-bridge/index.desktop"
           : "/desktop-bridge/index"
+      },
+      {
+        find: /\/qa-mocks$/gm,
+        replacement: isQAMocks ? "/qa-mocks/index.mocks" : "/qa-mocks/index"
       },
       {
         find: /\/sqlite$/gm,

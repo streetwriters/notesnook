@@ -21,7 +21,7 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/reminder-store";
 import { hashNavigate } from "../navigation";
 import useNavigate from "../hooks/use-navigate";
-import Placeholder from "../components/placeholders";
+import { ListPanePlaceholder } from "../components/placeholders";
 import { db } from "../common/db";
 import { useSearch } from "../hooks/use-search";
 import { ListLoader } from "../components/loaders/list-loader";
@@ -44,9 +44,12 @@ function Reminders() {
         group="reminders"
         refresh={refresh}
         items={filteredItems || reminders}
+        showGroupCounts
         isSearching={!!filteredItems}
         placeholder={
-          <Placeholder context={filteredItems ? "search" : "reminders"} />
+          <ListPanePlaceholder
+            variant={filteredItems ? "search" : "reminders"}
+          />
         }
         button={{
           onClick: () => hashNavigate("/reminders/create")

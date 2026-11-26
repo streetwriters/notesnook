@@ -55,6 +55,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { strings } from "@notesnook/intl";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
+import { PASSWORD_PLACEHOLDER } from "../../utils/constants";
 
 const getUser = () => {
   const user = MMKV.getString("user");
@@ -96,9 +97,6 @@ const AppLocked = () => {
   const lastAppState = useRef<AppStateStatus>(appState);
   const biometricUnlockAwaitingUserInput = useRef(false);
   const { height } = useWindowDimensions();
-  const keyboardType = useSettingStore(
-    (state) => state.settings.applockKeyboardType
-  );
   const appLockHasPasswordSecurity = useSettingStore(
     (state) => state.settings.appLockHasPasswordSecurity
   );
@@ -157,8 +155,7 @@ const AppLocked = () => {
         if (!appLockHasPasswordSecurity) {
           await setAppLockVerificationCipher(password.current);
           SettingsService.set({
-            appLockHasPasswordSecurity: true,
-            applockKeyboardType: "default"
+            appLockHasPasswordSecurity: true
           });
           DatabaseLogger.info("App lock migrated to password security");
         }
@@ -167,7 +164,7 @@ const AppLocked = () => {
         password.current = undefined;
       } else {
         ToastManager.show({
-          heading: strings.invalid(keyboardType),
+          heading: strings.invalid("password"),
           type: "error",
           context: "local"
         });
@@ -290,9 +287,7 @@ const AppLocked = () => {
               <Input
                 fwdRef={passwordInputRef}
                 secureTextEntry
-                keyboardType={
-                  appLockHasPasswordSecurity ? keyboardType : "default"
-                }
+                keyboardType={"default"}
                 onLayout={async () => {
                   if (
                     !biometricsAuthEnabled ||
@@ -303,13 +298,7 @@ const AppLocked = () => {
                     }, 32);
                   }
                 }}
-                placeholder={
-                  appLockHasPasswordSecurity
-                    ? keyboardType === "numeric"
-                      ? strings.enterApplockPassword()
-                      : strings.enterApplockPin()
-                    : strings.enterAccountPassword()
-                }
+                placeholder={PASSWORD_PLACEHOLDER}
                 onChangeText={(v) => (password.current = v)}
                 onSubmit={() => {
                   onSubmit();

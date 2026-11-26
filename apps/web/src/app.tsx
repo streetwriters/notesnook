@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -48,14 +48,19 @@ import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
 import { NavigationEvents } from "./navigation";
+import { EditorActionBar } from "./components/editor/action-bar";
 
 new WebExtensionRelay();
 
 function App() {
   const isMobile = useMobile();
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const isNavPaneCollapsed = useStore((store) => store.isNavPaneCollapsed);
+  const [isMobileSideMenuOpen, setIsMobileSideMenuOpen] = useState(false);
+  const [isMobileEditorActive, setIsMobileEditorActive] = useState(false);
   const { isFocused } = useWindowFocus();
   const { isFullscreen } = useWindowControls();
+  const navPane = useRef<SplitPaneImperativeHandle>(null);
   const hasNativeTitlebar =
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
@@ -83,24 +88,27 @@ function App() {
         <Global
           // These styles to make sure the app content doesn't overlap with the traffic lights.
           styles={`
-            .nav-pane .theme-scope-navigationMenu,
-            .mobile-nav-pane .theme-scope-navigationMenu {
-              padding-top: env(titlebar-area-height) !important;
-            }
-            .editor-pane:first-of-type .editor-action-bar,
-            .mobile-editor-pane.pane-active .editor-action-bar,
-            .mobile-list-pane.pane-active .route-container-header {
-                padding-left: 80px;
-            }
-            .route-container-header, .editor-action-bar {
-                transition: padding-left 0.4s ease-out;
-            }
             .editor-action-bar {
-              border-bottom: none;
+              padding-left: 62px !important;
             }
-            .route-container-header .routeHeader {
-              font-size: ${getFontSizes().title};
-            }
+            // .nav-pane .theme-scope-navigationMenu,
+            // .mobile-nav-pane .theme-scope-navigationMenu {
+            //   padding-top: env(titlebar-area-height) !important;
+            // }
+            // .editor-pane:first-of-type .editor-action-bar,
+            // .mobile-editor-pane.pane-active .editor-action-bar,
+            // .mobile-list-pane.pane-active .route-container-header {
+            //     padding-left: 80px;
+            // }
+            // .route-container-header, .editor-action-bar {
+            //     transition: padding-left 0.4s ease-out;
+            // }
+            // .editor-action-bar {
+            //   border-bottom: none;
+            // }
+            // .route-container-header .routeHeader {
+            //   font-size: ${getFontSizes().title};
+            // }
             // .global-split-pane .react-split__sash {
             //   height: calc(100% - ${TITLE_BAR_HEIGHT}px);
             // }
@@ -125,7 +133,49 @@ function App() {
           height: "100%"
         }}
       >
-        {isMobile ? <MobileAppContents /> : <DesktopAppContents />}
+        <ScopedThemeProvider scope="titleBar">
+          <Flex
+            className="editor-action-bar"
+            sx={{
+              position: "relative",
+              zIndex: 2,
+              height: TITLE_BAR_HEIGHT,
+              bg: "background",
+              px: "spacing4",
+              borderBottom: "1px solid",
+              borderColor: "border"
+            }}
+          >
+            <EditorActionBar
+              isMobileEditorActive={isMobileEditorActive}
+              isSidebarCollapsed={
+                isMobile ? !isMobileSideMenuOpen : isNavPaneCollapsed
+              }
+              onSidebarToggle={() => {
+                if (isMobile) {
+                  const nextOpenState = !isMobileSideMenuOpen;
+                  setIsMobileSideMenuOpen(nextOpenState);
+                  AppEventManager.publish(
+                    AppEvents.toggleSideMenu,
+                    nextOpenState
+                  );
+                } else if (isNavPaneCollapsed) {
+                  navPane.current?.reset(0);
+                } else {
+                  navPane.current?.collapse(0);
+                }
+              }}
+            />
+          </Flex>
+        </ScopedThemeProvider>
+        {isMobile ? (
+          <MobileAppContents
+            onSideMenuVisibilityChange={setIsMobileSideMenuOpen}
+            onEditorPaneVisibilityChange={setIsMobileEditorActive}
+          />
+        ) : (
+          <DesktopAppContents navPane={navPane} />
+        )}
         <Toaster
           containerClassName="toasts-container"
           containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
@@ -137,11 +187,14 @@ function App() {
 
 export default App;
 
-function DesktopAppContents() {
+function DesktopAppContents({
+  navPane
+}: {
+  navPane: { current: SplitPaneImperativeHandle | null };
+}) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
-  const navPane = useRef<SplitPaneImperativeHandle>(null);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
@@ -265,7 +318,13 @@ function DesktopAppContents() {
   );
 }
 
-function MobileAppContents() {
+function MobileAppContents({
+  onSideMenuVisibilityChange,
+  onEditorPaneVisibilityChange
+}: {
+  onSideMenuVisibilityChange: (isOpen: boolean) => void;
+  onEditorPaneVisibilityChange: (isActive: boolean) => void;
+}) {
   const { ref, slideToIndex } = useSlider({
     onSliding: (_e, { position }) => {
       const offset = 70;
@@ -285,8 +344,30 @@ function MobileAppContents() {
     onChange: (e, { slide, lastSlide }) => {
       slide.node.classList.add("pane-active");
       lastSlide?.node.classList.remove("pane-active");
+      onSideMenuVisibilityChange(
+        slide.node.classList.contains("mobile-nav-pane")
+      );
+      onEditorPaneVisibilityChange(
+        slide.node.classList.contains("mobile-editor-pane")
+      );
     }
   });
+
+  useEffect(() => {
+    if (ref.current) {
+      const activeSlide = Array.from(ref.current.children).find(
+        (node) =>
+          Math.round((node as HTMLElement).offsetLeft) ===
+          Math.round(ref.current!.scrollLeft)
+      );
+      onSideMenuVisibilityChange(
+        activeSlide?.classList.contains("mobile-nav-pane") ?? false
+      );
+      onEditorPaneVisibilityChange(
+        activeSlide?.classList.contains("mobile-editor-pane") ?? false
+      );
+    }
+  }, [onEditorPaneVisibilityChange, onSideMenuVisibilityChange, ref]);
 
   useEffect(() => {
     const toggleSideMenuEvent = AppEventManager.subscribe(

@@ -22,22 +22,26 @@ import { formatBytes } from "@notesnook/common";
 import {
   AttachmentError,
   Checkmark,
-  DeleteForver,
   DoubleCheckmark,
   Download,
   FileDocument,
   FileGeneral,
   FileImage,
+  FileText,
+  Checks,
+  CheckIcon,
+  Warning,
   FilePDF,
   FileVideo,
   FileWebClip,
   Icon,
   Loading,
   PasswordInvisible,
-  References,
-  Rename,
-  Reupload,
-  Uploading
+  Uploading,
+  PencilSimple,
+  Upload,
+  Trash,
+  LinkHorizontal
 } from "../icons";
 import { store, useStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
@@ -134,6 +138,83 @@ export function Attachment({
   }, [item.hash]);
 
   const FileIcon = getFileIcon(item.type);
+  if (compact) {
+    return (
+      <Box
+        sx={{
+          alignItems: "center",
+          borderRadius: "radius1",
+          display: "flex",
+          height: 23,
+          justifyContent: "space-between",
+          p: "spacing2",
+          width: "100%",
+          ":hover": { bg: "hover" }
+        }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          Menu.openMenu(AttachmentMenuItems(item, status));
+        }}
+        onClick={onSelected}
+        onKeyPress={async (e) => {
+          if (e.key === "Delete") {
+            await Multiselect.deleteAttachments(
+              useSelectionStore.getState().selectedItems
+            );
+          }
+        }}
+        style={style}
+      >
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
+          {processing?.failed || item.failed ? (
+            <Warning
+              color="icon-error"
+              size={13}
+              title={processing?.failed || item.failed}
+            />
+          ) : status || processing?.working ? (
+            <Loading color="icon" size={13} />
+          ) : (
+            <FileText color="icon" size={13} />
+          )}
+          <Text
+            sx={{
+              color: "paragraph-primary",
+              fontSize: "xs",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {item.filename}
+          </Text>
+        </Flex>
+        <Flex sx={{ alignItems: "center", gap: "spacing3", flexShrink: 0 }}>
+          {item.dateUploaded ? (
+            <Checks color="accent" size={13} title={strings.uploaded()} />
+          ) : (
+            <CheckIcon
+              color="paragraph-primary"
+              size={13}
+              title={strings.waitingForUpload()}
+            />
+          )}
+          <Text
+            sx={{
+              color: "paragraph-primary",
+              fontSize: "3xs",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {formatBytes(item.size, 1)}
+          </Text>
+        </Flex>
+      </Box>
+    );
+  }
+
   return (
     <Box
       as="tr"
@@ -260,7 +341,7 @@ const AttachmentMenuItems: (
       key: "preview-attachment",
       type: "button",
       title: strings.previewAttachment(),
-      icon: PasswordInvisible.path,
+      iconComponent: PasswordInvisible,
       isHidden:
         !attachment.mimeType.startsWith("image/") &&
         attachment.mimeType !== PDFMimeType,
@@ -288,7 +369,7 @@ const AttachmentMenuItems: (
       key: "notes",
       type: "button",
       title: strings.linkedNotes(),
-      icon: References.path,
+      iconComponent: LinkHorizontal,
       menu: {
         items: [
           {
@@ -304,6 +385,7 @@ const AttachmentMenuItems: (
                   type: "button",
                   key: note.id,
                   title: note.title,
+                  iconComponent: FileText,
                   onClick: () => {
                     useEditorStore.getState().openSession(note.id);
                     DialogManager.closeAll();
@@ -326,7 +408,7 @@ const AttachmentMenuItems: (
       type: "button",
       key: "recheck",
       title: strings.fileCheck(),
-      icon: DoubleCheckmark.path,
+      iconComponent: Checks,
       isDisabled: !attachment.dateUploaded,
       onClick: async () => {
         await store.recheck([attachment.id]);
@@ -336,12 +418,13 @@ const AttachmentMenuItems: (
       type: "button",
       key: "rename",
       title: strings.rename(),
-      icon: Rename.path,
+      iconComponent: PencilSimple,
       onClick: async () => {
         const newName = await PromptDialog.show({
           title: strings.doActions.rename.attachment(1),
           description: attachment.filename,
-          defaultValue: attachment.filename
+          defaultValue: attachment.filename,
+          label: strings.enterTitle()
         });
         if (!newName) return;
         await store.rename(attachment.hash, newName);
@@ -354,7 +437,7 @@ const AttachmentMenuItems: (
         status?.type === "download"
           ? strings.network.cancelDownload()
           : strings.network.download(),
-      icon: Download.path,
+      iconComponent: Download,
       onClick: async () => {
         const isDownloading = status?.type === "download";
         if (isDownloading) {
@@ -369,7 +452,7 @@ const AttachmentMenuItems: (
         status?.type === "upload"
           ? strings.network.cancelUpload()
           : strings.network.reupload(),
-      icon: Reupload.path,
+      iconComponent: Upload,
       onClick: async () => {
         const isDownloading = status?.type === "upload";
         if (isDownloading) {
@@ -378,11 +461,15 @@ const AttachmentMenuItems: (
       }
     },
     {
+      type: "separator",
+      key: "separator"
+    },
+    {
       type: "button",
       key: "permanent-delete",
       variant: "dangerous",
       title: strings.deletePermanently(),
-      icon: DeleteForver.path,
+      iconComponent: Trash,
       onClick: () => Multiselect.deleteAttachments([attachment.id])
     }
   ];

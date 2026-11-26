@@ -21,7 +21,6 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useGroupOptions } from "../../hooks/use-group-options";
 import { presentSheet, ToastManager } from "../../services/event-manager";
@@ -35,9 +34,7 @@ import { DefaultAppStyles } from "../../utils/styles";
 import { presentDialog } from "../dialog/functions";
 import { AddNotebookSheet } from "../sheets/add-notebook";
 import Sort from "../sheets/sort";
-import { IconButton } from "../ui/icon-button";
-import { Pressable } from "../ui/pressable";
-import Paragraph from "../ui/typography/paragraph";
+
 import { SideMenuHome } from "./side-menu-home";
 import { SideMenuNotebooks } from "./side-menu-notebooks";
 import { SideMenuTags } from "./side-menu-tags";
@@ -45,12 +42,15 @@ import {
   useSideMenuNotebookSelectionStore,
   useSideMenuTagsSelectionStore
 } from "./stores";
+import { TabBarButton } from "./tab-bar-button";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { Button } from "../ui/button";
 import SettingsService from "../../services/settings";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import { Spacing } from "../../common/design/spacing";
+import { createFormRef, validators } from "../ui/input/form-input";
 
 /**
  * Simple Tab View Implementation for the Side bar
@@ -78,7 +78,7 @@ type SimpleTabViewProps = {
 };
 
 const createSceneMap = (
-  scenes: Record<string, React.ComponentType<any>>
+  scenes: Record<string, React.ComponentType<unknown>>
 ): ((props: { route: SimpleRoute }) => React.ReactNode) => {
   // eslint-disable-next-line react/display-name
   return ({ route }: { route: SimpleRoute }) => {
@@ -192,8 +192,8 @@ export const SideMenu = React.memo(
         style={{
           flex: 1,
           backgroundColor: colors.primary.background,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom
+          paddingTop: Math.max(insets.top, Spacing.LEVEL_4),
+          paddingBottom: Math.max(insets.bottom, Spacing.LEVEL_4) + Spacing.LEVEL_1
         }}
       >
         <SimpleTabView
@@ -225,58 +225,66 @@ const TabBar = (props: SimpleTabBarProps) => {
   const getIcon = (key: string) => {
     switch (key) {
       case "home":
-        return "home-outline";
+        return "home";
       case "notebooks":
-        return "book-outline";
+        return "book";
       case "tags":
-        return "pound";
+        return "shopping-mode";
       default:
-        return "home-outline";
+        return "home";
     }
   };
 
   return (
     <View
       style={{
-        flexDirection: "row",
         width: "100%",
-        justifyContent: "space-between",
-        backgroundColor: colors.primary.background,
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingVertical: DefaultAppStyles.GAP_SMALL,
-        borderTopWidth: 1,
-        borderTopColor: colors.primary.border
+        paddingHorizontal: Spacing.LEVEL_3
       }}
     >
-      {isSelectionEnabled ? (
-        <>
-          {[
-            {
-              id: "selectAll",
-              title: strings.selectAll(),
-              icon: "check-all"
-            },
-            {
-              id: "delete",
-              title: strings.delete(),
-              icon: "delete"
-            },
-            {
-              id: "move",
-              title: strings.move(),
-              icon: "arrow-right-bold-box-outline",
-              hidden:
-                !notebookSelectionEnabled || props.navigationState.index !== 1
-            },
-            {
-              id: "close",
-              title: strings.close(),
-              icon: "close"
-            }
-          ].map((item) =>
-            item.hidden ? null : (
-              <React.Fragment key={item.id}>
-                <Pressable
+      <View
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "space-between",
+          paddingHorizontal: isSelectionEnabled ? Spacing.LEVEL_5 : 0,
+          backgroundColor: colors.primary.background,
+          borderTopWidth: 1,
+          borderTopColor: colors.primary.separator,
+          paddingTop: Spacing.LEVEL_2
+        }}
+      >
+        {isSelectionEnabled ? (
+          <>
+            {[
+              {
+                id: "selectAll",
+                title: strings.selectAll(),
+                icon: "checks"
+              },
+              {
+                id: "delete",
+                title: strings.delete(),
+                icon: "trash"
+              },
+              {
+                id: "move",
+                title: strings.move(),
+                icon: "drive-file-move",
+                hidden:
+                  !notebookSelectionEnabled || props.navigationState.index !== 1
+              },
+              {
+                id: "close",
+                title: strings.close(),
+                icon: "close"
+              }
+            ].map((item) =>
+              item.hidden ? null : (
+                <TabBarButton
+                  key={item.id}
+                  icon={item.icon}
+                  label={item.title}
                   onPress={async () => {
                     switch (item.id) {
                       case "selectAll": {
@@ -337,224 +345,214 @@ const TabBar = (props: SimpleTabBarProps) => {
                       }
                     }
                   }}
+                />
+              )
+            )}
+          </>
+        ) : (
+          <>
+            {dragging ? (
+              <Button
+                onPress={() => {
+                  useSideBarDraggingStore.setState({
+                    dragging: false
+                  });
+                }}
+                style={{
+                  width: "100%"
+                }}
+                type="accent"
+                testID="check"
+                title={strings.done()}
+                icon={"check"}
+                iconSize={AppFontSize.lg - 2}
+              />
+            ) : (
+              <>
+                <View
                   style={{
-                    borderRadius: 10,
-                    paddingVertical: 2,
-                    width: "25%"
+                    flexDirection: "row",
+                    gap: Spacing.LEVEL_2
                   }}
-                  type="plain"
                 >
-                  <Icon
-                    name={item.icon}
-                    color={colors.primary.icon}
-                    size={AppFontSize.lg}
-                  />
-                  <Paragraph
-                    color={colors.primary.paragraph}
-                    size={AppFontSize.xxxs - 1}
-                  >
-                    {item.title}
-                  </Paragraph>
-                </Pressable>
-              </React.Fragment>
-            )
-          )}
-        </>
-      ) : (
-        <>
-          {dragging ? (
-            <Button
-              onPress={() => {
-                useSideBarDraggingStore.setState({
-                  dragging: false
-                });
-              }}
-              style={{
-                width: "100%"
-              }}
-              type="accent"
-              testID="check"
-              title={strings.done()}
-              icon={"check"}
-              iconSize={AppFontSize.lg - 2}
-            />
-          ) : (
-            <>
-              <View
-                style={{
-                  flexDirection: "row",
-                  gap: DefaultAppStyles.GAP_SMALL
-                }}
-              >
-                {props.navigationState.routes.map((route, index) => {
-                  const isFocused = props.navigationState.index === index;
+                  {props.navigationState.routes.map((route, index) => {
+                    const isFocused = props.navigationState.index === index;
 
-                  return (
-                    <Pressable
-                      key={route.key}
-                      testID={`tab-${route.key}`}
-                      onPress={() => {
-                        props.jumpTo(route.key);
-                        switch (route.key) {
-                          case "notebooks":
-                            Navigation.routeNeedsUpdate(
-                              "Notebooks",
-                              Navigation.routeUpdateFunctions.Notebooks
-                            );
-                            break;
-                          case "tags":
-                            Navigation.routeNeedsUpdate(
-                              "Tags",
-                              Navigation.routeUpdateFunctions.Tags
-                            );
-                            break;
-                          default:
-                            break;
-                        }
-                      }}
-                      style={{
-                        borderRadius: 10,
-                        paddingVertical: 2,
-                        width: 40,
-                        height: 40
-                      }}
-                      type={isFocused ? "selected" : "plain"}
-                    >
-                      <Icon
-                        name={getIcon(route.key)}
-                        color={
-                          isFocused ? colors.selected.icon : colors.primary.icon
-                        }
-                        size={AppFontSize.lg}
+                    return (
+                      <TabBarButton
+                        key={route.key}
+                        testID={`tab-${route.key}`}
+                        icon={getIcon(route.key)}
+                        label={route.title || ""}
+                        isActive={isFocused}
+                        onPress={() => {
+                          props.jumpTo(route.key);
+                          switch (route.key) {
+                            case "notebooks":
+                              Navigation.routeNeedsUpdate(
+                                "Notebooks",
+                                Navigation.routeUpdateFunctions.Notebooks
+                              );
+                              break;
+                            case "tags":
+                              Navigation.routeNeedsUpdate(
+                                "Tags",
+                                Navigation.routeUpdateFunctions.Tags
+                              );
+                              break;
+                            default:
+                              break;
+                          }
+                        }}
                       />
-                    </Pressable>
-                  );
-                })}
-              </View>
+                    );
+                  })}
+                </View>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: DefaultAppStyles.GAP_SMALL
-                }}
-              >
-                {props.navigationState.index > 0 ? (
-                  <>
-                    <IconButton
-                      name="plus"
-                      testID="sidebar-add-button"
-                      size={AppFontSize.lg - 2}
-                      top={10}
-                      color={colors.primary.icon}
-                      onPress={async () => {
-                        if (props.navigationState.index === 1) {
-                          const notebooksFeature =
-                            await isFeatureAvailable("notebooks");
-                          if (!notebooksFeature.isAllowed) {
-                            PaywallSheet.present(notebooksFeature);
-                            return;
-                          }
-
-                          AddNotebookSheet.present();
-                        } else {
-                          const tagsFeature = await isFeatureAvailable("tags");
-                          if (!tagsFeature.isAllowed) {
-                            PaywallSheet.present(tagsFeature);
-                            return;
-                          }
-                          presentDialog({
-                            title: strings.addTag(),
-                            paragraph: strings.addTagDesc(),
-                            input: true,
-                            positiveText: strings.add(),
-                            positivePress: async (tag) => {
-                              if (tag) {
-                                await db.tags.add({
-                                  title: tag
-                                });
-                                useTagStore.getState().refresh();
-                                return true;
-                              }
-                              ToastManager.show({
-                                context: "local",
-                                type: "error",
-                                message: strings.allFieldsRequired()
-                              });
-                              return false;
-                            }
-                          });
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: DefaultAppStyles.GAP_SMALL
+                  }}
+                >
+                  {props.navigationState.index > 0 ? (
+                    <>
+                      <TabBarButton
+                        icon="plus"
+                        testID="sidebar-add-button"
+                        label={
+                          props.navigationState.index === 1
+                            ? strings.dataTypesCamelCase.notebook()
+                            : strings.dataTypesCamelCase.tag()
                         }
-                      }}
-                      style={{
-                        width: 35,
-                        height: 35
-                      }}
-                    />
+                        onPress={async () => {
+                          if (props.navigationState.index === 1) {
+                            const notebooksFeature =
+                              await isFeatureAvailable("notebooks");
+                            if (!notebooksFeature.isAllowed) {
+                              PaywallSheet.present(notebooksFeature);
+                              return;
+                            }
 
-                    <IconButton
-                      name={
-                        groupOptions?.sortDirection === "asc"
-                          ? "sort-ascending"
-                          : "sort-descending"
-                      }
-                      top={10}
-                      testID="sidebar-sort-button"
-                      color={colors.primary.icon}
-                      onPress={() => {
-                        presentSheet({
-                          component: (
-                            <Sort
-                              dataType={
-                                props.navigationState.index === 1
-                                  ? "notebook"
-                                  : "tag"
-                              }
-                              group={
-                                props.navigationState.index === 1
-                                  ? "notebooks"
-                                  : "tags"
-                              }
-                              hideGroupOptions
-                            />
-                          )
-                        });
-                      }}
-                      style={{
-                        width: 35,
-                        height: 35
-                      }}
-                      size={AppFontSize.lg - 2}
-                    />
-                  </>
-                ) : null}
+                            AddNotebookSheet.present();
+                          } else {
+                            const tagsFeature =
+                              await isFeatureAvailable("tags");
+                            if (!tagsFeature.isAllowed) {
+                              PaywallSheet.present(tagsFeature);
+                              return;
+                            }
+                            presentDialog({
+                              title: strings.addTag(),
+                              form: {
+                                formRef: createFormRef({
+                                  title: ""
+                                }),
+                                items: [
+                                  {
+                                    label: strings.enterTitle(),
+                                    name: "title",
+                                    placeholder: strings.tagTitlePlaceholder(),
+                                    ref: React.createRef(),
+                                    validators: [
+                                      validators.required(
+                                        strings.titleIsRequired()
+                                      )
+                                    ],
+                                    inputProps: {
+                                      autoCapitalize: "none"
+                                    }
+                                  }
+                                ],
+                                onFormSubmit: async (form) => {
+                                  try {
+                                    if (!form.validate()) return false;
+                                    await db.tags.add({
+                                      title: form.getValue("title").trim()
+                                    });
+                                    useTagStore.getState().refresh();
+                                    ToastManager.show({
+                                      message: strings.actions.created.tag(1),
+                                      type: "success",
+                                    });
+                                    return true;
+                                  } catch (e) {
+                                    form.setError(
+                                      "title",
+                                      (e as Error).message
+                                    );
+                                    return false;
+                                  }
+                                }
+                              },
+                              positiveText: strings.add()
+                            });
+                          }
+                        }}
+                      />
 
-                {props.navigationState.index === 0 ? (
-                  <>
-                    <IconButton
-                      onPress={() => {
-                        SettingsService.set({
-                          useSystemTheme: false
-                        });
-                        useThemeStore.getState().setColorScheme();
-                      }}
-                      style={{
-                        width: 28,
-                        height: 28
-                      }}
-                      top={10}
-                      testID="sidebar-theme-button"
-                      color={colors.primary.icon}
-                      name={isDark ? "weather-night" : "weather-sunny"}
-                      size={AppFontSize.lg - 2}
-                    />
-                  </>
-                ) : null}
-              </View>
-            </>
-          )}
-        </>
-      )}
+                      <TabBarButton
+                        icon={
+                          groupOptions?.sortDirection === "asc"
+                            ? "sort-ascending"
+                            : "sort-descending"
+                        }
+                        testID="sidebar-sort-button"
+                        label={strings.sort()}
+                        onPress={() => {
+                          presentSheet({
+                            component: (
+                              <Sort
+                                dataType={
+                                  props.navigationState.index === 1
+                                    ? "notebook"
+                                    : "tag"
+                                }
+                                type={
+                                  props.navigationState.index === 1
+                                    ? "notebook"
+                                    : "tag"
+                                }
+                                group={
+                                  props.navigationState.index === 1
+                                    ? "notebooks"
+                                    : "tags"
+                                }
+                                hideGroupOptions
+                              />
+                            )
+                          });
+                        }}
+                      />
+                    </>
+                  ) : null}
+
+                  {props.navigationState.index === 0 ? (
+                    <>
+                      <TabBarButton
+                        icon={isDark ? "dark-mode-outline" : "sun"}
+                        testID="sidebar-theme-button"
+                        label={
+                          isDark
+                            ? strings.darkModeTitle()
+                            : strings.lightModeTitle()
+                        }
+                        onPress={() => {
+                          SettingsService.set({
+                            useSystemTheme: false
+                          });
+                          useThemeStore.getState().setColorScheme();
+                        }}
+                      />
+                    </>
+                  ) : null}
+                </View>
+              </>
+            )}
+          </>
+        )}
+      </View>
     </View>
   );
 };

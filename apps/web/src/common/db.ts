@@ -27,6 +27,7 @@ import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import { hosts, SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
+import { installQAMocks } from "./qa-mocks";
 
 function getHostUrl(hostUrl: keyof typeof hosts, defaultUrl: string) {
   if (IS_TESTING) return defaultUrl;
@@ -57,6 +58,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     NOTESNOOK_HOST: getHostUrl("NOTESNOOK_HOST", "https://notesnook.com"),
     ...Config.get("serverUrls", {})
   });
+  installQAMocks(db);
 
   const storage = new NNStorage(
     "Notesnook",

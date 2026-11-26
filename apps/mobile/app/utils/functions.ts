@@ -60,9 +60,14 @@ function confirmDeleteAllNotes(
 ) {
   return new Promise<{ delete: boolean; deleteNotes: boolean }>((resolve) => {
     presentDialog({
-      title: strings.doActions.delete.notebook(items.length),
+      title: strings.moveToTrash() + "?",
+      paragraph: strings.notebooksMovedToTrashDesc(items.length),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
+      icon: "warning-circle",
+      iconType: "error",
+      iconFamily: "notesnook",
+      centered: true,
       positivePress: async (_inputValue, value) => {
         setTimeout(() => {
           resolve({ delete: true, deleteNotes: value });
@@ -170,6 +175,10 @@ export const deleteItems = async (
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
       paragraph: strings.actionConfirmations.delete.tag(2),
+      icon: "warning-circle",
+      centered: true,
+      iconFamily: "notesnook",
+      iconType: "error",
       positivePress: async () => {
         await db.tags.remove(...itemIds);
         useTagStore.getState().refresh();

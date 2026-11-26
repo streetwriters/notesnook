@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useDatePicker } from "@rehookify/datepicker";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "../icons";
+import { CaretLeft, CaretRight } from "../icons";
 import { SxProp } from "@theme-ui/core";
 
 type DayPickerProps = {
@@ -105,7 +105,7 @@ export function DayPicker(props: DayPickerProps) {
               { disabled: isPrevMonthBeforeMin }
             )}
           >
-            <ChevronLeft />
+            <CaretLeft />
           </Button>
           <select
             style={{
@@ -182,7 +182,7 @@ export function DayPicker(props: DayPickerProps) {
             }
           )}
         >
-          <ChevronRight />
+          <CaretRight />
         </Button>
       </Flex>
       <Box

@@ -19,21 +19,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Platform, Text, TextProps, ViewStyle } from "react-native";
+import { Text, TextProps, ViewStyle } from "react-native";
 import { AppFontSize } from "../../../utils/size";
+import {
+  FontFamily,
+  FontSizes,
+  getLineHeight,
+  LineHeightVariants
+} from "../../../common/design/font";
+
 interface HeadingProps extends TextProps {
   color?: string;
+  /**
+   * @deprecated Use fontSize prop instead
+   */
   size?: number;
   extraBold?: boolean;
+  fontSize?: keyof typeof FontSizes;
+  fontFamily?: keyof typeof FontFamily;
+  lineHeight?: LineHeightVariants | null;
 }
 
 const extraBoldStyle = {
-  fontFamily: Platform.OS === "android" ? "Inter-Bold" : undefined,
-  fontWeight: Platform.OS === "ios" ? "800" : undefined
+  fontFamily: FontFamily.BOLD
 };
 const boldStyle = {
-  fontFamily: Platform.OS === "android" ? "Inter-SemiBold" : undefined,
-  fontWeight: Platform.OS === "ios" ? "600" : undefined
+  fontFamily: FontFamily.SEMI_BOLD
 };
 
 const Heading = ({
@@ -41,23 +52,34 @@ const Heading = ({
   size = AppFontSize.xl,
   style,
   extraBold,
+  fontSize,
+  fontFamily,
+  lineHeight = "100%",
   ...restProps
 }: HeadingProps) => {
   const { colors } = useThemeColors();
 
   return (
     <Text
-      allowFontScaling={true}
       {...restProps}
+      allowFontScaling={true}
       style={[
         {
-          fontSize: size || AppFontSize.xl,
-          color: color || colors.primary.heading
+          fontSize: fontSize ? FontSizes[fontSize] : size || AppFontSize.xl,
+          color: color || colors.primary.heading,
+          lineHeight:
+            fontSize && lineHeight
+              ? getLineHeight(fontSize, lineHeight)
+              : undefined
         },
-        extraBold ? (extraBoldStyle as ViewStyle) : (boldStyle as ViewStyle),
+        fontFamily
+          ? { fontFamily: FontFamily[fontFamily] }
+          : extraBold
+            ? (extraBoldStyle as ViewStyle)
+            : (boldStyle as ViewStyle),
         style
       ]}
-    ></Text>
+    />
   );
 };
 

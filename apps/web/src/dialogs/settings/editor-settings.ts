@@ -32,6 +32,19 @@ import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
 import { EDITOR_LINE_HEIGHT } from "../../components/editor/common";
+import {
+  ArrowsVertical,
+  DoubleSpacedLines,
+  FileMagnifyingGlass,
+  GlobeSimple,
+  List,
+  Markdown,
+  NotebookText,
+  TextAa,
+  TextAlignLeft,
+  TextT,
+  Wrench
+} from "../../components/icons";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -41,6 +54,7 @@ export const EditorSettings: SettingsGroup[] = [
     settings: [
       {
         key: "default-title",
+        icon: TextAlignLeft,
         title: strings.titleFormat(),
         description: strings.titleFormatDesc(),
         onStateChange: (listener) =>
@@ -57,6 +71,8 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "default-font",
+        icon: TextAa,
+        description: strings.defaultFontFamilyDesc(),
         title: strings.defaultFontFamily(),
         onStateChange: (listener) =>
           onEditorConfigChange((c) => c.fontFamily, listener),
@@ -78,6 +94,7 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "default-font-size",
+        icon: TextT,
         title: strings.defaultFontSize(),
         description: strings.defaultFontSizeDesc(),
         onStateChange: (listener) =>
@@ -96,6 +113,7 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "line-height",
+        icon: ArrowsVertical,
         title: strings.lineHeight(),
         description: strings.lineHeightDesc(),
         onStateChange: (listener) =>
@@ -114,6 +132,7 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "double-spacing",
+        icon: DoubleSpacedLines,
         title: strings.doubleSpacedLines(),
         description: strings.doubleSpacedLinesDesc(),
         onStateChange: (listener) =>
@@ -129,6 +148,7 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "markdown-shortcuts",
+        icon: Markdown,
         title: strings.mardownShortcuts(),
         description: strings.mardownShortcutsDesc(),
         onStateChange: (listener) =>
@@ -144,6 +164,7 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "font-ligatures",
+        icon: List,
         title: strings.fontLigatures(),
         description: strings.fontLigaturesDesc(),
         onStateChange: (listener) =>
@@ -170,7 +191,9 @@ export const EditorSettings: SettingsGroup[] = [
     settings: [
       {
         key: "enable-spellchecker",
+        icon: FileMagnifyingGlass,
         title: strings.enableSpellChecker(),
+        description: "Check spelling as you type while writing your notes",
         onStateChange: (listener) =>
           useSpellChecker.subscribe((c) => c.enabled, listener),
         components: [
@@ -183,6 +206,7 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "spell-checker-languages",
+        icon: GlobeSimple,
         title: strings.languages(),
         description: strings.spellCheckerLanguagesDescription(),
         isHidden: () => !useSpellChecker.getState().enabled || isMac(),
@@ -197,7 +221,12 @@ export const EditorSettings: SettingsGroup[] = [
       },
       {
         key: "custom-dictionay-words",
+        icon: NotebookText,
         title: strings.customDictionaryWords(),
+        description: () =>
+          strings.customDictWords(useSpellChecker.getState().words.length),
+        onStateChange: (listener) =>
+          useSpellChecker.subscribe((c) => c.words, listener),
         components: [
           {
             type: "custom",
@@ -214,6 +243,8 @@ export const EditorSettings: SettingsGroup[] = [
     settings: [
       {
         key: "customize-toolbar",
+        icon: Wrench,
+        description: strings.customizeToolbarDesc(),
         title: strings.customizeToolbar(),
         components: [
           {

@@ -38,7 +38,11 @@ export const PdfPreviewDialog = DialogManager.register(
         height="100%"
         noScroll
         sx={{
-          py: 1
+          height: "100%",
+          borderRadius: 0,
+          // the dialog renders an empty, padded header row when it has no
+          // title; the pdf top bar should sit flush with the window edge.
+          "> div:first-of-type:empty": { display: "none" }
         }}
         onClose={() => onClose(false)}
       >

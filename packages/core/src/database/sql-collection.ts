@@ -52,7 +52,7 @@ import { createKeySelector, groupArray } from "../utils/grouping.js";
 import { toChunks } from "../utils/array.js";
 import { Sanitizer } from "./sanitizer.js";
 import {
-  createIsReminderActiveQuery,
+  createReminderGroupQuery,
   createUpcomingReminderTimeQuery
 } from "../collections/reminders.js";
 
@@ -528,6 +528,7 @@ export class FilteredSelector<T extends Item> {
         "reminders.mode",
         "reminders.snoozeUntil",
         "reminders.disabled",
+        "reminders.completedAt",
         "reminders.date",
         createUpcomingReminderTimeQuery().as("dueDate")
       );
@@ -625,10 +626,7 @@ export class FilteredSelector<T extends Item> {
       if (this.type === "notes" || this.type === "notebooks")
         qb = qb.orderBy(sql`IFNULL(pinned, 0) desc`);
       if (this.type === "reminders")
-        qb = qb.orderBy(
-          (qb) => qb.parens(createIsReminderActiveQuery()),
-          "desc"
-        );
+        qb = qb.orderBy((qb) => qb.parens(createReminderGroupQuery()), "asc");
 
       // order by group first so items of the same group stay together
       if (groupKey) qb = qb.orderBy(...groupKey);

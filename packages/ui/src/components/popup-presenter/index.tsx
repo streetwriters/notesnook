@@ -55,9 +55,10 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
   const repositionPopup = useCallback((position: PositionOptions) => {
     if (!contentRef.current || !position) return;
     const popup = contentRef.current;
-    const popupPosition = getPosition(popup, position);
-    popup.style.top = popupPosition.top + "px";
-    popup.style.left = popupPosition.left + "px";
+    getPosition(popup, position).then(({ top, left }) => {
+      popup.style.top = top + "px";
+      popup.style.left = left + "px";
+    });
   }, []);
 
   useEffect(() => {

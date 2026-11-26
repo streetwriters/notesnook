@@ -23,12 +23,12 @@ import useMobile from "../../hooks/use-mobile";
 
 function GlobalMenuWrapper() {
   const { isOpen, closeMenu } = useMenuTrigger();
-  const { items, options } = useMenu();
+  const { items, options, isNative } = useMenu();
   const isMobile = useMobile();
 
   return (
     <MenuPresenter
-      isOpen={isOpen}
+      isOpen={isOpen && !isNative}
       onClose={closeMenu}
       focusOnRender={!options.blocking}
       blocking={options.blocking}

@@ -496,6 +496,16 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("errorContext", "text")
             .execute();
         }
+      },
+      "a-2026-10-07": {
+        async up(db) {
+          await ensureColumn(db, "reminders", "completedAt", async () => {
+            await db.schema
+              .alterTable("reminders")
+              .addColumn("completedAt", "integer")
+              .execute();
+          });
+        }
       }
     };
   }

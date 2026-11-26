@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useAreFeaturesAvailable } from "@notesnook/common";
 import { useEffect } from "react";
 import { db } from "../common/database";
-import { useDragState } from "../screens/settings/editor/state";
+import { useDragState } from "../screens/settings/components/editor/state";
 import Notifications from "../services/notifications";
 import SettingsService from "../services/settings";
 import { useUserStore } from "../stores/use-user-store";

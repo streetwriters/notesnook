@@ -26,6 +26,7 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import Reminders from "../views/reminders";
 import { RouteResult, defineRoutes } from "./types";
 import { CREATE_BUTTON_MAP } from "../common";
+import { BellPlus } from "../components/icons";
 import { strings } from "@notesnook/intl";
 
 function defineRoute(route: RouteResult): RouteResult {
@@ -44,13 +45,7 @@ const routes = defineRoutes({
       key: "home",
       type: "notes",
       title: strings.routes.Notes(),
-      component: AllNotes,
-      buttons: {
-        create: CREATE_BUTTON_MAP.notes,
-        search: {
-          title: strings.searchANote()
-        }
-      }
+      component: AllNotes
     });
   },
   "/notebooks/:notebookId": async ({ notebookId }) => {
@@ -91,7 +86,8 @@ const routes = defineRoutes({
       type: "reminders",
       component: Reminders,
       buttons: {
-        create: CREATE_BUTTON_MAP.reminders
+        ...CREATE_BUTTON_MAP.reminders,
+        icon: BellPlus
       }
     });
   },

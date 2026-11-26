@@ -22,7 +22,6 @@ import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { useSettingsStore } from "../hooks/useSettings";
 
 const modifyToolbarTheme = (toolbarTheme: Theme) => {
-  toolbarTheme.space = [0, 10, 12, 18];
   toolbarTheme.space.small = "10px";
 
   toolbarTheme.buttons.menuitem = {
@@ -83,7 +82,6 @@ export const EmotionEditorTheme = (props: PropsWithChildren<any>) => {
       }),
     [colors, isDark]
   );
-  theme.space = [0, 10, 12, 20];
   return (
     <EmotionThemeProvider theme={theme}>{props.children}</EmotionThemeProvider>
   );

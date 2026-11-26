@@ -52,6 +52,7 @@ export type TipContext =
   | "attachments";
 
 export type Tip = {
+  title?: () => string;
   text: () => string;
   contexts: TipContext[];
   button?: TipButton;
@@ -108,16 +109,19 @@ export const useTip = (
 
   const text =
     typeof activeTip.text === "function" ? activeTip.text() : activeTip.text;
+  const titleSource = defaultTip?.title || tip?.title;
+  const title =
+    typeof titleSource === "function" ? titleSource() : titleSource;
   const button = defaultTip?.button || tip?.button;
 
-  return { text, button };
+  return { title, text, button };
 };
 
 const getTips = (): Tip[] => (strings.webTips as unknown as Tip[]) || [];
 
 const getDefaultTips = (): Record<
   TipContext,
-  { text: () => string; button?: TipButton }
+  { title?: () => string; text: () => string; button?: TipButton }
 > => ({
   attachments: {
     text: () => strings.noAttachments()
@@ -137,7 +141,8 @@ const getDefaultTips = (): Record<
     }
   },
   notebooks: {
-    text: () => strings.notebooksEmpty(),
+    title: () => strings.noNotebooksYet(),
+    text: () => strings.noNotebooksCreated(),
     button: { ...CREATE_BUTTON_MAP.notebooks, icon: Plus }
   },
   notes: {
@@ -152,7 +157,8 @@ const getDefaultTips = (): Record<
     button: { ...CREATE_BUTTON_MAP.reminders, icon: Plus }
   },
   tags: {
-    text: () => strings.tagsEmpty(),
+    title: () => strings.noTagsYet(),
+    text: () => strings.useTagsToOrganizeNotes(),
     button: {
       ...CREATE_BUTTON_MAP.tags,
       icon: Plus

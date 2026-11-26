@@ -23,6 +23,7 @@ import { DDS } from "../../services/device-detection";
 import { useThemeColors } from "@notesnook/theme";
 import { getElevationStyle } from "../../utils/elevation";
 import { getContainerBorder } from "../../utils/colors";
+import { Radius } from "../../common/design/spacing";
 
 const DialogContainer = ({
   width,
@@ -44,9 +45,10 @@ const DialogContainer = ({
         {
           width: width || DDS.isTab ? 500 : "85%",
           maxHeight: height || 450,
-          borderRadius: 10,
+          borderRadius: Radius.LG,
           backgroundColor: colors.primary.background,
-          paddingTop: 12
+          paddingTop: 12,
+          marginTop: -300
         },
         restProps?.noBorder
           ? {}

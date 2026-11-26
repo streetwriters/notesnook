@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState, useCallback } from "react";
 import { Flex, Text, Button } from "@theme-ui/components";
-import { Lock } from "../icons";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
-import { ErrorText } from "../error-text";
+import { AuthErrorText } from "../error-text";
 import { strings } from "@notesnook/intl";
+import UnlockNoteIllustration from "../../assets/unlock-note.svg?react";
 
 type UnlockViewProps = {
   title: string;
@@ -79,61 +79,96 @@ export function UnlockView(props: UnlockViewProps) {
         sx={{
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
+          gap: "spacing7",
+          width: "333px",
+          maxWidth: "100%"
         }}
       >
-        <Lock size={100} sx={{ opacity: 0.2 }} />
-        <Text
-          data-test-id="unlock-note-title"
-          variant="heading"
-          mx={100}
-          mt={25}
-          sx={{ fontSize: 36, textAlign: "center" }}
+        <UnlockNoteIllustration
+          width={210}
+          height={210}
+          style={{ flexShrink: 0 }}
+        />
+        <Flex
+          sx={{
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "spacing3",
+            width: "100%"
+          }}
         >
-          {title}
-        </Text>
-      </Flex>
-      <Text
-        variant="body"
-        mt={1}
-        mb={4}
-        sx={{
-          textAlign: "center",
-          fontSize: "title",
-          color: "var(--paragraph-secondary)"
-        }}
-      >
-        {subtitle}
-      </Text>
-      <Field
-        id="vaultPassword"
-        data-test-id="unlock-note-password"
-        inputRef={passwordRef}
-        autoFocus
-        sx={{ width: ["95%", "95%", "max(30%, 400px)"] }}
-        placeholder={strings.enterPassword()}
-        type="password"
-        onKeyUp={async (e) => {
-          if (e.key === "Enter") {
+          <Text
+            data-test-id="unlock-note-title"
+            variant="heading"
+            sx={{
+              fontSize: "xl",
+              fontWeight: 600,
+              lineHeight: 1,
+              color: "heading",
+              textAlign: "center",
+              wordBreak: "break-word"
+            }}
+          >
+            {title}
+          </Text>
+          <Text
+            variant="body"
+            sx={{
+              width: "253px",
+              maxWidth: "100%",
+              textAlign: "center",
+              fontSize: "sm",
+              lineHeight: 1.2,
+              color: "paragraph"
+            }}
+          >
+            {subtitle}
+          </Text>
+          <Field
+            id="vaultPassword"
+            data-test-id="unlock-note-password"
+            inputRef={passwordRef}
+            autoFocus
+            label={strings.enterPassword()}
+            placeholder={strings.enterYourPassword()}
+            type="password"
+            sx={{ width: "100%" }}
+            styles={{
+              label: { lineHeight: 1 },
+              input: {
+                height: "45px",
+                px: "spacing4",
+                py: "spacing6",
+                fontSize: "sm",
+                color: "paragraph"
+              }
+            }}
+            onKeyUp={async (e) => {
+              if (e.key === "Enter") {
+                await submit();
+              } else if (errorMessage) {
+                setErrorMessage(undefined);
+              }
+            }}
+          />
+          <AuthErrorText
+            error={errorMessage}
+            sx={{ alignSelf: "flex-start", mt: "spacing1", p: 0 }}
+          />
+        </Flex>
+        <Button
+          variant="new_accent"
+          data-test-id="unlock-note-submit"
+          disabled={isUnlocking}
+          sx={{ width: "100%", px: "spacing4" }}
+          onClick={async () => {
             await submit();
-          } else if (errorMessage) {
-            setErrorMessage(undefined);
-          }
-        }}
-      />
-      {errorMessage && <ErrorText sx={{ mt: 1 }} error={errorMessage} />}
-      <Button
-        mt={3}
-        variant="accent"
-        data-test-id="unlock-note-submit"
-        disabled={isUnlocking}
-        sx={{ borderRadius: 100, px: 30 }}
-        onClick={async () => {
-          await submit();
-        }}
-      >
-        {isUnlocking ? strings.unlocking() + "..." : buttonTitle}
-      </Button>
+          }}
+        >
+          {isUnlocking ? strings.unlocking() + "..." : buttonTitle}
+        </Button>
+      </Flex>
     </Flex>
   );
 }

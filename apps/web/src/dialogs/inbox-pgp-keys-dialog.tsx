@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
@@ -27,6 +27,7 @@ import { showToast } from "../utils/toast";
 import { SerializedKeyPair } from "@notesnook/crypto";
 import { ConfirmDialog } from "./confirm";
 import { strings } from "@notesnook/intl";
+import { Icon, KeyIcon, MagicWand } from "../components/icons";
 
 type InboxPGPKeysDialogProps = BaseDialogProps<boolean> & {
   keys?: SerializedKeyPair | null;
@@ -82,7 +83,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
         if (initialKeys) {
           const ok = await ConfirmDialog.show({
             title: strings.changeInboxPgpKeys(),
-            message: strings.changingInboxPgpKeysNotice(),
+            subtitle: strings.changingInboxPgpKeysNotice(),
             positiveButtonText: strings.yes(),
             negativeButtonText: strings.no()
           });
@@ -108,42 +109,35 @@ export const InboxPGPKeysDialog = DialogManager.register(
         <Dialog
           isOpen={true}
           title={strings.setupInboxPgpKeys()}
-          width={500}
+          description={strings.setupInboxPgpKeysDescription()}
+          width={550}
           negativeButton={{
             text: strings.cancel(),
             onClick: () => onClose(false)
           }}
         >
-          <Flex sx={{ flexDirection: "column", gap: 3 }}>
-            <Text sx={{ fontSize: "body", color: "paragraph" }}>
-              {strings.setupInboxPgpKeysDescription()}
-            </Text>
-            <Flex sx={{ flexDirection: "column", gap: 2 }}>
-              <Button
-                variant="secondary"
+          <Flex sx={{ flexDirection: "column", mb: "spacing7" }}>
+            <Box sx={{ height: "1px", bg: "separator", my: "spacing6" }} />
+            <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+              <KeyOption
+                icon={MagicWand}
+                iconSize={13}
+                title={
+                  isLoading ? strings.generating() : strings.autoGenerateKeys()
+                }
+                description={strings.autoGenerateKeysDesc()}
+                selected={isLoading}
+                disabled={isLoading}
                 onClick={handleAutoGenerate}
+              />
+              <KeyOption
+                icon={KeyIcon}
+                iconSize={15}
+                title={strings.provideOwnKeys()}
+                description={strings.provideOwnKeysDesc()}
                 disabled={isLoading}
-                sx={{ width: "100%" }}
-              >
-                {isLoading ? strings.generating() : strings.autoGenerateKeys()}
-              </Button>
-              <Text
-                sx={{
-                  fontSize: "body",
-                  color: "paragraph",
-                  textAlign: "center"
-                }}
-              >
-                {strings.or()}
-              </Text>
-              <Button
-                variant="secondary"
                 onClick={() => setMode("edit")}
-                disabled={isLoading}
-                sx={{ width: "100%" }}
-              >
-                {strings.provideOwnKeys()}
-              </Button>
+              />
             </Flex>
           </Flex>
         </Dialog>
@@ -154,7 +148,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
       <Dialog
         isOpen={true}
         title={strings.manageInboxKeys()}
-        width={600}
+        width={700}
         positiveButton={{
           text: isLoading ? strings.saving() : strings.save(),
           onClick: handleSave,
@@ -165,38 +159,27 @@ export const InboxPGPKeysDialog = DialogManager.register(
           onClick: () => onClose(false)
         }}
       >
-        <Flex sx={{ flexDirection: "column", gap: 3 }}>
-          <Field
+        <Flex
+          sx={{
+            flexDirection: "column",
+            gap: "spacing7",
+            mt: "spacing7",
+            mb: "spacing7"
+          }}
+        >
+          <KeyField
             label={strings.publicKeyLabel()}
             id="publicKey"
-            name="publicKey"
-            as="textarea"
-            required
             value={publicKey}
-            onChange={(e) => setPublicKey(e.target.value)}
-            sx={{
-              fontFamily: "monospace",
-              fontSize: "body",
-              minHeight: 150,
-              resize: "vertical"
-            }}
+            onChange={setPublicKey}
             placeholder={strings.enterPgpPublicKey()}
             disabled={isLoading}
           />
-          <Field
+          <KeyField
             label={strings.privateKeyLabel()}
             id="privateKey"
-            name="privateKey"
-            as="textarea"
-            required
             value={privateKey}
-            onChange={(e) => setPrivateKey(e.target.value)}
-            sx={{
-              fontFamily: "monospace",
-              fontSize: "body",
-              minHeight: 150,
-              resize: "vertical"
-            }}
+            onChange={setPrivateKey}
             placeholder={strings.enterPgpPrivateKey()}
             disabled={isLoading}
           />
@@ -205,3 +188,101 @@ export const InboxPGPKeysDialog = DialogManager.register(
     );
   }
 );
+
+function KeyField(props: {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  disabled: boolean;
+}) {
+  const { label, id, value, onChange, placeholder, disabled } = props;
+  return (
+    <Field
+      label={label}
+      id={id}
+      name={id}
+      as="textarea"
+      required
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      styles={{
+        input: {
+          px: "spacing4",
+          py: "spacing6",
+          fontSize: "sm",
+          lineHeight: 1.2,
+          minHeight: "100px",
+          height: value ? "165px" : "100px",
+          resize: "vertical",
+          "::placeholder": { fontSize: "xs", color: "paragraph-secondary" }
+        }
+      }}
+      placeholder={placeholder}
+      disabled={disabled}
+    />
+  );
+}
+
+function KeyOption(props: {
+  icon: Icon;
+  iconSize: number;
+  title: string;
+  description: string;
+  selected?: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  const { icon: OptionIcon, iconSize, title, description, selected } = props;
+  return (
+    <Button
+      variant="primary"
+      onClick={props.onClick}
+      disabled={props.disabled}
+      sx={{
+        display: "flex",
+        width: "100%",
+        textAlign: "left",
+        whiteSpace: "normal",
+        alignItems: "center",
+        gap: "spacing3",
+        px: "spacing3",
+        py: "spacing4",
+        bg: selected ? "background-selected" : "background",
+        border: "1px solid",
+        borderColor: selected ? "transparent" : "border",
+        borderRadius: "radius2",
+        ":disabled": { opacity: 1, cursor: "default" },
+        ":hover:not(:disabled):not(:active)": {
+          bg: "hover",
+          borderColor: "transparent",
+          ".option-icon": { bg: "hover-secondary" }
+        }
+      }}
+    >
+      <Flex
+        variant="iconBox"
+        className="option-icon"
+        sx={selected ? { bg: "background" } : undefined}
+      >
+        <OptionIcon size={iconSize} />
+      </Flex>
+      <Flex sx={{ flexDirection: "column", gap: "spacing3", flex: 1 }}>
+        <Text
+          sx={{
+            fontSize: "sm",
+            fontWeight: 500,
+            lineHeight: 1,
+            color: "heading"
+          }}
+        >
+          {title}
+        </Text>
+        <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
+          {description}
+        </Text>
+      </Flex>
+    </Button>
+  );
+}

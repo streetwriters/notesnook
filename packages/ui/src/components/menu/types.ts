@@ -18,6 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ThemeUICSSObject } from "@theme-ui/core";
+import type { ComponentType } from "react";
+
+export type MenuIconComponent = ComponentType<{
+  size?: number;
+  color?: string;
+  sx?: ThemeUICSSObject;
+}>;
 
 export type MenuItemComponentProps = {
   onClick?: (e?: Event) => void;
@@ -46,6 +53,7 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   onClick?: () => void;
   title: string;
   icon?: string;
+  iconComponent?: MenuIconComponent;
   tooltip?: string;
   isDisabled?: boolean;
   isChecked?: boolean;

@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import Dialog from "../../components/dialog";
 import { steps } from "./steps";
-import { ErrorText } from "../../components/error-text";
+import { AuthErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { Box } from "@notesnook/ui";
 
 type RecoveryCodesDialogProps = BaseDialogProps<boolean> & {
   primaryMethod: AuthenticatorType;
@@ -40,16 +41,19 @@ export const RecoveryCodesDialog = DialogManager.register(
         isOpen={true}
         title={step.title}
         description={step.description}
-        width={500}
+        width={550}
         positiveButton={{
           text: strings.okay(),
           onClick: () => onClose(true)
         }}
       >
-        {step.component && (
-          <step.component onNext={() => {}} onError={setError} />
-        )}
-        <ErrorText error={error} />
+        <Box sx={{ mb: "spacing7" }}>
+          <Box sx={{ height: "1px", bg: "separator", mt: "spacing6" }} />
+          {step.component && (
+            <step.component onNext={() => {}} onError={setError} />
+          )}
+          <AuthErrorText error={error} />
+        </Box>
       </Dialog>
     );
   }

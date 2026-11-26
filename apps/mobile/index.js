@@ -53,6 +53,7 @@ if (!IS_SHARE_EXTENSION) {
 }
 
 enableFreeze(true);
+
 NetInfo.configure({
   reachabilityUrl: "https://api.notesnook.com/health",
   reachabilityTest: (response) => {

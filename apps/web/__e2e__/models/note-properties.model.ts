@@ -381,7 +381,10 @@ export class NoteContextMenuModel extends BaseProperties {
         for (const subNotebook of notebook.subNotebooks) {
           await addSubNotebookButton.click();
 
-          await fillNotebookDialog(page, subNotebook);
+          const editor = dialog.locator(getTestId("sub-notebook-editor"));
+          await editor.locator("input").fill(subNotebook.title);
+          await editor.locator("input").press("Enter");
+          await editor.waitFor({ state: "detached" });
 
           const subNotebookItem = dialog.locator(getTestId("notebook"), {
             hasText: subNotebook.title

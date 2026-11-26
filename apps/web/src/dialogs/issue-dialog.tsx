@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Link, Text } from "@theme-ui/components";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
-import { useState } from "react";
+import { Fragment } from "react";
+import { useForm } from "react-hook-form";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
@@ -32,12 +33,37 @@ import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
 import { getSubscriptionInfo } from "./settings/components/user-profile";
 
+const REQUIRED_FIELD_ERROR = "Please fill out this field";
+
 type IssueDialogProps = BaseDialogProps<boolean>;
+type IssueFormValues = { title: string; body: string };
+
 export const IssueDialog = DialogManager.register(function IssueDialog(
   props: IssueDialogProps
 ) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting }
+  } = useForm<IssueFormValues>({ defaultValues: { title: "", body: "" } });
+
+  async function submitIssue(values: IssueFormValues) {
+    try {
+      const response = await Debug.report({
+        title: values.title,
+        body: BODY_TEMPLATE(values.body),
+        userId: userstore.get().user?.id
+      });
+      if (!response) throw new Error(strings.couldNotSubmitBugReport());
+      if ("error" in response) throw new Error(response.error);
+
+      props.onClose(true);
+      await showIssueReportedDialog(response);
+    } catch (e) {
+      if (e instanceof Error) setError("root", { message: e.message });
+    }
+  }
 
   return (
     <Dialog
@@ -58,55 +84,34 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
       <Flex
         id="issueForm"
         as="form"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          try {
-            setIsSubmitting(true);
-            setError(undefined);
-
-            const formData = new FormData(e.target as HTMLFormElement);
-            const requestData = Object.fromEntries(
-              formData.entries() as IterableIterator<[string, string]>
-            );
-
-            if (!requestData.title.trim() || !requestData.body.trim()) return;
-            requestData.body = BODY_TEMPLATE(requestData.body);
-            const response = await Debug.report({
-              title: requestData.title,
-              body: requestData.body,
-              userId: userstore.get().user?.id
-            });
-            if (!response)
-              throw new Error(strings.couldNotSubmitBugReport());
-            if ("error" in response) throw new Error(response.error);
-
-            props.onClose(true);
-            await showIssueReportedDialog(response);
-          } catch (e) {
-            if (e instanceof Error) setError(e.message);
-          } finally {
-            setIsSubmitting(false);
-          }
+        onSubmit={handleSubmit(submitIssue)}
+        sx={{
+          flexDirection: "column",
+          gap: "spacing4",
+          mt: "spacing6",
+          mb: "spacing7"
         }}
-        sx={{ flexDirection: "column" }}
       >
         <Field
-          required
           label={strings.title()}
           id="title"
-          name="title"
           placeholder={strings.issueTitlePlaceholder()}
           autoFocus
+          error={errors.title?.message}
+          {...register("title", {
+            validate: (title) => !!title.trim() || REQUIRED_FIELD_ERROR
+          })}
         />
         <Field
           as="textarea"
-          required
           variant="forms.input"
           label={strings.description()}
           id="body"
-          name="body"
           placeholder={strings.issuePlaceholder()}
-          sx={{ mt: 1 }}
+          error={errors.body?.message}
+          {...register("body", {
+            validate: (body) => !!body.trim() || REQUIRED_FIELD_ERROR
+          })}
           styles={{
             input: {
               minHeight: 150
@@ -114,11 +119,15 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           }}
         />
         <Text
-          variant="error"
-          bg={"var(--background-error)"}
-          mt={1}
-          p={1}
-          sx={{ borderRadius: "default" }}
+          bg="background-error"
+          p="spacing4"
+          sx={{
+            borderRadius: "radius2",
+            fontSize: "xs",
+            lineHeight: 1.3,
+            color: "paragraph",
+            a: { color: "accent", fontWeight: 500, textDecoration: "none" }
+          }}
         >
           {strings.issueNotice[0]()}{" "}
           <Link
@@ -127,7 +136,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
             target="_blank"
           >
             github.com/streetwriters/notesnook/issues
-          </Link>
+          </Link>{" "}
           {strings.issueNotice[1]()}{" "}
           <Link
             href="https://discord.gg/zQBK97EE22"
@@ -136,19 +145,20 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           >
             {strings.issueNotice[2]()}
           </Link>
-          /
         </Text>
-        <Text variant="subBody" mt={1}>
+        <Text
+          sx={{ fontSize: "sm", lineHeight: 1.3, color: "paragraph-secondary" }}
+        >
           {getDeviceInfo([`Plan: ${getSubscriptionInfo().title}`])
             .split("\n")
-            .map((t) => (
-              <>
+            .map((t, i) => (
+              <Fragment key={i}>
                 {t}
                 <br />
-              </>
+              </Fragment>
             ))}
         </Text>
-        <ErrorText error={error} />
+        <ErrorText error={errors.root?.message} />
       </Flex>
     </Dialog>
   );
@@ -161,7 +171,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
     case "email": {
       return ConfirmDialog.show({
         title: strings.yourSupportRequestHasBeenForwarded(),
-        message: strings.supportEmailMessage()
+        subtitle: strings.supportEmailMessage()
       });
     }
     case "discussion": {
@@ -169,7 +179,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
       return ConfirmDialog.show({
         title: strings.thankYouForFeedback(),
         positiveButtonText: strings.copyLink(),
-        message: strings.featureRequestMessage(url)
+        subtitle: strings.featureRequestMessage(url)
       }).then((result) => {
         result && writeText(url);
       });
@@ -179,7 +189,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
       return ConfirmDialog.show({
         title: strings.thankYouForReporting(),
         positiveButtonText: strings.copyLink(),
-        message: strings.bugReportMessage(url)
+        subtitle: strings.bugReportMessage(url)
       }).then((result) => {
         result && writeText(url);
       });

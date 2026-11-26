@@ -31,6 +31,7 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import { useSideBarDraggingStore } from "./dragging-store";
 import SyncStatusButton from "./sync-status-button";
+import { Radius, Spacing } from "../../common/design/spacing";
 
 const SettingsIcon = () => {
   const { colors } = useThemeColors();
@@ -44,8 +45,10 @@ const SettingsIcon = () => {
       }}
       testID="sidemenu-settings-icon"
       style={{
-        width: 40,
-        height: 40
+        width: 32,
+        height: 32,
+        borderRadius: 100,
+        overflow: "hidden"
       }}
     >
       {userProfile?.profilePicture ? (
@@ -54,16 +57,15 @@ const SettingsIcon = () => {
             uri: userProfile?.profilePicture
           }}
           style={{
-            width: 25,
-            height: 25,
-            borderRadius: 100
+            width: "100%",
+            height: "100%"
           }}
         />
       ) : (
         <AppIcon
           name="cog-outline"
           color={colors.primary.icon}
-          size={AppFontSize.lg}
+          size={AppFontSize.xl}
         />
       )}
     </Pressable>
@@ -78,38 +80,36 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        borderBottomWidth: 1,
-        borderBottomColor: colors.primary.border,
-        paddingBottom: DefaultAppStyles.GAP,
-        paddingHorizontal: DefaultAppStyles.GAP
+        paddingHorizontal: Spacing.LEVEL_3
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          gap: DefaultAppStyles.GAP_SMALL,
+          gap: Spacing.LEVEL_1,
           alignItems: "center"
         }}
       >
         <View
           style={{
-            backgroundColor: "black",
-            width: 28,
-            height: 28,
-            borderRadius: 10
+            width: 26,
+            height: 26,
+            overflow: "hidden"
           }}
         >
-          <SvgView width={28} height={28} src={NOTESNOOK_LOGO_SVG} />
+          <SvgView width={26} height={26} src={NOTESNOOK_LOGO_SVG} />
         </View>
 
-        <Heading size={AppFontSize.lg}>Notesnook</Heading>
+        <Heading lineHeight="120%" fontSize="XL">
+          Notesnook
+        </Heading>
       </View>
 
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: DefaultAppStyles.GAP_SMALL
+          gap: Spacing.LEVEL_2
         }}
       >
         {props.rightButtons?.map((button, index) => (

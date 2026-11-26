@@ -25,13 +25,15 @@ import {
   FallbackStep,
   fallbackSteps,
   Step,
+  StepButton,
   steps
 } from "./steps";
 import { Authenticator, OnNextFunction } from "./types";
-import { ErrorText } from "../../components/error-text";
+import { AuthErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { Box } from "@notesnook/ui";
 
 type MultifactorDialogProps = BaseDialogProps<boolean> & {
   primaryMethod?: AuthenticatorType;
@@ -48,14 +50,30 @@ export const MultifactorDialog = DialogManager.register(
     const [error, setError] = useState<string>();
 
     if (!step) return null;
+
+    const goBack = () => {
+      setError(undefined);
+      setStep(
+        primaryMethod ? fallbackSteps.choose(primaryMethod) : steps.choose()
+      );
+    };
+    const buttonAction = (button?: StepButton) =>
+      button?.onClick?.({ onClose, goBack });
     return (
       <Dialog
         isOpen={true}
         title={step.title}
         description={step.description}
-        width={500}
+        width={step.width || 550}
         positiveButton={
-          step.next
+          step.positiveButton
+            ? step.positiveButton.onClick
+              ? {
+                  text: step.positiveButton.text,
+                  onClick: () => buttonAction(step.positiveButton)
+                }
+              : { text: step.positiveButton.text, form: "2faForm" }
+            : step.next
             ? {
                 text: strings.continue(),
                 form: "2faForm"
@@ -63,7 +81,12 @@ export const MultifactorDialog = DialogManager.register(
             : null
         }
         negativeButton={
-          step.cancellable
+          step.negativeButton
+            ? {
+                text: step.negativeButton.text,
+                onClick: () => buttonAction(step.negativeButton)
+              }
+            : step.cancellable
             ? {
                 text: strings.cancel(),
                 onClick: () => props.onClose(false)
@@ -71,26 +94,33 @@ export const MultifactorDialog = DialogManager.register(
             : null
         }
       >
-        {step.component && (
-          <step.component
-            onNext={(arg: AuthenticatorType | Authenticator) => {
-              if (!step.next) return onClose(true);
+        <Box sx={{ mb: "spacing7" }}>
+          {!step.hideSeparator && (
+            <Box sx={{ height: "1px", bg: "separator", mt: "spacing6" }} />
+          )}
+          {step.component && (
+            <step.component
+              onNext={(arg: AuthenticatorType | Authenticator) => {
+                if (!step.next) return onClose(true);
 
-              const nextStep =
-                step.next !== "recoveryCodes" && primaryMethod
-                  ? fallbackSteps[step.next](
-                      arg as AuthenticatorType & Authenticator,
-                      primaryMethod
-                    )
-                  : steps[step.next](arg as AuthenticatorType & Authenticator);
+                const nextStep =
+                  step.next !== "recoveryCodes" && primaryMethod
+                    ? fallbackSteps[step.next](
+                        arg as AuthenticatorType & Authenticator,
+                        primaryMethod
+                      )
+                    : steps[step.next](
+                        arg as AuthenticatorType & Authenticator
+                      );
 
-              setStep(nextStep);
-            }}
-            onError={setError}
-            onClose={onClose}
-          />
-        )}
-        <ErrorText error={error} />
+                setStep(nextStep);
+              }}
+              onError={setError}
+              onClose={onClose}
+            />
+          )}
+          <AuthErrorText error={error} />
+        </Box>
       </Dialog>
     );
   }

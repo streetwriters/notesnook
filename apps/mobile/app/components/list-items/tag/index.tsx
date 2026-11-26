@@ -28,7 +28,8 @@ import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import SelectionWrapper from "../selection-wrapper";
+import { selectItem } from "../../../stores/use-selection-store";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
 

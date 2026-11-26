@@ -18,101 +18,235 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { TipContext, useTip } from "../../hooks/use-tip";
-import { Info, Sync } from "../icons";
-import { useStore as useAppStore } from "../../stores/app-store";
+import { Plus } from "../icons";
 import { strings } from "@notesnook/intl";
+import { CREATE_BUTTON_MAP } from "../../common";
+import listPaneEmptyHomeView from "../../assets/list-pane-empty-home-view.svg";
+import listPaneEmptyFavoriteView from "../../assets/list-pane-empty-favorite-view.svg";
+import listPaneEmptyTrashView from "../../assets/list-pane-empty-trash-view.svg";
+import listPaneEmptyArchiveView from "../../assets/list-pane-empty-archive-view.svg";
+import listPaneEmptyMonographView from "../../assets/list-pane-empty-monograph-view.svg";
+import listPaneEmptyReminderView from "../../assets/list-pane-empty-reminder-view.svg";
+import listPaneEmptyTagView from "../../assets/list-pane-empty-tag-view.svg";
 
-type PlaceholderProps = { context: TipContext; text?: string };
-function Placeholder(props: PlaceholderProps) {
-  const { context, text } = props;
-  const tip = useTip(context);
-  const syncStatus = useAppStore((store) => store.syncStatus);
-  const isFirstSync = useAppStore((store) => store.lastSynced === 0);
-
-  if (isFirstSync && syncStatus.key === "syncing" && context === "notes") {
-    return (
-      <Flex
-        variant="columnCenter"
-        sx={{
-          position: "relative",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          alignSelf: "stretch",
-          px: 6
-        }}
-      >
-        <Flex
-          sx={{
-            border: "1px solid var(--accent)",
-            alignItems: "center",
-            borderRadius: 50,
-            p: 1,
-            py: "1.5px"
-          }}
-        >
-          <Sync color="accent" size={12} sx={{ mr: "small" }} />
-          <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            {strings.syncingYourNotes()}
-          </Text>
-        </Flex>
-
-        <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
-          {strings.networkProgress(syncStatus.type || "sync")}{" "}
-          {syncStatus.progress} {strings.items()}
-        </Text>
-      </Flex>
-    );
+const getSidebarPlaceholderVariants = () => ({
+  notebooks: {
+    title: strings.noNotebooksYet(),
+    text: strings.notebooksEmptyBody(),
+    button: {
+      ...CREATE_BUTTON_MAP.notebooks,
+      icon: Plus,
+      title: strings.createNotebook()
+    }
+  },
+  tags: {
+    title: strings.noTagsYet(),
+    text: strings.tagsEmptyBody(),
+    button: {
+      ...CREATE_BUTTON_MAP.tags,
+      icon: Plus,
+      title: strings.addTag()
+    }
   }
-  if (!tip) return null;
+});
+
+export function SidebarPlaceholder({
+  variant
+}: {
+  variant: keyof ReturnType<typeof getSidebarPlaceholderVariants>;
+}) {
+  const { title, text, button } = getSidebarPlaceholderVariants()[variant];
 
   return (
-    <>
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing6",
+        px: "spacing4",
+        width: "100%",
+        alignItems: "center"
+      }}
+    >
       <Flex
-        variant="columnCenter"
         sx={{
-          position: "relative",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          alignSelf: "stretch",
-          px: 6
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing3",
+          width: "100%",
+          textAlign: "center"
         }}
       >
-        <Flex
+        <Text
+          variant="body"
           sx={{
-            border: "1px solid var(--accent)",
-            borderRadius: 50,
-            p: 1,
-            py: "1.5px"
+            fontSize: "md",
+            fontWeight: "heading",
+            color: "heading",
+            lineHeight: 1
           }}
         >
-          <Info color="accent" size={13} sx={{ mr: "small" }} />
-          <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            {strings.tip()}
-          </Text>
-        </Flex>
-        <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
-          {text || tip.text}
+          {title}
         </Text>
-        {tip.button && (
-          <Button
-            sx={{
-              mt: 2,
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex"
-            }}
-            variant="secondary"
-            onClick={tip.button.onClick}
-          >
-            <Text mr={1} color="accent">
-              {tip.button.title}
-            </Text>
-            {tip.button.icon && <tip.button.icon size={18} color="accent" />}
-          </Button>
-        )}
+        <Text
+          variant="body"
+          sx={{
+            width: "208px",
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1.2
+          }}
+        >
+          {text}
+        </Text>
       </Flex>
-    </>
+      <Button
+        onClick={button.onClick}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "spacing3",
+          color: "accent",
+          fontSize: "sm",
+          fontWeight: 600,
+          lineHeight: 1,
+          width: "fit-content"
+        }}
+      >
+        {<button.icon size={15} color="accent" />}
+        {button.title}
+      </Button>
+    </Flex>
   );
 }
-export default Placeholder;
+
+const getListPanePlaceholderVariants = () =>
+  ({
+    home: {
+      image: listPaneEmptyHomeView,
+      title: strings.createYourFirstNote(),
+      description: (
+        <>
+          {strings.createFirstNoteHint[0]()}{" "}
+          <Text as="span" sx={{ color: "accent" }}>
+            {strings.newNote()}
+          </Text>{" "}
+          {strings.createFirstNoteHint[1]()}
+        </>
+      )
+    },
+    favorite: {
+      image: listPaneEmptyFavoriteView,
+      title: strings.noFavoritesYet(),
+      description: strings.noFavoritesYetDesc()
+    },
+    trash: {
+      image: listPaneEmptyTrashView,
+      title: strings.trashIsEmpty(),
+      description: strings.trashIsEmptyDesc()
+    },
+    archive: {
+      image: listPaneEmptyArchiveView,
+      title: strings.noArchivesYet(),
+      description: strings.noArchivesYetDesc()
+    },
+    monographs: {
+      image: listPaneEmptyMonographView,
+      title: strings.whatAreMonographs(),
+      description: (
+        <>
+          {strings.monographsEmptyDesc()}{" "}
+          <Text
+            as="span"
+            sx={{ color: "accent", cursor: "pointer" }}
+            onClick={() =>
+              window.open(
+                "https://notesnook.com/help/publish-notes-with-monographs",
+                "_blank"
+              )
+            }
+          >
+            {strings.learnMore()}
+          </Text>
+        </>
+      )
+    },
+    reminders: {
+      image: listPaneEmptyReminderView,
+      title: strings.noRemindersToday(),
+      description: strings.noRemindersTodayDesc()
+    },
+    tag: {
+      image: listPaneEmptyTagView,
+      title: strings.noNotesInTag(),
+      description: strings.noNotesInTagDesc()
+    },
+    /**
+     * TODO: implement a proper placeholder for the search view.
+     */
+    search: {
+      image: listPaneEmptyHomeView,
+      title: strings.createYourFirstNote(),
+      description: (
+        <>
+          {strings.createFirstNoteHint[0]()}{" "}
+          <Text as="span" sx={{ color: "accent" }}>
+            {strings.newNote()}
+          </Text>{" "}
+          {strings.createFirstNoteHint[1]()}
+        </>
+      )
+    }
+  } as const);
+
+export function ListPanePlaceholder({
+  variant
+}: {
+  variant: keyof ReturnType<typeof getListPanePlaceholderVariants>;
+}) {
+  const { image, title, description } =
+    getListPanePlaceholderVariants()[variant];
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "spacing7",
+        width: "100%"
+      }}
+    >
+      <img src={image} alt="" />
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing3",
+          textAlign: "center"
+        }}
+      >
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "md",
+            fontWeight: 600,
+            color: "heading",
+            lineHeight: 1
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          sx={{
+            maxWidth: "250px",
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1.2
+          }}
+        >
+          {description}
+        </Text>
+      </Flex>
+    </Flex>
+  );
+}

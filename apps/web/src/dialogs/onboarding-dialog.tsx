@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, Button } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -31,35 +31,19 @@ export const OnboardingDialog = DialogManager.register(
     const { title } = getSubscriptionInfo(user);
 
     return (
-      <Dialog isOpen={true} width={500} onClose={() => onClose(false)}>
-        <Flex
-          sx={{
-            flexDirection: "column",
-            alignItems: "center",
-            overflowY: "auto"
-          }}
-        >
-          <Text variant={"heading"} mt={2}>
-            {strings.welcomeToPlan(title + " plan")}
-          </Text>
-          <Text
-            variant={"body"}
-            sx={{
-              textAlign: "center",
-              maxWidth: "70%",
-              color: "var(--paragraph-secondary)"
-            }}
-          >
-            {strings.thankYouPrivacy()}
-          </Text>
-          <Button
-            variant="accent"
-            sx={{ borderRadius: 50, px: 30, mb: 4, mt: 4 }}
-            onClick={() => onClose(false)}
-          >
-            {strings.continue()}
-          </Button>
-        </Flex>
+      <Dialog
+        isOpen={true}
+        width={474}
+        title={strings.welcomeToPlan(title + " plan")}
+        description={strings.thankYouPrivacy()}
+        noScroll
+        onClose={() => onClose(false)}
+        positiveButton={{
+          text: strings.continue(),
+          onClick: () => onClose(false)
+        }}
+      >
+        <Flex sx={{ mb: "spacing7" }} />
       </Dialog>
     );
   }

@@ -20,18 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { memo } from "react";
 import MDIIcon from "@mdi/react";
 import {
-  mdiPlus,
-  mdiMinus,
-  mdiBookOutline,
   mdiNotebookOutline,
-  mdiArrowLeft,
-  mdiArrowRight,
   mdiArrowDown,
   mdiBookPlusMultipleOutline,
   mdiBookmarkOutline,
   mdiShieldOutline,
   mdiLockOpenOutline,
-  mdiLockOutline,
   mdiStarOutline,
   mdiCircle,
   mdiCircleOutline,
@@ -39,28 +33,21 @@ import {
   mdiCheck,
   mdiClose,
   mdiDotsVertical,
-  mdiTrashCanOutline,
-  mdiArchiveOutline,
   mdiBookRemoveOutline,
   mdiMagnify,
   mdiMenu,
   mdiLoginVariant,
-  mdiEmailAlertOutline,
   mdiAccountOutline,
   mdiLogoutVariant,
   mdiSunglasses,
   mdiGlasses,
   mdiCogOutline,
-  mdiHomeOutline,
   mdiRecycle,
   mdiSync,
   mdiSyncOff,
-  mdiLoading,
   mdiExportVariant,
   mdiArrowExpandDown,
   mdiArrowTopRightThick,
-  mdiChevronLeft,
-  mdiChevronRight,
   mdiPound,
   mdiPinOutline,
   mdiPin,
@@ -68,12 +55,10 @@ import {
   mdiWeatherSunny,
   mdiThemeLightDark,
   mdiCheckCircle,
-  mdiLanguageMarkdownOutline,
   mdiFilePdfBox,
   mdiLanguageHtml5,
   mdiFormatTitle,
   mdiAlertCircle,
-  mdiInformation,
   mdiToggleSwitchOffOutline,
   mdiToggleSwitchOutline,
   mdiBackupRestore,
@@ -90,7 +75,6 @@ import {
   mdiBullhorn,
   mdiCloudUploadOutline,
   mdiCloudCheckOutline,
-  mdiContentCopy,
   mdiCheckboxMultipleMarkedCircleOutline,
   mdiBookEditOutline,
   mdiDeleteForeverOutline,
@@ -107,9 +91,7 @@ import {
   mdiFileOutline,
   mdiImage,
   mdiNoteOutline,
-  mdiSyncAlert,
   mdiAlertOutline,
-  mdiEyeOutline,
   mdiEyeOffOutline,
   mdiAttachment,
   mdiPencilOutline,
@@ -124,8 +106,6 @@ import {
   mdiEmoticonOutline,
   mdiPaletteOutline,
   mdiFormatBold,
-  mdiTable,
-  mdiCrownOutline,
   mdiDatabaseLockOutline,
   mdiPaletteSwatchOutline,
   mdiAppleIos,
@@ -163,8 +143,6 @@ import {
   mdiProgressUpload,
   mdiFormTextbox,
   mdiCheckAll,
-  mdiCloudOffOutline,
-  mdiContentDuplicate,
   mdiPrinterOutline,
   mdiRefresh,
   mdiRestore,
@@ -176,9 +154,7 @@ import {
   mdiCalendarClockOutline,
   mdiPuzzleOutline,
   mdiBellRingOutline,
-  mdiClockTimeFiveOutline,
   mdiBellOffOutline,
-  mdiVibrate,
   mdiBellCancelOutline,
   mdiBellPlusOutline,
   mdiBellOutline,
@@ -198,8 +174,6 @@ import {
   mdiLinkOff,
   mdiMagnifyPlusOutline,
   mdiMagnifyMinusOutline,
-  mdiRotateRight,
-  mdiRotateLeft,
   mdiKeyOutline,
   mdiDatabaseImportOutline,
   mdiDeveloperBoard,
@@ -226,10 +200,8 @@ import {
   mdiHistory,
   mdiArrowCollapseRight,
   mdiNoteEditOutline,
-  mdiArrowUp,
   mdiInbox,
   mdiConsoleLine,
-  mdiSpellcheck,
   mdiDeleteSweepOutline,
   mdiCloseCircle
 } from "@mdi/js";
@@ -237,6 +209,207 @@ import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { isThemeColor, SchemeColors } from "@notesnook/theme";
+import EyeClosed from "@notesnook/icons/eye-closed.svg?react";
+import EyeOpen from "@notesnook/icons/eye-open.svg?react";
+import ChatIcon from "@notesnook/icons/chat.svg?react";
+import EnvelopeSimple from "@notesnook/icons/envelope-simple.svg?react";
+import LockSimple from "@notesnook/icons/lock-simple.svg?react";
+import ChevronRightIcon from "@notesnook/icons/chevron-right.svg?react";
+import ChevronDownIcon from "@notesnook/icons/chevron-down.svg?react";
+import ClockIcon from "@notesnook/icons/clock.svg?react";
+import ClockCounterClockwiseIcon from "@notesnook/icons/clock-counter-clockwise.svg?react";
+import WarningCircle from "@notesnook/icons/warning-circle.svg?react";
+import CloudSvg from "@notesnook/icons/cloud.svg?react";
+import ShieldCheckSvg from "@notesnook/icons/shield-check.svg?react";
+import DeviceMobileCameraSvg from "@notesnook/icons/device-mobile-camera.svg?react";
+import FileSvg from "@notesnook/icons/file.svg?react";
+import ImageSvg from "@notesnook/icons/image.svg?react";
+import ArrowRightSvg from "@notesnook/icons/arrow-right.svg?react";
+import CheckCircleSvg from "@notesnook/icons/check-circle.svg?react";
+import CheckSvg from "@notesnook/icons/check.svg?react";
+import KeySvg from "@notesnook/icons/key.svg?react";
+import RecoveryKeyShieldCheckSvg from "@notesnook/icons/recovery-key-shield-check.svg?react";
+import CopyIcon from "@notesnook/icons/copy.svg?react";
+import BoxArrowDownIcon from "@notesnook/icons/box-arrow-down.svg?react";
+import DownloadIcon from "@notesnook/icons/download-simple.svg?react";
+import FloppyDiskIcon from "@notesnook/icons/floppy-disk.svg?react";
+import HomeSvg from "@notesnook/icons/home.svg?react";
+import BookmarkSvg from "@notesnook/icons/bookmark.svg?react";
+import PencilSimpleSvg from "@notesnook/icons/pencil-simple.svg?react";
+import ShoppingModeSvg from "@notesnook/icons/shopping-mode.svg?react";
+import FileTextSvg from "@notesnook/icons/file-text.svg?react";
+import ChecksSvg from "@notesnook/icons/checks.svg?react";
+import StarSvg from "@notesnook/icons/star.svg?react";
+import PlusSvg from "@notesnook/icons/plus.svg?react";
+import FunnelSvg from "@notesnook/icons/funnel.svg?react";
+import SlidersSvg from "@notesnook/icons/sliders.svg?react";
+import BellSvg from "@notesnook/icons/bell.svg?react";
+import NoteCalendarSvg from "@notesnook/icons/calendar.svg?react";
+import NotePinSvg from "@notesnook/icons/pin.svg?react";
+import NoteFavoriteSvg from "@notesnook/icons/star-filled.svg?react";
+import NoteReadonlySvg from "@notesnook/icons/pencil-simple-slash.svg?react";
+import NoteLinkSvg from "@notesnook/icons/link.svg?react";
+import NoteBellSvg from "@notesnook/icons/bell-note.svg?react";
+import NoteExpirySvg from "@notesnook/icons/bomb.svg?react";
+import SearchSvg from "@notesnook/icons/search.svg?react";
+import ViewListSvg from "@notesnook/icons/view-list.svg?react";
+import CaretRightSvg from "@notesnook/icons/caret-right.svg?react";
+import LinkSimpleSvg from "@notesnook/icons/link-simple.svg?react";
+import LinkBreakSvg from "@notesnook/icons/link-break.svg?react";
+import QuestionSvg from "@notesnook/icons/question.svg?react";
+import CalendarBlankSvg from "@notesnook/icons/calendar-blank.svg?react";
+import ProhibitSvg from "@notesnook/icons/prohibit.svg?react";
+import HandCoinsSvg from "@notesnook/icons/hand-coins.svg?react";
+import ArrowUpSvg from "@notesnook/icons/arrow-up.svg?react";
+import LightningSvg from "@notesnook/icons/lightning.svg?react";
+import ArrowLeftSvg from "@notesnook/icons/arrow-left.svg?react";
+import CheckCircleSuccesSvg from "@notesnook/icons/check-circle-success.svg?react";
+import InfoSvg from "@notesnook/icons/info.svg?react";
+import BookOpenSvg from "@notesnook/icons/book-open.svg?react";
+import ArchiveSvg from "@notesnook/icons/archive.svg?react";
+import TrashSvg from "@notesnook/icons/trash.svg?react";
+import PaletteSvg from "@notesnook/icons/palette.svg?react";
+import TabsSvg from "@notesnook/icons/tabs.svg?react";
+import PrinterSvg from "@notesnook/icons/printer.svg?react";
+import CloudArrowUpSvg from "@notesnook/icons/cloud-arrow-up.svg?react";
+import UploadSvg from "@notesnook/icons/upload.svg?react";
+import LinkHorizontalSvg from "@notesnook/icons/format-link-simple-horizontal.svg?react";
+import DuplicateSvg from "@notesnook/icons/copy-simple.svg?react";
+import CloudSlashSvg from "@notesnook/icons/cloud-slash.svg?react";
+import HourglassSvg from "@notesnook/icons/hourglass.svg?react";
+import ArrowSquareOutSvg from "@notesnook/icons/arrow-square-out.svg?react";
+import ClockClockwiseSvg from "@notesnook/icons/clock-clockwise.svg?react";
+import BackspaceSvg from "@notesnook/icons/backspace.svg?react";
+import FilePdfSvg from "@notesnook/icons/file-pdf.svg?react";
+import MarkdownSvg from "@notesnook/icons/markdown.svg?react";
+import FileHtmlSvg from "@notesnook/icons/file-html.svg?react";
+import TextAaSvg from "@notesnook/icons/text-aa.svg?react";
+import SelectAllSvg from "@notesnook/icons/select-all.svg?react";
+import SortAscendingSvg from "@notesnook/icons/sort-ascending.svg?react";
+import OrderAlphabeticalAscendingSvg from "@notesnook/icons/order-alphabetical-ascending.svg?react";
+import OrderAlphabeticalDescendingSvg from "@notesnook/icons/order-alphabetical-descending.svg?react";
+import OrderNumericAscendingSvg from "@notesnook/icons/order-numeric-ascending.svg?react";
+import OrderNumericDescendingSvg from "@notesnook/icons/order-numeric-descending.svg?react";
+import ArrowCounterClockwiseSvg from "@notesnook/icons/arrow-counter-clockwise.svg?react";
+import HouseSvg from "@notesnook/icons/house.svg?react";
+import EllipseSvg from "@notesnook/icons/ellipse.svg?react";
+import ArrowsInCardinalSvg from "@notesnook/icons/arrows-in-cardinal.svg?react";
+import MoonStarsSvg from "@notesnook/icons/moon-stars.svg?react";
+import GearSixSvg from "@notesnook/icons/gear-six.svg?react";
+import SignOutSvg from "@notesnook/icons/sign-out.svg?react";
+import SignInSvg from "@notesnook/icons/sign-in.svg?react";
+import UserSvg from "@notesnook/icons/user.svg?react";
+import ListSvg from "@notesnook/icons/list.svg?react";
+import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
+import CloseSvg from "@notesnook/icons/close.svg?react";
+import CaretLeftSvg from "@notesnook/icons/caret-left.svg?react";
+import SquaresFourSvg from "@notesnook/icons/squares-four.svg?react";
+import TableSvg from "@notesnook/icons/table.svg?react";
+import SpellCheckSvg from "@notesnook/icons/spellcheck.svg?react";
+import CircleNotchSvg from "@notesnook/icons/circle-notch.svg?react";
+import CrownSvg from "@notesnook/icons/crown-simple.svg?react";
+import LeftPanelCloseSvg from "@notesnook/icons/left-panel-close.svg?react";
+import LeftPanelOpenSvg from "@notesnook/icons/left-panel-open.svg?react";
+import CommandSvg from "@notesnook/icons/command.svg?react";
+import PencilSimpleSlashSvg from "@notesnook/icons/pencil-simple-slash.svg?react";
+import MinusSvg from "@notesnook/icons/minus.svg?react";
+import CopySimpleSvg from "@notesnook/icons/copy-simple.svg?react";
+import PushPinSimpleSvg from "@notesnook/icons/push-pin-simple.svg?react";
+import LockOpenSvg from "@notesnook/icons/lock-simple-open.svg?react";
+import MagnifyingGlassSvg from "@notesnook/icons/magnifying-glass.svg?react";
+import DotsThreeSvg from "@notesnook/icons/dots-three.svg?react";
+import CloudCheckSvg from "@notesnook/icons/cloud-check.svg?react";
+import ScanDeleteSvg from "@notesnook/icons/scan-delete.svg?react";
+import CheckboxSvg from "@notesnook/icons/checkbox.svg?react";
+import CheckboxUncheckedSvg from "@notesnook/icons/checkbox-unchecked.svg?react";
+import BellPlusSvg from "@notesnook/icons/bell-plus.svg?react";
+import VibrateSvg from "@notesnook/icons/vibrate.svg?react";
+import ArrowsClockwiseSvg from "@notesnook/icons/arrows-clockwise.svg?react";
+import ArrowClockwiseSvg from "@notesnook/icons/arrow-clockwise.svg?react";
+import MagnifyingGlassMinusSvg from "@notesnook/icons/magnifying-glass-minus.svg?react";
+import BellSimpleSlashSvg from "@notesnook/icons/bell-simple-slash.svg?react";
+import CheckSquareSvg from "@notesnook/icons/check-square.svg?react";
+import SidebarSimpleSvg from "@notesnook/icons/sidebar-simple.svg?react";
+import EyeglassesSvg from "@notesnook/icons/eyeglasses.svg?react";
+import SyncErrorSvg from "@notesnook/icons/sync-error.svg?react";
+import EditorMarginsSvg from "@notesnook/icons/editor-margins.svg?react";
+import CornersOutSvg from "@notesnook/icons/corners-out.svg?react";
+import MobileLockSvg from "@notesnook/icons/mobile-lock.svg?react";
+import CornersInSvg from "@notesnook/icons/corners-in.svg?react";
+import ArrowDownSvg from "@notesnook/icons/arrow-down.svg?react";
+import EyeglassesEmptySvg from "@notesnook/icons/eyeglasses-empty.svg?react";
+import AsteriskSvg from "@notesnook/icons/asterisk.svg?react";
+import SyncDisabledSvg from "@notesnook/icons/sync-disabled.svg?react";
+import WarningOctagonSvg from "@notesnook/icons/warning-octagon.svg?react";
+import CheckboxRemoveSvg from "@notesnook/icons/checkbox-remove.svg?react";
+import SunDimSvg from "@notesnook/icons/sun-dim.svg?react";
+import ArrowUpRightSvg from "@notesnook/icons/arrow-up-right.svg?react";
+import ArrowDownLeftSvg from "@notesnook/icons/arrow-down-left.svg?react";
+import PaperclipHorizontalSvg from "@notesnook/icons/paperclip-horizontal.svg?react";
+import ArrowBendUpLeftSvg from "@notesnook/icons/arrow-bend-up-left.svg?react";
+import ArrowBendUpRightSvg from "@notesnook/icons/arrow-bend-up-right.svg?react";
+import KeyboardSvg from "@notesnook/icons/keyboard.svg?react";
+import LaptopSvg from "@notesnook/icons/laptop.svg?react";
+import GavelSvg from "@notesnook/icons/gavel.svg?react";
+import KeyholeSvg from "@notesnook/icons/keyhole.svg?react";
+import UsersSvg from "@notesnook/icons/users.svg?react";
+import CloudArrowDownSvg from "@notesnook/icons/cloud-arrow-down.svg?react";
+import GlobeSimpleSvg from "@notesnook/icons/globe-simple.svg?react";
+import NotebookTextSvg from "@notesnook/icons/notebook.svg?react";
+import CalendarDotSvg from "@notesnook/icons/calendar-dot.svg?react";
+import PictureInPictureSvg from "@notesnook/icons/picture-in-picture.svg?react";
+import TraySvg from "@notesnook/icons/tray.svg?react";
+import XCircleSvg from "@notesnook/icons/x-circle.svg?react";
+import XSquareSvg from "@notesnook/icons/x-square.svg?react";
+import SubtitlesSvg from "@notesnook/icons/subtitles.svg?react";
+import EnvelopeSvg from "@notesnook/icons/envelope.svg?react";
+import IdentificationBadgeSvg from "@notesnook/icons/identification-badge.svg?react";
+import BracketsAngleSvg from "@notesnook/icons/brackets-angle.svg?react";
+import RoadHorizonSvg from "@notesnook/icons/road-horizon.svg?react";
+import FileMagnifyingGlassSvg from "@notesnook/icons/file-magnifying-glass.svg?react";
+import DotsNineSvg from "@notesnook/icons/dots-nine.svg?react";
+import BugBeetleSvg from "@notesnook/icons/bug-beetle.svg?react";
+import TimerSvg from "@notesnook/icons/timer.svg?react";
+import BroomSvg from "@notesnook/icons/broom.svg?react";
+import MagicWandSvg from "@notesnook/icons/magic-wand.svg?react";
+import MagnifyingGlassPlusSvg from "@notesnook/icons/magnifying-glass-plus.svg?react";
+import WalletSvg from "@notesnook/icons/wallet.svg?react";
+import CrownSimpleLineSvg from "@notesnook/icons/crown-simple-line.svg?react";
+import GiftSvg from "@notesnook/icons/gift.svg?react";
+import PauseSvg from "@notesnook/icons/pause.svg?react";
+import ArrowsCounterClockwiseSvg from "@notesnook/icons/arrows-counter-clockwise.svg?react";
+import PlaySvg from "@notesnook/icons/play.svg?react";
+import CameraSvg from "@notesnook/icons/camera.svg?react";
+import CaretUpSvg from "@notesnook/icons/caret-up.svg?react";
+import CompassSvg from "@notesnook/icons/compass.svg?react";
+import SparkleSvg from "@notesnook/icons/sparkle.svg?react";
+import TrashSimpleSvg from "@notesnook/icons/trash-simple.svg?react";
+import ChevronLeftSimpleSvg from "@notesnook/icons/chevron-left-simple.svg?react";
+import CloudOutlineSvg from "@notesnook/icons/cloud-outline.svg?react";
+import CaretDownSvg from "@notesnook/icons/caret-down.svg?react";
+import TrayArrowDownSvg from "@notesnook/icons/tray-arrow-down.svg?react";
+import EyeSlashSvg from "@notesnook/icons/eye-slash.svg?react";
+import WifiSlashSvg from "@notesnook/icons/wifi-slash.svg?react";
+import CheckCircleSimpleSvg from "@notesnook/icons/check-circle-simple.svg?react";
+import ShieldSvg from "@notesnook/icons/shield.svg?react";
+import FolderSvg from "@notesnook/icons/folder.svg?react";
+import ExportOutlineSvg from "@notesnook/icons/export.svg?react";
+import GithubLogoSvg from "@notesnook/icons/github-logo.svg?react";
+import TelegramLogoSvg from "@notesnook/icons/telegram-logo.svg?react";
+import XLogoSvg from "@notesnook/icons/x-logo.svg?react";
+import DiscordLogoSvg from "@notesnook/icons/discord-logo.svg?react";
+import MastodonLogoSvg from "@notesnook/icons/mastodon-logo.svg?react";
+import HardDrivesSvg from "@notesnook/icons/hard-drives.svg?react";
+import NetworkSvg from "@notesnook/icons/network.svg?react";
+import PathSvg from "@notesnook/icons/path.svg?react";
+import ShieldPlusSvg from "@notesnook/icons/shield-plus.svg?react";
+import NumpadSvg from "@notesnook/icons/numpad.svg?react";
+import WarningTriangleSvg from "@notesnook/icons/warning.svg?react";
+import WrenchSvg from "@notesnook/icons/wrench.svg?react";
+import TextAlignLeftSvg from "@notesnook/icons/text-align-left.svg?react";
+import TextTSvg from "@notesnook/icons/text-t.svg?react";
+import ArrowsVerticalSvg from "@notesnook/icons/arrows-vertical.svg?react";
+import DoubleSpacedLinesSvg from "@notesnook/icons/double-spaced-lines.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -325,17 +498,50 @@ export function createIcon(path: string, rotate = false) {
   return NNIcon;
 }
 
-export const Plus = createIcon(mdiPlus);
+export function createSvgIcon(
+  Component: React.FunctionComponent<React.SVGProps<SVGSVGElement>>,
+  rotate = false
+) {
+  const NNIcon: Icon = function Icon(props) {
+    const {
+      sx,
+      size = 24,
+      color = "icon",
+      rotate: _rotate = rotate,
+      className,
+      ...restProps
+    } = props;
+    return (
+      <Flex
+        {...restProps}
+        className={[_rotate ? "rotate" : undefined, className]
+          .filter(Boolean)
+          .join(" ")}
+        sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          flexShrink: 0,
+          color,
+          width: size,
+          height: size,
+          ...sx
+        }}
+      >
+        <Component width="100%" height="100%" />
+      </Flex>
+    );
+  };
+  NNIcon.isReactComponent = true;
+  NNIcon.path = "";
+  return NNIcon;
+}
+
 export const NoteAdd = createIcon(mdiNoteEditOutline);
 export const Note = createIcon(mdiNoteOutline);
 export const NoteRemove = createIcon(mdiNoteRemoveOutline);
 export const Notes = createIcon(mdiNoteMultipleOutline);
-export const Minus = createIcon(mdiMinus);
-export const Notebook = createIcon(mdiBookOutline);
 export const Notebooks = createIcon(mdiBookMultipleOutline);
 export const Notebook2 = createIcon(mdiNotebookOutline);
-export const ArrowLeft = createIcon(mdiArrowLeft);
-export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
 export const ArrowTopRight = createIcon(mdiArrowTopRight);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
@@ -343,8 +549,6 @@ export const Topic = createIcon(mdiBookmarkOutline);
 export const Alert = createIcon(mdiAlertOctagonOutline);
 export const Vault = createIcon(mdiShieldOutline);
 export const Unlock = createIcon(mdiLockOpenOutline);
-export const Lock = createIcon(mdiLockOutline);
-export const Star = createIcon(mdiStarOutline);
 export const StarOutline = createIcon(mdiStarOutline);
 export const Circle = createIcon(mdiCircle);
 export const CircleEmpty = createIcon(mdiCircleOutline);
@@ -353,34 +557,24 @@ export const Check = createIcon(mdiCheck);
 export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
 export const MoreHorizontal = createIcon(mdiDotsHorizontal);
-export const Trash = createIcon(mdiTrashCanOutline);
-export const Archive = createIcon(mdiArchiveOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
 export const Search = createIcon(mdiMagnify);
 export const TableOfContents = createIcon(mdiFormatListBulleted);
 export const Menu = createIcon(mdiMenu);
 export const Login = createIcon(mdiLoginVariant);
-export const Email = createIcon(mdiEmailAlertOutline);
 export const Signup = createIcon(mdiAccountOutline);
 export const Logout = createIcon(mdiLogoutVariant);
 export const FocusMode = createIcon(mdiGlasses);
 export const NormalMode = createIcon(mdiSunglasses);
 export const Settings = createIcon(mdiCogOutline);
-export const Home = createIcon(mdiHomeOutline);
 export const Restore = createIcon(mdiRecycle);
 export const Sync = createIcon(mdiSync);
 export const SyncOff = createIcon(mdiSyncOff);
-export const SyncError = createIcon(mdiSyncAlert);
-export const Loading = createIcon(mdiLoading, true);
 export const Export = createIcon(mdiExportVariant);
 export const AddToNotebook = createIcon(mdiBookPlusMultipleOutline);
 export const Expand = createIcon(mdiArrowExpandDown);
 export const Shortcut = createIcon(mdiArrowTopRightThick);
-export const ChevronLeft = createIcon(mdiChevronLeft);
-export const ChevronRight = createIcon(mdiChevronRight);
-export const Close = createIcon(mdiClose);
-export const Tag = createIcon(mdiPound);
 export const Tag2 = createIcon(mdiPound);
 export const Pin = createIcon(mdiPinOutline);
 export const PinFilled = createIcon(mdiPin);
@@ -390,12 +584,10 @@ export const LightMode = createIcon(mdiWeatherSunny);
 export const ThemeIcon = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const DoubleCheckmark = createIcon(mdiCheckAll);
-export const CheckCircle = createIcon(mdiCheckCircle);
 export const CheckIntermediate = createIcon(mdiMinusCircleOutline);
 export const CheckRemove = createIcon(mdiCloseCircleOutline);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
 export const Properties = createIcon(mdiDotsVertical);
-export const Markdown = createIcon(mdiLanguageMarkdownOutline);
 export const PDF = createIcon(mdiFilePdfBox);
 export const Attachment = createIcon(mdiAttachment);
 export const AttachmentError = createIcon(mdiAlertCircleOutline);
@@ -405,7 +597,6 @@ export const Text = createIcon(mdiFormatTitle);
 export const Success = createIcon(mdiCheckCircle);
 export const Error = createIcon(mdiAlertCircle);
 export const Warn = createIcon(mdiAlertOutline);
-export const Info = createIcon(mdiInformation);
 export const ToggleUnchecked = createIcon(mdiToggleSwitchOffOutline);
 export const ToggleChecked = createIcon(mdiToggleSwitchOutline);
 export const Backup = createIcon(mdiBackupRestore);
@@ -418,18 +609,13 @@ export const ChevronDown = createIcon(mdiChevronDown);
 export const ChevronUp = createIcon(mdiChevronUp);
 export const SortAsc = createIcon(mdiSortAscending);
 export const SortDesc = createIcon(mdiSortDescending);
-export const PasswordInvisible = createIcon(mdiEyeOutline);
-export const PasswordVisible = createIcon(mdiEyeOffOutline);
 export const Fullscreen = createIcon(mdiFullscreen);
 export const ExitFullscreen = createIcon(mdiFullscreenExit);
 export const Announcement = createIcon(mdiBullhorn);
 export const Publish = createIcon(mdiCloudUploadOutline);
 export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
-export const Copy = createIcon(mdiContentCopy);
 export const Refresh = createIcon(mdiRefresh);
-export const Clock = createIcon(mdiClockTimeFiveOutline);
-export const Duplicate = createIcon(mdiContentDuplicate);
 export const InternalLink = createIcon(mdiLink);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(mdiBookEditOutline);
@@ -450,7 +636,6 @@ export const Github = createIcon(mdiGithub);
 export const Reddit = createIcon(mdiReddit);
 export const Dismiss = createIcon(mdiClose);
 export const File = createIcon(mdiFileOutline);
-export const Download = createIcon(mdiArrowDown);
 export const Print = createIcon(mdiPrinterOutline);
 export const ImageDownload = createIcon(mdiImage);
 export const Billboard = createIcon(mdiBillboard);
@@ -463,10 +648,7 @@ export const ImageMultiple = createIcon(mdiImageMultipleOutline);
 export const Harddisk = createIcon(mdiHarddisk);
 export const FileCabinet = createIcon(mdiFileCabinet);
 export const Emoticon = createIcon(mdiEmoticonOutline);
-export const Palette = createIcon(mdiPaletteOutline);
 export const Bold = createIcon(mdiFormatBold);
-export const Table = createIcon(mdiTable);
-export const Pro = createIcon(mdiCrownOutline);
 export const EncryptedBackup = createIcon(mdiDatabaseLockOutline);
 export const Accent = createIcon(mdiPaletteSwatchOutline);
 
@@ -506,7 +688,6 @@ export const MfaSms = createIcon(mdiMessageLockOutline);
 export const MfaEnabled = createIcon(mdiShieldCheckOutline);
 export const Reupload = createIcon(mdiProgressUpload);
 export const Rename = createIcon(mdiFormTextbox);
-export const Upload = createIcon(mdiCloudOffOutline);
 export const Uploaded = createIcon(mdiCloudCheckOutline);
 export const Uploading = createIcon(mdiUploadOutline);
 export const References = createIcon(mdiVectorLink);
@@ -522,7 +703,6 @@ export const Reminder = createIcon(mdiBellOutline);
 export const ReminderOff = createIcon(mdiBellCancelOutline);
 export const AddReminder = createIcon(mdiBellPlusOutline);
 export const Silent = createIcon(mdiBellOffOutline);
-export const Vibrate = createIcon(mdiVibrate);
 export const Loud = createIcon(mdiBellRingOutline);
 export const CustomToolbar = createIcon(mdiGestureTapButton);
 
@@ -546,8 +726,6 @@ export const FileWebClip = createIcon(mdiWeb);
 export const Unlink = createIcon(mdiLinkOff);
 export const ZoomIn = createIcon(mdiMagnifyPlusOutline);
 export const ZoomOut = createIcon(mdiMagnifyMinusOutline);
-export const RotateCW = createIcon(mdiRotateRight);
-export const RotateACW = createIcon(mdiRotateLeft);
 export const Reset = createIcon(mdiRestore);
 
 export const Account = createIcon(mdiAccountOutline);
@@ -585,8 +763,215 @@ export const SessionHistory = createIcon(mdiHistory);
 export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
-export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
-export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
 export const CloseCircle = createIcon(mdiCloseCircle);
+
+export const CheckSvgIcon = createSvgIcon(CheckSvg);
+export const Home = createSvgIcon(HomeSvg);
+export const Notebook = createSvgIcon(BookmarkSvg);
+export const Tag = createSvgIcon(ShoppingModeSvg);
+export const FileText = createSvgIcon(FileTextSvg);
+export const Checks = createSvgIcon(ChecksSvg);
+export const Star = createSvgIcon(StarSvg);
+export const Bell = createSvgIcon(BellSvg);
+export const BookOpen = createSvgIcon(BookOpenSvg);
+export const Archive = createSvgIcon(ArchiveSvg);
+export const Plus = createSvgIcon(PlusSvg);
+export const PasswordInvisible = createSvgIcon(EyeOpen);
+export const PasswordVisible = createSvgIcon(EyeClosed);
+export const Chat = createSvgIcon(ChatIcon);
+export const Email = createSvgIcon(EnvelopeSimple);
+export const RecoveryCode = createSvgIcon(LockSimple);
+export const ChevronRight = createSvgIcon(ChevronRightIcon);
+export const CaretDown = createSvgIcon(ChevronDownIcon);
+export const Clock = createSvgIcon(ClockIcon);
+export const ClockCounterClockwise = createSvgIcon(ClockCounterClockwiseIcon);
+export const Warning = createSvgIcon(WarningCircle);
+export const Cloud = createSvgIcon(CloudSvg);
+export const DeviceMobileCamera = createSvgIcon(DeviceMobileCameraSvg);
+export const FileDoc = createSvgIcon(FileSvg);
+export const Picture = createSvgIcon(ImageSvg);
+export const ArrowRight = createSvgIcon(ArrowRightSvg);
+export const CheckCircle = createSvgIcon(CheckCircleSvg);
+export const CheckIcon = createSvgIcon(CheckSvg);
+export const KeyIcon = createSvgIcon(KeySvg);
+export const Trash = createSvgIcon(TrashSvg);
+export const RecoveryKeyShieldCheck = createSvgIcon(RecoveryKeyShieldCheckSvg);
+export const Copy = createSvgIcon(CopyIcon);
+export const BoxArrowDown = createSvgIcon(BoxArrowDownIcon);
+export const Download = createSvgIcon(DownloadIcon);
+export const FloppyDisk = createSvgIcon(FloppyDiskIcon);
+export const Sliders = createSvgIcon(SlidersSvg);
+export const Funnel = createSvgIcon(FunnelSvg);
+export const NoteCalendar = createSvgIcon(NoteCalendarSvg);
+export const NotePin = createSvgIcon(NotePinSvg);
+export const NoteFavorite = createSvgIcon(NoteFavoriteSvg);
+export const NoteReadonly = createSvgIcon(NoteReadonlySvg);
+export const NoteLink = createSvgIcon(NoteLinkSvg);
+export const NoteBell = createSvgIcon(NoteBellSvg);
+export const NoteExpiry = createSvgIcon(NoteExpirySvg);
+export const SearchIcon = createSvgIcon(SearchSvg);
+export const ViewList = createSvgIcon(ViewListSvg);
+export const PencilSimple = createSvgIcon(PencilSimpleSvg);
+export const CaretRight = createSvgIcon(CaretRightSvg);
+export const LinkSimple = createSvgIcon(LinkSimpleSvg);
+export const LinkBreak = createSvgIcon(LinkBreakSvg);
+export const Question = createSvgIcon(QuestionSvg);
+export const ShieldCheck = createSvgIcon(ShieldCheckSvg);
+export const CalendarBlank = createSvgIcon(CalendarBlankSvg);
+export const Prohibit = createSvgIcon(ProhibitSvg);
+export const HandCoins = createSvgIcon(HandCoinsSvg);
+export const ArrowUp = createSvgIcon(ArrowUpSvg);
+export const Lightning = createSvgIcon(LightningSvg);
+export const ArrowLeft = createSvgIcon(ArrowLeftSvg);
+export const CheckCircleSuccess = createSvgIcon(CheckCircleSuccesSvg);
+export const Info = createSvgIcon(InfoSvg);
+export const Palette = createSvgIcon(PaletteSvg);
+export const Tabs = createSvgIcon(TabsSvg);
+export const Printer = createSvgIcon(PrinterSvg);
+export const CloudArrowUp = createSvgIcon(CloudArrowUpSvg);
+export const Upload = createSvgIcon(UploadSvg);
+export const LinkHorizontal = createSvgIcon(LinkHorizontalSvg);
+export const Duplicate = createSvgIcon(DuplicateSvg);
+export const CloudSlash = createSvgIcon(CloudSlashSvg);
+export const Hourglass = createSvgIcon(HourglassSvg);
+export const ArrowSquareOut = createSvgIcon(ArrowSquareOutSvg);
+export const ClockClockwise = createSvgIcon(ClockClockwiseSvg);
+export const Backspace = createSvgIcon(BackspaceSvg);
+export const FilePdf = createSvgIcon(FilePdfSvg);
+export const Markdown = createSvgIcon(MarkdownSvg);
+export const FileHtml = createSvgIcon(FileHtmlSvg);
+export const TextAa = createSvgIcon(TextAaSvg);
+export const SelectAll = createSvgIcon(SelectAllSvg);
+export const SortAscending = createSvgIcon(SortAscendingSvg);
+export const OrderAlphabeticalAscending = createSvgIcon(
+  OrderAlphabeticalAscendingSvg
+);
+export const OrderAlphabeticalDescending = createSvgIcon(
+  OrderAlphabeticalDescendingSvg
+);
+export const OrderNumericAscending = createSvgIcon(OrderNumericAscendingSvg);
+export const OrderNumericDescending = createSvgIcon(OrderNumericDescendingSvg);
+export const ArrowCounterClockwise = createSvgIcon(ArrowCounterClockwiseSvg);
+export const House = createSvgIcon(HouseSvg);
+export const Ellipse = createSvgIcon(EllipseSvg);
+export const ArrowsInCardinal = createSvgIcon(ArrowsInCardinalSvg);
+export const MoonStars = createSvgIcon(MoonStarsSvg);
+export const GearSix = createSvgIcon(GearSixSvg);
+export const SignOut = createSvgIcon(SignOutSvg);
+export const SignIn = createSvgIcon(SignInSvg);
+export const UserProfileIcon = createSvgIcon(UserSvg);
+export const List = createSvgIcon(ListSvg);
+export const CalendarDots = createSvgIcon(CalendarDotsSvg);
+export const Close = createSvgIcon(CloseSvg);
+export const CaretLeft = createSvgIcon(CaretLeftSvg);
+export const SquaresFour = createSvgIcon(SquaresFourSvg);
+export const Table = createSvgIcon(TableSvg);
+export const SpellCheck = createSvgIcon(SpellCheckSvg);
+export const Loading = createSvgIcon(CircleNotchSvg, true);
+export const Pro = createSvgIcon(CrownSvg);
+export const LeftPanelClose = createSvgIcon(LeftPanelCloseSvg);
+export const LeftPanelOpen = createSvgIcon(LeftPanelOpenSvg);
+export const Command = createSvgIcon(CommandSvg);
+export const PencilSimpleSlash = createSvgIcon(PencilSimpleSlashSvg);
+export const Minus = createSvgIcon(MinusSvg);
+export const CopySimple = createSvgIcon(CopySimpleSvg);
+export const PushPinSimple = createSvgIcon(PushPinSimpleSvg);
+export const Lock = createSvgIcon(LockSimple);
+export const LockOpen = createSvgIcon(LockOpenSvg);
+export const MagnifyingGlass = createSvgIcon(MagnifyingGlassSvg);
+export const DotsThree = createSvgIcon(DotsThreeSvg);
+export const CloudCheck = createSvgIcon(CloudCheckSvg);
+export const ScanDelete = createSvgIcon(ScanDeleteSvg);
+export const Checkbox = createSvgIcon(CheckboxSvg);
+export const CheckboxUnchecked = createSvgIcon(CheckboxUncheckedSvg);
+export const BellPlus = createSvgIcon(BellPlusSvg);
+export const BellSimpleSlash = createSvgIcon(BellSimpleSlashSvg);
+export const Vibrate = createSvgIcon(VibrateSvg);
+export const ArrowsClockwise = createSvgIcon(ArrowsClockwiseSvg);
+export const ArrowClockwise = createSvgIcon(ArrowClockwiseSvg);
+export const MagnifyingGlassMinus = createSvgIcon(MagnifyingGlassMinusSvg);
+export const CheckSquare = createSvgIcon(CheckSquareSvg);
+export const SidebarSimple = createSvgIcon(SidebarSimpleSvg);
+export const Eyeglasses = createSvgIcon(EyeglassesSvg);
+export const EditorMargins = createSvgIcon(EditorMarginsSvg);
+export const SyncError = createSvgIcon(SyncErrorSvg);
+export const CornersOut = createSvgIcon(CornersOutSvg);
+export const MobileLock = createSvgIcon(MobileLockSvg);
+export const CornersIn = createSvgIcon(CornersInSvg);
+export const CaretDownSvgIcon = createSvgIcon(CaretDownSvg);
+export const ArrowDownSvgIcon = createSvgIcon(ArrowDownSvg);
+export const EyeglassesEmpty = createSvgIcon(EyeglassesEmptySvg);
+export const Asterisk = createSvgIcon(AsteriskSvg);
+export const SyncDisabled = createSvgIcon(SyncDisabledSvg);
+export const WarningOctagon = createSvgIcon(WarningOctagonSvg);
+export const CheckboxRemove = createSvgIcon(CheckboxRemoveSvg);
+export const SunDim = createSvgIcon(SunDimSvg);
+export const ArrowUpRight = createSvgIcon(ArrowUpRightSvg);
+export const ArrowDownLeft = createSvgIcon(ArrowDownLeftSvg);
+export const PaperclipHorizontal = createSvgIcon(PaperclipHorizontalSvg);
+export const ArrowBendUpLeft = createSvgIcon(ArrowBendUpLeftSvg);
+export const ArrowBendUpRight = createSvgIcon(ArrowBendUpRightSvg);
+export const Keyboard = createSvgIcon(KeyboardSvg);
+export const Laptop = createSvgIcon(LaptopSvg);
+export const Gavel = createSvgIcon(GavelSvg);
+export const Keyhole = createSvgIcon(KeyholeSvg);
+export const Users = createSvgIcon(UsersSvg);
+export const CloudArrowDown = createSvgIcon(CloudArrowDownSvg);
+export const GlobeSimple = createSvgIcon(GlobeSimpleSvg);
+export const NotebookText = createSvgIcon(NotebookTextSvg);
+export const CalendarDot = createSvgIcon(CalendarDotSvg);
+export const PictureInPicture = createSvgIcon(PictureInPictureSvg);
+export const Tray = createSvgIcon(TraySvg);
+export const XCircle = createSvgIcon(XCircleSvg);
+export const XSquare = createSvgIcon(XSquareSvg);
+export const Subtitles = createSvgIcon(SubtitlesSvg);
+export const Envelope = createSvgIcon(EnvelopeSvg);
+export const IdentificationBadge = createSvgIcon(IdentificationBadgeSvg);
+export const BracketsAngle = createSvgIcon(BracketsAngleSvg);
+export const RoadHorizon = createSvgIcon(RoadHorizonSvg);
+export const FileMagnifyingGlass = createSvgIcon(FileMagnifyingGlassSvg);
+export const DotsNine = createSvgIcon(DotsNineSvg);
+export const BugBeetle = createSvgIcon(BugBeetleSvg);
+export const Timer = createSvgIcon(TimerSvg);
+export const Broom = createSvgIcon(BroomSvg);
+export const MagicWand = createSvgIcon(MagicWandSvg);
+export const MagnifyingGlassPlus = createSvgIcon(MagnifyingGlassPlusSvg);
+export const Wallet = createSvgIcon(WalletSvg);
+export const CrownSimple = createSvgIcon(CrownSimpleLineSvg);
+export const Gift = createSvgIcon(GiftSvg);
+export const Pause = createSvgIcon(PauseSvg);
+export const ArrowsCounterClockwise = createSvgIcon(ArrowsCounterClockwiseSvg);
+export const Play = createSvgIcon(PlaySvg);
+export const Camera = createSvgIcon(CameraSvg);
+export const CaretUp = createSvgIcon(CaretUpSvg);
+export const Compass = createSvgIcon(CompassSvg);
+export const Sparkle = createSvgIcon(SparkleSvg);
+export const TrashSimple = createSvgIcon(TrashSimpleSvg);
+export const ChevronLeftSimple = createSvgIcon(ChevronLeftSimpleSvg);
+export const CloudOutline = createSvgIcon(CloudOutlineSvg);
+export const CaretDownOutline = createSvgIcon(CaretDownSvg);
+export const TrayArrowDown = createSvgIcon(TrayArrowDownSvg);
+export const EyeSlash = createSvgIcon(EyeSlashSvg);
+export const WifiSlash = createSvgIcon(WifiSlashSvg);
+export const CheckCircleSimple = createSvgIcon(CheckCircleSimpleSvg);
+export const Shield = createSvgIcon(ShieldSvg);
+export const Folder = createSvgIcon(FolderSvg);
+export const ExportOutline = createSvgIcon(ExportOutlineSvg);
+export const GithubLogo = createSvgIcon(GithubLogoSvg);
+export const TelegramLogo = createSvgIcon(TelegramLogoSvg);
+export const XLogo = createSvgIcon(XLogoSvg);
+export const DiscordLogo = createSvgIcon(DiscordLogoSvg);
+export const MastodonLogo = createSvgIcon(MastodonLogoSvg);
+export const HardDrives = createSvgIcon(HardDrivesSvg);
+export const Network = createSvgIcon(NetworkSvg);
+export const Path = createSvgIcon(PathSvg);
+export const ShieldPlus = createSvgIcon(ShieldPlusSvg);
+export const Numpad = createSvgIcon(NumpadSvg);
+export const WarningTriangle = createSvgIcon(WarningTriangleSvg);
+export const Wrench = createSvgIcon(WrenchSvg);
+export const TextAlignLeft = createSvgIcon(TextAlignLeftSvg);
+export const TextT = createSvgIcon(TextTSvg);
+export const ArrowsVertical = createSvgIcon(ArrowsVerticalSvg);
+export const DoubleSpacedLines = createSvgIcon(DoubleSpacedLinesSvg);
