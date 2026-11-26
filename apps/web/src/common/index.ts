@@ -24,6 +24,7 @@ import {
   areFeaturesAvailable,
   FeatureId,
   FeatureResult,
+  formatBytes,
   isFeatureAvailable,
   sanitizeFilename
 } from "@notesnook/common";
@@ -39,7 +40,7 @@ import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { ProgressReportCallback, TaskManager } from "./task-manager";
 import { EVENTS, parseInternalLink } from "@notesnook/core";
-import { createWritableStream } from "./desktop-bridge";
+import { createWritableStream, desktop } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
@@ -97,6 +98,18 @@ export async function introduceFeatures() {
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
+async function checkStorageSpace() {
+  try {
+    const free = await desktop?.backups.freeSpace.query();
+    if (free === undefined) return;
+    const size = (await db.attachments.totalSize()) || 0;
+    const required = size * 1.1 + 100 * 1024 * 1024;
+    return free < required ? required : undefined;
+  } catch {
+    // unknown free space should never block the backup
+  }
+}
+
 export async function createBackup(
   options: {
     rescueMode?: boolean;
@@ -136,33 +149,50 @@ export async function createBackup(
     title: strings.backingUpData(mode),
     subtitle: strings.backingUpDataWait(),
     action: async (report) => {
-      const { createZipStream } = await import("../utils/streams/zip-stream");
-      const writeStream = await createWritableStream(filePath);
-      const files = backupToZipFiles(
-        { encrypt: encryptedBackups, mode, background },
-        report
-      );
-      await new ReadableStream<ZipFile>(
-        {
-          async pull(controller) {
-            const { value, done } = await files.next();
-            if (done) controller.close();
-            else controller.enqueue(value);
+      try {
+        if (mode === "full") {
+          const required = await checkStorageSpace();
+          if (required !== undefined)
+            throw new Error(
+              `${strings.notEnoughStorageSpace()} ${strings.freeSpaceWarning(
+                formatBytes(required)
+              )}`
+            );
+        }
+        const { createZipStream } = await import("../utils/streams/zip-stream");
+        const writeStream = await createWritableStream(filePath);
+        const files = backupToZipFiles(
+          { encrypt: encryptedBackups, mode, background },
+          report
+        );
+        await new ReadableStream<ZipFile>(
+          {
+            async pull(controller) {
+              const { value, done } = await files.next();
+              if (done) controller.close();
+              else controller.enqueue(value);
+            },
+            async cancel() {
+              await files.return(undefined);
+            }
           },
-          async cancel() {
-            await files.return(undefined);
-          }
-        },
-        { highWaterMark: 0 }
-      )
-        .pipeThrough(createZipStream())
-        .pipeTo(writeStream);
+          { highWaterMark: 0 }
+        )
+          .pipeThrough(createZipStream())
+          .pipeTo(writeStream);
+      } catch (e) {
+        // status tasks don't catch errors so always return them
+        return e as Error;
+      }
     }
   });
   if (error) {
+    const message = (error as Error).message;
     showToast(
       "error",
-      `${strings.backupFailed()}: ${(error as Error).message}`
+      `${strings.backupFailed()}: ${
+        message?.includes("ENOSPC") ? strings.notEnoughStorageSpace() : message
+      }`
     );
     console.error(error);
   } else {
