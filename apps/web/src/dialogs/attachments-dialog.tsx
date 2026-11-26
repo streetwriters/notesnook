@@ -18,40 +18,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState, memo, useRef, startTransition } from "react";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Donut,
-  Flex,
-  Input,
-  Label,
-  Text
-} from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { store, useStore } from "../stores/attachment-store";
+import { useStore as useUserStore } from "../stores/user-store";
 import { formatBytes, usePromise, useResolvedItem } from "@notesnook/common";
 import Dialog from "../components/dialog";
 import {
+  ArrowDownSvgIcon,
+  ArrowUp,
+  CalendarBlank,
+  CaretDownOutline,
+  Checks,
   ChevronDown,
   ChevronUp,
-  ClearCache,
   Close,
-  DoubleCheckmark,
-  Download,
-  FileAudio,
-  FileDocument,
-  FileGeneral,
-  FileImage,
-  FileVideo,
+  FileDoc,
   Icon,
+  MusicNotes,
+  OrderAlphabeticalAscending,
+  OrderAlphabeticalDescending,
+  PaintBrushHousehold,
+  Picture,
+  Play,
+  SearchIcon,
   Trash,
-  Unlink,
-  Uploading
+  Upload,
+  Warning
 } from "../components/icons";
 import NavigationItem from "../components/navigation-menu/navigation-item";
 import { db } from "../common/db";
 import { Attachment } from "../components/attachment";
-import { ScopedThemeProvider } from "../components/theme-provider";
 import {
   Attachment as AttachmentType,
   VirtualizedGrouping
@@ -67,44 +63,143 @@ import { ConfirmDialog } from "./confirm";
 import { showToast } from "../utils/toast";
 import { Loader } from "../components/loader";
 import { strings } from "@notesnook/intl";
+import Field from "../components/field";
+import { Checkbox } from "../components/checkbox";
+import { Menu } from "../hooks/use-menu";
+import { MenuItem } from "@notesnook/ui";
 
 type ToolbarAction = {
   title: string;
   icon: Icon;
+  isDestructive?: boolean;
   onClick: ({ selected }: { selected: string[] }) => void;
 };
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   {
     title: strings.network.download(),
-    icon: Download,
+    icon: ArrowDownSvgIcon,
     onClick: async ({ selected }) => {
       await store.get().download(selected);
     }
   },
   {
     title: strings.fileCheck(),
-    icon: DoubleCheckmark,
+    icon: Checks,
     onClick: async ({ selected }) => await store.recheck(selected)
   },
   {
     title: strings.delete(),
     icon: Trash,
+    isDestructive: true,
     onClick: ({ selected }) => Multiselect.deleteAttachments(selected)
   }
 ];
 
 const COLUMNS = [
-  { id: "filename" as const, title: strings.name(), width: "65%" },
-  { id: "status" as const, width: "24px" },
-  { id: "size" as const, title: strings.size(), width: "15%" },
-  { id: "dateUploaded" as const, title: strings.dateUploaded(), width: "20%" }
+  { id: "filename" as const, title: strings.name() },
+  { id: "size" as const, title: strings.size(), width: "30.4%" },
+  { id: "dateUploaded" as const, title: strings.dateUploaded(), width: "30.4%" }
 ];
 
 type SortOptions = {
   id: "filename" | "size" | "dateUploaded";
   direction: "asc" | "desc";
 };
+
+const SORT_GROUPS: {
+  title: string;
+  items: (SortOptions & { title: string; icon: Icon })[];
+}[] = [
+  {
+    title: strings.name(),
+    items: [
+      {
+        id: "filename",
+        direction: "asc",
+        title: strings.aToZ(),
+        icon: OrderAlphabeticalAscending
+      },
+      {
+        id: "filename",
+        direction: "desc",
+        title: strings.zToA(),
+        icon: OrderAlphabeticalDescending
+      }
+    ]
+  },
+  {
+    title: strings.size(),
+    items: [
+      {
+        id: "size",
+        direction: "desc",
+        title: "Largest first",
+        icon: ArrowDownSvgIcon
+      },
+      {
+        id: "size",
+        direction: "asc",
+        title: "Smallest first",
+        icon: ArrowUp
+      }
+    ]
+  },
+  {
+    title: strings.dateUploaded(),
+    items: [
+      {
+        id: "dateUploaded",
+        direction: "asc",
+        title: strings.oldestFirst(),
+        icon: CalendarBlank
+      },
+      {
+        id: "dateUploaded",
+        direction: "desc",
+        title: strings.newestFirst(),
+        icon: CalendarBlank
+      }
+    ]
+  }
+];
+
+function getSortMenuItems(
+  sortBy: SortOptions,
+  onSort: (sortBy: SortOptions) => void
+): MenuItem[] {
+  return SORT_GROUPS.flatMap((group) => [
+    {
+      type: "popup",
+      key: `heading-${group.title}`,
+      component: () => (
+        <Text
+          sx={{
+            px: "spacing4",
+            py: "spacing1",
+            fontSize: "xxs",
+            fontWeight: 500,
+            color: "accent"
+          }}
+        >
+          {group.title}
+        </Text>
+      )
+    },
+    { type: "separator", key: `separator-${group.title}` },
+    ...group.items.map(
+      (item): MenuItem => ({
+        type: "button",
+        key: `${item.id}-${item.direction}`,
+        title: item.title,
+        iconComponent: item.icon,
+        isChecked: sortBy.id === item.id && sortBy.direction === item.direction,
+        onClick: () => onSort({ id: item.id, direction: item.direction })
+      })
+    )
+  ]);
+}
+
 type AttachmentsDialogProps = BaseDialogProps<false>;
 export const AttachmentsDialog = DialogManager.register(
   function AttachmentsDialog({ onClose }: AttachmentsDialogProps) {
@@ -126,6 +221,7 @@ export const AttachmentsDialog = DialogManager.register(
       direction: "asc"
     });
     const currentRoute = useRef<Route>("all");
+    const sortButtonRef = useRef<HTMLButtonElement>(null);
     const download = useStore((store) => store.download);
 
     useEffect(() => {
@@ -141,18 +237,125 @@ export const AttachmentsDialog = DialogManager.register(
       getCounts().then((counts) => startTransition(() => setCounts(counts)));
     }, [nonce]);
 
+    const isAllSelected =
+      !!attachments &&
+      attachments.length > 0 &&
+      selected.length === attachments.length;
+
+    const header = attachments ? (
+      <Box
+        as="tr"
+        sx={{
+          height: 29,
+          bg: "background-secondary",
+          th: { p: 0, fontWeight: "normal", textAlign: "left" },
+          "th:first-of-type": {
+            pl: "spacing3",
+            borderTopLeftRadius: "3px",
+            borderBottomLeftRadius: "3px"
+          },
+          "th:last-of-type": {
+            pr: "spacing3",
+            borderTopRightRadius: "3px",
+            borderBottomRightRadius: "3px"
+          }
+        }}
+      >
+        <Box as="th" sx={{ width: 32 }}>
+          <Flex sx={{ alignItems: "center" }}>
+            <Checkbox
+              checked={isAllSelected}
+              aria-label={strings.selectAll()}
+              size={15}
+              checkboxUncheckedIconColor="icon-disabled"
+              onToggle={async () => {
+                setSelected(
+                  !isAllSelected
+                    ? await filterAttachments(currentRoute.current).ids()
+                    : []
+                );
+              }}
+            />
+          </Flex>
+        </Box>
+        {COLUMNS.map((column) => (
+          <Box
+            as="th"
+            key={column.id}
+            sx={{
+              width: column.width,
+              cursor: "pointer",
+              ":hover": { bg: "hover" }
+            }}
+            onClick={() => {
+              setSortBy((sortBy) => ({
+                direction:
+                  sortBy.id === column.id && sortBy.direction === "asc"
+                    ? "desc"
+                    : "asc",
+                id: column.id
+              }));
+            }}
+          >
+            <Flex
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "spacing2",
+                pr: "spacing3",
+                ml: column.id === "filename" ? "-3px" : 0
+              }}
+            >
+              <Text
+                variant="body"
+                sx={{
+                  fontSize: "xs",
+                  color: "paragraph",
+                  fontWeight: 400,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis"
+                }}
+              >
+                {column.title}
+              </Text>
+              {sortBy.id === column.id ? (
+                sortBy.direction === "asc" ? (
+                  <ChevronUp size={16} />
+                ) : (
+                  <ChevronDown size={16} />
+                )
+              ) : null}
+            </Flex>
+          </Box>
+        ))}
+      </Box>
+    ) : null;
+
+    const tableStyle: React.CSSProperties = {
+      tableLayout: "fixed",
+      width: "100%",
+      borderCollapse: "collapse"
+    };
+
     return (
       <Dialog
         isOpen={true}
-        width={"70%"}
+        width={"min(1102px, 90vw)"}
+        height={"min(80vh, 760px)"}
         onClose={() => onClose(false)}
         noScroll
-        sx={{ bg: "transparent" }}
+        sx={{
+          boxShadow: "0px 5px 10px rgba(39, 39, 39, 0.17)",
+          "& > div:first-of-type": { display: "none" }
+        }}
       >
         <Flex
           sx={{
-            height: "80vw",
-            overflow: "hidden"
+            height: "min(80vh, 760px)",
+            overflow: "hidden",
+            p: "spacing6",
+            gap: "spacing4"
           }}
         >
           <Sidebar
@@ -180,154 +383,141 @@ export const AttachmentsDialog = DialogManager.register(
             }}
           />
           <Flex
-            variant="columnFill"
             sx={{
-              bg: "background",
+              flex: 1,
+              minWidth: 0,
               flexDirection: "column",
-              pl: 4,
-              pt: 2,
+              gap: "spacing6",
               overflow: "hidden"
             }}
           >
-            <FlexScrollContainer style={{ minHeight: 300 }}>
-              <Flex sx={{ justifyContent: "space-between" }}>
-                <Flex sx={{ gap: 1 }}>
-                  {TOOLBAR_ACTIONS.map((tool) => (
-                    <Button
-                      variant="secondary"
-                      key={tool.title}
-                      title={tool.title}
-                      onClick={() => {
-                        try {
-                          tool.onClick({
-                            selected
-                          });
-                        } catch (e) {
-                          showToast("error", (e as Error).message);
-                        }
-                      }}
-                      disabled={!selected.length}
-                      sx={{ bg: "transparent", p: 1 }}
-                    >
-                      <tool.icon size={18} />
-                    </Button>
-                  ))}
-                </Flex>
-                {/* <Button
-              variant="tool"
-              sx={{ p: 1, display: "flex" }}
-              onClick={async () => {
-                if (!(await insertAttachment())) return;
-                refresh();
+            <Flex
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "spacing4",
+                flexShrink: 0
               }}
             >
-              <Plus size={18} />
-              <Text variant="body" sx={{ ml: 1 }}>
-                Upload
-              </Text>
-            </Button> */}
+              <Flex sx={{ gap: "spacing4" }}>
+                {TOOLBAR_ACTIONS.map((tool) => (
+                  <Button
+                    variant="new_bordered"
+                    key={tool.title}
+                    title={tool.title}
+                    onClick={() => {
+                      try {
+                        tool.onClick({
+                          selected
+                        });
+                      } catch (e) {
+                        showToast("error", (e as Error).message);
+                      }
+                    }}
+                    disabled={!selected.length}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "spacing3",
+                      p: "spacing5",
+                      borderRadius: "radius2",
+                      fontFamily: "body",
+                      fontSize: "xs",
+                      fontWeight: 600,
+                      lineHeight: 1,
+                      whiteSpace: "nowrap",
+                      color: tool.isDestructive
+                        ? "paragraph-error"
+                        : "buttonForeground-secondary",
+                      ":disabled": { opacity: 0.4, cursor: "default" }
+                    }}
+                  >
+                    <tool.icon
+                      size={13}
+                      color={
+                        tool.isDestructive
+                          ? "paragraph-error"
+                          : "buttonForeground-secondary"
+                      }
+                    />
+                    {tool.title}
+                  </Button>
+                ))}
               </Flex>
-              {attachments ? (
-                <VirtualizedTable
-                  style={{
-                    tableLayout: "fixed",
-                    width: "100%",
-                    borderCollapse: "collapse"
+              <Button
+                ref={sortButtonRef}
+                variant="new_bordered"
+                data-test-id="attachments-sort-button"
+                onClick={() => {
+                  Menu.openMenu(getSortMenuItems(sortBy, setSortBy), {
+                    position: {
+                      target: sortButtonRef.current,
+                      isTargetAbsolute: true,
+                      location: "below",
+                      align: "end",
+                      yOffset: 5
+                    }
+                  });
+                }}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexShrink: 0,
+                  width: 123,
+                  height: 41,
+                  px: "spacing4",
+                  py: "spacing5",
+                  borderRadius: "radius2",
+                  fontFamily: "body",
+                  fontSize: "sm",
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  color: "buttonForeground-secondary"
+                }}
+              >
+                {strings.sortBy()}
+                <CaretDownOutline
+                  size={13}
+                  color="buttonForeground-secondary"
+                />
+              </Button>
+            </Flex>
+            {!attachments ? (
+              <Loader title={strings.loading() + "..."} />
+            ) : attachments.length === 0 ? (
+              <Flex sx={{ flex: 1, flexDirection: "column" }}>
+                <table style={tableStyle}>
+                  <thead>{header}</thead>
+                </table>
+                <Flex
+                  sx={{
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
-                  header={
-                    <Box
-                      as="tr"
-                      sx={{
-                        height: 40,
-                        th: { borderBottom: "1px solid var(--separator)" },
-                        bg: "background"
-                      }}
-                    >
-                      <Text
-                        as="th"
-                        variant="body"
-                        sx={{
-                          width: 24,
-                          textAlign: "left",
-                          fontWeight: "normal",
-                          mb: 2
-                        }}
-                      >
-                        <Label>
-                          <Checkbox
-                            sx={{
-                              width: 18,
-                              height: 18,
-                              color:
-                                selected.length === attachments.length
-                                  ? "accent"
-                                  : "icon"
-                            }}
-                            onChange={async (e) => {
-                              setSelected(
-                                e.currentTarget.checked
-                                  ? await filterAttachments(
-                                      currentRoute.current
-                                    ).ids()
-                                  : []
-                              );
-                            }}
-                            checked={selected.length === attachments.length}
-                          />
-                        </Label>
-                      </Text>
-                      {COLUMNS.map((column) =>
-                        !column.title ? (
-                          <th key={column.id} />
-                        ) : (
-                          <Box
-                            as="th"
-                            key={column.id}
-                            sx={{
-                              width: column.width,
-                              cursor: "pointer",
-                              px: 1,
-                              mb: 2,
-                              ":hover": { bg: "hover" }
-                            }}
-                            onClick={() => {
-                              setSortBy((sortBy) => ({
-                                direction:
-                                  sortBy.id === column.id &&
-                                  sortBy.direction === "asc"
-                                    ? "desc"
-                                    : "asc",
-                                id: column.id
-                              }));
-                            }}
-                          >
-                            <Flex
-                              sx={{
-                                alignItems: "center",
-                                justifyContent: "space-between"
-                              }}
-                            >
-                              <Text
-                                variant="body"
-                                sx={{ textAlign: "left", fontWeight: "normal" }}
-                              >
-                                {column.title}
-                              </Text>
-                              {sortBy.id === column.id ? (
-                                sortBy.direction === "asc" ? (
-                                  <ChevronUp size={16} />
-                                ) : (
-                                  <ChevronDown size={16} />
-                                )
-                              ) : null}
-                            </Flex>
-                          </Box>
-                        )
-                      )}
-                    </Box>
-                  }
+                >
+                  <Text
+                    variant="body"
+                    sx={{
+                      width: 208,
+                      fontSize: "sm",
+                      lineHeight: 1.2,
+                      color: "paragraph",
+                      textAlign: "center"
+                    }}
+                  >
+                    No attachments yet. Upload a file to get started.
+                  </Text>
+                </Flex>
+              </Flex>
+            ) : (
+              <FlexScrollContainer style={{ flex: 1, minHeight: 0 }}>
+                <VirtualizedTable
+                  style={tableStyle}
+                  header={header}
                   mode="fixed"
-                  estimatedSize={30}
+                  estimatedSize={29}
                   getItemKey={(index) => attachments.key(index)}
                   items={attachments.placeholders}
                   context={{
@@ -345,10 +535,8 @@ export const AttachmentsDialog = DialogManager.register(
                   }}
                   renderRow={AttachmentRow}
                 />
-              ) : (
-                <Loader title={strings.loading() + "..."} />
-              )}
-            </FlexScrollContainer>
+              </FlexScrollContainer>
+            )}
           </Flex>
         </Flex>
       </Dialog>
@@ -396,40 +584,95 @@ type Route =
 const routes: { id: Route; icon: Icon; title: string }[] = [
   {
     id: "all",
-    icon: FileGeneral,
+    icon: FileDoc,
     title: strings.mediaTypes.all()
   },
   {
     id: "images",
-    icon: FileImage,
+    icon: Picture,
     title: strings.mediaTypes.image()
   },
   {
     id: "documents",
-    icon: FileDocument,
+    icon: FileDoc,
     title: strings.mediaTypes.document()
   },
   {
     id: "videos",
-    icon: FileVideo,
+    icon: Play,
     title: strings.mediaTypes.video()
   },
   {
     id: "audio",
-    icon: FileAudio,
+    icon: MusicNotes,
     title: strings.mediaTypes.audio()
   },
   {
     id: "uploads",
-    icon: Uploading,
+    icon: Upload,
     title: strings.uploads()
   },
   {
     id: "orphaned",
-    icon: Unlink,
+    icon: Warning,
     title: strings.orphaned()
   }
 ];
+
+const sidebarActionStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "spacing3",
+  width: "100%",
+  px: "spacing3",
+  py: "spacing4",
+  borderRadius: "radius1",
+  bg: "transparent",
+  fontFamily: "body",
+  fontSize: "xs",
+  fontWeight: 500,
+  lineHeight: 1,
+  color: "buttonForeground-secondary",
+  textAlign: "left"
+} as const;
+
+const PROGRESS_RADIUS = 7;
+const PROGRESS_CIRCUMFERENCE = 2 * Math.PI * PROGRESS_RADIUS;
+function ProgressCircle({ progress }: { progress: number }) {
+  const value = Math.min(1, Math.max(0, progress || 0));
+  return (
+    <svg
+      width={16}
+      height={16}
+      viewBox="0 0 16 16"
+      style={{ flexShrink: 0 }}
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(value * 100)}
+    >
+      <circle
+        cx="8"
+        cy="8"
+        r={PROGRESS_RADIUS}
+        fill="none"
+        strokeWidth="2"
+        stroke="var(--background-tertiary)"
+      />
+      <circle
+        cx="8"
+        cy="8"
+        r={PROGRESS_RADIUS}
+        fill="none"
+        strokeWidth="2"
+        stroke="var(--accent)"
+        strokeDasharray={PROGRESS_CIRCUMFERENCE}
+        strokeDashoffset={PROGRESS_CIRCUMFERENCE * (1 - value)}
+        transform="rotate(-90 8 8)"
+      />
+    </svg>
+  );
+}
 
 type SidebarProps = {
   onDownloadAll: () => void;
@@ -443,127 +686,212 @@ const Sidebar = memo(
     const [route, setRoute] = useState("all");
     const downloadStatus = useStore((store) => store.status);
     const cancelDownload = useStore((store) => store.cancel);
+    const user = useUserStore((store) => store.user);
     const result = usePromise(() => db.attachments.totalSize());
 
+    const storagePercent =
+      user?.totalStorage && user.totalStorage > 0
+        ? Math.min(100, ((user.storageUsed || 0) / user.totalStorage) * 100)
+        : 0;
+
     return (
-      <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
-        <Flex
-          className="theme-scope-navigationMenu"
-          sx={{
-            flexShrink: 0,
-            flexDirection: "column",
-            justifyContent: "space-between",
-            width: 240,
-            backgroundColor: "background"
-          }}
-        >
-          <Flex sx={{ flexDirection: "column", gap: "small", mx: 2, mt: 2 }}>
-            <Input
-              id="search"
-              name="search"
-              placeholder={strings.search()}
-              sx={{ mb: 2, width: "auto", bg: "background", py: "7px" }}
-              onChange={(e) => {
-                setRoute(e.target.value ? "none" : "all");
-                if (e.target.value) filter(e.target.value);
-              }}
-            />
+      <Flex
+        sx={{
+          flexShrink: 0,
+          flexDirection: "column",
+          justifyContent: "space-between",
+          gap: "spacing13",
+          width: 220,
+          pr: "spacing4",
+          borderRight: "1px solid var(--border-secondary)",
+          overflowY: "auto"
+        }}
+      >
+        <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+          <Field
+            id="search"
+            name="search"
+            type="text"
+            variant="clean"
+            autoFocus
+            leftIcon={SearchIcon}
+            placeholder={strings.search()}
+            sx={{ gap: 0, m: 0, width: "100%", height: "40px" }}
+            styles={{
+              input: {
+                m: 0,
+                p: "spacing4",
+                pl: "spacing10",
+                fontSize: "xs",
+                color: "paragraph",
+                bg: "background-secondary",
+                borderRadius: "radius2",
+                ":focus": {
+                  outline: "1px solid var(--accent)",
+                  outlineOffset: "-1px"
+                },
+                "::placeholder": {
+                  color: "paragraph-secondary",
+                  textAlign: "start"
+                }
+              }
+            }}
+            onChange={(e) => {
+              setRoute(e.target.value ? "none" : "all");
+              if (e.target.value) filter(e.target.value);
+            }}
+          />
+          <Flex sx={{ flexDirection: "column" }}>
             {routes.map((item) => (
               <NavigationItem
                 key={item.id}
                 icon={item.icon}
+                iconSize={15}
                 title={item.title}
                 onClick={() => {
                   onRouteChange(item.id);
                   setRoute(item.id);
                 }}
                 selected={route === item.id}
+                sx={{ px: "spacing3" }}
               >
-                <Text variant="subBody">{counts[item.id]}</Text>
+                <Text
+                  sx={{
+                    fontSize: "3xs",
+                    lineHeight: 1,
+                    color:
+                      route === item.id ? "paragraph" : "paragraph-secondary"
+                  }}
+                >
+                  {counts[item.id]}
+                </Text>
               </NavigationItem>
             ))}
           </Flex>
-          <Flex sx={{ flexDirection: "column" }}>
-            <Flex sx={{ pl: 2, m: 2, mt: 1, justifyContent: "space-between" }}>
-              <Flex sx={{ flexDirection: "column" }}>
-                <Text variant="body">{strings.files(counts.all)}</Text>
-                {result.status === "fulfilled" && (
-                  <Text variant="subBody">
-                    {formatBytes(result.value || 0)}
-                  </Text>
-                )}
-              </Flex>
-              <Flex>
-                <Button
-                  variant="secondary"
-                  sx={{
-                    bg: "transparent",
-                    borderRadius: 100,
-                    position: "relative",
-                    width: 38,
-                    height: 38
-                  }}
-                  disabled={!!downloadStatus}
-                  title={strings.clearCache()}
-                  onClick={async () => {
-                    if (
-                      await ConfirmDialog.show({
-                        title: strings.clearCacheConfirm(),
-                        subtitle: strings.clearCacheConfirmDesc(),
-                        negativeButtonText: strings.no(),
-                        positiveButtonText: strings.yes()
-                      })
-                    ) {
-                      await db.fs().clear();
-                      showToast("success", strings.cacheCleared());
-                    }
-                  }}
-                >
-                  <ClearCache />
-                </Button>
-                <Button
-                  variant="secondary"
-                  sx={{
-                    bg: "transparent",
-                    borderRadius: 100,
-                    position: "relative",
-                    width: 38,
-                    height: 38
-                  }}
-                  title={strings.downloadAllAttachments()}
-                  onClick={async () => {
-                    if (downloadStatus) {
-                      await cancelDownload();
-                    } else {
-                      onDownloadAll();
-                    }
-                  }}
-                >
-                  {downloadStatus ? (
-                    <Close size={18} />
-                  ) : (
-                    <Download size={18} />
-                  )}
-                  {downloadStatus ? (
-                    <Donut
-                      value={
-                        (downloadStatus.current / downloadStatus.total) * 100
-                      }
-                      max={100}
-                      size={38}
-                      sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0
-                      }}
-                    />
-                  ) : null}
-                </Button>
-              </Flex>
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+          <Button
+            variant="secondary"
+            disabled={!!downloadStatus}
+            title={strings.clearCache()}
+            sx={{
+              ...sidebarActionStyle,
+              ":hover:not(:disabled)": { bg: "hover" },
+              ":disabled": {
+                opacity: 0.4,
+                bg: "transparent",
+                cursor: "default"
+              }
+            }}
+            onClick={async () => {
+              if (
+                await ConfirmDialog.show({
+                  title: strings.clearCacheConfirm(),
+                  subtitle: strings.clearCacheConfirmDesc(),
+                  negativeButtonText: strings.no(),
+                  positiveButtonText: strings.yes()
+                })
+              ) {
+                await db.fs().clear();
+                showToast("success", strings.cacheCleared());
+              }
+            }}
+          >
+            <PaintBrushHousehold size={15} color="buttonForeground-secondary" />
+            {strings.clearCache()}
+          </Button>
+          {downloadStatus ? (
+            <Flex sx={{ ...sidebarActionStyle, py: 0, height: 35 }}>
+              <ProgressCircle
+                progress={downloadStatus.current / downloadStatus.total}
+              />
+              <Text
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: "xs",
+                  fontWeight: 500,
+                  lineHeight: 1,
+                  color: "buttonForeground-secondary"
+                }}
+              >
+                {strings.network.downloading()}…
+              </Text>
+              <Button
+                variant="secondary"
+                title={strings.network.cancelDownload()}
+                onClick={() => cancelDownload()}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  width: 20,
+                  height: 20,
+                  p: 0,
+                  bg: "hover",
+                  borderRadius: "3px"
+                }}
+              >
+                <Close size={15} color="buttonForeground-secondary" />
+              </Button>
             </Flex>
+          ) : (
+            <Button
+              variant="secondary"
+              title={strings.downloadAllAttachments()}
+              sx={{
+                ...sidebarActionStyle,
+                ":hover:not(:disabled)": { bg: "hover" }
+              }}
+              onClick={() => onDownloadAll()}
+            >
+              <ArrowDownSvgIcon size={15} color="buttonForeground-secondary" />
+              {strings.downloadAllAttachments()}
+            </Button>
+          )}
+          <Box sx={{ height: "1px", bg: "separator" }} />
+          <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+            <Flex
+              sx={{ alignItems: "center", justifyContent: "space-between" }}
+            >
+              <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
+                {strings.files(counts.all)}
+              </Text>
+              {result.status === "fulfilled" && (
+                <Text
+                  sx={{
+                    fontSize: "3xs",
+                    lineHeight: 1,
+                    color: "paragraph-secondary"
+                  }}
+                >
+                  {formatBytes(result.value || 0)}
+                </Text>
+              )}
+            </Flex>
+            {user?.totalStorage ? (
+              <Box
+                sx={{
+                  height: 6,
+                  borderRadius: "50px",
+                  bg: "background-secondary",
+                  overflow: "hidden"
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${storagePercent}%`,
+                    height: "100%",
+                    borderRadius: "50px",
+                    bg: "accent"
+                  }}
+                />
+              </Box>
+            ) : null}
           </Flex>
         </Flex>
-      </ScopedThemeProvider>
+      </Flex>
     );
   },
   (prev, next) =>
