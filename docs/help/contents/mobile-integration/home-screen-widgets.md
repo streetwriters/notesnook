@@ -73,7 +73,7 @@ The widget keeps up to 30 notes per source. Locked notes show `Note locked` inst
 1. Long press the home screen and open the widget picker.
 2. Drag the Notesnook Notes widget onto the home screen.
 3. A list of sources opens. Search or scroll, then tap the source you want.
-4. Scroll the widget to browse the notes, and tap a note to open it in the app.
+4. Scroll the widget to browse the notes, and tap a note to open it in the app. See [create and open from the Notes widget](#create-and-open-from-the-notes-widget) for the `+` and open buttons.
 
 The title of the widget is the name of the source. Each widget has its own source, so you can add several Notes widgets, one for a notebook and another for `{{pinned}}`, for example.
 
@@ -98,9 +98,16 @@ The Notes widget needs iOS 17 or later.
 
 ![The large Notes widget on an iOS home screen showing seven recent notes and page arrows](/static/mobile-integration/ios-notes-widget-large.png)
 
-On the medium and large widgets, tap `+` in the header to start a new note. When the widget shows a notebook, tag or color, the note is created inside it. For `Recent`, `Pinned` and `Favorites` it is a regular new note. For a notebook, tag or color, an open icon next to `+` takes you to that notebook, tag or color in the app. When a source has more notes than fit, arrows with a page count such as `1/3` appear in the header. Tap them to move between pages. The small widget shows only the first note of the source.
+On the medium and large widgets, when a source has more notes than fit, arrows with a page count such as `1/3` appear in the header. Tap them to move between pages. The small widget shows only the first note of the source.
 
 :::
+
+### Create and open from the Notes widget
+
+The header of the Notes widget has a `+` button, and an open icon next to it when the widget shows a notebook, tag or color. On iOS these are on the medium and large widgets.
+
+- Tap `+` to start a new note. When the widget shows a notebook, tag or color, the note is created inside it. For `{{recent}}`, `{{pinned}}` and Favorites it is a regular new note.
+- Tap the open icon to go to that notebook, tag or color in the app.
 
 ### Choose different sources on iOS
 
