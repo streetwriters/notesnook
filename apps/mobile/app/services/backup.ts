@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { sanitizeFilename } from "@notesnook/common";
+import { formatBytes, sanitizeFilename } from "@notesnook/common";
 import { formatDate } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
+import DeviceInfo from "react-native-device-info";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
@@ -40,6 +41,7 @@ import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
 import { getCachePathForFile } from "../common/filesystem/io";
+import { NotesnookModule } from "../utils/notesnook-module";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -176,6 +178,67 @@ function getNextBackupTime(
   return Math.max(Date.now(), lastBackupDate + interval);
 }
 
+async function getFreeSpace(): Promise<number | undefined> {
+  try {
+    const free = await DeviceInfo.getFreeDiskStorage(
+      Platform.OS === "ios" ? "important" : undefined
+    );
+    return Number.isFinite(free) && free > 0 ? free : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function isOutOfSpaceError(e: unknown) {
+  // react-native-scoped-storage rejects with a plain string instead of an Error
+  const message = typeof e === "string" ? e : (e as Error)?.message;
+  return /ENOSPC|no space left|enough space/i.test(message || "");
+}
+
+const MARGIN = 100 * 1024 * 1024;
+const withMargin = (bytes: number) => bytes * 1.1 + MARGIN;
+
+/**
+ * For full backups, checks that there is enough space and returns the
+ * required space of the location that is short, or undefined if there is
+ * enough (or unknown) space. Attachments are copied 2x on iOS (backup_temp +
+ * zip). On Android they are copied 2x internally (backup_temp + zip in cache)
+ * and 1x more into the selected folder, which is either the same volume (3x
+ * internal) or another one such as an SD card (1x on that volume).
+ * Never throws. Unknown values never block the backup.
+ */
+async function checkStorageSpace(
+  backupType: "full" | "partial",
+  targetUri?: string
+): Promise<number | undefined> {
+  if (backupType !== "full") return;
+  try {
+    let free: number | undefined;
+    let targetFree: number | undefined;
+    if (Platform.OS === "android" && targetUri) {
+      const info = await NotesnookModule.getBackupStorageInfo(targetUri);
+      if (info.internalFree > 0) {
+        free = info.internalFree;
+        if (info.targetFree > 0 && !info.sameVolume)
+          targetFree = info.targetFree;
+      }
+    }
+    free = free ?? (await getFreeSpace());
+
+    const attachmentsSize = (await db.attachments.totalSize()) || 0;
+    const split = Platform.OS === "ios" || targetFree !== undefined;
+    const required = withMargin(attachmentsSize * (split ? 2 : 3));
+    if (free !== undefined && free < required) return required;
+
+    if (targetFree !== undefined) {
+      const requiredTarget = withMargin(attachmentsSize);
+      if (targetFree < requiredTarget) return requiredTarget;
+    }
+  } catch (e) {
+    DatabaseLogger.error(e, "Backup: failed to check storage space");
+  }
+}
+
 let backupRunning = false;
 /**
  * @param {boolean=} progress
@@ -213,6 +276,21 @@ async function run(
       error: new Error(strings.backupDirectoryNotSelected()),
       report: false
     };
+
+  const shortRequired = await checkStorageSpace(
+    backupType,
+    androidBackupDirectory?.uri
+  );
+  if (shortRequired !== undefined) {
+    backupRunning = false;
+    const error = new Error(
+      `${strings.notEnoughStorageSpace()} ${strings.freeSpaceWarning(
+        formatBytes(shortRequired)
+      )}`
+    );
+    ToastManager.error(error, strings.backupFailed(), context || "global");
+    return { error, report: false };
+  }
 
   let path;
 
@@ -281,9 +359,12 @@ async function run(
               await getCachePathForFile(file.hash),
               `${attachmentsDir}/${file.hash}`
             )
-            .catch((e) =>
-              DatabaseLogger.error(e, "Error saving attachment to backup file")
-            );
+            .catch((e) => {
+              // stop the backup if the disk is full, there is no point in
+              // continuing.
+              if (isOutOfSpaceError(e)) throw e;
+              DatabaseLogger.error(e, "Error saving attachment to backup file");
+            });
         }
       }
     }
@@ -350,7 +431,11 @@ async function run(
     };
   } catch (e) {
     backupRunning = false;
-    ToastManager.error(e as Error, strings.backupFailed(), context || "global");
+    const outOfSpace = isOutOfSpaceError(e);
+    const error = outOfSpace
+      ? new Error(strings.notEnoughStorageSpace())
+      : (e as Error);
+    ToastManager.error(error, strings.backupFailed(), context || "global");
 
     if (
       (e as Error)?.message?.includes("android.net.Uri") &&
@@ -367,8 +452,8 @@ async function run(
       endProgress();
     }
     return {
-      error: e as Error,
-      report: true
+      error,
+      report: !outOfSpace
     };
   }
 }

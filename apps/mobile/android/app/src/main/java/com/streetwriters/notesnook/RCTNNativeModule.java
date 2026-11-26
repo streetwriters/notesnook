@@ -13,8 +13,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Icon;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.WindowManager;
@@ -30,6 +36,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.streetwriters.notesnook.datatypes.Note;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -438,6 +445,57 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
 
         return Icon.createWithBitmap(bitmap);
+    }
+
+    /**
+     * Free space (bytes) of the app's internal storage and of the volume behind a
+     * SAF tree uri. Unknown values are -1. Never rejects.
+     */
+    @ReactMethod
+    public void getBackupStorageInfo(final String treeUri, Promise promise) {
+        WritableMap result = Arguments.createMap();
+        double internalFree = -1;
+        double targetFree = -1;
+        boolean sameVolume = false;
+
+        try {
+            internalFree = new StatFs(getReactApplicationContext().getFilesDir().getPath()).getAvailableBytes();
+        } catch (Exception e) {
+            // unknown
+        }
+
+        try {
+            Uri uri = Uri.parse(treeUri);
+            if ("com.android.externalstorage.documents".equals(uri.getAuthority())) {
+                String docId = DocumentsContract.getTreeDocumentId(uri);
+                String volumeId = docId.split(":", 2)[0];
+                if ("primary".equalsIgnoreCase(volumeId)) {
+                    sameVolume = true;
+                    targetFree = new StatFs(Environment.getExternalStorageDirectory().getPath()).getAvailableBytes();
+                } else {
+                    StorageManager manager = (StorageManager) getReactApplicationContext().getSystemService(Context.STORAGE_SERVICE);
+                    for (StorageVolume volume : manager.getStorageVolumes()) {
+                        String uuid = volume.getUuid();
+                        if (uuid == null || !uuid.equalsIgnoreCase(volumeId)) continue;
+                        File dir = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                                ? volume.getDirectory()
+                                : new File("/storage/" + volumeId);
+                        if (dir != null) {
+                            targetFree = new StatFs(dir.getPath()).getAvailableBytes();
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            targetFree = -1;
+            sameVolume = false;
+        }
+
+        result.putDouble("internalFree", internalFree);
+        result.putDouble("targetFree", targetFree);
+        result.putBoolean("sameVolume", sameVolume);
+        promise.resolve(result);
     }
 
     private int getColorForLetter(String letter) {
