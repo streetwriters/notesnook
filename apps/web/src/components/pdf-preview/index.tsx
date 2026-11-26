@@ -23,7 +23,7 @@ import { ToolbarSlot, toolbarPlugin } from "@react-pdf-viewer/toolbar";
 import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { RenderSearchProps, searchPlugin } from "@react-pdf-viewer/search";
 import "@react-pdf-viewer/search/lib/styles/index.css";
-import React, { PropsWithChildren, useRef, useState } from "react";
+import React, { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { ThemeUIStyleObject } from "@theme-ui/core";
 import {
   ArrowDownSvgIcon,
@@ -505,17 +505,19 @@ function SearchPopover(props: SearchPopoverProps) {
   const [isQuerying, setIsQuerying] = useState(false);
   const [searchDone, setSearchDone] = useState(false);
 
+  useEffect(() => () => clearKeyword(), []);
+
   function performSearch() {
     setIsQuerying(true);
-    search().then(() => {
-      setIsQuerying(false);
-      setSearchDone(true);
-    });
+    search()
+      .then(() => setSearchDone(true))
+      .catch(console.error)
+      .finally(() => setIsQuerying(false));
   }
 
-  function close() {
-    onClose();
-    clearKeyword();
+  function findNext() {
+    if (searchDone) jumpToNextMatch();
+    else performSearch();
   }
 
   return (
@@ -543,7 +545,7 @@ function SearchPopover(props: SearchPopoverProps) {
         if (e.key === "Escape") {
           e.preventDefault();
           e.stopPropagation();
-          close();
+          onClose();
         }
       }}
     >
@@ -570,9 +572,7 @@ function SearchPopover(props: SearchPopoverProps) {
               setKeyword(e.target.value);
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && keyword) {
-                searchDone ? jumpToNextMatch() : performSearch();
-              }
+              if (e.key === "Enter" && keyword) findNext();
             }}
             sx={{
               flex: 1,
@@ -648,15 +648,17 @@ function SearchPopover(props: SearchPopoverProps) {
             title={strings.nextMatch()}
             size={20}
             filled
-            disabled={currentMatch > numberOfMatches - 1}
-            onClick={jumpToNextMatch}
+            disabled={
+              !keyword || isQuerying || (searchDone && numberOfMatches === 0)
+            }
+            onClick={findNext}
           />
         </Flex>
         <ToolbarButton
           icon={Close}
           title={strings.close()}
           size={20}
-          onClick={close}
+          onClick={onClose}
         />
       </Flex>
     </ScopedThemeProvider>
