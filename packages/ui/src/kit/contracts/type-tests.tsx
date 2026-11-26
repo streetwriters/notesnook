@@ -327,8 +327,10 @@ export const webShaped = [
       size: 20,
       background: "background",
       borderStyle: "solid",
-      borderBottomWidth: 1,
+      borderTopWidth: 1,
       borderRightWidth: 1,
+      borderBottomWidth: 1,
+      borderLeftWidth: 1,
       outline: "none",
       visibility: "hidden"
     }}

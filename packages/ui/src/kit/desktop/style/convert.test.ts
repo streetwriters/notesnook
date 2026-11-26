@@ -66,18 +66,57 @@ describe("sx keys taken from apps/web", () => {
     expect(style.wordWrap).toBeUndefined();
   });
 
-  test("border side widths, style and textDecorationColor pass through", () => {
+  test("border side widths pass through, each side on its own", () => {
     expect(
       convertDeclarations({
-        borderBottomWidth: 1,
-        borderStyle: "dashed",
-        textDecorationColor: "red"
+        borderTopWidth: 1,
+        borderRightWidth: 2,
+        borderBottomWidth: 3,
+        borderLeftWidth: 4
       }).style
     ).toMatchObject({
-      borderBottomWidth: 1,
-      borderStyle: "dashed",
-      textDecorationColor: "red"
+      borderTopWidth: 1,
+      borderRightWidth: 2,
+      borderBottomWidth: 3,
+      borderLeftWidth: 4
     });
+  });
+
+  test("borderStyle passes through", () => {
+    expect(convertDeclarations({ borderStyle: "dashed" }).style).toMatchObject(
+      { borderStyle: "dashed" }
+    );
+  });
+
+  test("textDecorationColor passes through", () => {
+    expect(
+      convertDeclarations({ textDecorationColor: "red" }).style
+    ).toMatchObject({ textDecorationColor: "red" });
+  });
+
+  test("background is a colour; gradients and images are not drawn", () => {
+    expect(convertDeclarations({ background: "red" }).style).toMatchObject({
+      backgroundColor: "red"
+    });
+    expect(
+      convertDeclarations({ background: "linear-gradient(red, blue)" }).style
+        .backgroundColor
+    ).toBeUndefined();
+    expect(
+      convertDeclarations({ background: "url(a.png)" }).style.backgroundColor
+    ).toBeUndefined();
+  });
+
+  test("outline is none, or width, style and colour together", () => {
+    expect(convertDeclarations({ outline: "none" }).style).toMatchObject({
+      outlineWidth: 0
+    });
+    expect(
+      convertDeclarations({ outline: "2px solid var(--accent)" }).style
+    ).toMatchObject({ outlineWidth: 2, outlineColor: "accent" });
+    expect(
+      convertDeclarations({ outline: "2px solid" }).style.outlineWidth
+    ).toBeUndefined();
   });
 });
 
