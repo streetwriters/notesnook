@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { initTRPC } from "@trpc/server";
 import { createWriteStream, mkdirSync } from "node:fs";
+import { statfs } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { config } from "../utils/config";
@@ -44,6 +45,27 @@ function getStreamOrThrow(id: string, operation: "write" | "close") {
 }
 
 export const backupsRouter = t.router({
+  freeSpace: t.procedure.query(async () => {
+    try {
+      // the backup directory is created on the first backup so walk up to the
+      // nearest existing parent.
+      let dir = resolvePath(config.backupDirectory);
+      for (;;) {
+        try {
+          const stats = await statfs(dir);
+          return stats.bavail * stats.bsize;
+        } catch (e) {
+          const parent = path.dirname(dir);
+          if ((e as NodeJS.ErrnoException).code !== "ENOENT" || parent === dir)
+            throw e;
+          dir = parent;
+        }
+      }
+    } catch {
+      return undefined;
+    }
+  }),
+
   open: t.procedure
     .input(z.object({ filename: z.string() }))
     .mutation(({ input }) => {
