@@ -72,9 +72,7 @@ export const PLANNED_FIXES = {
   "*.ref>querySelector": RAW_DOM,
   "*.ref>appendChild": RAW_DOM,
   "*.ref>classList": RAW_DOM,
-  "*.ref>outerHTML": RAW_DOM,
-  "Image.maxHeight":
-    "theme-ui 0.16.1's Image has no maxHeight prop, so the 150px cap in apps/web's announcements/body.jsx never applies; delete it, or move it into sx if that changes what web draws (a decision for the user)"
+  "*.ref>outerHTML": RAW_DOM
 };
 
 const VIRTUOSO = { library: "react-virtuoso" };

@@ -141,9 +141,9 @@ function Image({ item }) {
   return (
     <RebassImage
       src={src}
-      maxHeight="150px"
       sx={{
         objectFit: "cover",
+        maxHeight: "150px",
         ...mapStyle(style)
       }}
     />

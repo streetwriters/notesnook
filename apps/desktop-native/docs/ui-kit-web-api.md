@@ -83,14 +83,14 @@ Three of the old props had a web name with a different shape, so they could not 
 - **DOM type names.** `apps/web` writes `useRef<HTMLDivElement>` and `React.MouseEvent<HTMLInputElement>`. Desktop is type-checked without the DOM library, so those names do not exist there. The desktop implementation has to supply them as aliases of the `UI*` types before shared files can use them unchanged.
 - **`sx` keys.** `apps/web` writes CSS in `sx` that the contract rejects (selectors, grid, animations and so on). They are listed in the last table. They do not fail the check: each one needs a decision when its file is aligned, either to draw it on desktop and add it, or to rewrite the call site.
 - **Shape is checked by name, not by type.** The check compares names only: props, the members a handler reads from its event, the members used on a ref, the keys of `components` and of `Modal`'s `style`, and named imports. It does not compare the type of a value `apps/web` passes with the type the contract declares. A `kept` row proves the name exists, not that the value fits. The value types are proved by type-checking `apps/web` against the kit (plan item 5.3).
-- **Planned fixes.** Seven items `apps/web` uses are not in the kit, so the check fails on them: five raw DOM methods read from refs (`closest`, `querySelector`, `appendChild`, `classList`, `outerHTML`) and `Image`'s `maxHeight`. The call sites are fixed when they are aligned. Deleting `maxHeight` or moving it into `sx` changes what web draws, so that choice is for the user.
+- **Planned fixes.** Five raw DOM methods that `apps/web` reads from refs (`closest`, `querySelector`, `appendChild`, `classList`, `outerHTML`) are not in the kit, so the check fails on them until their call sites are aligned. `Image`'s `maxHeight` is no longer one of them: web now sets it in `sx`, which the kit types as `SxProp.maxHeight`.
 - **What the scan cannot see.** It reads the source without type-checking it. It follows app components whose props type extends a library's (`FieldProps = InputProps & …`), but not props that travel only through a spread of an untyped object, and not components chosen at runtime.
 
 ## Generated table
 
 <!-- generated:start -->
 
-Scanned 339 files in `apps/web/src`: 464 items, 353 kept, 70 subset, 34 not supported (none of them used), 7 missing (7 with a planned fix). A missing item fails the check.
+Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supported (none of them used), 6 missing (6 with a planned fix). A missing item fails the check.
 
 ### theme-ui
 
@@ -236,7 +236,6 @@ Scanned 339 files in `apps/web/src`: 464 items, 353 kept, 70 subset, 34 not supp
 | Grid | `sx` | prop | 2 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
 | Image | `alt` | prop | 1 | kept |  |
 | Image | `draggable` | prop | 1 | kept |  |
-| Image | `maxHeight` | prop | 1 | MISSING | planned fix: theme-ui 0.16.1's Image has no maxHeight prop, so the 150px cap in apps/web's announcements/body.jsx never applies; delete it, or move it into sx if that changes what web draws (a decision for the user) |
 | Image | `onClick` | prop | 1 | kept |  |
 | Image | `onDoubleClick` | prop | 1 | kept |  |
 | Image | `onLoad` | prop | 1 | kept |  |
