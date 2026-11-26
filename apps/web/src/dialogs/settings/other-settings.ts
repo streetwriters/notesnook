@@ -47,25 +47,6 @@ import {
   BugBeetle
 } from "../../components/icons";
 
-async function checkForUpdateAndWait() {
-  await checkForUpdate();
-  if (useAutoUpdateStore.getState().status?.type !== "checking") return;
-  await new Promise<void>((resolve) => {
-    const timeout = setTimeout(done, 15000);
-    const unsubscribe = useAutoUpdateStore.subscribe(
-      (s) => s.status,
-      (status) => {
-        if (status?.type !== "checking") done();
-      }
-    );
-    function done() {
-      clearTimeout(timeout);
-      unsubscribe();
-      resolve();
-    }
-  });
-}
-
 export const AboutSettings: SettingsGroup[] = [
   {
     key: "about",
@@ -112,7 +93,7 @@ export const AboutSettings: SettingsGroup[] = [
                 }
               : {
                   type: "button",
-                  action: checkForUpdateAndWait,
+                  action: checkForUpdate,
                   title: strings.checkForUpdates(),
                   variant: "secondary"
                 }

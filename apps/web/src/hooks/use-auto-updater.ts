@@ -102,6 +102,10 @@ export function useAutoUpdater() {
       AppEvents.updateDownloadProgress,
       updateDownloadProgress
     );
+    const updateErrorEvent = AppEventManager.subscribe(
+      AppEvents.updateError,
+      () => changeStatus()
+    );
 
     const settingStoreUnsub = useSettingStore.subscribe(
       (s) => s.autoUpdates,
@@ -117,6 +121,7 @@ export function useAutoUpdater() {
       updateNotAvailableEvent.unsubscribe();
       updateCompletedEvent.unsubscribe();
       updateProgressEvent.unsubscribe();
+      updateErrorEvent.unsubscribe();
       settingStoreUnsub();
     };
   }, []);
