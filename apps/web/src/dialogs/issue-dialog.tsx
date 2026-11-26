@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Link, Text } from "@theme-ui/components";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
+import { useForm } from "react-hook-form";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
@@ -35,13 +36,34 @@ import { getSubscriptionInfo } from "./settings/components/user-profile";
 const REQUIRED_FIELD_ERROR = "Please fill out this field";
 
 type IssueDialogProps = BaseDialogProps<boolean>;
+type IssueFormValues = { title: string; body: string };
+
 export const IssueDialog = DialogManager.register(function IssueDialog(
   props: IssueDialogProps
 ) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string>();
-  const [titleError, setTitleError] = useState<string>();
-  const [bodyError, setBodyError] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting }
+  } = useForm<IssueFormValues>({ defaultValues: { title: "", body: "" } });
+
+  async function submitIssue(values: IssueFormValues) {
+    try {
+      const response = await Debug.report({
+        title: values.title,
+        body: BODY_TEMPLATE(values.body),
+        userId: userstore.get().user?.id
+      });
+      if (!response) throw new Error(strings.couldNotSubmitBugReport());
+      if ("error" in response) throw new Error(response.error);
+
+      props.onClose(true);
+      await showIssueReportedDialog(response);
+    } catch (e) {
+      if (e instanceof Error) setError("root", { message: e.message });
+    }
+  }
 
   return (
     <Dialog
@@ -62,40 +84,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
       <Flex
         id="issueForm"
         as="form"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          try {
-            setError(undefined);
-
-            const formData = new FormData(e.target as HTMLFormElement);
-            const requestData = Object.fromEntries(
-              formData.entries() as IterableIterator<[string, string]>
-            );
-
-            const isTitleEmpty = !requestData.title.trim();
-            const isBodyEmpty = !requestData.body.trim();
-            setTitleError(isTitleEmpty ? REQUIRED_FIELD_ERROR : undefined);
-            setBodyError(isBodyEmpty ? REQUIRED_FIELD_ERROR : undefined);
-            if (isTitleEmpty || isBodyEmpty) return;
-
-            setIsSubmitting(true);
-            requestData.body = BODY_TEMPLATE(requestData.body);
-            const response = await Debug.report({
-              title: requestData.title,
-              body: requestData.body,
-              userId: userstore.get().user?.id
-            });
-            if (!response) throw new Error(strings.couldNotSubmitBugReport());
-            if ("error" in response) throw new Error(response.error);
-
-            props.onClose(true);
-            await showIssueReportedDialog(response);
-          } catch (e) {
-            if (e instanceof Error) setError(e.message);
-          } finally {
-            setIsSubmitting(false);
-          }
-        }}
+        onSubmit={handleSubmit(submitIssue)}
         sx={{
           flexDirection: "column",
           gap: "spacing4",
@@ -106,21 +95,23 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
         <Field
           label={strings.title()}
           id="title"
-          name="title"
           placeholder={strings.issueTitlePlaceholder()}
           autoFocus
-          error={titleError}
-          onChange={() => setTitleError(undefined)}
+          error={errors.title?.message}
+          {...register("title", {
+            validate: (title) => !!title.trim() || REQUIRED_FIELD_ERROR
+          })}
         />
         <Field
           as="textarea"
           variant="forms.input"
           label={strings.description()}
           id="body"
-          name="body"
           placeholder={strings.issuePlaceholder()}
-          error={bodyError}
-          onChange={() => setBodyError(undefined)}
+          error={errors.body?.message}
+          {...register("body", {
+            validate: (body) => !!body.trim() || REQUIRED_FIELD_ERROR
+          })}
           styles={{
             input: {
               minHeight: 150
@@ -167,7 +158,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
               </Fragment>
             ))}
         </Text>
-        <ErrorText error={error} />
+        <ErrorText error={errors.root?.message} />
       </Flex>
     </Dialog>
   );
