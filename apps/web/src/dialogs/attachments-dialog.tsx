@@ -17,11 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState, memo, useRef, startTransition } from "react";
+import { useEffect, useState, useRef, startTransition } from "react";
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { store, useStore } from "../stores/attachment-store";
 import { useStore as useUserStore } from "../stores/user-store";
-import { formatBytes, usePromise, useResolvedItem } from "@notesnook/common";
+import {
+  formatBytes,
+  resolveItems,
+  usePromise,
+  useResolvedItem
+} from "@notesnook/common";
 import Dialog from "../components/dialog";
 import {
   ArrowDownSvgIcon,
@@ -101,6 +106,14 @@ const COLUMNS = [
   { id: "size" as const, title: strings.size(), width: "30.4%" },
   { id: "dateUploaded" as const, title: strings.dateUploaded(), width: "30.4%" }
 ];
+
+const TABLE_STYLE: React.CSSProperties = {
+  tableLayout: "fixed",
+  width: "100%",
+  borderCollapse: "collapse"
+};
+
+const SEARCH_DEBOUNCE_MS = 200;
 
 type SortOptions = {
   id: "filename" | "size" | "dateUploaded";
@@ -220,18 +233,40 @@ export const AttachmentsDialog = DialogManager.register(
       id: "filename",
       direction: "asc"
     });
-    const currentRoute = useRef<Route>("all");
+    const [route, setRoute] = useState<Route>("all");
+    const [search, setSearch] = useState("");
+    const [query, setQuery] = useState("");
     const sortButtonRef = useRef<HTMLButtonElement>(null);
     const download = useStore((store) => store.download);
 
     useEffect(() => {
-      filterAttachments(currentRoute.current)
-        .sorted({
-          sortBy: sortBy.id,
-          sortDirection: sortBy.direction
-        })
-        .then((value) => startTransition(() => setAttachments(value)));
-    }, [sortBy, nonce]);
+      const value = search.trim();
+      if (!value) {
+        setQuery("");
+        return;
+      }
+      const timeout = setTimeout(() => setQuery(value), SEARCH_DEBOUNCE_MS);
+      return () => clearTimeout(timeout);
+    }, [search]);
+
+    useEffect(() => {
+      let isStale = false;
+      const sortOptions = {
+        sortBy: sortBy.id,
+        sortDirection: sortBy.direction
+      };
+      (async () => {
+        const grouping = query
+          ? await db.lookup.attachments(query).sorted(sortOptions)
+          : await filterAttachments(route).sorted(sortOptions);
+        if (grouping.length > 0) await grouping.item(0, resolveItems);
+        if (isStale) return;
+        startTransition(() => setAttachments(grouping));
+      })();
+      return () => {
+        isStale = true;
+      };
+    }, [query, route, sortBy, nonce]);
 
     useEffect(() => {
       getCounts().then((counts) => startTransition(() => setCounts(counts)));
@@ -269,11 +304,7 @@ export const AttachmentsDialog = DialogManager.register(
               size={15}
               checkboxUncheckedIconColor="icon-disabled"
               onToggle={async () => {
-                setSelected(
-                  !isAllSelected
-                    ? await filterAttachments(currentRoute.current).ids()
-                    : []
-                );
+                setSelected(!isAllSelected ? await attachments.ids() : []);
               }}
             />
           </Flex>
@@ -332,12 +363,6 @@ export const AttachmentsDialog = DialogManager.register(
       </Box>
     ) : null;
 
-    const tableStyle: React.CSSProperties = {
-      tableLayout: "fixed",
-      width: "100%",
-      borderCollapse: "collapse"
-    };
-
     return (
       <Dialog
         isOpen={true}
@@ -367,19 +392,17 @@ export const AttachmentsDialog = DialogManager.register(
                 })
               )
             }
-            filter={async (query) => {
-              setAttachments(await db.lookup.attachments(query).sorted());
-            }}
-            counts={counts}
-            onRouteChange={async (route) => {
-              currentRoute.current = route;
+            search={search}
+            onSearchChange={(value) => {
+              setSearch(value);
               setSelected([]);
-              setAttachments(
-                await filterAttachments(currentRoute.current).sorted({
-                  sortBy: sortBy.id,
-                  sortDirection: sortBy.direction
-                })
-              );
+            }}
+            route={search.trim() ? undefined : route}
+            counts={counts}
+            onRouteChange={(route) => {
+              setRoute(route);
+              setSearch("");
+              setSelected([]);
             }}
           />
           <Flex
@@ -487,7 +510,7 @@ export const AttachmentsDialog = DialogManager.register(
               <Loader title={strings.loading() + "..."} />
             ) : attachments.length === 0 ? (
               <Flex sx={{ flex: 1, flexDirection: "column" }}>
-                <table style={tableStyle}>
+                <table style={TABLE_STYLE}>
                   <thead>{header}</thead>
                 </table>
                 <Flex
@@ -514,7 +537,7 @@ export const AttachmentsDialog = DialogManager.register(
             ) : (
               <FlexScrollContainer style={{ flex: 1, minHeight: 0 }}>
                 <VirtualizedTable
-                  style={tableStyle}
+                  style={TABLE_STYLE}
                   header={header}
                   mode="fixed"
                   estimatedSize={29}
@@ -559,7 +582,12 @@ function AttachmentRow(
     items: props.context!.attachments,
     type: "attachment"
   });
-  if (!item) return null;
+  if (!item?.item)
+    return (
+      <tr ref={props.rowRef} style={{ ...props.style, height: 29 }}>
+        <td colSpan={COLUMNS.length + 1} />
+      </tr>
+    );
   return (
     <Attachment
       key={item.item.id}
@@ -676,232 +704,223 @@ function ProgressCircle({ progress }: { progress: number }) {
 
 type SidebarProps = {
   onDownloadAll: () => void;
+  route?: Route;
   onRouteChange: (route: Route) => void;
-  filter: (query: string) => void;
+  search: string;
+  onSearchChange: (search: string) => void;
   counts: Record<Route, number>;
 };
-const Sidebar = memo(
-  function Sidebar(props: SidebarProps) {
-    const { onRouteChange, filter, counts, onDownloadAll } = props;
-    const [route, setRoute] = useState("all");
-    const downloadStatus = useStore((store) => store.status);
-    const cancelDownload = useStore((store) => store.cancel);
-    const user = useUserStore((store) => store.user);
-    const result = usePromise(() => db.attachments.totalSize());
+function Sidebar(props: SidebarProps) {
+  const {
+    route,
+    onRouteChange,
+    search,
+    onSearchChange,
+    counts,
+    onDownloadAll
+  } = props;
+  const downloadStatus = useStore((store) => store.status);
+  const cancelDownload = useStore((store) => store.cancel);
+  const user = useUserStore((store) => store.user);
+  const result = usePromise(() => db.attachments.totalSize());
 
-    const storagePercent =
-      user?.totalStorage && user.totalStorage > 0
-        ? Math.min(100, ((user.storageUsed || 0) / user.totalStorage) * 100)
-        : 0;
+  const storagePercent =
+    user?.totalStorage && user.totalStorage > 0
+      ? Math.min(100, ((user.storageUsed || 0) / user.totalStorage) * 100)
+      : 0;
 
-    return (
-      <Flex
-        sx={{
-          flexShrink: 0,
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: "spacing13",
-          width: 220,
-          pr: "spacing4",
-          borderRight: "1px solid var(--border-secondary)",
-          overflowY: "auto"
-        }}
-      >
-        <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
-          <Field
-            id="search"
-            name="search"
-            type="text"
-            variant="clean"
-            autoFocus
-            leftIcon={SearchIcon}
-            placeholder={strings.search()}
-            sx={{ gap: 0, m: 0, width: "100%", height: "40px" }}
-            styles={{
-              input: {
-                m: 0,
-                p: "spacing4",
-                pl: "spacing10",
-                fontSize: "xs",
-                color: "paragraph",
-                bg: "background-secondary",
-                borderRadius: "radius2",
-                ":focus": {
-                  outline: "1px solid var(--accent)",
-                  outlineOffset: "-1px"
-                },
-                "::placeholder": {
-                  color: "paragraph-secondary",
-                  textAlign: "start"
-                }
+  return (
+    <Flex
+      sx={{
+        flexShrink: 0,
+        flexDirection: "column",
+        justifyContent: "space-between",
+        gap: "spacing13",
+        width: 220,
+        pr: "spacing4",
+        borderRight: "1px solid var(--border-secondary)",
+        overflowY: "auto"
+      }}
+    >
+      <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+        <Field
+          id="search"
+          name="search"
+          type="text"
+          variant="clean"
+          autoFocus
+          leftIcon={SearchIcon}
+          placeholder={strings.search()}
+          sx={{ gap: 0, m: 0, width: "100%", height: "40px" }}
+          styles={{
+            input: {
+              m: 0,
+              p: "spacing4",
+              pl: "spacing10",
+              fontSize: "xs",
+              color: "paragraph",
+              bg: "background-secondary",
+              borderRadius: "radius2",
+              ":focus": {
+                outline: "1px solid var(--accent)",
+                outlineOffset: "-1px"
+              },
+              "::placeholder": {
+                color: "paragraph-secondary",
+                textAlign: "start"
               }
-            }}
-            onChange={(e) => {
-              setRoute(e.target.value ? "none" : "all");
-              if (e.target.value) filter(e.target.value);
-            }}
-          />
-          <Flex sx={{ flexDirection: "column" }}>
-            {routes.map((item) => (
-              <NavigationItem
-                key={item.id}
-                icon={item.icon}
-                iconSize={15}
-                title={item.title}
-                onClick={() => {
-                  onRouteChange(item.id);
-                  setRoute(item.id);
-                }}
-                selected={route === item.id}
-                sx={{ px: "spacing3" }}
-              >
-                <Text
-                  sx={{
-                    fontSize: "3xs",
-                    lineHeight: 1,
-                    color:
-                      route === item.id ? "paragraph" : "paragraph-secondary"
-                  }}
-                >
-                  {counts[item.id]}
-                </Text>
-              </NavigationItem>
-            ))}
-          </Flex>
-        </Flex>
-        <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
-          <Button
-            variant="secondary"
-            disabled={!!downloadStatus}
-            title={strings.clearCache()}
-            sx={{
-              ...sidebarActionStyle,
-              ":hover:not(:disabled)": { bg: "hover" },
-              ":disabled": {
-                opacity: 0.4,
-                bg: "transparent",
-                cursor: "default"
-              }
-            }}
-            onClick={async () => {
-              if (
-                await ConfirmDialog.show({
-                  title: strings.clearCacheConfirm(),
-                  subtitle: strings.clearCacheConfirmDesc(),
-                  negativeButtonText: strings.no(),
-                  positiveButtonText: strings.yes()
-                })
-              ) {
-                await db.fs().clear();
-                showToast("success", strings.cacheCleared());
-              }
-            }}
-          >
-            <PaintBrushHousehold size={15} color="buttonForeground-secondary" />
-            {strings.clearCache()}
-          </Button>
-          {downloadStatus ? (
-            <Flex sx={{ ...sidebarActionStyle, py: 0, height: 35 }}>
-              <ProgressCircle
-                progress={downloadStatus.current / downloadStatus.total}
-              />
+            }
+          }}
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+        <Flex sx={{ flexDirection: "column" }}>
+          {routes.map((item) => (
+            <NavigationItem
+              key={item.id}
+              icon={item.icon}
+              iconSize={15}
+              title={item.title}
+              onClick={() => onRouteChange(item.id)}
+              selected={route === item.id}
+              sx={{ px: "spacing3" }}
+            >
               <Text
                 sx={{
-                  flex: 1,
-                  minWidth: 0,
-                  fontSize: "xs",
-                  fontWeight: 500,
+                  fontSize: "3xs",
                   lineHeight: 1,
-                  color: "buttonForeground-secondary"
+                  color: route === item.id ? "paragraph" : "paragraph-secondary"
                 }}
               >
-                {strings.network.downloading()}…
+                {counts[item.id]}
               </Text>
-              <Button
-                variant="secondary"
-                title={strings.network.cancelDownload()}
-                onClick={() => cancelDownload()}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  width: 20,
-                  height: 20,
-                  p: 0,
-                  bg: "hover",
-                  borderRadius: "3px"
-                }}
-              >
-                <Close size={15} color="buttonForeground-secondary" />
-              </Button>
-            </Flex>
-          ) : (
-            <Button
-              variant="secondary"
-              title={strings.downloadAllAttachments()}
-              sx={{
-                ...sidebarActionStyle,
-                ":hover:not(:disabled)": { bg: "hover" }
-              }}
-              onClick={() => onDownloadAll()}
-            >
-              <ArrowDownSvgIcon size={15} color="buttonForeground-secondary" />
-              {strings.downloadAllAttachments()}
-            </Button>
-          )}
-          <Box sx={{ height: "1px", bg: "separator" }} />
-          <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
-            <Flex
-              sx={{ alignItems: "center", justifyContent: "space-between" }}
-            >
-              <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
-                {strings.files(counts.all)}
-              </Text>
-              {result.status === "fulfilled" && (
-                <Text
-                  sx={{
-                    fontSize: "3xs",
-                    lineHeight: 1,
-                    color: "paragraph-secondary"
-                  }}
-                >
-                  {formatBytes(result.value || 0)}
-                </Text>
-              )}
-            </Flex>
-            {user?.totalStorage ? (
-              <Box
-                sx={{
-                  height: 6,
-                  borderRadius: "50px",
-                  bg: "background-secondary",
-                  overflow: "hidden"
-                }}
-              >
-                <Box
-                  sx={{
-                    width: `${storagePercent}%`,
-                    height: "100%",
-                    borderRadius: "50px",
-                    bg: "accent"
-                  }}
-                />
-              </Box>
-            ) : null}
-          </Flex>
+            </NavigationItem>
+          ))}
         </Flex>
       </Flex>
-    );
-  },
-  (prev, next) =>
-    prev.counts.all === next.counts.all &&
-    prev.counts.documents === next.counts.documents &&
-    prev.counts.images === next.counts.images &&
-    prev.counts.videos === next.counts.videos &&
-    prev.counts.uploads === next.counts.uploads &&
-    prev.counts.orphaned === next.counts.orphaned
-);
+      <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+        <Button
+          variant="secondary"
+          disabled={!!downloadStatus}
+          title={strings.clearCache()}
+          sx={{
+            ...sidebarActionStyle,
+            ":hover:not(:disabled)": { bg: "hover" },
+            ":disabled": {
+              opacity: 0.4,
+              bg: "transparent",
+              cursor: "default"
+            }
+          }}
+          onClick={async () => {
+            if (
+              await ConfirmDialog.show({
+                title: strings.clearCacheConfirm(),
+                subtitle: strings.clearCacheConfirmDesc(),
+                negativeButtonText: strings.no(),
+                positiveButtonText: strings.yes()
+              })
+            ) {
+              await db.fs().clear();
+              showToast("success", strings.cacheCleared());
+            }
+          }}
+        >
+          <PaintBrushHousehold size={15} color="buttonForeground-secondary" />
+          {strings.clearCache()}
+        </Button>
+        {downloadStatus ? (
+          <Flex sx={{ ...sidebarActionStyle, py: 0, height: 35 }}>
+            <ProgressCircle
+              progress={downloadStatus.current / downloadStatus.total}
+            />
+            <Text
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: "xs",
+                fontWeight: 500,
+                lineHeight: 1,
+                color: "buttonForeground-secondary"
+              }}
+            >
+              {strings.network.downloading()}…
+            </Text>
+            <Button
+              variant="secondary"
+              title={strings.network.cancelDownload()}
+              onClick={() => cancelDownload()}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                width: 20,
+                height: 20,
+                p: 0,
+                bg: "hover",
+                borderRadius: "3px"
+              }}
+            >
+              <Close size={15} color="buttonForeground-secondary" />
+            </Button>
+          </Flex>
+        ) : (
+          <Button
+            variant="secondary"
+            title={strings.downloadAllAttachments()}
+            sx={{
+              ...sidebarActionStyle,
+              ":hover:not(:disabled)": { bg: "hover" }
+            }}
+            onClick={() => onDownloadAll()}
+          >
+            <ArrowDownSvgIcon size={15} color="buttonForeground-secondary" />
+            {strings.downloadAllAttachments()}
+          </Button>
+        )}
+        <Box sx={{ height: "1px", bg: "separator" }} />
+        <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+          <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
+            <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
+              {strings.files(counts.all)}
+            </Text>
+            {result.status === "fulfilled" && (
+              <Text
+                sx={{
+                  fontSize: "3xs",
+                  lineHeight: 1,
+                  color: "paragraph-secondary"
+                }}
+              >
+                {formatBytes(result.value || 0)}
+              </Text>
+            )}
+          </Flex>
+          {user?.totalStorage ? (
+            <Box
+              sx={{
+                height: 6,
+                borderRadius: "50px",
+                bg: "background-secondary",
+                overflow: "hidden"
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${storagePercent}%`,
+                  height: "100%",
+                  borderRadius: "50px",
+                  bg: "accent"
+                }}
+              />
+            </Box>
+          ) : null}
+        </Flex>
+      </Flex>
+    </Flex>
+  );
+}
 
 async function getCounts(): Promise<Record<Route, number>> {
   return {
