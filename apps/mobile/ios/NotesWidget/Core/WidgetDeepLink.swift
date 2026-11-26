@@ -26,12 +26,7 @@ enum WidgetLink {
   }
 
   private static func sourceURL(type: String, id: String, newNote: Bool) -> URL? {
-    var components = URLComponents()
-    components.scheme = "https"
-    components.host = "app.notesnook.com"
-    components.path = "/open_\(type)"
-    components.queryItems = [URLQueryItem(name: "id", value: id)] + (newNote ? [URLQueryItem(name: "new", value: "1")] : [])
-    return components.url
+    URL(string: "nn://\(type)/\(encode(id))\(newNote ? "?new=1" : "")")
   }
 
   private static func encode(_ value: String) -> String {
