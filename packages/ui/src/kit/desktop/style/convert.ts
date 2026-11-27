@@ -109,6 +109,16 @@ export function convertAnimation(
 }
 
 const PX = /^(-?\d+(?:\.\d+)?)px$/;
+const FLEX_ALIGN_KEYS = new Set([
+  "alignItems",
+  "alignSelf",
+  "alignContent",
+  "justifyContent"
+]);
+const LOGICAL: Record<string, Record<string, string>> = {
+  flex: { start: "flex-start", end: "flex-end" },
+  text: { start: "left", end: "right" }
+};
 const SIDE_BORDER = /^(?:borderTop|borderRight|borderBottom|borderLeft)$/;
 const SIDE_BORDER_VALUE =
   /^(\d+(?:\.\d+)?)px\s+(?:solid|dashed|dotted)(?:\s+(\S.*))?$/;
@@ -131,6 +141,10 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
   } else if (key === "border" && value === "none")
     result = [[`borderWidth`, 0]];
   else if (px) result = [[key, parseFloat(px[1])]];
+  else if (FLEX_ALIGN_KEYS.has(key) && LOGICAL.flex[value])
+    result = [[key, LOGICAL.flex[value]]];
+  else if (key === "textAlign" && LOGICAL.text[value])
+    result = [[key, LOGICAL.text[value]]];
   else if (SHORTHANDS.has(key) && /[\s]/.test(value)) {
     try {
       result = Object.entries(

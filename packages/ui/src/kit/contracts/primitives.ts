@@ -208,6 +208,10 @@ export interface ButtonProps extends BaseProps {
   variant?: keyof Theme["buttons"];
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  /** Focuses the button when it mounts. */
+  autoFocus?: boolean;
+  /** The `id` of the form (a `Box as="form"`) the button submits. */
+  form?: string;
   /** `false` keeps focus where it was when the button is pressed. */
   focusable?: boolean;
   children?: ReactNode;

@@ -147,6 +147,8 @@ function useControl(): ElementControl {
 }
 
 const FormContext = createContext<{ submit(): void } | undefined>(undefined);
+/** Forms with an `id`, for buttons outside them that name it in `form`. */
+const formsById = new Map<string, { submit(): void }>();
 
 interface LabelRegistry {
   register(control: ElementControl): () => void;
@@ -229,6 +231,14 @@ function Container(
         : undefined,
     [isForm, element]
   );
+  useEffect(() => {
+    if (!form || !props.id) return;
+    const id = props.id;
+    formsById.set(id, form);
+    return () => {
+      if (formsById.get(id) === form) formsById.delete(id);
+    };
+  }, [form, props.id]);
 
   // Text written straight into a box, as HTML allows, is drawn as text.
   const text = hasText(children)
@@ -376,11 +386,20 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
         justifyContent: "center"
       }
     });
-    const [setRef] = useElementRef(ref, { id: props.id });
+    const [setRef, element] = useElementRef(ref, { id: props.id });
     const mergedTextStyle = useMergedTextStyle(textStyle);
-    const form = useContext(FormContext);
-    // As in HTML, a button in a form submits it unless its type says otherwise.
+    const parentForm = useContext(FormContext);
+    // As in HTML, a button submits its form, or the form its `form` names,
+    // unless its type says otherwise.
+    const form = props.form
+      ? { submit: () => formsById.get(props.form!)?.submit() }
+      : parentForm;
     const submits = !!form && props.type !== "button" && props.type !== "reset";
+    useEffect(() => {
+      if (props.autoFocus) element.current?.focus();
+      // Only on mount, as the attribute does on the web.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const clicks = useRef({ last: 0 });
     const onPress = pressHandler(
       submits

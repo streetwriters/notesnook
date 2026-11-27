@@ -113,3 +113,20 @@ describe("alpha", () => {
     expect(resolveAlpha(sx, colors)).toBe(sx);
   });
 });
+
+describe("CSS variables", () => {
+  test("a theme colour written as var(--name) is its colour", () => {
+    expect(
+      resolveAlpha({ color: "var(--accent)", bg: "var(--background)" }, colors)
+    ).toEqual({ color: "#008837", bg: "#fff" });
+  });
+
+  test("nested state styles are resolved too, and unknown names are kept", () => {
+    expect(
+      resolveAlpha(
+        { ":hover": { bg: "var(--accent)" }, color: "var(--nope)" },
+        colors
+      )
+    ).toEqual({ ":hover": { bg: "#008837" }, color: "var(--nope)" });
+  });
+});

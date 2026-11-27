@@ -139,6 +139,19 @@ export const unknownCssVariable: SxProp = {
   color: "var(--not-a-theme-color)"
 };
 
+export const logicalAlignment: SxProp = {
+  alignItems: "start",
+  justifyContent: "end",
+  textAlign: "end"
+};
+
+export const viewportUnits: SxProp = {
+  height: ["auto", "auto", "80vw"],
+  maxHeight: "70vh",
+  borderRadius: "150px",
+  mx: "5%"
+};
+
 export const unknownToken: SxProp = {
   // @ts-expect-error not a theme colour
   bg: "not-a-theme-color"

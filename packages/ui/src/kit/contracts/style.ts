@@ -40,15 +40,27 @@ export type SpaceToken =
   | "small"
   | "auto"
   | `${number}px`
+  | `${number}%`
   | number;
-export type RadiusToken = keyof Theme["radii"] | number | `${number}px`;
+export type RadiusToken =
+  | keyof Theme["radii"]
+  | number
+  | `${number}px`
+  | `${number}%`;
 export type FontSizeToken = keyof Theme["fontSizes"] | number;
 export type FontFamilyToken = keyof Theme["fonts"];
 export type FontWeightToken = keyof Theme["fontWeights"] | number;
 export type ShadowToken = keyof Theme["shadows"];
 export type IconSizeToken = keyof Theme["iconSizes"] | number;
 
-export type Length = number | `${number}px` | `${number}%` | "auto";
+/** `vw` and `vh` are a share of the window, measured when the style is drawn. */
+export type Length =
+  | number
+  | `${number}px`
+  | `${number}%`
+  | `${number}vw`
+  | `${number}vh`
+  | "auto";
 export type Responsive<T> = T | (T | null)[];
 
 type BorderLineStyle = "solid" | "dashed" | "dotted";
@@ -198,6 +210,8 @@ type LayoutProps = {
   alignContent?:
     | "flex-start"
     | "flex-end"
+    | "start"
+    | "end"
     | "center"
     | "stretch"
     | "space-between"
@@ -282,7 +296,8 @@ type TextStyleProps = {
   fontStyle?: "normal" | "italic";
   lineHeight?: number | `${number}px` | `${number}%` | "body" | "heading";
   letterSpacing?: number;
-  textAlign?: "left" | "center" | "right" | "justify";
+  /** `start` and `end` are drawn as `left` and `right`. */
+  textAlign?: "left" | "center" | "right" | "justify" | "start" | "end";
   textDecorationLine?: "none" | "underline" | "line-through";
   textDecoration?: "none" | "underline" | "line-through";
   textDecorationColor?: ColorValue;

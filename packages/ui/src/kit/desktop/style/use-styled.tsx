@@ -131,6 +131,25 @@ function withInlineStyle(sx: SxProp | undefined, style: StyleProp | undefined) {
   return { ...sx, ...inline } as SxProp;
 }
 
+const VIEWPORT_UNIT = /^(-?\d*\.?\d+)(vw|vh)$/;
+
+/**
+ * `vw` and `vh` lengths in pixels of the window as it is now; the style is
+ * measured again whenever the component draws.
+ */
+export function withViewportUnits(style: Style): Style {
+  let result: Style | undefined;
+  for (const key in style) {
+    const value = style[key];
+    const match = typeof value === "string" ? VIEWPORT_UNIT.exec(value) : null;
+    if (!match) continue;
+    const window = Dimensions.get("window");
+    const size = match[2] === "vw" ? window.width : window.height;
+    (result ??= { ...style })[key] = (parseFloat(match[1]) / 100) * size;
+  }
+  return result ?? { ...style };
+}
+
 export function useStyled(
   props: BaseProps<any> & { variant?: string },
   options: StyledOptions = {}
@@ -148,7 +167,7 @@ export function useStyled(
   });
 
   return useMemo(() => {
-    const viewStyle: Style = { ...resolved.style };
+    const viewStyle: Style = withViewportUnits(resolved.style);
     let textStyle: Style | undefined;
     for (const textKey of TEXT_KEYS) {
       if (viewStyle[textKey] === undefined) continue;

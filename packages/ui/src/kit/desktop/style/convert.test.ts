@@ -303,3 +303,36 @@ describe("styles that replace React Native props", () => {
     expect(converted.style.width).toBe(10);
   });
 });
+
+describe("logical alignment from apps/web", () => {
+  test("start and end are flex-start and flex-end", () => {
+    expect(
+      convertDeclarations({
+        alignItems: "start",
+        alignSelf: "end",
+        justifyContent: "end",
+        alignContent: "start"
+      }).style
+    ).toMatchObject({
+      alignItems: "flex-start",
+      alignSelf: "flex-end",
+      justifyContent: "flex-end",
+      alignContent: "flex-start"
+    });
+  });
+
+  test("textAlign start and end are left and right", () => {
+    expect(convertDeclarations({ textAlign: "end" }).style.textAlign).toBe(
+      "right"
+    );
+    expect(convertDeclarations({ textAlign: "start" }).style.textAlign).toBe(
+      "left"
+    );
+  });
+
+  test("a px radius is a number of pixels", () => {
+    expect(convertDeclarations({ borderRadius: "150px" }).style.borderRadius).toBe(
+      150
+    );
+  });
+});

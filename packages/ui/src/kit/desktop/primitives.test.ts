@@ -38,7 +38,10 @@ vi.mock("react-native", () => {
         setNativeProps() {},
         measure() {},
         measureInWindow() {},
-        focus() {},
+        focus() {
+          (globalThis as any).focusCalls =
+            ((globalThis as any).focusCalls ?? 0) + 1;
+        },
         blur() {}
       }));
       return h(name, props);
@@ -346,5 +349,49 @@ describe("createButtonVariant", () => {
     expect(node.props.style.flexDirection).toBe("row");
     expect(node.props.style.backgroundColor).toBe("transparent");
     expect(node.props.hoverStyle?.backgroundColor).toMatch(/^#/);
+  });
+});
+
+describe("Button", () => {
+  it("submits the form its form attribute names, from outside it", () => {
+    const onSubmit = vi.fn();
+    render(
+      h(
+        Box,
+        {},
+        h(Box, { as: "form", id: "2faForm", onSubmit }),
+        h(Button, { form: "2faForm" }, "Next")
+      )
+    );
+    fire(() => root.root.findByType("Pressable" as any).props.onPress(press()));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it("does nothing for a form that is not mounted", () => {
+    render(h(Button, { form: "missing" }, "Next"));
+    expect(() =>
+      fire(() =>
+        root.root.findByType("Pressable" as any).props.onPress(press())
+      )
+    ).not.toThrow();
+  });
+
+  it("focuses itself on mount with autoFocus, and not without it", () => {
+    (globalThis as any).focusCalls = 0;
+    render(h(Button, {}, "Plain"));
+    expect((globalThis as any).focusCalls).toBe(0);
+    render(h(Button, { autoFocus: true }, "Focused"));
+    expect((globalThis as any).focusCalls).toBe(1);
+  });
+});
+
+describe("viewport units", () => {
+  it("draws vw and vh as a share of the window", () => {
+    render(h(Box, { sx: { width: "50vw", maxHeight: "25vh", height: 10 } }));
+    expect(root.root.findByType("View" as any).props.style).toMatchObject({
+      width: 600,
+      maxHeight: 200,
+      height: 10
+    });
   });
 });
