@@ -222,6 +222,8 @@ function Presenter(props: Contract.PopupPresenterProps) {
   } = props;
   const window = useWindowSize();
   const content = useRef<UIElement>(null);
+  const frame = useRef<UIElement>(null);
+  const [windowOrigin, setWindowOrigin] = useState<{ x: number; y: number }>();
   // A popup at the pointer stays where the pointer was when it opened.
   const [pointer] = useState(() => ({ x: lastPointer.x, y: lastPointer.y }));
   const [anchor, setAnchor] = useState<Contract.AnchorRect>();
@@ -255,6 +257,22 @@ function Presenter(props: Contract.PopupPresenterProps) {
     };
   });
 
+  // The presenter is drawn where it is rendered, which can be inside a positioned
+  // parent (a footer item). Its absolute layers start there, so its own window
+  // position is read after every render, as the popup's size is.
+  useEffect(() => {
+    let cancelled = false;
+    measureInWindow(frame.current, (x, y) => {
+      if (cancelled) return;
+      setWindowOrigin((current) =>
+        current?.x === x && current?.y === y ? current : { x, y }
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
+
   useEffect(() => {
     if (focusOnRender) content.current?.focus?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -264,6 +282,11 @@ function Presenter(props: Contract.PopupPresenterProps) {
     anchor && size
       ? popupPosition(anchor, size, position ?? {}, window)
       : undefined;
+  const origin = windowOrigin ?? { x: 0, y: 0 };
+  // A blocking popup sits in a layer that starts at the window's origin, so it
+  // is placed in window coordinates. A non-blocking one is drawn in place, so
+  // it is shifted by the presenter's own origin.
+  const shift = blocking ? { x: 0, y: 0 } : origin;
   const popup = (
     <Flex
       data-test-id="popup-presenter"
@@ -273,8 +296,8 @@ function Presenter(props: Contract.PopupPresenterProps) {
       sx={{
         position: "absolute",
         zIndex: 1000,
-        top: placed?.top ?? anchor?.y ?? 0,
-        left: placed?.left ?? anchor?.x ?? 0,
+        top: (placed?.top ?? anchor?.y ?? 0) - shift.y,
+        left: (placed?.left ?? anchor?.x ?? 0) - shift.x,
         maxHeight: placed?.maxHeight,
         // Drawn invisibly first, to be measured before it is placed.
         opacity: placed ? 1 : 0,
@@ -286,7 +309,7 @@ function Presenter(props: Contract.PopupPresenterProps) {
   );
   // A blocking popup covers the window: a click outside it closes it and
   // reaches nothing else. A non-blocking one leaves the window usable.
-  const body = blocking ? (
+  const layer = blocking ? (
     <Box
       data-test-id="popup-backdrop"
       onClick={onClose}
@@ -296,10 +319,10 @@ function Presenter(props: Contract.PopupPresenterProps) {
       }}
       sx={{
         position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        top: -origin.y,
+        left: -origin.x,
+        width: window.width,
+        height: window.height,
         zIndex: 1000
       }}
     >
@@ -307,6 +330,14 @@ function Presenter(props: Contract.PopupPresenterProps) {
     </Box>
   ) : (
     popup
+  );
+  const body = (
+    <Box
+      ref={frame}
+      sx={{ position: "absolute", top: 0, left: 0, width: 0, height: 0 }}
+    >
+      {layer}
+    </Box>
   );
   return scope ? <ThemeScope scope={scope}>{body}</ThemeScope> : body;
 }
