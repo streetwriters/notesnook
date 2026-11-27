@@ -308,6 +308,11 @@ export const Grid = forwardRef<UIElement, Contract.GridProps>(function Grid(
   );
 });
 
+/** Web marks text selectable with `className="selectable"`; desktop reads it too. */
+function selectableFromClass(className: string | undefined): true | undefined {
+  return className?.split(/\s+/).includes("selectable") ? true : undefined;
+}
+
 export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
   props,
   ref
@@ -343,7 +348,11 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
         ...viewStyle
       })}
       numberOfLines={numberOfLines ?? resolved.numberOfLines}
-      selectable={selectable ?? resolved.selectable}
+      selectable={
+        selectable ??
+        resolved.selectable ??
+        selectableFromClass(props.className)
+      }
       onPress={onPress}
     >
       {dangerouslySetInnerHTML

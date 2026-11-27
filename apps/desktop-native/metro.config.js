@@ -52,6 +52,11 @@ const config = mergeConfig(base, {
       linkedModulesNodeModules
     ],
     resolveRequest: (context, moduleName, platform) => {
+      // Web stylesheets (copied with the web components) style DOM elements;
+      // desktop draws its own scrollbars, so a stylesheet is an empty module.
+      if (moduleName.endsWith(".css")) {
+        return { type: "empty" };
+      }
       if (
         moduleName === "react-dom" ||
         moduleName === "crypto" ||

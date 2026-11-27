@@ -237,6 +237,28 @@ describe("Text", () => {
     const text = tree.root.findAll((node) => (node.type as any) === "Text")[0];
     expect(text.props.children).toEqual(["a", "\n", "b", "\n", "c"]);
   });
+
+  it("is selectable when written with the web selectable class", () => {
+    const tree = render(h(Text, { className: "selectable" }, "Failed"));
+    const text = tree.root.findAll((node) => (node.type as any) === "Text")[0];
+    expect(text.props.selectable).toBe(true);
+  });
+
+  it("is not selectable for another class, and an explicit selectable wins", () => {
+    const other = render(h(Text, { className: "selectable-off" }, "x"));
+    const otherText = other.root.findAll(
+      (node) => (node.type as any) === "Text"
+    )[0];
+    expect(otherText.props.selectable).toBeUndefined();
+
+    const explicit = render(
+      h(Text, { className: "selectable", selectable: false }, "x")
+    );
+    const explicitText = explicit.root.findAll(
+      (node) => (node.type as any) === "Text"
+    )[0];
+    expect(explicitText.props.selectable).toBe(false);
+  });
 });
 
 describe("Box and Flex", () => {

@@ -34,7 +34,7 @@
     {
       "path": "components/importer/components/import-errors.tsx",
       "category": "platform",
-      "reason": "The bug report link opens with the shell service (shell.openUrl); web calls window.open, which the desktop host does not have. Otherwise identical to web."
+      "reason": "The bug report link opens with the shell service (shell.openUrl); web calls window.open, which the desktop host does not have. The error list also keeps the selectable class so a bug report can copy it: the old desktop code selected it, and web's text is not selectable (app.css only enables selection for the selectable class)."
     },
     {
       "path": "components/unlock/index.tsx",

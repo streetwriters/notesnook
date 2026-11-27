@@ -38,6 +38,7 @@ export function ImportErrors(props: ImportErrorsProps) {
         {props.errors.map((error, index) => (
           <Text
             key={index}
+            className="selectable"
             variant="body"
             sx={{ color: "paragraph-error", my: 1, fontFamily: "monospace" }}
           >
