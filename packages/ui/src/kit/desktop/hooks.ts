@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Appearance, Dimensions, useWindowDimensions } from "react-native";
 import { Platform, useColorScheme } from "react-native";
 import type * as Contract from "../contracts/hooks";
+import type { StateStyle } from "../contracts/style";
 import { formatShortcutFor, type ShortcutPlatform } from "../shared/shortcut";
 import { lastPointer } from "./style/events";
 import { alphaToken, withAlpha } from "./style/resolve";
@@ -90,20 +91,26 @@ export const createButtonVariant: typeof Contract.createButtonVariant = (
   background = "transparent",
   color = "paragraph",
   states
-) => ({
-  bg: background,
-  color,
-  fontFamily: "body",
-  fontWeight: "body",
-  fontSize: "body",
-  borderRadius: "default",
-  cursor: "pointer",
-  px: 2,
-  py: 1,
-  overflow: "hidden",
-  ":hover": { bg: background, ...states?.hover },
-  ":active": { bg: background, ...states?.hover, ...states?.active }
-});
+) => {
+  // The states are drawn as desktop's `StateStyle`; the cast only narrows the
+  // wider `SxProp` they are typed as in the contract to that shape.
+  const hover = states?.hover as StateStyle | undefined;
+  const active = states?.active as StateStyle | undefined;
+  return {
+    bg: background,
+    color,
+    fontFamily: "body",
+    fontWeight: "body",
+    fontSize: "body",
+    borderRadius: "default",
+    cursor: "pointer",
+    px: 2,
+    py: 1,
+    overflow: "hidden",
+    ":hover": { bg: background, ...hover },
+    ":active": { bg: background, ...hover, ...active }
+  };
+};
 
 export const useThemeColor: typeof Contract.useThemeColor = (token) =>
   useThemeContext().colors[token] ?? "transparent";
