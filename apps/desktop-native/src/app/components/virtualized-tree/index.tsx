@@ -218,15 +218,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         };
       },
       onItemPress: (index, _id, event, open) => {
-        onMouseUp(
-          {
-            button: event.button,
-            ctrlKey: event.ctrlKey,
-            metaKey: event.metaKey,
-            shiftKey: event.shiftKey
-          },
-          index
-        );
+        onMouseUp(event, index);
         setFocusedIndex(index);
         if (!event.metaKey && !event.shiftKey && !event.ctrlKey) open();
       }
@@ -241,7 +233,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         ref={list}
         style={{ flex: 1 }}
         tabIndex={0}
-        onKeyDown={onKeyDown}
+        onKeyDown={(e) => onKeyDown(e.nativeEvent)}
         onBlur={() => setFocusedIndex(-1)}
         totalCount={nodes.length}
         computeItemKey={(index) => nodes[index]?.id ?? `${index}`}

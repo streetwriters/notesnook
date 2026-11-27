@@ -215,10 +215,10 @@ function EditorProperties(props: EditorPropertiesProps) {
               key={tab.id}
               data-test-id={`properties-tab-${tab.id}`}
               icon={tab.icon}
-              size={30}
-              iconColor="icon-secondary"
               selected={activeTab === tab.id}
               onClick={() => useEditorStore.getState().setPropertiesTab(tab.id)}
+              sx={{ width: "30px", height: "30px" }}
+              iconColor="icon-secondary"
             />
           ))}
         </Flex>

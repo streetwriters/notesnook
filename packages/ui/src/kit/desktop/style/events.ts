@@ -178,6 +178,7 @@ export function keyboardEvent<T = UIElement>(
     ...members,
     nativeEvent: {
       ...members,
+      keyCode: typeof native.keyCode === "number" ? native.keyCode : 0,
       preventDefault: () => base.preventDefault(),
       stopPropagation: () => base.stopPropagation()
     }

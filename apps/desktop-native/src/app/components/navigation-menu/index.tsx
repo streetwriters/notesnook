@@ -366,8 +366,14 @@ export function NavigationMenu(props: {
                 key={tab.id}
                 data-test-id={`tab-${tab.id}`}
                 icon={tab.icon}
+                title={tab.title}
                 selected={currentTab.id === tab.id}
-                isCollapsed={isCollapsed}
+                sx={{
+                  p: 0,
+                  width: isCollapsed ? "25px" : "34px",
+                  height: isCollapsed ? "25px" : "34px",
+                  borderRadius: isCollapsed ? "5px" : "6px"
+                }}
                 onClick={() => {
                   if (isNavPaneCollapsed) setExpanded(true);
                   setNavigationTab(tab.id);

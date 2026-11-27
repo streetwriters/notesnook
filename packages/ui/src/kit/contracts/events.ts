@@ -78,6 +78,8 @@ export type Key =
 export interface UINativeKeyboardEvent extends UIEvent, Modifiers {
   key: Key;
   code: string;
+  /** The DOM's legacy key code; 0 when the platform does not report one. */
+  keyCode: number;
   repeat: boolean;
 }
 

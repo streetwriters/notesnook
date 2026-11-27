@@ -24,6 +24,8 @@ import { base, keyName } from "w3c-keyname";
 import { environment, type KeyEvent } from "@platform";
 
 export type Command = () => boolean;
+// A kit keyboard event's `nativeEvent` and a platform key event both fit.
+type KeyHandlerEvent = Omit<KeyEvent, "inEditor">;
 const mac = environment.os === "macOS" || environment.os === "iOS";
 
 function normalizeKeyName(name: string) {
@@ -55,7 +57,7 @@ function normalize(map: { [key: string]: Command }) {
   return copy;
 }
 
-function modifiers(name: string, event: KeyEvent, shift: boolean) {
+function modifiers(name: string, event: KeyHandlerEvent, shift: boolean) {
   if (event.altKey) name = "Alt-" + name;
   if (event.ctrlKey) name = "Ctrl-" + name;
   if (event.metaKey) name = "Meta-" + name;
@@ -68,7 +70,7 @@ function modifiers(name: string, event: KeyEvent, shift: boolean) {
 // handler](#view.EditorProps.handleKeyDown) that handles them.
 export function keydownHandler(
   bindings: Record<string, Command>
-): (event: KeyEvent) => boolean {
+): (event: KeyHandlerEvent) => boolean {
   const map = normalize(bindings);
   return function (event) {
     const name = keyName(event as unknown as KeyboardEvent),

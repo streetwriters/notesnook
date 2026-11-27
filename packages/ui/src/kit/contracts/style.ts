@@ -41,7 +41,7 @@ export type SpaceToken =
   | "auto"
   | `${number}px`
   | number;
-export type RadiusToken = keyof Theme["radii"] | number;
+export type RadiusToken = keyof Theme["radii"] | number | `${number}px`;
 export type FontSizeToken = keyof Theme["fontSizes"] | number;
 export type FontFamilyToken = keyof Theme["fonts"];
 export type FontWeightToken = keyof Theme["fontWeights"] | number;

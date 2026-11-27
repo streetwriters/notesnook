@@ -18,10 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { Theme } from "@notesnook/theme";
-import type { ColorToken, ColorValue } from "./style";
+import type { ColorToken, ColorValue, SxProp } from "./style";
 
 export declare function useThemeUI(): { theme: Theme };
 export declare function alpha(color: ColorValue, amount: number): ColorValue;
+/**
+ * `@notesnook/theme`'s button look (colours, font, radius, padding and the
+ * hover and pressed states) as an `sx`, for an element that is not a `Button`.
+ */
+export declare function createButtonVariant(
+  background?: ColorValue,
+  color?: ColorValue,
+  states?: { hover?: SxProp; active?: SxProp }
+): SxProp;
 export declare function useMediaQuery(query: string): boolean;
 export declare function matchMediaQuery(query: string): boolean;
 export declare function useWindowSize(): { width: number; height: number };

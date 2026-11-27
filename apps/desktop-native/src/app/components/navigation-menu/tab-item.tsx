@@ -17,39 +17,60 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, type ColorValue } from "@notesnook/ui-kit";
-import type { Icon } from "../icons";
+import {
+  createButtonVariant,
+  Flex,
+  type ColorValue as ThemeColor,
+  type FlexProps
+} from "@notesnook/ui-kit";
+import { Icon } from "../icons";
 
-export function TabItem(props: {
-  "data-test-id": string;
+type TabItemProps = {
   icon: Icon;
-  selected: boolean;
-  isCollapsed?: boolean;
   title?: string;
-  size?: number;
-  iconColor?: ColorValue;
-  onClick: () => void;
-}) {
-  const TabIcon = props.icon;
+  selected?: boolean;
+  onClick?: () => void;
+  iconColor?: ThemeColor;
+};
+
+export function TabItem(props: TabItemProps & FlexProps) {
+  const {
+    icon: Icon,
+    iconColor = "icon",
+    title,
+    selected,
+    onClick,
+    sx,
+    ...restProps
+  } = props;
+
   return (
     <Flex
-      data-test-id={props["data-test-id"]}
-      title={props.title}
-      onClick={props.onClick}
+      {...restProps}
       sx={{
+        ...createButtonVariant(
+          selected ? "background-selected" : "transparent",
+          "transparent",
+          {
+            hover: {
+              bg: selected ? "hover-selected" : "hover"
+            }
+          }
+        ),
+        borderRadius: "default",
         alignItems: "center",
         justifyContent: "center",
-        width: props.size ?? (props.isCollapsed ? 25 : 34),
-        height: props.size ?? (props.isCollapsed ? 25 : 34),
-        borderRadius: props.isCollapsed ? 5 : 6,
-        bg: props.selected ? "background-selected" : "transparent",
-        ":hover": { bg: props.selected ? "hover-selected" : "hover" }
+        position: "relative",
+        ":focus": { bg: selected ? "hover-selected" : "hover" },
+        p: 1,
+        ...sx
+      }}
+      title={title}
+      onClick={() => {
+        if (onClick) onClick();
       }}
     >
-      <TabIcon
-        size={15}
-        color={props.selected ? "icon-selected" : props.iconColor ?? "icon"}
-      />
+      <Icon size={15} color={selected ? "icon-selected" : iconColor} />
     </Flex>
   );
 }

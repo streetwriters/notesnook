@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useRef } from "react";
-import type { UIKeyboardEvent, UIMouseEvent } from "@notesnook/ui-kit";
+import { keydownHandler } from "../common/key-handler";
+import type {
+  UIMouseEvent as MouseEvent,
+  UINativeKeyboardEvent as KeyboardEvent
+} from "@notesnook/ui-kit";
 
 enum DIRECTION {
   UP = -1,
@@ -52,6 +56,7 @@ export function useKeyboardListNavigation(
   } = options;
   const cursor = useRef(-1);
   const anchor = useRef(-1);
+  // const { reset, select, deselect } = useSelection();
 
   const direction = useCallback(() => {
     return cursor.current === anchor.current
@@ -75,10 +80,7 @@ export function useKeyboardListNavigation(
   }, [open, resetSelection, select, length]);
 
   const onMouseUp = useCallback(
-    (
-      e: Pick<UIMouseEvent, "button" | "ctrlKey" | "metaKey" | "shiftKey">,
-      itemIndex: number
-    ) => {
+    (e: MouseEvent, itemIndex: number) => {
       if (e.button !== 0) return;
       if (e.ctrlKey || e.metaKey) {
         select(itemIndex, true);
@@ -104,87 +106,98 @@ export function useKeyboardListNavigation(
   );
 
   const onKeyDown = useCallback(
-    (e: UIKeyboardEvent) => {
+    (e: KeyboardEvent) => {
       const max = length - 1;
-      const handled = (fn: () => boolean) => {
-        if (fn()) e.preventDefault();
-      };
 
-      const shiftArrow = (dir: DIRECTION.UP | DIRECTION.DOWN) => {
-        if (anchor.current === -1) {
-          anchor.current = cursor.current;
-          if (anchor.current >= 0 && anchor.current < length) {
-            select(anchor.current);
+      keydownHandler({
+        Space: openActiveItem,
+        Enter: openActiveItem,
+        ArrowUp: () => {
+          resetSelection();
+
+          let nextIndex = moveUpCyclic(cursor.current, max);
+          while (skip && skip(nextIndex))
+            nextIndex = moveUpCyclic(nextIndex, max);
+          focusItemAt(nextIndex);
+          cursor.current = nextIndex;
+          return true;
+        },
+        ArrowDown: () => {
+          resetSelection();
+
+          let nextIndex = moveDownCyclic(cursor.current, max);
+          while (skip && skip(nextIndex))
+            nextIndex = moveDownCyclic(nextIndex, max);
+          focusItemAt(nextIndex);
+          cursor.current = nextIndex;
+          return true;
+        },
+        "Mod-a": () => {
+          resetSelection();
+          bulkSelect(new Array(length).fill(0).map((_, i) => i));
+          return true;
+        },
+        "Shift-ArrowUp": () => {
+          if (anchor.current === -1) {
+            anchor.current = cursor.current;
+            if (anchor.current >= 0 && anchor.current < length) {
+              select(anchor.current);
+            }
           }
+
+          if (
+            direction() === DIRECTION.DOWN &&
+            cursor.current >= 0 &&
+            cursor.current < length
+          ) {
+            deselect(cursor.current);
+          }
+
+          let nextIndex = moveUp(cursor.current);
+          if (skip && skip(nextIndex)) nextIndex = moveUp(nextIndex);
+          if (nextIndex === cursor.current) return false;
+
+          focusItemAt(nextIndex);
+          cursor.current = nextIndex;
+          if (direction() === DIRECTION.UP) {
+            select(nextIndex);
+          }
+          e.preventDefault();
+          return false;
+        },
+        "Shift-ArrowDown": () => {
+          if (anchor.current === -1) {
+            anchor.current = cursor.current;
+            if (anchor.current >= 0 && anchor.current < length) {
+              select(anchor.current);
+            }
+          }
+
+          if (
+            direction() === DIRECTION.UP &&
+            cursor.current >= 0 &&
+            cursor.current < length
+          ) {
+            deselect(cursor.current);
+          }
+
+          let nextIndex = moveDown(cursor.current, max);
+          if (skip && skip(nextIndex)) nextIndex = moveDown(nextIndex, max);
+          if (nextIndex === cursor.current) return false;
+
+          focusItemAt(nextIndex);
+          cursor.current = nextIndex;
+          if (direction() === DIRECTION.DOWN) {
+            select(nextIndex);
+          }
+          e.preventDefault();
+          return false;
+        },
+        Escape: () => {
+          resetSelection();
+          return true;
         }
-
-        if (
-          direction() === -dir &&
-          cursor.current >= 0 &&
-          cursor.current < length
-        ) {
-          deselect(cursor.current);
-        }
-
-        const step =
-          dir === DIRECTION.UP ? moveUp : (i: number) => moveDown(i, max);
-        let nextIndex = step(cursor.current);
-        if (skip && skip(nextIndex)) nextIndex = step(nextIndex);
-        if (nextIndex === cursor.current) return;
-
-        focusItemAt(nextIndex);
-        cursor.current = nextIndex;
-        if (direction() === dir) {
-          select(nextIndex);
-        }
-        e.preventDefault();
-      };
-
-      const mod = e.metaKey || e.ctrlKey;
-      switch (e.key) {
-        case " ":
-        case "Enter":
-          if (!mod && !e.shiftKey) handled(openActiveItem);
-          return;
-        case "ArrowUp":
-          if (e.shiftKey) return shiftArrow(DIRECTION.UP);
-          handled(() => {
-            resetSelection();
-            let nextIndex = moveUpCyclic(cursor.current, max);
-            while (skip && skip(nextIndex))
-              nextIndex = moveUpCyclic(nextIndex, max);
-            focusItemAt(nextIndex);
-            cursor.current = nextIndex;
-            return true;
-          });
-          return;
-        case "ArrowDown":
-          if (e.shiftKey) return shiftArrow(DIRECTION.DOWN);
-          handled(() => {
-            resetSelection();
-            let nextIndex = moveDownCyclic(cursor.current, max);
-            while (skip && skip(nextIndex))
-              nextIndex = moveDownCyclic(nextIndex, max);
-            focusItemAt(nextIndex);
-            cursor.current = nextIndex;
-            return true;
-          });
-          return;
-        case "a":
-          if (!mod) return;
-          handled(() => {
-            resetSelection();
-            bulkSelect(new Array(length).fill(0).map((_, i) => i));
-            return true;
-          });
-          return;
-        case "Escape":
-          handled(() => {
-            resetSelection();
-            return true;
-          });
-          return;
-      }
+      })(e);
     },
     [
       length,

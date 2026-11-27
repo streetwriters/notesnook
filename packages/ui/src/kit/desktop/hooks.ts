@@ -80,6 +80,31 @@ export const alpha: typeof Contract.alpha = (color, amount) =>
     ? withAlpha(color, amount)
     : alphaToken(color, amount)) as ReturnType<typeof Contract.alpha>;
 
+/**
+ * `@notesnook/theme`'s `createButtonVariant` with the selectors desktop draws:
+ * its `:hover:not(:disabled):not(:active)` is `:hover` and its
+ * `:active:not(:disabled)` is `:active`. The CSS-only parts (`transition`,
+ * `height: min-content`, `outline`, `:disabled`) are left out.
+ */
+export const createButtonVariant: typeof Contract.createButtonVariant = (
+  background = "transparent",
+  color = "paragraph",
+  states
+) => ({
+  bg: background,
+  color,
+  fontFamily: "body",
+  fontWeight: "body",
+  fontSize: "body",
+  borderRadius: "default",
+  cursor: "pointer",
+  px: 2,
+  py: 1,
+  overflow: "hidden",
+  ":hover": { bg: background, ...states?.hover },
+  ":active": { bg: background, ...states?.hover, ...states?.active }
+});
+
 export const useThemeColor: typeof Contract.useThemeColor = (token) =>
   useThemeContext().colors[token] ?? "transparent";
 

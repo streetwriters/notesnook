@@ -159,15 +159,7 @@ export default function ListContainer(props: ListContainerProps) {
         event: UIMouseEvent,
         open: () => void
       ) => {
-        onMouseUp(
-          {
-            button: event.button,
-            ctrlKey: event.ctrlKey,
-            metaKey: event.metaKey,
-            shiftKey: event.shiftKey
-          },
-          index
-        );
+        onMouseUp(event, index);
         setFocusedIndex(index);
         if (!event.metaKey && !event.shiftKey && !event.ctrlKey) open();
       }
@@ -255,7 +247,7 @@ export default function ListContainer(props: ListContainerProps) {
           data-test-id="virtual-list"
           style={{ flex: 1 }}
           tabIndex={0}
-          onKeyDown={onKeyDown}
+          onKeyDown={(e) => onKeyDown(e.nativeEvent)}
           onBlur={() => {
             setFocusedGroupIndex(-1);
             setFocusedIndex(-1);
