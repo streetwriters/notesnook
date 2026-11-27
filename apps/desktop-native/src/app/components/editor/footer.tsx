@@ -45,7 +45,7 @@ import { strings } from "@notesnook/intl";
 import { EDITOR_ZOOM } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
 import { enterFullscreen, exitFullscreen } from "../../utils/fullscreen";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { getNoteStatistics } from "../../utils/note-statistics";
 import { Box, PopupPresenter } from "@notesnook/ui-kit";
 import { saveContent } from "./index";
@@ -150,19 +150,18 @@ function EditorFooter() {
         {tools
           .filter((tool) => !tool.hidden)
           .map((tool) => (
-            <>
+            <Fragment key={tool.title}>
               <StatusBarItem
                 variant="button"
                 data-test-id={tool.title}
                 disabled={!tool.enabled}
                 title={tool.title}
-                key={tool.title}
                 onClick={tool.onClick}
                 sx={{ display: tool.hidden ? "none" : "flex" }}
                 icon={tool.icon}
               />
               {!tool.hidden && <EditorFooterSeparator />}
-            </>
+            </Fragment>
           ))}
         <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
           <StatusBarItem

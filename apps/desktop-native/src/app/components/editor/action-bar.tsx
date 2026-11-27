@@ -480,6 +480,7 @@ function Tab(props: {
   return (
     <Flex
       data-test-id={`tab-${props.id}`}
+      className={isActive ? "tab active" : "tab"}
       group="tab"
       onDrop={props.onDrop}
       onContextMenu={(event) => {

@@ -33,20 +33,21 @@ type TitleBoxProps = {
   readonly: boolean;
 };
 
-async function onTitleChange(
-  noteId: string,
-  title: string,
-  pendingChanges: { current: boolean }
-) {
+// The title typed but not yet saved. The store's title only replaces the input
+// when nothing is pending, and an earlier save finishing must not clear a newer
+// title: that would revert the input to the older title and drop keystrokes.
+type PendingTitle = { current: string | undefined };
+
+async function onTitleChange(noteId: string, title: string, pending: PendingTitle) {
   await useEditorStore.getState().setTitle(noteId, title);
-  pendingChanges.current = false;
+  if (pending.current === title) pending.current = undefined;
 }
 
 const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
 
 function TitleBox(props: TitleBoxProps) {
   const { readonly, id } = props;
-  const pendingChanges = useRef(false);
+  const pendingChanges = useRef<string | undefined>(undefined);
   const sessionType = useEditorStore((store) => store.getSession(id)?.type);
   const storedTitle = useEditorStore((store) => {
     const session = store.getSession(id);
@@ -58,7 +59,7 @@ function TitleBox(props: TitleBoxProps) {
   const timeFormat = useSettingsStore((store) => store.timeFormat);
 
   useEffect(() => {
-    if (pendingChanges.current) return;
+    if (pendingChanges.current !== undefined) return;
     setTitle(storedTitle);
   }, [sessionType, id, storedTitle]);
 
@@ -77,7 +78,7 @@ function TitleBox(props: TitleBoxProps) {
         if (sessionId !== id) return;
         setTitle(title);
         if (!preventSave) {
-          pendingChanges.current = true;
+          pendingChanges.current = title;
           debouncedOnTitleChange(sessionId, sessionId, title, pendingChanges);
         }
       }
@@ -112,7 +113,7 @@ function TitleBox(props: TitleBoxProps) {
           NEWLINE_STRIP_REGEX,
           " "
         );
-        pendingChanges.current = true;
+        pendingChanges.current = next;
         setTitle(next);
         debouncedOnTitleChange(id, id, next, pendingChanges);
         if (submitted)
