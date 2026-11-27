@@ -36,7 +36,8 @@ type Entry = {
   actions?: Contract.ToastAction[];
 };
 
-const useToasts = create<{ entries: Entry[] }>(() => ({ entries: [] }));
+// Exported for the kit's tests; the app only renders <ToastHost />.
+export const useToasts = create<{ entries: Entry[] }>(() => ({ entries: [] }));
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function hide(id: string) {
@@ -55,7 +56,9 @@ export const showToast: typeof Contract.showToast = (
   hideAfter = 5000
 ) => {
   // As apps/web (`id: message`): a toast with the same message replaces the
-  // one on screen and restarts its timer, so equal messages never stack.
+  // one on screen and restarts its timer, so equal messages never stack. The
+  // handle hides by that message, so a stale handle also hides a newer toast
+  // with the same message, exactly as apps/web's `toast.dismiss(id)` does.
   const id = message;
   const existing = timers.get(id);
   if (existing) clearTimeout(existing);
