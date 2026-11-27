@@ -322,6 +322,11 @@ type TextStyleProps = {
 };
 
 type StateKeys = {
+  /**
+   * Styles for the text fields inside this element, as web's nested `input`
+   * selector: drawn over the field's own styles.
+   */
+  input?: SxProp;
   ":hover"?: StateStyle;
   ":active"?: StateStyle;
   ":focus"?: StateStyle;

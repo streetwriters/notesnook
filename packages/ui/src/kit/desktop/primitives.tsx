@@ -153,6 +153,10 @@ interface FormHandle {
   register?(field: FormField): () => void;
 }
 const FormContext = createContext<FormHandle | undefined>(undefined);
+/** The `sx.input` of the nearest element above that sets one. */
+const InputSxContext = createContext<Contract.BoxProps["sx"] | undefined>(
+  undefined
+);
 
 /** Puts a field with a `name` into its form's FormData. */
 function useFormField(
@@ -207,8 +211,7 @@ function withLineBreaks(children: ReactNode): ReactNode[] {
 }
 
 function hasText(children: ReactNode): boolean {
-  if (typeof children === "string" || typeof children === "number")
-    return true;
+  if (typeof children === "string" || typeof children === "number") return true;
   return Array.isArray(children) && children.some(hasText);
 }
 
@@ -281,6 +284,12 @@ function Container(
   if (form)
     content = (
       <FormContext.Provider value={form}>{content}</FormContext.Provider>
+    );
+  if (props.sx?.input)
+    content = (
+      <InputSxContext.Provider value={props.sx.input}>
+        {content}
+      </InputSxContext.Provider>
     );
   const style = { ...viewStyle };
   for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
@@ -395,8 +404,8 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
       {dangerouslySetInnerHTML
         ? htmlToText(dangerouslySetInnerHTML.__html)
         : hasLineBreak(props.children)
-          ? withLineBreaks(props.children)
-          : props.children}
+        ? withLineBreaks(props.children)
+        : props.children}
     </TextComponent>
   );
 });
@@ -567,15 +576,15 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
   ref
 ) {
   const context = useThemeContext();
-  const { viewStyle, nativeProps } = useStyled(props, {
-    variantGroup: "forms",
-    defaultVariant: props.field,
-    defaults: { p: 2 }
-  });
-  // A DOM input has an intrinsic width; a native text field with `width:
-  // "auto"` and no text would size to nothing and could not be clicked.
-  if (viewStyle.width === "auto" && viewStyle.minWidth === undefined)
-    (viewStyle as Record<string, unknown>).minWidth = 136;
+  const inputSx = useContext(InputSxContext);
+  const { viewStyle, nativeProps } = useStyled(
+    inputSx ? { ...props, sx: { ...props.sx, ...inputSx } } : props,
+    {
+      variantGroup: "forms",
+      defaultVariant: props.field,
+      defaults: { p: 2 }
+    }
+  );
   const control = useControl();
   if (props.value !== undefined) control.value = String(props.value);
   else if (control.value === undefined)

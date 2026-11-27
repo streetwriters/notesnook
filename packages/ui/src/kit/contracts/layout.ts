@@ -84,6 +84,8 @@ export interface ScrollContainerProps extends DataAttributes {
   sx?: SxProp;
   suppressScrollX?: boolean;
   suppressScrollY?: boolean;
+  /** mac-scrollbar's prop on the web; accepted, desktop scrollbars are the platform's. */
+  suppressAutoHide?: boolean;
   /** Accepted and unused on desktop: the scrollbar is the platform's. */
   minThumbSize?: number;
   trackStyle?: (horizontal?: boolean) => StyleProp;

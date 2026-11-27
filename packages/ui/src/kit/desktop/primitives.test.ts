@@ -437,3 +437,18 @@ describe("FormData", () => {
     expect([...new FormData().keys()]).toEqual([]);
   });
 });
+
+describe("nested input styles", () => {
+  it("draws sx.input on the text fields inside, over their own styles", () => {
+    render(
+      h(
+        Box,
+        { sx: { input: { px: 7 } } },
+        h(Input, { sx: { px: 1, py: 3 } })
+      )
+    );
+    expect(
+      root.root.findByType("TextInput" as any).props.style
+    ).toMatchObject({ paddingLeft: 35, paddingTop: 15 });
+  });
+});

@@ -598,7 +598,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 
 ### sx keys
 
-174 different keys are written in `sx` objects; 105 are in the contract. The rest are listed here with the reason desktop does not draw them; they do not fail the check.
+174 different keys are written in `sx` objects; 107 are in the contract. The rest are listed here with the reason desktop does not draw them; they do not fail the check.
 
 | Key | Uses | Example | Note |
 |---|---:|---|---|
@@ -649,12 +649,10 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | `gridRow` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
 | `gridTemplateColumns` | 8 | src/components/announcements/body.jsx | desktop lays out with flexbox only; use Flex and widths |
 | `gridTemplateRows` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
-| `input` | 13 | src/components/filtered-list/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
 | `justifySelf` | 2 | src/components/auth-container/index.jsx | a grid property; flexbox has alignSelf only |
 | `listStyle` | 1 | src/components/notebook-picker.tsx | desktop has no list markers |
 | `msOverflowStyle` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
 | `postion` | 1 | src/views/plans.tsx | a typo for position in apps/web; it has no effect there either |
-| `resize` | 3 | src/components/editor/title-box.tsx | desktop text areas have no resize handle |
 | `scale` | 1 | src/views/plans.tsx | use transform: [{ scale }] |
 | `scrollbarWidth` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
 | `scrollBehavior` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
