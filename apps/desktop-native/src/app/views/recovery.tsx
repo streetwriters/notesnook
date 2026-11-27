@@ -233,7 +233,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
       {recoveryMethods.map((method, index) => (
         <Flex
           key={method.testId}
-          testID={method.testId}
+          data-test-id={method.testId}
           sx={{
             alignItems: "center",
             px: "spacing5",
@@ -245,7 +245,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
             cursor: "pointer",
             mt: index === 0 ? 0 : "spacing4"
           }}
-          onPress={() => setSelected(index)}
+          onClick={() => setSelected(index)}
         >
           <Flex
             sx={{
@@ -378,7 +378,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       <AuthenticatedAsCard user={user} />
       <Button
         variant="secondary"
-        onPress={() => navigate("methods")}
+        onClick={() => navigate("methods")}
         sx={{
           alignItems: "center",
           justifyContent: "center",
@@ -581,7 +581,7 @@ function Final() {
 
         <Button
           variant="new_accent"
-          onPress={handleGoToLogin}
+          onClick={handleGoToLogin}
           sx={{
             width: "100%"
           }}
@@ -640,7 +640,7 @@ function AuthenticatedAsCard({ user }: { user: User }) {
       </Flex>
       <Button
         variant="new_anchor"
-        onPress={() => openURL("/login")}
+        onClick={() => openURL("/login")}
         sx={{
           flexShrink: 0,
           color: "accent",

@@ -60,7 +60,7 @@ function Tags() {
   return (
     <Flex
       id="tags"
-      testID="tags"
+      data-test-id="tags"
       sx={{ flexDirection: "column", flex: 1, mt: "spacing4" }}
     >
       <ListContainer

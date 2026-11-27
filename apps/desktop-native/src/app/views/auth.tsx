@@ -297,9 +297,9 @@ function Login(props: BaseAuthComponentProps<"login">) {
             defaultValue={form?.password ?? formData?.password}
           />
           <Button
-            testID="auth-forgot-password"
+            data-test-id="auth-forgot-password"
             variant="new_anchor"
-            onPress={() => navigate("recover", { email: form?.email || "" })}
+            onClick={() => navigate("recover", { email: form?.email || "" })}
             sx={{
               mt: "spacing4",
               fontSize: "xs",
@@ -454,10 +454,10 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
             autoFocus
           />
           <Button
-            testID="auth-forgot-password"
+            data-test-id="auth-forgot-password"
             mt={2}
             variant="anchor"
-            onPress={() => user && navigate("recover", { email: user.email })}
+            onClick={() => user && navigate("recover", { email: user.email })}
             sx={{ color: "paragraph", alignSelf: "flex-end" }}
           >
             {strings.forgotPassword()}
@@ -476,7 +476,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
               mt: 5,
               color: "paragraph-error"
             }}
-            onPress={async () => {
+            onClick={async () => {
               if (await showLogoutConfirmation()) {
                 await TaskManager.startTask({
                   type: "modal",
@@ -851,7 +851,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   <Button
                     variant="anchor"
                     disabled={isSending || !enabled}
-                    onPress={() => sendCode(selectedMethod as "sms" | "email")}
+                    onClick={() => sendCode(selectedMethod as "sms" | "email")}
                     sx={{
                       fontSize: "xs",
                       fontWeight: 500,
@@ -874,7 +874,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                 textAlign: "left",
                 borderRadius: "radius2"
               }}
-              onPress={() => navigate("mfa:select", formData)}
+              onClick={() => navigate("mfa:select", formData)}
             >
               <Flex sx={{ alignItems: "center", gap: 10 }}>
                 <Flex
@@ -988,7 +988,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
 
                 textAlign: "left"
               }}
-              onPress={() => {
+              onClick={() => {
                 formData.selectedMethod = method.type;
                 navigate("mfa:code", formData);
               }}
@@ -1137,7 +1137,7 @@ export function AuthFormContainer<
   return (
     <AuthFormContext.Provider value={context}>
       <Flex
-        testID="authForm"
+        data-test-id="authForm"
         sx={{
           flex: 1,
           flexDirection: "column",
@@ -1161,7 +1161,7 @@ export function AuthFormContainer<
           </Text>
         </Flex>
         <Text
-          testID={titleTestID}
+          data-test-id={titleTestID}
           sx={{
             fontSize: "xl",
             textAlign: "left",
@@ -1203,7 +1203,7 @@ export function AuthFormContainer<
           <Button
             variant="new_bordered"
             sx={{ width: "100%", mt: "spacing4" }}
-            onPress={async () => {
+            onClick={async () => {
               const ok = await ConfirmDialog.show({
                 title: strings.offlineMode(),
                 subtitle: strings.offlineModeDesc(),
@@ -1232,14 +1232,14 @@ export function AuthFormContainer<
           >
             {strings.signupAgreement[0]()}{" "}
             <Text
-              onPress={() => shell.openUrl("https://notesnook.com/tos")}
+              onClick={() => shell.openUrl("https://notesnook.com/tos")}
               sx={{ fontWeight: 600, color: "accent" }}
             >
               {strings.signupAgreement[1]()}
             </Text>{" "}
             {strings.signupAgreement[2]()}{" "}
             <Text
-              onPress={() => shell.openUrl("https://notesnook.com/privacy")}
+              onClick={() => shell.openUrl("https://notesnook.com/privacy")}
               sx={{ fontWeight: 600, color: "accent" }}
             >
               {strings.signupAgreement[3]()}
@@ -1280,7 +1280,7 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
           color: "accent",
           cursor: "pointer"
         }}
-        onPress={props.action.onClick}
+        onClick={props.action.onClick}
       >
         {props.action.text}
       </Button>
@@ -1321,10 +1321,12 @@ export function AuthField(
   return (
     <Field
       {...fieldProps}
-      testID={props.testID || id}
+      data-test-id={props["data-test-id"] || id}
       value={values[id] ?? defaultValue ?? ""}
-      onChangeText={(text) => setValue(id, text)}
-      onSubmitEditing={() => submit()}
+      onChange={(e) => setValue(id, e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") submit();
+      }}
       {...authFieldProps}
     />
   );
@@ -1341,9 +1343,9 @@ export function SubmitButton(props: SubmitButtonProps) {
     <>
       <AuthErrorText error={error} sx={{ mt: "spacing4", p: 0 }} />
       <Button
-        testID="submitButton"
+        data-test-id="submitButton"
         variant="new_accent"
-        onPress={() => submit()}
+        onClick={() => submit()}
         sx={{ mt: "spacing8", width: "100%" }}
         disabled={props.loading || props.disabled}
       >

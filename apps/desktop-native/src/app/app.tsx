@@ -69,7 +69,7 @@ export function App(props: { titleBarInset?: number }) {
 
   return (
     <Flex
-      testID="app"
+      data-test-id="app"
       sx={{ flexDirection: "column", flex: 1, bg: "background" }}
     >
       {isDatabaseReady ? <AppEffects /> : null}
@@ -175,7 +175,7 @@ function DesktopAppContents(props: {
           isListPaneVisible: sizes[1] > 5
         });
       }}
-      testID="global-split-pane"
+      data-test-id="global-split-pane"
       direction="vertical"
       autoSaveId="global-panel-group"
       sx={{ overflow: "hidden" }}
@@ -261,7 +261,7 @@ function MobileAppContents(props: {
 
   return (
     <Flex
-      testID="mobile-contents"
+      data-test-id="mobile-contents"
       onWheel={(event) => {
         if (index === 2) return;
         const now = Date.now();

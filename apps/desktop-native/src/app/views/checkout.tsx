@@ -170,7 +170,7 @@ function Checkout() {
               <ArrowLeft
                 size={20}
                 color="icon"
-                onPress={() => hardNavigate("/plans")}
+                onClick={() => hardNavigate("/plans")}
               />
             </Button>
           )}
@@ -590,7 +590,7 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
       </Flex>
       <Button
         variant="new_accent"
-        onPress={onClose}
+        onClick={onClose}
         sx={{
           width: "100%",
           px: "spacing4",
@@ -929,7 +929,7 @@ function SummaryContent(props: SummaryContentProps) {
         placeholder={strings.enterCouponCode()}
         disabled={!!couponCode}
         value={couponInputValue}
-        onChangeText={setCouponInputValue}
+        onChange={(e) => setCouponInputValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && couponInputValue.trim()) {
             setIsApplyingCoupon(true);

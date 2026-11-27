@@ -61,7 +61,7 @@ function Plans() {
 
   return (
     <Flex
-      testID="plans"
+      data-test-id="plans"
       sx={{
         flexDirection: "column",
         flex: 1,
@@ -104,8 +104,8 @@ function Plans() {
             sx={{ position: "absolute", bottom: -30, right: 73 }}
           />
           <Button
-            onPress={() => openURL("/")}
-            testID="close-plans"
+            onClick={() => openURL("/")}
+            data-test-id="close-plans"
             variant="new_bordered"
             sx={{
               flexDirection: "row",
@@ -291,7 +291,7 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
               </Text>
             </Flex>
             <Button
-              onPress={props.onChoosePlan}
+              onClick={props.onChoosePlan}
               variant="new_accent"
               sx={{
                 alignSelf: "flex-start",
@@ -348,7 +348,7 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
           </Flex>
           <Flex sx={{ gap: "spacing7" }}>
             <Text
-              onPress={() => shell.openUrl("https://notesnook.com/privacy")}
+              onClick={() => shell.openUrl("https://notesnook.com/privacy")}
               sx={{
                 color: inverseParagraph,
                 fontSize: "sm",
@@ -360,7 +360,7 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
               {strings.privacyPolicy()}
             </Text>
             <Text
-              onPress={() => shell.openUrl("https://notesnook.com/terms")}
+              onClick={() => shell.openUrl("https://notesnook.com/terms")}
               sx={{
                 color: inverseParagraph,
                 fontSize: "sm",

@@ -535,10 +535,10 @@ export function PlatformSmoke() {
 
   return (
     <Flex
-      testID="platform-smoke"
+      data-test-id="platform-smoke"
       sx={{ flex: 1, flexDirection: "column", bg: "background", p: 3, gap: 2 }}
     >
-      <Button testID="run-checks" onPress={runAll}>
+      <Button data-test-id="run-checks" onClick={runAll}>
         <Text>Run checks</Text>
       </Button>
       <ScrollContainer>
@@ -549,7 +549,7 @@ export function PlatformSmoke() {
               sx={{ flexDirection: "row", gap: 2, alignItems: "center" }}
             >
               <Text sx={{ color: "paragraph", width: 140 }}>{check.name}</Text>
-              <Text testID={`check-${check.name}`} sx={{ color: "paragraph" }}>
+              <Text data-test-id={`check-${check.name}`} sx={{ color: "paragraph" }}>
                 {results[check.name] ?? "running"}
               </Text>
             </Flex>

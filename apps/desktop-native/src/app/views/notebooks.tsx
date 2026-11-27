@@ -125,7 +125,7 @@ export function Notebooks() {
           <ListLoader />
         ) : notebooks.length === 0 ? (
           <Flex
-            testID="list-placeholder"
+            data-test-id="list-placeholder"
             sx={{
               justifyContent: "center",
               alignItems: "center",
@@ -135,7 +135,7 @@ export function Notebooks() {
             <SidebarPlaceholder variant="notebooks" />
           </Flex>
         ) : (
-          <Flex testID="notebooks-list" sx={{ flex: 1, px: "spacing4" }}>
+          <Flex data-test-id="notebooks-list" sx={{ flex: 1, px: "spacing4" }}>
             <VirtualizedTree
               rootId="root"
               itemHeight={33}

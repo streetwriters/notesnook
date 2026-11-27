@@ -659,7 +659,7 @@ export default function Wrapped() {
       </ScrollContainer>
 
       <Button
-        onPress={() => hardNavigate("/")}
+        onClick={() => hardNavigate("/")}
         variant="secondary"
         sx={{ position: "absolute", top: 3, left: 3, zIndex: 1000 }}
       >

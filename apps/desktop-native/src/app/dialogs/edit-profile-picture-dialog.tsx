@@ -114,7 +114,7 @@ export const EditProfilePictureDialog = DialogManager.register(
         <Flex sx={{ flexDirection: "column" }}>
           {profilePicture ? (
             <AvatarEditor
-              testID="avatar-editor"
+              data-test-id="avatar-editor"
               ref={profileRef}
               image={profilePicture}
               width={256}

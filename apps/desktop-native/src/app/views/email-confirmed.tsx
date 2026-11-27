@@ -147,7 +147,7 @@ function BlogPromoBanner() {
           <account.icon
             key={account.title}
             title={account.title}
-            onPress={() => shell.openUrl(account.link)}
+            onClick={() => shell.openUrl(account.link)}
             size={30}
             color="icon"
             sx={{

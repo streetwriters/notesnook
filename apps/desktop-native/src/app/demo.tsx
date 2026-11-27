@@ -40,7 +40,7 @@ export function Demo(props: {
 
   return (
     <Flex
-      testID="root"
+      data-test-id="root"
       sx={{
         flexDirection: "column",
         alignItems: "center",
@@ -50,10 +50,10 @@ export function Demo(props: {
         bg: "background"
       }}
     >
-      <Text testID="title" sx={{ fontSize: "heading", color: "heading" }}>
+      <Text data-test-id="title" sx={{ fontSize: "heading", color: "heading" }}>
         Notesnook
       </Text>
-      <Text testID="boot-state" sx={{ color: "paragraph" }}>
+      <Text data-test-id="boot-state" sx={{ color: "paragraph" }}>
         {state.status === "loading"
           ? "Loading"
           : state.status === "error"
@@ -63,7 +63,7 @@ export function Demo(props: {
           : "Logged out"}
       </Text>
       {state.status === "ready" ? (
-        <Text testID="boot-info" sx={{ color: "paragraph-secondary" }}>
+        <Text data-test-id="boot-info" sx={{ color: "paragraph-secondary" }}>
           {`Notesnook ${state.version} (${
             state.online ? "online" : "offline"
           })`}
@@ -71,7 +71,7 @@ export function Demo(props: {
       ) : null}
       <Flex
         group="row"
-        testID="row"
+        data-test-id="row"
         sx={{
           alignItems: "center",
           gap: 2,
@@ -84,7 +84,7 @@ export function Demo(props: {
       >
         <Text sx={{ color: "paragraph", flex: 1 }}>Hover this row</Text>
         <Box
-          testID="row-action"
+          data-test-id="row-action"
           sx={{
             width: 20,
             height: 20,
@@ -96,26 +96,26 @@ export function Demo(props: {
         />
       </Flex>
       <Button
-        testID="toggle-scheme"
-        onPress={props.onToggleColorScheme}
+        data-test-id="toggle-scheme"
+        onClick={props.onToggleColorScheme}
         sx={{ px: 3, py: 2 }}
       >
         {`Switch to ${props.colorScheme === "dark" ? "light" : "dark"}`}
       </Button>
       <Input
-        testID="input"
+        data-test-id="input"
         placeholder="Type here"
         value={text}
-        onChangeText={setText}
+        onChange={(e) => (setText)(e.target.value)}
         sx={{ width: 280 }}
       />
-      <Text testID="echo" sx={{ color: "paragraph" }}>
+      <Text data-test-id="echo" sx={{ color: "paragraph" }}>
         {text}
       </Text>
       <Flex sx={{ alignItems: "center", gap: 2 }}>
-        <Flex testID="outline-parent" sx={{ p: 2, bg: "background" }}>
+        <Flex data-test-id="outline-parent" sx={{ p: 2, bg: "background" }}>
           <Box
-            testID="outline-box"
+            data-test-id="outline-box"
             sx={{
               width: 20,
               height: 20,
@@ -125,33 +125,33 @@ export function Demo(props: {
           />
         </Flex>
       </Flex>
-      <Flex testID="weights" sx={{ flexDirection: "column", gap: 1 }}>
+      <Flex data-test-id="weights" sx={{ flexDirection: "column", gap: 1 }}>
         {[400, 500, 600, 700].map((weight) => (
           <Text
             key={weight}
-            testID={`weight-${weight}`}
+            data-test-id={`weight-${weight}`}
             sx={{ fontSize: "md", fontWeight: weight, alignSelf: "flex-start" }}
           >
             Travel itinerary
           </Text>
         ))}
       </Flex>
-      <Grid testID="grid" columns={3} gap={1} sx={{ width: 280 }}>
+      <Grid data-test-id="grid" columns={3} gap={1} sx={{ width: 280 }}>
         {[0, 1, 2, 3, 4, 5].map((index) => (
           <Box
             key={index}
-            testID={`grid-${index}`}
+            data-test-id={`grid-${index}`}
             sx={{ height: 20, bg: "accent" }}
           />
         ))}
       </Grid>
       <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
         <Flex
-          testID="fade-parent"
+          data-test-id="fade-parent"
           sx={{ width: 40, height: 40, bg: "background" }}
         >
           <Box
-            testID="fade"
+            data-test-id="fade"
             sx={{
               width: 40,
               height: 40,
@@ -165,16 +165,16 @@ export function Demo(props: {
             }}
           />
         </Flex>
-        <Button testID="toggle-fade" onPress={() => setFaded((v) => !v)}>
+        <Button data-test-id="toggle-fade" onClick={() => setFaded((v) => !v)}>
           Fade
         </Button>
         <Flex
-          testID="spin-parent"
+          data-test-id="spin-parent"
           sx={{ width: 40, height: 40, bg: "background" }}
         >
           {shown ? (
             <Box
-              testID="spin"
+              data-test-id="spin"
               sx={{
                 width: 40,
                 height: 40,
@@ -188,11 +188,11 @@ export function Demo(props: {
             />
           ) : null}
         </Flex>
-        <Button testID="toggle-spin" onPress={() => setShown((v) => !v)}>
+        <Button data-test-id="toggle-spin" onClick={() => setShown((v) => !v)}>
           Show
         </Button>
       </Flex>
-      <Text testID="renders" sx={{ color: "paragraph-secondary" }}>
+      <Text data-test-id="renders" sx={{ color: "paragraph-secondary" }}>
         {`renders: ${renders.current}`}
       </Text>
     </Flex>

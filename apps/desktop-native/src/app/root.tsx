@@ -138,7 +138,7 @@ function RootContent(props: RootProps) {
         bg: "background"
       }}
     >
-      <Text testID="boot-state" sx={{ color: "paragraph" }}>
+      <Text data-test-id="boot-state" sx={{ color: "paragraph" }}>
         {`Error: ${state.message}`}
       </Text>
     </Flex>
