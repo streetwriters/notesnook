@@ -76,7 +76,16 @@ vi.mock("../shared/icons", () => ({ CaretDown: () => null }));
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
-const { Checkbox, Input, Slider, Switch, Box, Button, Text } = await import(
+const {
+  Checkbox,
+  Input,
+  Slider,
+  Switch,
+  Box,
+  Button,
+  Text,
+  resolvePercentTranslate
+} = await import(
   "./primitives"
 );
 const { Select } = await import("./select");
@@ -195,6 +204,28 @@ describe("Button", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(typeof onClick.mock.calls[0][0].stopPropagation).toBe("function");
+  });
+});
+
+describe("resolvePercentTranslate", () => {
+  it("turns a translate of the element's own size into pixels", () => {
+    expect(resolvePercentTranslate("translateY(-50%)", 20, 10)).toBe(
+      "translateY(-5px)"
+    );
+    expect(resolvePercentTranslate("translateX(50%) rotate(4deg)", 20, 10)).toBe(
+      "translateX(10px) rotate(4deg)"
+    );
+    expect(resolvePercentTranslate("translate(-50%)", 20, 10)).toBe(
+      "translate(-10px, -5px)"
+    );
+  });
+
+  it("leaves other transforms alone", () => {
+    const array = [{ rotate: "90deg" }];
+    expect(resolvePercentTranslate(array, 20, 10)).toBe(array);
+    expect(resolvePercentTranslate("translateY(4px)", 20, 10)).toBe(
+      "translateY(4px)"
+    );
   });
 });
 

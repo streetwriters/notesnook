@@ -67,6 +67,13 @@ export type Transform = {
   rotate?: `${number}deg`;
 }[];
 
+/**
+ * A CSS transform function, as apps/web writes it. A percentage in a
+ * translate is of the element's own size; desktop resolves it for icons.
+ */
+export type CssTransform =
+  `${"translate" | "translateX" | "translateY" | "scale" | "rotate"}(${string})`;
+
 export type AnimatableProperty =
   | "opacity"
   | "transform"
@@ -156,10 +163,10 @@ export type GroupStateStyle = { group: string; style: StateStyle };
 type LayoutProps = {
   display?: Responsive<"flex" | "none">;
   position?: "relative" | "absolute";
-  top?: Length;
-  right?: Length;
-  bottom?: Length;
-  left?: Length;
+  top?: Length | SpaceToken;
+  right?: Length | SpaceToken;
+  bottom?: Length | SpaceToken;
+  left?: Length | SpaceToken;
   zIndex?: number;
   flex?: number;
   flexGrow?: number;
@@ -257,9 +264,12 @@ type AppearanceProps = {
   outlineOffset?: number;
   outlineStyle?: "solid" | "dashed" | "dotted";
   boxShadow?: ShadowToken;
-  transform?: Transform;
+  transform?: Transform | CssTransform;
   cursor?: "default" | "pointer" | "text" | "not-allowed" | "grab" | "move";
-  pointerEvents?: "auto" | "none";
+  /** Accepted and ignored: desktop form controls follow the kit theme. */
+  colorScheme?: "light" | "dark" | "normal";
+  /** `all` is drawn as `auto`. */
+  pointerEvents?: "auto" | "none" | "all";
   userSelect?: "auto" | "none" | "text";
   objectFit?: "cover" | "contain" | "fill";
 };
@@ -290,6 +300,8 @@ type StateKeys = {
   ":active"?: StateStyle;
   ":focus"?: StateStyle;
   ":focus-visible"?: StateStyle;
+  /** Applied while the element's `disabled` prop is set. */
+  ":disabled"?: StateStyle;
   ":drag-over"?: StateStyle;
   ":group-hover"?: GroupStateStyle;
   ":group-active"?: GroupStateStyle;

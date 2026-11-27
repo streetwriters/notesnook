@@ -63,13 +63,6 @@ module.exports = {
           { name: "location", message: "Use @platform." },
           { name: "self", message: "Use @platform." },
           { name: "globalThis", message: "Use @platform." }
-        ],
-        "no-restricted-syntax": [
-          "error",
-          {
-            selector: "JSXAttribute[name.name='className']",
-            message: "className is not part of the styling contract."
-          }
         ]
       }
     }

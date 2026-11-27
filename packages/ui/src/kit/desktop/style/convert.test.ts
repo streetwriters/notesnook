@@ -21,6 +21,15 @@ import { describe, expect, test } from "vitest";
 import { convertDeclarations, convertOutline, expandFlex } from "./convert";
 
 describe("sx keys taken from apps/web", () => {
+  test("pointerEvents all is auto; colorScheme is ignored", () => {
+    expect(convertDeclarations({ pointerEvents: "all" }).style.pointerEvents).toBe(
+      "auto"
+    );
+    expect(convertDeclarations({ colorScheme: "dark" }).style).not.toHaveProperty(
+      "colorScheme"
+    );
+  });
+
   test("inherit leaves the property to the parent", () => {
     expect(convertDeclarations({ color: "inherit" }).style.color).toBe(
       undefined

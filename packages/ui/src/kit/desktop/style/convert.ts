@@ -248,6 +248,9 @@ export function convertDeclarations(
     // `inherit` is what desktop text does already when nothing is set.
     if (value === undefined || value === null || value === "inherit") continue;
     switch (key) {
+      case "pointerEvents":
+        if (value === "all") value = "auto";
+        break;
       case "alignItems":
       case "alignSelf":
       case "alignContent":
@@ -291,6 +294,7 @@ export function convertDeclarations(
       case "objectFit":
         if (typeof value === "string") converted.objectFit = value;
         continue;
+      case "colorScheme":
       case "wordBreak":
       case "overflowWrap":
       case "wordWrap":

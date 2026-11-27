@@ -1321,7 +1321,7 @@ export function AuthField(
   return (
     <Field
       {...fieldProps}
-      data-test-id={props["data-test-id"] || id}
+      data-test-id={String(props["data-test-id"] || id)}
       value={values[id] ?? defaultValue ?? ""}
       onChange={(e) => setValue(id, e.target.value)}
       onKeyDown={(e) => {

@@ -39,6 +39,8 @@ The command exits with 1 when `apps/web` uses something the contract does not ha
 
 **Menus.** `MenuPresenter`, `PopupPresenter`, `PositionOptions` and the menu item types that `apps/web/src/components/menu` and its callers import from `@notesnook/ui`.
 
+**Web CSS the desktop kit draws.** A theme colour written as a CSS variable (`bg="var(--background-error)"`, `border: "1px solid var(--border)"`), `start`/`end` alignment, `pointerEvents: "all"`, `color: "inherit"`, `alpha()` of a CSS colour name, a `:disabled` state (applied while the `disabled` prop is set), text written straight into a `Box` or `Flex`, `<br />` in a `Text`, and a percentage `translate` on an `Icon` (resolved against the icon's size). `colorScheme` is accepted and ignored.
+
 **Styles that replace React Native props.** `numberOfLines={2}` becomes `sx={{ lineClamp: 2 }}`; `resizeMode="cover"` becomes `sx={{ objectFit: "cover" }}`.
 
 ## The web implementation
@@ -97,8 +99,7 @@ Three of the old props had a web name with a different shape, so they could not 
   - These components are unit-tested by rendering them headlessly (`desktop/testing/render.ts`, with the stand-ins in `desktop/testing/mocks.ts`).
 - **What desktop does differently for a kept name.** `onPaste` is never raised (the native text field reports no paste). `preventDefault()` on a keyboard event does not stop the native key handling. `as` only selects form behaviour (`as="form"`); it sets no accessibility role. `dir`, `aria-invalid`, `aria-describedby`, `data-*` other than `data-test-id`, and on `Input` `name`, `required`, `pattern`, `min`, `max`, `step`, `autoComplete` and `inputMode` are accepted and ignored. `scrollIntoView`, `scrollTo` and setting `scrollTop` act on the nearest native scroll view. A `Label` with its own click handler does not also activate its control.
 - **`measureInWindow` is still required on `UIElement`.** While it is, a real DOM element is not assignable to `UIElement`. It becomes assignable when the deprecated names are removed.
-- **DOM type names.** `apps/web` writes `useRef<HTMLDivElement>` and `React.MouseEvent<HTMLInputElement>`. Desktop is type-checked without the DOM library, so those names do not exist there. A shared file imports the `UI*` type under the DOM name (`import { type UIInputElement as HTMLInputElement } from "@notesnook/ui-kit"`), so only its imports differ from web's. A DOM name used as a value (`instanceof HTMLTextAreaElement`) has no stand-in.
-- **Icons as strings.** `apps/web` passes an icon to string APIs as `icon: Plus.path`. Every icon from `shared/icon-factory.ts` has a `.path`: the SVG path of an `mdiIcon`, the whole SVG document of an `svgIcon`. `Icon`'s `path` prop draws either (anything starting with `<` is drawn like `svg`), on both targets.
+- **DOM type names.** `apps/web` writes `useRef<HTMLDivElement>` and `React.MouseEvent<HTMLInputElement>`. Desktop is type-checked without the DOM library, where those names are empty stand-ins from `@types/react`. `desktop/dom-types.d.ts` makes `HTMLElement` a `UIElement` (and `HTMLInputElement`, `HTMLTextAreaElement` the input ones), and the handlers in `BaseProps` are declared as methods, so a handler typed with React's event names fits them. On desktop the handler still receives the kit's DOM-shaped event.
 - **`sx` keys.** `apps/web` writes CSS in `sx` that the contract rejects (selectors, grid, animations and so on). They are listed in the last table. They do not fail the check: each one needs a decision when its file is aligned, either to draw it on desktop and add it, or to rewrite the call site.
 - **Shape is checked by name, not by type.** The check compares names only: props, the members a handler reads from its event, the members used on a ref, the keys of `components` and of `Modal`'s `style`, and named imports. It does not compare the type of a value `apps/web` passes with the type the contract declares. A `kept` row proves the name exists, not that the value fits. The value types are proved by type-checking `apps/web` against the kit (plan item 5.3).
 - **Planned fixes.** Five raw DOM methods that `apps/web` reads from refs (`closest`, `querySelector`, `appendChild`, `classList`, `outerHTML`) are not in the kit, so the check fails on them until their call sites are aligned. `Image`'s `maxHeight` is no longer one of them: web now sets it in `sx`, which the kit types as `SxProp.maxHeight`.
@@ -595,7 +596,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 
 ### sx keys
 
-174 different keys are written in `sx` objects; 103 are in the contract. The rest are listed here with the reason desktop does not draw them; they do not fail the check.
+174 different keys are written in `sx` objects; 105 are in the contract. The rest are listed here with the reason desktop does not draw them; they do not fail the check.
 
 | Key | Uses | Example | Note |
 |---|---:|---|---|
@@ -603,7 +604,6 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | `::-webkit-inner-spin-button` | 1 | src/components/otp-input/index.tsx | browser number-input spinner; desktop draws none |
 | `::-webkit-outer-spin-button` | 1 | src/components/otp-input/index.tsx | browser number-input spinner; desktop draws none |
 | `::placeholder` | 1 | src/components/editor/title-box.tsx | pseudo-element; the kit's Input draws its placeholder in the placeholder colour |
-| `:disabled` | 1 | src/components/field/index.tsx | not a kit state; style from the disabled prop instead |
 | `:first-of-type` | 1 | src/dialogs/mfa/steps.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
 | `:hover #profile-picture-edit` | 1 | src/dialogs/settings/components/user-profile.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
 | `:hover #remove-item, :hover #add-item` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
@@ -642,7 +642,6 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | `backgroundPosition` | 1 | src/views/wrapped.tsx | use experimental_backgroundPosition |
 | `backgroundSize` | 2 | src/components/lightbox/index.tsx | use experimental_backgroundSize |
 | `borderCollapse` | 1 | src/dialogs/inbox-history-dialog.tsx | desktop has no table layout |
-| `colorScheme` | 1 | src/components/field/index.tsx | native form controls follow the kit theme, not a colour scheme |
 | `fieldSizing` | 1 | src/components/editor/title-box.tsx | inputs do not size to their content on desktop |
 | `gridColumn` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
 | `gridRow` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |

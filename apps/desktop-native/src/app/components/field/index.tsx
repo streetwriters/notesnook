@@ -17,41 +17,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useState, type ReactElement } from "react";
-import {
-  Button,
-  Flex,
-  Input,
-  Label,
-  Text,
-  type InputProps,
-  type UIMouseEvent,
-  type SxProp,
-  type UIInputElement
-} from "@notesnook/ui-kit";
-import { PasswordInvisible, PasswordVisible, type Icon } from "../icons";
+import { forwardRef, useId, useState } from "react";
+import { Button, Flex, Text, InputProps, Input, Label } from "@notesnook/ui-kit";
+import { ThemeUIStyleObject } from "@notesnook/ui-kit";
+import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AuthErrorText } from "../error-text";
 
 type Action = {
   id?: string;
   testId?: string;
-  onClick?: (event: UIMouseEvent) => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
   icon?: Icon;
-  component?: ReactElement;
+  component?: JSX.Element;
   hidden?: boolean;
-  sx?: SxProp;
+  sx?: ThemeUIStyleObject;
 };
-
 export type FieldProps = InputProps & {
   label?: string;
   helpText?: string;
   error?: string;
+  inputRef?: React.Ref<HTMLInputElement>;
+  ["data-test-id"]?: string;
   validate?: (text: string) => boolean;
   styles?: {
-    input?: SxProp;
-    label?: SxProp;
-    helpText?: SxProp;
+    input?: ThemeUIStyleObject;
+    label?: ThemeUIStyleObject;
+    helpText?: ThemeUIStyleObject;
   };
   action?: Action;
   rightActions?: Action[];
@@ -60,83 +53,7 @@ export type FieldProps = InputProps & {
   rightIcon?: Icon;
 };
 
-function ActionButtons(props: {
-  actions: Action[];
-  side: "left" | "right";
-  iconSize: number;
-}) {
-  const { actions, side, iconSize } = props;
-  if (actions.length === 0) return null;
-  return (
-    <Flex
-      sx={{
-        flexDirection: "row",
-        position: "absolute",
-        top: 0,
-        [side]: 0,
-        height: "100%",
-        ...(side === "left"
-          ? {
-              borderTopLeftRadius: "radius2",
-              borderBottomLeftRadius: "radius2"
-            }
-          : {
-              borderTopRightRadius: "radius2",
-              borderBottomRightRadius: "radius2"
-            }),
-        overflow: "hidden"
-      }}
-    >
-      {actions.map((action, index) => (
-        <Button
-          id={action.id}
-          key={action.testId || action.id || index}
-          variant="secondary"
-          data-test-id={action.testId}
-          onClick={action.onClick}
-          disabled={action.disabled}
-          sx={{
-            p: 0,
-            px: 1,
-            height: "100%",
-            borderRadius: 0,
-            margin: 0,
-            alignItems: "center",
-            justifyContent: "center",
-            ...action.sx
-          }}
-        >
-          {action.component ? (
-            action.component
-          ) : action.icon ? (
-            <action.icon size={iconSize} color="icon" />
-          ) : null}
-        </Button>
-      ))}
-    </Flex>
-  );
-}
-
-function InlineIcon(props: { icon: Icon; side: "left" | "right" }) {
-  return (
-    <Flex
-      sx={{
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        [props.side]: "spacing4",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: "none",
-        zIndex: 1
-      }}
-    >
-      <props.icon size={15} color="icon" />
-    </Flex>
-  );
-}
-
-const Field = forwardRef<UIInputElement, FieldProps>(function Field(
+const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
   props,
   ref
 ) {
@@ -147,19 +64,19 @@ const Field = forwardRef<UIInputElement, FieldProps>(function Field(
     error,
     action,
     sx,
+    id,
     type,
+    inputRef,
     validate,
     disabled,
-    leftIcon,
-    rightIcon,
-    onChange,
-    // Deprecated alias, still used by callers outside components until 5.1:
-    // raised here, after validation, and kept off the inner Input.
-    onChangeText,
+    leftIcon: LeftIcon,
+    rightIcon: RightIcon,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const colorScheme = useThemeStore((state) => state.colorScheme);
   const [isValid, setIsValid] = useState(true);
+  const errorId = useId();
   const rightActions = props.rightActions
     ? props.rightActions.filter((a) => !a.hidden)
     : action && !action.hidden
@@ -172,77 +89,100 @@ const Field = forwardRef<UIInputElement, FieldProps>(function Field(
   return (
     <Flex
       sx={{
+        // m: "2px",
+        // mr: "2px",
         opacity: disabled ? 0.7 : 1,
         gap: "spacing4",
         ...sx,
         flexDirection: "column"
       }}
     >
-      {label ? (
+      {label && (
         <Label
+          htmlFor={id}
           sx={{
             fontFamily: "body",
             flexDirection: "column",
-            alignItems: "flex-start",
             fontSize: "xs",
             color: "paragraph-secondary",
             lineHeight: 1.2,
             ...styles?.label
           }}
         >
-          <Text
-            sx={{
-              fontSize: "xs",
-              color: "paragraph-secondary",
-              textAlign: "left",
-              ...styles?.label
-            }}
-          >
-            {label}
-            {helpText ? " " : ""}
-            {helpText ? (
-              <Text
-                variant="subBody"
-                sx={{ fontWeight: "normal", ...styles?.helpText }}
-              >
-                {helpText}
-              </Text>
-            ) : null}
-          </Text>
+          {label}{" "}
+          {helpText && (
+            <Text
+              variant="subBody"
+              as="span"
+              sx={{
+                fontWeight: "normal",
+                ...styles?.helpText
+              }}
+            >
+              {helpText}
+            </Text>
+          )}
         </Label>
-      ) : null}
+      )}
 
       <Flex sx={{ position: "relative", flex: 1 }}>
         <Input
           {...inputProps}
-          ref={ref}
-          disabled={disabled}
           variant={isValid && !error ? inputProps.variant || "input" : "error"}
+          aria-invalid={error ? true : inputProps["aria-invalid"]}
+          aria-describedby={error ? errorId : inputProps["aria-describedby"]}
+          ref={ref || inputRef}
+          id={id}
           type={isPasswordVisible ? "text" : type || "text"}
           sx={{
             flex: 1,
             pr: rightActions.length > 0 ? 20 : undefined,
             ...styles?.input,
-            pointerEvents: disabled ? "none" : "auto"
+            pointerEvents: disabled ? "none" : "all",
+            ":disabled": {
+              bg: "background-disabled"
+            },
+            colorScheme
           }}
           onChange={(e) => {
-            const valid = !validate || validate(e.target.value);
-            setIsValid(valid);
-            if (valid) {
-              onChange?.(e);
-              onChangeText?.(e.target.value);
-            }
+            const isValid = !validate || validate(e.target.value);
+            setIsValid(isValid);
+            if (isValid && inputProps.onChange) inputProps.onChange(e);
           }}
         />
-        {leftIcon ? <InlineIcon icon={leftIcon} side="left" /> : null}
-        {rightIcon ? <InlineIcon icon={rightIcon} side="right" /> : null}
-        {type === "password" ? (
+        {LeftIcon && (
+          <LeftIcon
+            size={15}
+            color="icon"
+            sx={{
+              left: "spacing4",
+              pointerEvents: "none",
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 1
+            }}
+          />
+        )}
+        {RightIcon && (
+          <RightIcon
+            size={15}
+            color="icon"
+            sx={{
+              right: "spacing4",
+              pointerEvents: "none",
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 1
+            }}
+          />
+        )}
+        {type === "password" && (
           <Flex
             onClick={() => setIsPasswordVisible((s) => !s)}
+            variant="rowCenter"
             sx={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
               position: "absolute",
               right: 0,
               top: 0,
@@ -255,16 +195,102 @@ const Field = forwardRef<UIInputElement, FieldProps>(function Field(
             }}
           >
             {isPasswordVisible ? (
-              <PasswordVisible size={15} color="icon" />
+              <PasswordVisible size={15} />
             ) : (
-              <PasswordInvisible size={15} color="icon" />
+              <PasswordInvisible size={15} />
             )}
           </Flex>
+        )}
+
+        {leftActions.length > 0 ? (
+          <Flex
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              height: "100%",
+              borderTopLeftRadius: "radius2",
+              borderBottomLeftRadius: "radius2",
+              overflow: "hidden"
+            }}
+          >
+            {leftActions.map((action) => (
+              <Button
+                id={action.id}
+                key={action.testId}
+                type="button"
+                variant={"secondary"}
+                data-test-id={action.testId}
+                onClick={action.onClick}
+                sx={{
+                  p: 0,
+                  px: 1,
+                  height: "100%",
+                  // bg: "transparent",
+                  borderRadius: 0,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  ...action.sx
+                }}
+                disabled={action.disabled}
+              >
+                {action.component ? (
+                  action.component
+                ) : action.icon ? (
+                  <action.icon size={20} />
+                ) : null}
+              </Button>
+            ))}
+          </Flex>
         ) : null}
-        <ActionButtons actions={leftActions} side="left" iconSize={20} />
-        <ActionButtons actions={rightActions} side="right" iconSize={15} />
+        {rightActions.length > 0 ? (
+          <Flex
+            className="rightActions"
+            sx={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              height: "100%",
+              borderTopRightRadius: "radius2",
+              borderBottomRightRadius: "radius2",
+              overflow: "hidden"
+            }}
+          >
+            {rightActions.map((action) => (
+              <Button
+                id={action.id}
+                key={action.testId}
+                type="button"
+                variant={"secondary"}
+                data-test-id={action.testId}
+                onClick={action.onClick}
+                sx={{
+                  p: 0,
+                  px: 1,
+                  height: "100%",
+                  // bg: "transparent",
+                  borderRadius: 0,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  ...action.sx
+                }}
+                disabled={action.disabled}
+              >
+                {action.component ? (
+                  action.component
+                ) : action.icon ? (
+                  <action.icon size={15} />
+                ) : null}
+              </Button>
+            ))}
+          </Flex>
+        ) : null}
       </Flex>
-      <AuthErrorText error={error} />
+      <AuthErrorText id={errorId} error={error} />
     </Flex>
   );
 });

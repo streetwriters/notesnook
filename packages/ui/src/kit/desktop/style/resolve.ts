@@ -112,6 +112,15 @@ function withCssTransform<T extends object>(style: T): T {
   return style;
 }
 
+/** `:disabled` styles apply while the element's `disabled` prop is set. */
+export function withDisabledStyle(sx: SxProp | undefined, disabled: unknown) {
+  const state = (sx as { ":disabled"?: SxProp } | undefined)?.[":disabled"];
+  if (!state) return sx;
+  const rest: Record<string, unknown> = { ...sx };
+  delete rest[":disabled"];
+  return (disabled ? { ...rest, ...state } : rest) as SxProp;
+}
+
 export function resolveSx(
   sx: SxProp | undefined,
   context: ThemeContextValue,

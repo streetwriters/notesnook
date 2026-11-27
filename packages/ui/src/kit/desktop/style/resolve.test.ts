@@ -23,8 +23,19 @@ import {
   resolveAlpha,
   resolveColor,
   resolveCssVars,
-  withAlpha
+  withAlpha,
+  withDisabledStyle
 } from "./resolve";
+
+describe(":disabled", () => {
+  test("applies while disabled and is dropped otherwise", () => {
+    const sx = { bg: "accent", ":disabled": { bg: "background" } } as never;
+    expect(withDisabledStyle(sx, true)).toEqual({ bg: "background" });
+    expect(withDisabledStyle(sx, false)).toEqual({ bg: "accent" });
+    const plain = { bg: "accent" } as never;
+    expect(withDisabledStyle(plain, true)).toBe(plain);
+  });
+});
 
 const colors = { accent: "#008837", background: "#fff" };
 

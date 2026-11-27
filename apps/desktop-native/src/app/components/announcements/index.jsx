@@ -21,7 +21,6 @@ import { Flex, Text } from "@notesnook/ui-kit";
 import { Cross } from "../icons";
 import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
-import Notice from "../notice";
 
 import { alpha } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";

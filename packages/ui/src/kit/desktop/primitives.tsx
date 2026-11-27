@@ -945,6 +945,27 @@ export const Slider = forwardRef<UIInputElement, Contract.SliderProps>(
   }
 );
 
+const PERCENT_TRANSLATE = /translate([XY]?)\((-?\d*\.?\d+)%\)/g;
+
+/**
+ * A CSS transform with each percentage translate (of the element's own
+ * size, as on the web) turned into pixels, which is all desktop can draw.
+ */
+export function resolvePercentTranslate(
+  transform: unknown,
+  width: number,
+  height: number
+) {
+  if (typeof transform !== "string" || !transform.includes("%"))
+    return transform;
+  return transform.replace(PERCENT_TRANSLATE, (_, axis: string, amount) => {
+    const ratio = parseFloat(amount) / 100;
+    if (axis === "X") return `translateX(${ratio * width}px)`;
+    if (axis === "Y") return `translateY(${ratio * height}px)`;
+    return `translate(${ratio * width}px, ${ratio * height}px)`;
+  });
+}
+
 export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   props,
   ref
@@ -962,12 +983,12 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   const color = props.color
     ? resolveColor(props.color, context.colors)
     : context.colors.icon;
+  const own = resolvePercentTranslate(viewStyle.transform, pixels, pixels);
   const transform = props.rotate
-    ? [
-        ...((viewStyle.transform as any[]) ?? []),
-        { rotate: `${props.rotate}deg` }
-      ]
-    : viewStyle.transform;
+    ? typeof own === "string"
+      ? `${own} rotate(${props.rotate}deg)`
+      : [...((own as any[]) ?? []), { rotate: `${props.rotate}deg` }]
+    : own;
   return (
     <IconView
       ref={setRef}

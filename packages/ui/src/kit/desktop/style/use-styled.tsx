@@ -42,7 +42,12 @@ import {
   pressHandler,
   type NativeHost
 } from "./native-props";
-import { breakpointOf, resolveSx, type ResolvedStyle } from "./resolve";
+import {
+  breakpointOf,
+  resolveSx,
+  withDisabledStyle,
+  type ResolvedStyle
+} from "./resolve";
 
 export { lastPointer, pressHandler };
 
@@ -132,9 +137,9 @@ export function useStyled(
 ): StyledResult {
   const context = useThemeContext();
   const breakpoint = useBreakpoint();
-  const sx = withInlineStyle(
-    mergeShorthands(props, options.defaults),
-    props.style
+  const sx = withDisabledStyle(
+    withInlineStyle(mergeShorthands(props, options.defaults), props.style),
+    (props as { disabled?: boolean }).disabled
   );
   const resolved = resolveSx(sx, context, {
     variantGroup: options.variantGroup,
