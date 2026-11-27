@@ -26,6 +26,8 @@ export const SUBSET = {
   "*.style":
     "the keys of StyleProp only, no responsive arrays and no theme lookups",
   "*.className": "accepted and ignored on desktop",
+  "Text.className":
+    "accepted; desktop reads the selectable class (text can be selected) and ignores the rest",
   "*.overlayClassName": "accepted and ignored on desktop",
   "*.as": "one of the tags in ElementTag; desktop maps each to a role",
   "*.variant": "the variants the Notesnook theme defines",

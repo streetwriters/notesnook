@@ -734,7 +734,7 @@ function LinkedNote({
             >
               <CaretDown
                 size={11}
-                sx={{}}
+                sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
                 color={isExpanded ? "icon-selected" : "icon"}
               />
             </Button>
@@ -854,7 +854,10 @@ function ReferencedIn({
               toggleExpand();
             }}
           >
-            <CaretDown size={11} sx={{}} />
+            <CaretDown
+              size={11}
+              sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
+            />
           </Button>
           <Text
             sx={{

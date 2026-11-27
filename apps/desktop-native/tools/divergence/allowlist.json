@@ -165,6 +165,71 @@
       "path": "components/notebook-picker.tsx",
       "category": "platform",
       "reason": "Web reveals each notebook's add button with CSS child selectors (&:hover .add-sub-notebook, &:focus-within) and styles the list with listStyle; desktop has no stylesheet selectors or list markers and uses the kit's group hover."
+    },
+    {
+      "path": "components/dialog/index.tsx",
+      "category": "platform",
+      "reason": "Draws its own backdrop and closes on a click there. Web's dialog reads react-modal's DOM (contentEl and offsetLeft/clientWidth geometry) and closes on a mousedown outside that element; the desktop kit's Modal does not expose those, so the close and the layout stay in the desktop file."
+    },
+    {
+      "path": "components/attachment/index.tsx",
+      "category": "platform",
+      "reason": "Desktop rows are flex layouts, not web's table rows. Attachments are read as base64 (downloadAttachment with base64) and PDFs open as base64 data URLs, because the desktop host has no Blob URLs (web uses URL.createObjectURL). The context menu opens at the pointer through the desktop menu hook."
+    },
+    {
+      "path": "components/publish-view/index.tsx",
+      "category": "platform",
+      "reason": "Keeps the publish form in local state with its own validation and opens the link with shell.openUrl. Web binds the fields with react-hook-form register(), which reads DOM inputs; desktop inputs are native elements, and web's target=_blank anchor has no desktop equivalent."
+    },
+    {
+      "path": "components/status-bar/index.tsx",
+      "category": "platform",
+      "reason": "Uses the desktop ThemeScope in place of web's ScopedThemeProvider and the kit's theme-token colours in place of var(--icon-error). The status icons spin with the kit's rotate prop, and web's responsive display arrays are not drawn."
+    },
+    {
+      "path": "components/properties/index.tsx",
+      "category": "platform",
+      "reason": "The spell-check item is not gated on IS_DESKTOP_APP, because the desktop has its own spell checker service. The item gap is a constant rather than a theme lookup, and the list uses the kit's containerSx and placeholderSx props. The collapse caret rotates as on web."
+    },
+    {
+      "path": "components/theme-preview/index.tsx",
+      "category": "platform",
+      "reason": "The desktop kit has no alpha() from @theme-ui/color and no CSS hover or transition, so the accent tint comes from a hex colour helper that accepts only #rrggbb and falls back to background-secondary for anything else. The size is split into width and height."
+    },
+    {
+      "path": "components/icon-tag/index.tsx",
+      "category": "platform",
+      "reason": "Draws the single-line label with the kit's lineClamp in place of web's CSS ellipsis, and the dismiss control with the kit's secondary button variant. Adds a chip prop with a group-hover background, takes container styles as containerSx, and has no className."
+    },
+    {
+      "path": "components/checkbox.tsx",
+      "category": "platform",
+      "reason": "onToggle gets the ctrl or meta state as a boolean, where web passes the DOM event. The label is the element's title, and the unchecked hover colour is the uncheckedGroupHoverColor prop instead of web's CSS class."
+    },
+    {
+      "path": "components/selected-check.tsx",
+      "category": "platform",
+      "reason": "onClick gets the ctrl or meta state as a boolean, not the DOM event. The deprecated onPress alias still works, and the click stops at the remove icon."
+    },
+    {
+      "path": "components/global-menu-wrapper/index.tsx",
+      "category": "platform",
+      "reason": "Renders the desktop MenuHost, which draws the menu panel in the app. Web's wrapper hands the menu to the native shell when it can (use-menu.ts isNative), and the desktop host has no showMenu call, so the menu always draws in the app."
+    },
+    {
+      "path": "components/menu/index.tsx",
+      "category": "desktop-only",
+      "reason": "The desktop host for the in-app menu panel. It connects the kit's desktop menu presenter to the menu store and to the @platform keyboard service. Web has no such file: its MenuPresenter is wired in global-menu-wrapper."
+    },
+    {
+      "path": "components/menu/store.ts",
+      "category": "desktop-only",
+      "reason": "Re-exports the kit's shared menu store, which positions the menu from an anchor rectangle, because the desktop kit measures native elements. Web's use-menu store keys the menu on a target element."
+    },
+    {
+      "path": "components/unlock-screen/index.tsx",
+      "category": "desktop-only",
+      "reason": "Desktop's own lock screen. It unlocks with the native keychain through @platform safeStorage and with WebAuthn security keys through the platform service. Web's lock UI is inline in views/app-lock.tsx and uses the web key store's desktop.safeStorage bridge."
     }
   ]
 }

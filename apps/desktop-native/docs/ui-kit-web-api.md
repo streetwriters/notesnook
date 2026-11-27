@@ -25,7 +25,7 @@ The command exits with 1 when `apps/web` uses something the contract does not ha
 
 ## The contract in short
 
-**Props.** Every element takes `sx`, `style`, `className`, `id`, `title`, `dir`, `tabIndex`, `data-*`, `aria-label`, `aria-hidden`, `aria-invalid`, `aria-describedby`, and the handlers `onClick`, `onAuxClick`, `onDoubleClick`, `onContextMenu`, `onMouseDown/Up/Move/Enter/Leave`, `onPointerDown/Move/Up`, `onTouchStart/Move/End`, `onWheel`, `onFocus`, `onBlur`, `onKeyDown/Up/Press`, `onSubmit`, `draggable`, `onDragStart/End/Enter/Over/Leave` and `onDrop`. `className` is accepted and ignored on desktop. Tests find elements by `data-test-id`.
+**Props.** Every element takes `sx`, `style`, `className`, `id`, `title`, `dir`, `tabIndex`, `data-*`, `aria-label`, `aria-hidden`, `aria-invalid`, `aria-describedby`, and the handlers `onClick`, `onAuxClick`, `onDoubleClick`, `onContextMenu`, `onMouseDown/Up/Move/Enter/Leave`, `onPointerDown/Move/Up`, `onTouchStart/Move/End`, `onWheel`, `onFocus`, `onBlur`, `onKeyDown/Up/Press`, `onSubmit`, `draggable`, `onDragStart/End/Enter/Over/Leave` and `onDrop`. `className` is accepted and ignored on desktop, except that `Text` reads the `selectable` class so error text can be selected as on web. Tests find elements by `data-test-id`.
 
 **Events.** Handlers receive DOM-shaped events (`contracts/events.ts`): `target`, `currentTarget`, `preventDefault`, `stopPropagation` on all of them; `key`, `code`, `repeat` and the modifier keys on keyboard events; `clientX/Y`, `pageX/Y`, `button`, `buttons`, `detail` on mouse events; `deltaX/Y` on wheel events; `dataTransfer` on drag events; `clipboardData` on paste.
 
@@ -358,7 +358,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Text | `as` | prop | 57 | subset | one of the tags in ElementTag; desktop maps each to a role |
 | Text | `bg` | prop | 2 | kept |  |
 | Text | `children` | prop | 478 | kept |  |
-| Text | `className` | prop | 11 | subset | accepted and ignored on desktop |
+| Text | `className` | prop | 11 | subset | accepted; desktop reads the selectable class (text can be selected) and ignores the rest |
 | Text | `color` | prop | 22 | kept |  |
 | Text | `dangerouslySetInnerHTML` | prop | 6 | subset | desktop draws the text of simple inline HTML, not arbitrary markup |
 | Text | `data-test-id` | prop | 35 | kept |  |

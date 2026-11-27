@@ -137,7 +137,7 @@ Top-level directories in `apps/desktop-native/`:
 - `desktop/`: the native project: `desktop.json` (window, identifier, packaging), the Rust entry point, assets and the end-to-end tests in `desktop/e2e/`
 - `tools/`: asset and icon generators, the visual parity tools, performance scripts and `ui-kit-web-api/` (`npm run check:web-api`: scans `apps/web` for the UI APIs it uses, fails if the kit contract lacks one, and regenerates the table in `docs/ui-kit-web-api.md`) and `divergence/` (`npm run report:divergence`: pairs every file in `src/app` with its `apps/web/src` counterpart, removes imports, and lists the changed lines per file; `-- --show <path>` prints one pair's diff, `-- --json` the whole report. `divergence/allowlist.json` lists the files allowed to differ, each with its category (platform, native-editor, desktop-only) and reason. A report only, it exits 0 whatever it finds) and `codemod/` (`npm run codemod -- [--write] <file|dir>...`: renames `onPress`, `onHoverIn/Out`, `testID`, `onChangeText` (on `Input`, `Textarea`), `numberOfLines` (on `Text`) and `resizeMode` (on `Image`) to the web API names, and lists what it left for a manual change; tests in `lib.test.mjs`)
 
-The app code only imports `@notesnook/ui-kit` and `@platform/*`; Metro resolves them to the active target.
+The app code only imports `@notesnook/ui-kit` and `@platform/*`; Metro resolves them to the active target. Stylesheets that copied web components import (`*.css`) resolve to an empty module, since the desktop draws its own styling (`metro.config.js`).
 
 ## Running tests
 
