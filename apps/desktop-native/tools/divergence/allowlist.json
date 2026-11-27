@@ -45,6 +45,126 @@
       "path": "components/filtered-list/index.tsx",
       "category": "platform",
       "reason": "The filter input is styled through Field's styles.input where web reaches it with an `input` selector in sx: desktop has no stylesheet selectors. Otherwise identical to web."
+    },
+    {
+      "path": "components/pdf-preview/index.tsx",
+      "category": "platform",
+      "reason": "Web draws PDFs with @react-pdf-viewer (DOM, canvas and its stylesheet); desktop draws them with the kit's PDF viewer over @react-native-gpui/pdf and saves, copies and prints through @platform files, shell and window services."
+    },
+    {
+      "path": "components/lightbox/index.tsx",
+      "category": "platform",
+      "reason": "Web's lightbox is a DOM image viewer that adds a class to document.body and listens for keys on document; desktop draws the image with kit primitives and takes keys from the kit and the window."
+    },
+    {
+      "path": "components/diff-viewer/index.tsx",
+      "category": "platform",
+      "reason": "Web scrolls the two versions together with react-scroll-sync over DOM scroll containers and renders diffblazer's HTML; desktop has no DOM, so it syncs the kit's scroll views and draws the diff from text."
+    },
+    {
+      "path": "components/error-boundary/index.tsx",
+      "category": "platform",
+      "reason": "Web listens for window error and unhandledrejection events, removes the #splash element and reloads with window.location; desktop takes errors from the Hermes runtime and restarts through the lifecycle service."
+    },
+    {
+      "path": "components/title-bar/index.tsx",
+      "category": "platform",
+      "reason": "Web's title bar calls the Electron bridge and window.close; desktop's window controls are the windowControls platform service and the kit's native TitleBar."
+    },
+    {
+      "path": "components/theme-provider/index.tsx",
+      "category": "platform",
+      "reason": "Web writes the theme into a <style> element, a theme-color <meta> and the <html> element; desktop has no document and hands the theme to the kit's ThemeScope."
+    },
+    {
+      "path": "components/importer/components/file-provider-handler.tsx",
+      "category": "platform",
+      "reason": "Web picks files with react-dropzone and hashes them with hash-wasm (WebAssembly); desktop picks files with the files platform service and hashes with the crypto service's xxh64."
+    },
+    {
+      "path": "components/importer/components/network-provider-handler.tsx",
+      "category": "platform",
+      "reason": "Web hashes with hash-wasm (WebAssembly) and writes the log with <span>/<br> and the help link with <a>; desktop hashes with the crypto service and draws the log as text and the link with the kit."
+    },
+    {
+      "path": "components/importer/components/provider-selector.tsx",
+      "category": "platform",
+      "reason": "Web uses a raw <select> and an <a> link; desktop has no HTML elements and uses the kit's Select and a link Text."
+    },
+    {
+      "path": "components/importer/xxhash.ts",
+      "category": "platform",
+      "reason": "Desktop's xxh64 from the crypto platform service, which stands in for hash-wasm (WebAssembly) that the importer uses on web."
+    },
+    {
+      "path": "components/loaders/list-loader.tsx",
+      "category": "platform",
+      "reason": "Web draws the loading skeleton with react-loading-skeleton (DOM and CSS animation); desktop draws it with kit boxes."
+    },
+    {
+      "path": "components/day-picker/index.tsx",
+      "category": "platform",
+      "reason": "Web lays the calendar out with CSS grid (display: grid) and @rehookify/datepicker; desktop lays out with flexbox only, so the calendar is built from rows."
+    },
+    {
+      "path": "components/placeholders/index.tsx",
+      "category": "platform",
+      "reason": "Web imports the empty-list illustrations as .svg files through Vite; the desktop host cannot import asset files and draws the generated illustrations (illustrations.generated.ts)."
+    },
+    {
+      "path": "components/icons.ts",
+      "category": "platform",
+      "reason": "Web's icons import @mdi/react and .svg?react files through Vite; desktop draws the same glyphs from the generated paths in icons.generated.ts through the kit's Icon."
+    },
+    {
+      "path": "components/icon-factory.ts",
+      "category": "platform",
+      "reason": "Makes the generated desktop icons (see icons.ts); web builds its icons from @mdi/react and SVG components."
+    },
+    {
+      "path": "components/notice/index.tsx",
+      "category": "platform",
+      "reason": "Web asks \"don't show again\" with the synchronous window.confirm; desktop has no blocking browser dialog and asks with ConfirmDialog."
+    },
+    {
+      "path": "components/otp-input/index.tsx",
+      "category": "platform",
+      "reason": "Web takes a pasted code from the input's paste event; the desktop text field raises no paste event, so a pasted code arrives through onChange and is split there."
+    },
+    {
+      "path": "components/announcements/body.tsx",
+      "category": "platform",
+      "reason": "Web lays action buttons out with CSS grid and opens links with window.open/window.location; desktop lays out with flexbox and opens links with the shell service."
+    },
+    {
+      "path": "components/monthly-activity-heatmap/index.tsx",
+      "category": "platform",
+      "reason": "Web shows each bar's tooltip with CSS child selectors (&:hover .tooltip, &:hover .bar) and CSS transition strings; desktop has no stylesheet selectors and uses the kit's hover state on each bar."
+    },
+    {
+      "path": "components/properties/toggle.tsx",
+      "category": "platform",
+      "reason": "Web sizes the switch's label with a `& label` selector; desktop has no stylesheet selectors and styles the label itself."
+    },
+    {
+      "path": "components/auth-container/index.tsx",
+      "category": "platform",
+      "reason": "Web places the background art with CSS grid (justifySelf) and transformOrigin; desktop lays out with flexbox and its transforms always use the element's centre."
+    },
+    {
+      "path": "components/svg-image/index.tsx",
+      "category": "platform",
+      "reason": "Draws the generated SVG and raster assets with the theme's colours; web shows the same files with <img src> through Vite, which the desktop host cannot import."
+    },
+    {
+      "path": "components/window-reveal.tsx",
+      "category": "desktop-only",
+      "reason": "Shows the native window once the first screen has drawn (or after a timeout); a browser tab has no window to reveal."
+    },
+    {
+      "path": "components/notebook-picker.tsx",
+      "category": "platform",
+      "reason": "Web reveals each notebook's add button with CSS child selectors (&:hover .add-sub-notebook, &:focus-within) and styles the list with listStyle; desktop has no stylesheet selectors or list markers and uses the kit's group hover."
     }
   ]
 }

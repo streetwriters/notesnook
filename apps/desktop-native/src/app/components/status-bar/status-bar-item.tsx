@@ -17,75 +17,57 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, type ForwardedRef, type ReactNode } from "react";
-import {
-  Button,
-  Text,
-  type ButtonProps,
-  type ColorValue,
-  type SxProp,
-  type UIElement
-} from "@notesnook/ui-kit";
-import type { Icon } from "../icons";
+import { Button, ButtonProps, Text, RestrictedSxProp } from "@notesnook/ui-kit";
+import { ForwardedRef, ReactNode, forwardRef } from "react";
+import { Icon, IconProps } from "../icons";
 
-type StatusBarIconProps = {
-  rotate?: boolean;
-  rotateDirection?: "clockwise" | "counterclockwise";
-  color?: ColorValue;
+type CommonProps = { sx?: RestrictedSxProp; className?: string };
+
+type NativeButtonProps = Omit<
+  ButtonProps,
+  "variant" | "sx" | "children" | "ref" | "className"
+> & {
+  "data-test-id"?: string;
 };
 
-type CommonProps = { sx?: SxProp; className?: string };
+type StatusBarIconProps = Pick<
+  IconProps,
+  "rotate" | "rotateDirection" | "color"
+>;
 
-type StatusBarTextItemProps = CommonProps & {
+export type StatusBarTextItemProps = CommonProps & {
   variant: "text";
   text: ReactNode;
   title?: string;
   "data-test-id"?: string;
 };
 
-type StatusBarButtonProps = CommonProps &
-  Pick<ButtonProps, "onClick" | "disabled" | "title"> & {
-    variant: "button";
-    "data-test-id"?: string;
-    icon?: Icon;
-    iconProps?: StatusBarIconProps;
-    text?: ReactNode;
-  };
+// button needs an icon, text, or both
+export type StatusBarButtonProps = CommonProps &
+  NativeButtonProps & { variant: "button" } & (
+    | { icon: Icon; iconProps?: StatusBarIconProps; text?: ReactNode }
+    | { icon?: never; iconProps?: never; text: ReactNode }
+  );
 
 export type StatusBarItemProps = StatusBarTextItemProps | StatusBarButtonProps;
 
-const TEXT_STYLE: SxProp = {
+const TEXT_STYLE: RestrictedSxProp = {
   color: "paragraph",
   fontSize: "3xs"
 };
 
-function spin(direction: "clockwise" | "counterclockwise"): SxProp {
-  const turn = direction === "clockwise" ? "360deg" : "-360deg";
-  return {
-    animation: {
-      keyframes: {
-        from: { transform: [{ rotate: "0deg" }] },
-        to: { transform: [{ rotate: turn as `${number}deg` }] }
-      },
-      duration: 1000,
-      iterationCount: "infinite",
-      easing: "linear"
-    }
-  };
-}
-
 function _StatusBarItem(
   props: StatusBarItemProps,
-  ref: ForwardedRef<UIElement>
+  ref: ForwardedRef<HTMLButtonElement>
 ) {
   if (props.variant === "text") {
-    const { text, sx, className, title } = props;
+    const { text, sx, className, title, "data-test-id": testId } = props;
     return (
       <Text
         className={className}
         title={title}
-        data-test-id={props["data-test-id"]}
-        sx={{ ...TEXT_STYLE, ...sx }}
+        data-test-id={testId}
+        sx={{ ...TEXT_STYLE, ...sx } as RestrictedSxProp}
       >
         {text}
       </Text>
@@ -100,37 +82,22 @@ function _StatusBarItem(
       {...buttonProps}
       ref={ref}
       variant="statusitem"
-      sx={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "paragraph",
-        height: 15,
-        borderRadius: "radius0",
-        gap: "spacing3",
-        ...(hasText
-          ? { fontSize: "3xs", px: "spacing1", py: 0 }
-          : { width: 15 }),
-        ...sx
-      }}
+      sx={
+        {
+          alignItems: "center",
+          justifyContent: "center",
+          display: "flex",
+          color: "paragraph",
+          height: "15px",
+          borderRadius: "radius0",
+          gap: "spacing3",
+          ...(hasText ? { fontSize: "3xs", p: "spacing1" } : { width: "15px" }),
+          ...sx
+        } as RestrictedSxProp
+      }
     >
-      {StatusIcon ? (
-        <StatusIcon
-          size={13}
-          color={iconProps?.color ?? "icon"}
-          sx={
-            iconProps?.rotate
-              ? spin(iconProps.rotateDirection ?? "clockwise")
-              : undefined
-          }
-        />
-      ) : null}
-      {hasText &&
-      (StatusIcon || typeof text === "string" || typeof text === "number") ? (
-        <Text sx={TEXT_STYLE}>{text}</Text>
-      ) : (
-        text
-      )}
+      {StatusIcon ? <StatusIcon size={13} {...iconProps} /> : null}
+      {StatusIcon && hasText ? <Text sx={TEXT_STYLE}>{text}</Text> : text}
     </Button>
   );
 }
