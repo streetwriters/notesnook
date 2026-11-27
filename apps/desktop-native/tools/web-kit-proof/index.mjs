@@ -20,8 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // The apps/web switch-over proof (see lib.mjs and docs/web-on-kit-proof.md).
 //
 //   node tools/web-kit-proof/index.mjs switch          rewrite apps/web's imports
-//   node tools/web-kit-proof/index.mjs report <ref>    diff size and every
-//                                                      non-import change since <ref>
+//   node tools/web-kit-proof/index.mjs report <base> [<head>]
+//        diff size and every non-import change from <base> to <head>
+//        (default HEAD), both committed
 //
 // A report only: exits 0 whatever it finds, 1 for bad arguments.
 
@@ -33,7 +34,7 @@ import { nonImportChanges, switchImports } from "./lib.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const web = path.join(root, "apps/web");
-const [command, ref] = process.argv.slice(2);
+const [command, ref, head = "HEAD"] = process.argv.slice(2);
 const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" });
 
 if (command === "switch") {
@@ -57,20 +58,22 @@ if (command === "switch") {
     if (fs.existsSync(path.join(web, dir))) walk(path.join(web, dir));
   console.log(`rewrote ${imports} imports in ${files} files`);
 } else if (command === "report" && ref) {
-  console.log(git("diff", "--shortstat", ref, "--", ".").trim());
-  const files = git("diff", "--name-only", ref, "--", ".").split("\n").filter(Boolean);
+  console.log(git("diff", "--shortstat", ref, head, "--", ".").trim());
+  const files = git("diff", "--name-only", ref, head, "--", ".")
+    .split("\n")
+    .filter(Boolean);
+  const show = (rev, file) => {
+    try {
+      return git("show", `${rev}:${file}`);
+    } catch {
+      return "";
+    }
+  };
   let importOnly = 0;
   let changed = 0;
   for (const file of files) {
-    const before = (() => {
-      try {
-        return git("show", `${ref}:${file}`);
-      } catch {
-        return "";
-      }
-    })();
-    const abs = path.join(root, file);
-    const after = fs.existsSync(abs) ? fs.readFileSync(abs, "utf8") : "";
+    const before = show(ref, file);
+    const after = show(head, file);
     const lines = /\.(tsx?|jsx?|mjs)$/.test(file)
       ? nonImportChanges(before, after)
       : ["(not a source file)"];
@@ -86,6 +89,6 @@ if (command === "switch") {
     `\n${files.length} files changed: ${importOnly} import-only, ${changed} with other changes`
   );
 } else {
-  console.error("usage: index.mjs switch | report <git-ref>");
+  console.error("usage: index.mjs switch | report <base> [<head>]");
   process.exit(1);
 }
