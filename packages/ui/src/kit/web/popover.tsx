@@ -18,66 +18,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import { create } from "zustand";
+import { createPortal } from "react-dom";
 import type * as Contract from "../contracts/overlays";
 import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
 import { useEscape } from "../shared/use-escape";
 import { useWindowSize } from "./hooks";
-import { Box, Flex } from "./primitives";
+import { Flex } from "./primitives";
 import { ThemeScope } from "./theme";
 
-type Entry = {
-  id: number;
-  rect: { x: number; y: number; width: number; height: number };
-  props: Contract.PopoverProps;
-};
+type Rect = { x: number; y: number; width: number; height: number };
 
-const useStore = create<{ entries: Entry[] }>(() => ({ entries: [] }));
-
-let counter = 0;
-
-function put(entry: Entry) {
-  useStore.setState((state) => ({
-    entries: [...state.entries.filter((e) => e.id !== entry.id), entry]
-  }));
-}
-
-function remove(id: number) {
-  useStore.setState((state) => ({
-    entries: state.entries.filter((e) => e.id !== id)
-  }));
-}
-
+/**
+ * Draws the popover beside its anchor, in a layer on `document.body`. It needs
+ * no `PopoverHost`: apps/web never mounted one, so popovers opened and did
+ * nothing (the same at the baseline).
+ */
 export function Popover(props: Contract.PopoverProps) {
-  const [id] = useStable();
+  const [rect, setRect] = useState<Rect>();
   useEscape(props.onClose, props.isOpen);
 
   useEffect(() => {
-    if (!props.isOpen) {
-      remove(id);
-      return;
-    }
-    if (props.anchorRect) {
-      put({ id, rect: props.anchorRect, props });
-      return;
-    }
-    const anchor = props.anchorRef?.current?.getBoundingClientRect();
-    if (anchor)
-      put({
-        id,
-        rect: {
-          x: anchor.left,
-          y: anchor.top,
-          width: anchor.width,
-          height: anchor.height
-        },
-        props
-      });
+    const next = props.isOpen ? anchorOf(props) : undefined;
+    setRect((current) => (sameRect(current, next) ? current : next));
   });
 
-  useEffect(() => () => remove(id), [id]);
-  return null;
+  if (!props.isOpen || !rect) return null;
+  return createPortal(
+    <PopoverEntry rect={rect} popover={props} />,
+    document.body
+  );
+}
+
+function anchorOf(props: Contract.PopoverProps): Rect | undefined {
+  if (props.anchorRect) return props.anchorRect;
+  const anchor = props.anchorRef?.current?.getBoundingClientRect();
+  if (!anchor) return undefined;
+  return {
+    x: anchor.left,
+    y: anchor.top,
+    width: anchor.width,
+    height: anchor.height
+  };
+}
+
+function sameRect(a?: Rect, b?: Rect) {
+  return (
+    a === b ||
+    (!!a &&
+      !!b &&
+      a.x === b.x &&
+      a.y === b.y &&
+      a.width === b.width &&
+      a.height === b.height)
+  );
 }
 
 const DEFAULT_SHEET_BREAKPOINT = 600;
@@ -102,28 +96,17 @@ export function ResponsivePresenter(props: Contract.ResponsivePresenterProps) {
   );
 }
 
-function useStable() {
-  return useState(() => ++counter);
-}
-
+/**
+ * Kept so existing mounts keep compiling. Popovers draw themselves now, so
+ * there is nothing for a host to draw.
+ */
 export function PopoverHost() {
-  const entries = useStore((state) => state.entries);
-  const window = useWindowSize();
-  return (
-    <>
-      {entries.map((entry) => (
-        <PopoverEntry key={entry.id} entry={entry} window={window} />
-      ))}
-    </>
-  );
+  return null;
 }
 
-function PopoverEntry(props: {
-  entry: Entry;
-  window: { width: number; height: number };
-}) {
-  const { entry, window } = props;
-  const { rect, props: popover } = entry;
+function PopoverEntry(props: { rect: Rect; popover: Contract.PopoverProps }) {
+  const { rect, popover } = props;
+  const viewport = useWindowSize();
   const ref = useRef<UIElement>(null);
   const [position, setPosition] = useState<{ top: number; left: number }>();
 
@@ -135,7 +118,7 @@ function PopoverEntry(props: {
         rect,
         { width: size.width, height: size.height },
         popover.placement ?? "bottom-start",
-        window
+        viewport
       ).then((next) => {
         if (cancelled) return;
         setPosition((current) =>
@@ -149,12 +132,14 @@ function PopoverEntry(props: {
     };
   });
 
+  // A fixed layer covers the viewport: a click outside the popover closes it,
+  // and the popover is placed in viewport coordinates, as it was measured.
   return (
     <ThemeScope scope="contextMenu">
-      <Box
+      <div
         onClick={popover.onClose}
-        sx={{
-          position: "absolute",
+        style={{
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
@@ -178,7 +163,7 @@ function PopoverEntry(props: {
         >
           {popover.children}
         </Flex>
-      </Box>
+      </div>
     </ThemeScope>
   );
 }

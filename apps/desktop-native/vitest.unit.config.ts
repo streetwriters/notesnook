@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  // jsdom tests transform as web modules, which only reads files the dev server
+  // may serve: the kit lives in packages/ui, outside this package.
+  server: { fs: { allow: ["../.."] } },
   test: {
     include: [
       "src/**/*.test.ts",
