@@ -125,6 +125,7 @@ const SIDE_BORDER_VALUE =
 const parseCache = new Map<string, [string, unknown][]>();
 
 function convertValue(key: string, value: unknown): [string, unknown][] {
+  if (key === "border" && value === 0) return [["borderWidth", 0]];
   if (typeof value !== "string") return [[key, value]];
   const cacheKey = `${key}\u0000${value}`;
   const hit = parseCache.get(cacheKey);
@@ -263,7 +264,12 @@ export function convertDeclarations(
     let value = declarations[key];
     // `inherit` is what desktop text does already when nothing is set.
     if (value === undefined || value === null || value === "inherit") continue;
+    // Desktop boxes already size to their content.
+    if (value === "fit-content") continue;
     switch (key) {
+      case "fontWeight":
+        if (value === "bolder") value = 700;
+        break;
       case "pointerEvents":
         if (value === "all") value = "auto";
         break;

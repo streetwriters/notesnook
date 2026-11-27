@@ -49,7 +49,8 @@ export type RadiusToken =
   | `${number}%`;
 export type FontSizeToken = keyof Theme["fontSizes"] | number;
 export type FontFamilyToken = keyof Theme["fonts"];
-export type FontWeightToken = keyof Theme["fontWeights"] | number;
+/** `bolder` is drawn as 700. */
+export type FontWeightToken = keyof Theme["fontWeights"] | number | "bolder";
 export type ShadowToken = keyof Theme["shadows"];
 export type IconSizeToken = keyof Theme["iconSizes"] | number;
 
@@ -60,12 +61,16 @@ export type Length =
   | `${number}%`
   | `${number}vw`
   | `${number}vh`
-  | "auto";
+  | "auto"
+  /** Drawn as the default size: desktop boxes already fit their content. */
+  | "fit-content";
 export type Responsive<T> = T | (T | null)[];
 
 type BorderLineStyle = "solid" | "dashed" | "dotted";
 export type Border =
   | "none"
+  /** As in CSS: no border. */
+  | 0
   | `${number}px ${BorderLineStyle}`
   | `${number}px ${BorderLineStyle} ${ColorToken}`
   | `${number}px ${BorderLineStyle} ${CssVarColor}`;
@@ -156,8 +161,14 @@ type SpaceKeys =
   | "rowGap"
   | "columnGap";
 
+/**
+ * Spacing may also be a theme callback, as in theme-ui: desktop resolves it
+ * with the same css() pass that resolves the tokens.
+ */
 export type SpaceProps = {
-  [K in SpaceKeys]?: Responsive<SpaceToken>;
+  [K in SpaceKeys]?:
+    | Responsive<SpaceToken>
+    | ((theme: Theme) => SpaceToken | Length);
 };
 
 export type StateStyle = ColorProps & {
@@ -173,7 +184,8 @@ export type StateStyle = ColorProps & {
 export type GroupStateStyle = { group: string; style: StateStyle };
 
 type LayoutProps = {
-  display?: Responsive<"flex" | "none">;
+  /** `block` is drawn as the default layout: desktop has no inline flow. */
+  display?: Responsive<"flex" | "none" | "block">;
   position?: "relative" | "absolute";
   top?: Length | SpaceToken;
   right?: Length | SpaceToken;

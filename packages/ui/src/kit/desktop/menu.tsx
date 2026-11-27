@@ -87,6 +87,8 @@ function MenuButton(props: {
   const { item } = props;
   const dangerous = item.variant === "dangerous";
   const IconComponent = item.iconComponent;
+  const iconColor =
+    item.styles?.icon?.color ?? (dangerous ? "icon-error" : "icon-secondary");
   const hasSubmenu = !!item.menu;
   return (
     <Button
@@ -126,16 +128,9 @@ function MenuButton(props: {
         }}
       >
         {IconComponent ? (
-          <IconComponent
-            size={13}
-            color={dangerous ? "icon-error" : "icon-secondary"}
-          />
+          <IconComponent size={13} color={iconColor} />
         ) : item.icon ? (
-          <Icon
-            path={item.icon}
-            size={13}
-            color={dangerous ? "icon-error" : "icon-secondary"}
-          />
+          <Icon path={item.icon} size={13} color={iconColor} />
         ) : null}
         <Text
           variant="body"

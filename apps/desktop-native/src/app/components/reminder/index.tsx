@@ -64,7 +64,6 @@ const PRIORITY_ICON_MAP = {
 type ReminderProps = {
   item: ReminderType;
   compact?: boolean;
-  index?: number;
 };
 
 function Reminder(props: ReminderProps) {
@@ -104,7 +103,6 @@ function Reminder(props: ReminderProps) {
   return (
     <ListItem
       item={item}
-      index={props.index}
       title={
         <Flex
           sx={{
@@ -236,7 +234,7 @@ function Reminder(props: ReminderProps) {
         ...(compact && {
           borderRadius: "radius1",
           p: "spacing2",
-          border: "none",
+          border: 0,
           gap: "spacing1"
         })
       }}

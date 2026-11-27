@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { ListItemIndex } from "../list-item";
 import {
   useCallback,
   useEffect,
@@ -349,15 +350,16 @@ function ItemRenderer(props: {
           }}
         />
       ) : null}
-      <ListItemWrapper
-        key={resolvedItem.item.id}
-        index={index}
-        item={resolvedItem.item}
-        data={resolvedItem.data}
-        context={context}
-        group={isSearching ? "search" : group}
-        compact={compact}
-      />
+      <ListItemIndex.Provider value={index}>
+        <ListItemWrapper
+          key={resolvedItem.item.id}
+          item={resolvedItem.item}
+          data={resolvedItem.data}
+          context={context}
+          group={isSearching ? "search" : group}
+          compact={compact}
+        />
+      </ListItemIndex.Provider>
     </>
   );
 }

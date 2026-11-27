@@ -30,6 +30,18 @@ describe("sx keys taken from apps/web", () => {
     );
   });
 
+  test("display block, fit-content and bolder draw as desktop defaults", () => {
+    const { style } = convertDeclarations({
+      display: "block",
+      height: "fit-content",
+      fontWeight: "bolder"
+    });
+    expect(style).not.toHaveProperty("display");
+    expect(style).not.toHaveProperty("height");
+    expect(style.fontWeight).toBe("700");
+    expect(convertDeclarations({ border: 0 }).style.borderWidth).toBe(0);
+  });
+
   test("inherit leaves the property to the parent", () => {
     expect(convertDeclarations({ color: "inherit" }).style.color).toBe(
       undefined

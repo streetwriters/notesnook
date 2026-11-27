@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   Notebook as NotebookType,
   VirtualizedGrouping
@@ -27,7 +27,7 @@ import { strings } from "@notesnook/intl";
 import { Box, Flex, Input } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
-import { store as selectionStore } from "../stores/selection-store";
+import { useStore as useSelectionStore } from "../stores/selection-store";
 import { Notebook } from "../components/notebook";
 import {
   VirtualizedTree,
@@ -37,15 +37,25 @@ import {
 import { ListLoader } from "../components/loaders/list-loader";
 import { SidebarPlaceholder } from "../components/placeholders";
 import { Funnel } from "../components/icons";
-
-type NotebookNodeData = { notebook: NotebookType; totalNotes: number };
+import { SidebarScroller } from "../components/sidebar-scroller";
 
 export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
-  const [filtered, setFiltered] = useState<VirtualizedGrouping<NotebookType>>();
-  const query = useRef("");
-  const treeRef = useRef<VirtualizedTreeHandle<NotebookNodeData>>(null);
-  const notebooks = filtered || roots;
+  const [filteredNotebooks, setFilteredNotebooks] =
+    useState<VirtualizedGrouping<NotebookType>>();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const treeRef =
+    useRef<
+      VirtualizedTreeHandle<{ notebook: NotebookType; totalNotes: number }>
+    >(null);
+  const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const isSelected = useSelectionStore((store) => store.isSelected);
+  const selectItem = useSelectionStore((store) => store.selectItem);
+  const deselectItem = useSelectionStore((store) => store.deselectItem);
+  const toggleSelection = useSelectionStore(
+    (store) => store.toggleSelectionMode
+  );
+  const notebooks = filteredNotebooks || roots;
 
   useEffect(() => {
     store.get().refresh();
@@ -53,79 +63,33 @@ export function Notebooks() {
 
   useEffect(() => {
     treeRef.current?.resetAndRefresh();
-  }, [filtered]);
+  }, [filteredNotebooks]);
 
   useEffect(() => {
     treeRef.current?.refresh();
-    if (!query.current) return;
+
+    const query = inputRef.current?.value.trim();
+    if (!query) return;
+
     (async () => {
-      setFiltered(await db.lookup.notebooks(query.current).sorted());
+      setFilteredNotebooks(await db.lookup.notebooks(query).sorted());
     })();
   }, [roots]);
 
-  const onFilter = useMemo(
-    () =>
-      debounce(async (text: string) => {
-        query.current = text.trim();
-        setFiltered(
-          await (query.current
-            ? db.lookup.notebooks(query.current).sorted()
-            : undefined)
-        );
-      }, 300),
-    []
-  );
-
-  const getChildNodes = useMemo(
-    () => async (parent: TreeNode<NotebookNodeData>) => {
-      if (!notebooks) return [];
-      const nodes: TreeNode<NotebookNodeData>[] = [];
-      const grouping =
-        parent.id === "root"
-          ? notebooks
-          : await db.relations
-              .from({ type: "notebook", id: parent.id }, "notebook")
-              .selector.sorted(db.settings.getGroupOptions("notebooks"));
-      for (let i = 0; i < grouping.length; ++i) {
-        const notebook = await grouping.item(i);
-        if (!notebook.item) continue;
-        nodes.push({
-          data: { notebook: notebook.item, totalNotes: 0 },
-          depth: parent.depth + 1,
-          hasChildren: false,
-          id: notebook.item.id,
-          parentId: parent.id
-        });
-      }
-      const allRelations = await db.relations
-        .from({ type: "notebook", ids: nodes.map((n) => n.id) }, [
-          "notebook",
-          "note"
-        ])
-        .get();
-      for (const node of nodes) {
-        node.hasChildren = allRelations.some(
-          (relation) =>
-            relation.fromId === node.id && relation.toType === "notebook"
-        );
-        node.data.totalNotes = allRelations.filter(
-          (relation) =>
-            relation.fromId === node.id && relation.toType === "note"
-        ).length;
-      }
-      return nodes;
-    },
-    [notebooks]
-  );
-
   return (
     <>
-      <Box id="notebooks" sx={{ flex: 1, mt: "spacing4" }}>
+      <Box
+        id="notebooks"
+        sx={{
+          flex: 1,
+          mt: "spacing4",
+          px: "spacing4"
+        }}
+      >
         {!notebooks ? (
           <ListLoader />
-        ) : notebooks.length === 0 ? (
+        ) : notebooks.length == 0 ? (
           <Flex
-            data-test-id="list-placeholder"
             sx={{
               justifyContent: "center",
               alignItems: "center",
@@ -135,52 +99,82 @@ export function Notebooks() {
             <SidebarPlaceholder variant="notebooks" />
           </Flex>
         ) : (
-          <Flex data-test-id="notebooks-list" sx={{ flex: 1, px: "spacing4" }}>
-            <VirtualizedTree
-              rootId="root"
-              itemHeight={33}
-              treeRef={treeRef}
-              saveKey="notebook-tree"
-              deselectAll={() => selectionStore.toggleSelectionMode(false)}
-              bulkSelect={selectionStore.setSelectedItems}
-              isSelected={selectionStore.isSelected}
-              onDeselect={selectionStore.deselectItem}
-              onSelect={selectionStore.selectItem}
-              getChildNodes={getChildNodes}
-              renderItem={({
-                collapse,
-                expand,
-                expanded,
-                item: node,
-                index,
-                select
-              }) => (
-                <Notebook
-                  key={node.id}
-                  index={index}
-                  depth={node.depth}
-                  isExpandable={node.hasChildren}
-                  item={node.data.notebook}
-                  isExpanded={expanded}
-                  totalNotes={node.data.totalNotes}
-                  refresh={async () => {
-                    const notebook = await db.notebooks.notebook(node.id);
-                    const totalNotes = await db.relations
-                      .from(node.data.notebook, "note")
-                      .count();
-                    treeRef.current?.refreshItem(
-                      index,
-                      notebook ? { notebook, totalNotes } : undefined,
-                      { expand: true }
+          <VirtualizedTree
+            testId="notebooks-list"
+            rootId={"root"}
+            itemHeight={33}
+            treeRef={treeRef}
+            deselectAll={() => toggleSelection(false)}
+            bulkSelect={setSelectedItems}
+            isSelected={isSelected}
+            onDeselect={deselectItem}
+            onSelect={selectItem}
+            saveKey="notebook-tree"
+            getChildNodes={async (parent) => {
+              const nodes: TreeNode<{
+                notebook: NotebookType;
+                totalNotes: number;
+              }>[] = [];
+              const grouping =
+                parent.id === "root"
+                  ? notebooks
+                  : await db.relations
+                    .from({ type: "notebook", id: parent.id }, "notebook")
+                    .selector.sorted(
+                      db.settings.getGroupOptions("notebooks")
                     );
-                  }}
-                  collapse={collapse}
-                  expand={expand}
-                  select={select}
-                />
-              )}
-            />
-          </Flex>
+              for (let i = 0; i < grouping.length; ++i) {
+                const notebook = await grouping.item(i);
+                if (!notebook.item) continue;
+                nodes.push({
+                  data: { notebook: notebook.item, totalNotes: 0 },
+                  depth: parent.depth + 1,
+                  hasChildren: false,
+                  id: notebook.item.id,
+                  parentId: parent.id
+                });
+              }
+              const allRelations = await db.relations
+                .from({ type: "notebook", ids: nodes.map((n) => n.id) }, [
+                  "notebook",
+                  "note"
+                ])
+                .get();
+              for (const node of nodes) {
+                node.hasChildren = allRelations.some(
+                  (nb) => nb.fromId === node.id && nb.toType === "notebook"
+                );
+                node.data.totalNotes = allRelations.filter(
+                  (nb) => nb.fromId === node.id && nb.toType === "note"
+                ).length;
+              }
+              return nodes;
+            }}
+            renderItem={({ collapse, expand, expanded, index, item: node }) => (
+              <Notebook
+                key={node.id}
+                depth={node.depth}
+                isExpandable={node.hasChildren}
+                item={node.data.notebook}
+                isExpanded={expanded}
+                totalNotes={node.data.totalNotes}
+                refresh={async () => {
+                  const notebook = await db.notebooks.notebook(node.id);
+                  const totalNotes = await db.relations
+                    .from(node.data.notebook, "note")
+                    .count();
+                  treeRef.current?.refreshItem(
+                    index,
+                    notebook ? { notebook, totalNotes } : undefined,
+                    { expand: true }
+                  );
+                }}
+                collapse={collapse}
+                expand={expand}
+              />
+            )}
+            Scroller={SidebarScroller}
+          />
         )}
       </Box>
       <Flex
@@ -192,6 +186,7 @@ export function Notebooks() {
         }}
       >
         <Input
+          ref={inputRef}
           variant="clean"
           placeholder={strings.filterNotebooks()}
           sx={{
@@ -201,7 +196,12 @@ export function Notebooks() {
             fontSize: "xs",
             color: "paragraph"
           }}
-          onChange={(e) => onFilter(e.target.value)}
+          onChange={debounce(async (e) => {
+            const query = e.target.value.trim();
+            setFilteredNotebooks(
+              await (query ? db.lookup.notebooks(query).sorted() : undefined)
+            );
+          }, 300)}
         />
         <Funnel size={13} color="icon-secondary" />
       </Flex>

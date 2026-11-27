@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { Theme } from "@notesnook/theme";
 import { areFeaturesAvailable } from "@notesnook/common";
 import {
   createInternalLink,
@@ -24,14 +25,7 @@ import {
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useRef } from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Text,
-  type MenuItem,
-  type UIMouseEvent
-} from "@notesnook/ui-kit";
+import { Box, Button, Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import {
   ArrowCounterClockwise,
@@ -66,12 +60,6 @@ import { useDragHandler } from "../../hooks/use-drag-handler";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 
-// The kit takes no theme callbacks in sx: these are spacing2, spacing3 and the
-// caret size that web's callback reads from the theme.
-const ICON_SIZE = 11;
-const SPACING2 = 5;
-const SPACING3 = 7;
-
 type NotebookProps = {
   item: NotebookType;
   totalNotes?: number;
@@ -81,8 +69,6 @@ type NotebookProps = {
   collapse?: () => void;
   refresh?: () => void;
   depth?: number;
-  index?: number;
-  select?: (event?: UIMouseEvent) => void;
 };
 export function Notebook(props: NotebookProps) {
   const {
@@ -93,8 +79,7 @@ export function Notebook(props: NotebookProps) {
     expand = () => {},
     collapse = () => {},
     refresh = () => {},
-    depth = 0,
-    select = () => {}
+    depth = 0
   } = props;
   const context = useNotesStore((store) => store.context);
   const isOpened = context?.type === "notebook" && context.id === item.id;
@@ -109,11 +94,7 @@ export function Notebook(props: NotebookProps) {
       isFocused={isOpened}
       isCompact
       item={item}
-      index={props.index}
-      onClick={(e) => {
-        select(e);
-        navigate(`/notebooks/${item.id}`);
-      }}
+      onClick={() => navigate(`/notebooks/${item.id}`)}
       onDragEnter={(e) => {
         if (!isDragEntering(e)) return;
         e.currentTarget.focus();
@@ -157,7 +138,6 @@ export function Notebook(props: NotebookProps) {
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                select(e);
                 isExpanded ? collapse() : expand();
               }}
             >
@@ -185,6 +165,7 @@ export function Notebook(props: NotebookProps) {
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "normal",
+              display: "block",
               fontSize: "xs",
               minWidth: 0
             }}
@@ -210,7 +191,16 @@ export function Notebook(props: NotebookProps) {
         borderRadius: "radius1",
         height: "100%",
         mb: "spacing1",
-        pl: depth === 0 ? SPACING2 : SPACING2 + (depth * ICON_SIZE + SPACING3)
+        pl: (t) => {
+          const theme = t as Theme;
+          const iconSize = 11;
+          const notebookIconSize = 13;
+          const gap = theme.space.spacing3;
+
+          return depth === 0
+            ? `${theme.space.spacing2}px`
+            : theme.space.spacing2 + (depth * iconSize + gap);
+        }
       }}
     />
   );

@@ -1034,47 +1034,42 @@
     {
       "path": "views/notebooks.tsx",
       "category": "platform",
-      "reason": "Keeps the desktop VirtualizedTree API (per-row index and select for keyboard selection, store callbacks instead of a DOM Scroller); the filter field below the tree is web's inline Input."
+      "reason": "Web pads Virtuoso's viewport through a '[data-viewport-type=\"element\"]' selector with a calc() width; desktop has no selectors, so the padding is on the container."
     },
     {
       "path": "components/reminder/index.tsx",
       "category": "platform",
-      "reason": "Web's ':hover .class' rules become the kit's :group-hover on the list-item group (checkbox and icon backgrounds), since desktop has no class selectors; rows take an index for keyboard selection; border: 0 becomes border: none for the kit's border type."
+      "reason": "Desktop has no class selectors, so web's ':hover .reminder-…' rules become the kit's :group-hover on the list-item group, for the checkbox colour and the icon backgrounds."
     },
     {
       "path": "components/note/index.tsx",
       "category": "platform",
-      "reason": "The kit has no alpha() or theme callbacks in sx, so the note colour is a data colour with the alpha in its hex code and the left padding is a number; rows take an index for keyboard selection; open-link, copy and print go through the shell, clipboard and environment platform services; colour menu items draw an icon component because desktop menus do not read styles.icon.color."
+      "reason": "Platform services and kit colours: open-link, copy and print go through the shell, clipboard and environment services (print hidden where the host cannot print), and the note colour is a data colour with its alpha in the hex code because the kit has no alpha() from @theme-ui/color. The ':hover .note-chip' rule is dropped: desktop has no class selectors, and IconTag draws the chip hover itself."
     },
     {
       "path": "components/notebook/index.tsx",
       "category": "platform",
-      "reason": "Rows take an index and a select callback for the desktop tree's keyboard selection, and the expander keeps the notebook-expand test id the e2e specs use; the depth padding is computed from constants because the kit takes no theme callbacks in sx; display: block is dropped."
+      "reason": "Only adds the notebook-expand test id that the e2e specs find the tree's expanders by."
     },
     {
       "path": "components/search-result/index.tsx",
       "category": "platform",
-      "reason": "Highlighted matches are kit Text with their own background, since the kit has no <span> or '.match' class selectors; 'bolder' becomes weight 700 and display: block is dropped (the kit types reject both); the expand button keeps the search-result-expand test id the e2e specs use."
+      "reason": "Highlighted matches are kit Text with their own background, since the desktop kit has no <span> and no '.match' class selector; the rows give React keys (web leaves them out) and the expand button keeps the search-result-expand test id the e2e specs use."
     },
     {
       "path": "components/trash-item/index.tsx",
       "category": "platform",
-      "reason": "Rows take an index for keyboard selection; the chip hover comes from IconTag's group-hover in place of web's '.trash-chip' class selector and className."
+      "reason": "Drops web's ':hover .trash-chip' rule: desktop has no class selectors, and IconTag draws the chip hover itself."
     },
     {
       "path": "views/tags.tsx",
       "category": "platform",
-      "reason": "The list placeholder is centred through ListContainer's placeholderSx (the kit has no '.list-container-placeholder' selector), there is no DOM SidebarScroller, and the view keeps the tags test id the e2e specs use."
+      "reason": "The list placeholder is centred through ListContainer's placeholderSx (desktop has no '.list-container-placeholder' selector) and ListContainer takes no Scroller; the view keeps the tags test id the e2e specs use."
     },
     {
       "path": "components/notebook-header.tsx",
       "category": "platform",
       "reason": "The crumb hover colour is paragraph: web's paragraph-hover is not a colour in the theme, which the kit's typed colours reject."
-    },
-    {
-      "path": "components/tag/index.tsx",
-      "category": "platform",
-      "reason": "Rows take an index for keyboard selection; height: fit-content and display: block are dropped because the kit's layout types reject them."
     },
     {
       "path": "hooks/use-resolved-item.ts",

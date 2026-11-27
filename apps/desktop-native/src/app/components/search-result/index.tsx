@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo, useState } from "react";
+import React, { useState } from "react";
 import type { HighlightedResult, Match as TMatch } from "@notesnook/core";
 import { Button, Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
@@ -103,7 +103,8 @@ function SearchResult(props: SearchResultProps) {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  fontWeight: isCompact ? "bold" : 700
+                  fontWeight: isCompact ? "bold" : "bolder",
+                  display: "block"
                 }}
               >
                 {item.title.map((match) => (
@@ -153,7 +154,8 @@ function SearchResult(props: SearchResultProps) {
                   variant={"body"}
                   color={isOpened ? "paragraph-selected" : "paragraph"}
                   sx={{
-                    whiteSpace: "pre-wrap"
+                    whiteSpace: "pre-wrap",
+                    display: "block"
                   }}
                 >
                   {match.map((match) => (
@@ -173,7 +175,7 @@ function SearchResult(props: SearchResultProps) {
   );
 }
 
-export default memo(SearchResult);
+export default React.memo(SearchResult);
 
 function Match({ match }: { match: TMatch }) {
   return (

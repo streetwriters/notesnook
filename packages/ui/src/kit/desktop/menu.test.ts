@@ -351,3 +351,22 @@ test("an empty menu and children in place of items both render", async () => {
   expect(custom.text()).toBe("my own content");
   expect(custom.queryByTestId("menu-container")).toBeUndefined();
 });
+
+test("an item's styles.icon.color colours its icon", async () => {
+  const colors: unknown[] = [];
+  const Swatch = (props: { color?: unknown }) => {
+    colors.push(props.color);
+    return null;
+  };
+  const { element } = menu([
+    {
+      ...button("red", "Red", []),
+      iconComponent: Swatch,
+      styles: { icon: { color: "accent" } }
+    } as MenuItem,
+    { ...button("plain", "Plain", []), iconComponent: Swatch } as MenuItem
+  ]);
+  await render(element);
+  expect(colors).toContain("accent");
+  expect(colors).toContain("icon-secondary");
+});

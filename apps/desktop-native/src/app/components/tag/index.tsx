@@ -48,7 +48,7 @@ import {
   Trash
 } from "../icons";
 
-type TagProps = { item: TagType; totalNotes: number; index?: number };
+type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
   const { item, totalNotes } = props;
   const { id } = item;
@@ -62,7 +62,6 @@ function Tag(props: TagProps) {
   return (
     <ListItem
       item={item}
-      index={props.index}
       isCompact
       isFocused={isSelected}
       sx={{
@@ -70,6 +69,7 @@ function Tag(props: TagProps) {
         px: "spacing2",
         mx: "spacing4",
         py: "spacing4",
+        height: "fit-content",
         pr: "spacing2"
       }}
       title={
@@ -97,6 +97,7 @@ function Tag(props: TagProps) {
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "normal",
+              display: "block",
               minWidth: 0
             }}
           >

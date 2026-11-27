@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { ComponentType } from "react";
+import { ListItemIndex } from "../list-item";
 import {
   useEffect,
   useImperativeHandle,
@@ -69,6 +71,8 @@ type TreeViewProps<T> = {
   }) => ReactNode;
   saveKey?: string;
   "data-test-id"?: string;
+  testId?: string;
+  Scroller?: ComponentType<any>;
   onSelect?: (id: string) => void;
   onDeselect?: (id: string) => void;
   bulkSelect?: (ids: string[]) => void;
@@ -207,7 +211,8 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   return (
     <ListSelectionContext.Provider value={cursor.selection}>
       <Virtuoso
-        data-test-id={props["data-test-id"]}
+        data-test-id={props.testId ?? props["data-test-id"]}
+        components={props.Scroller ? { Scroller: props.Scroller } : undefined}
         ref={list}
         style={{ flex: 1 }}
         tabIndex={0}
@@ -220,42 +225,44 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           const node = nodes[index];
           if (!node) return null;
           return (
-            <Node
-              item={node}
-              index={index}
-              select={() => undefined}
-              expanded={nodes[index + 1]?.parentId === node.id}
-              collapse={() => {
-                setExpandedIds({ ...expandedRef.current, [node.id]: false });
-                setNodes((tree) => {
-                  const removeIds: string[] = [];
-                  for (const treeNode of tree) {
-                    if (
-                      treeNode.parentId &&
-                      (treeNode.parentId === node.id ||
-                        removeIds.includes(treeNode.parentId))
-                    )
-                      removeIds.push(treeNode.id);
-                  }
-                  return tree.filter((n) => !removeIds.includes(n.id));
-                });
-              }}
-              expand={async () => {
-                const { children } = await fetchChildren(
-                  node,
-                  expandedRef.current,
-                  getChildNodes
-                );
-                setExpandedIds({ ...expandedRef.current, [node.id]: true });
-                setNodes((tree) => {
-                  if (tree.some((n) => n.parentId === node.id)) return tree;
-                  const copy = tree.slice();
-                  const at = copy.findIndex((n) => n.id === node.id);
-                  copy.splice(at + 1, 0, ...children);
-                  return copy;
-                });
-              }}
-            />
+            <ListItemIndex.Provider value={index}>
+              <Node
+                item={node}
+                index={index}
+                select={() => undefined}
+                expanded={nodes[index + 1]?.parentId === node.id}
+                collapse={() => {
+                  setExpandedIds({ ...expandedRef.current, [node.id]: false });
+                  setNodes((tree) => {
+                    const removeIds: string[] = [];
+                    for (const treeNode of tree) {
+                      if (
+                        treeNode.parentId &&
+                        (treeNode.parentId === node.id ||
+                          removeIds.includes(treeNode.parentId))
+                      )
+                        removeIds.push(treeNode.id);
+                    }
+                    return tree.filter((n) => !removeIds.includes(n.id));
+                  });
+                }}
+                expand={async () => {
+                  const { children } = await fetchChildren(
+                    node,
+                    expandedRef.current,
+                    getChildNodes
+                  );
+                  setExpandedIds({ ...expandedRef.current, [node.id]: true });
+                  setNodes((tree) => {
+                    if (tree.some((n) => n.parentId === node.id)) return tree;
+                    const copy = tree.slice();
+                    const at = copy.findIndex((n) => n.id === node.id);
+                    copy.splice(at + 1, 0, ...children);
+                    return copy;
+                  });
+                }}
+              />
+            </ListItemIndex.Provider>
           );
         }}
       />

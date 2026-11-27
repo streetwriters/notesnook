@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { Theme } from "@notesnook/theme";
 import React from "react";
 import {
   areFeaturesAvailable,
@@ -110,8 +111,7 @@ import {
   Tag as TagIcon,
   TextAa,
   Trash,
-  Upload,
-  type Icon
+  Upload
 } from "../icons";
 import type { Context } from "../list-container/types";
 import IconTag from "../icon-tag";
@@ -125,7 +125,6 @@ type NoteProps = NoteResolvedData & {
   date: number;
   compact?: boolean;
   sx?: SxProp;
-  index?: number;
 };
 
 // The kit has no alpha() from @theme-ui/color: a note's colour is drawn as a
@@ -174,7 +173,6 @@ function Note(props: NoteProps) {
 
   return (
     <ListItem
-      index={props.index}
       draggable={true}
       isFocused={isOpened}
       isCompact={compact}
@@ -226,7 +224,7 @@ function Note(props: NoteProps) {
       sx={{
         py: "spacing4",
         px: "spacing6",
-        pl: 13,
+        pl: (t) => (t as Theme).space?.["spacing6"] - 2,
         height: compact ? "auto" : undefined,
         borderBottom: "1px solid",
         borderLeft: "2px solid",
@@ -308,6 +306,7 @@ function Note(props: NoteProps) {
               </Flex>
               {note.expiryDate?.value && (
                 <IconTag
+                  className="note-chip"
                   icon={NoteExpiry}
                   selected={isSelected || isOpened}
                   text={formatDate(note.expiryDate.value, {
@@ -753,7 +752,8 @@ function colorsToMenuItems(
               type: "button",
               key: color.id,
               title: color.title,
-              iconComponent: createColorIcon(color.colorCode),
+              icon: Circle.path,
+              styles: { icon: { color: toDataColor(color.colorCode) } },
               isChecked,
               onClick: () => store.setColor(color.id, isChecked, ...ids)
             } satisfies MenuItem;
@@ -1017,6 +1017,7 @@ function getMetadataItems(props: {
     ...(context?.type !== "notebook"
       ? notebooks?.items.map((notebook) => (
           <IconTag
+            className="note-chip"
             selected={isSelected}
             key={notebook.id}
             icon={Notebook}
@@ -1031,6 +1032,7 @@ function getMetadataItems(props: {
       : []),
     ...(tags?.items.map((tag) => (
       <IconTag
+        className="note-chip"
         key={tag.id}
         selected={isSelected}
         testId="tag-item"
@@ -1049,6 +1051,7 @@ function getMetadataItems(props: {
     reminder && isReminderActive(reminder) && (
       <IconTag
         key="reminder"
+        className="note-chip"
         icon={NoteBell}
         selected={isSelected}
         iconSize={13}
@@ -1062,13 +1065,4 @@ function getMetadataItems(props: {
       />
     )
   ].filter(Boolean);
-}
-
-// Desktop menus draw an icon component in its own colour; they do not read
-// styles.icon.color.
-function createColorIcon(colorCode: string): Icon {
-  const color = toDataColor(colorCode);
-  return function ColorIcon(props) {
-    return <Circle {...props} color={color} />;
-  };
 }

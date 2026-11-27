@@ -35,7 +35,7 @@ import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { Multiselect } from "../../common/multi-select";
 
-type TrashItemProps = { item: TrashItemType; date: number; index?: number };
+type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
@@ -47,7 +47,6 @@ function TrashItem(props: TrashItemProps) {
     <ListItem
       isFocused={isOpened}
       item={item}
-      index={props.index}
       title={
         <Text
           dir="auto"
@@ -88,6 +87,7 @@ function TrashItem(props: TrashItemProps) {
             }}
           >
             <IconTag
+              className="trash-chip"
               icon={Note}
               selected={isSelected || isOpened}
               text={strings.note()}
@@ -105,6 +105,7 @@ function TrashItem(props: TrashItemProps) {
             }}
           >
             <IconTag
+              className="trash-chip"
               icon={Notebook}
               selected={isSelected || isOpened}
               text={strings.dataTypesCamelCase.notebook()}

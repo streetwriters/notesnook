@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  type ReactNode
+} from "react";
 import { Item } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { environment } from "@platform";
@@ -39,6 +45,13 @@ import {
 } from "../../stores/selection-store";
 import { Menu } from "../../hooks/use-menu";
 import { setDragData } from "../../utils/data-transfer";
+
+/**
+ * The row's position in its list, for the desktop keyboard selection. Lists
+ * and trees provide it, so item components need no index prop (web's have
+ * none: DOM focus moves between rows there).
+ */
+export const ListItemIndex = createContext<number | undefined>(undefined);
 
 type ListItemColors = {
   heading: ColorValue;
@@ -92,6 +105,8 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     item
   } = props;
   const selection = useListSelection();
+  const rowIndex = useContext(ListItemIndex);
+  const index = props.index ?? rowIndex;
   const isSelected = useSelectionStore((store) => {
     const isInSelection = store.selectedItems.includes(item.id);
     return isFocused
@@ -100,19 +115,19 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
   });
   const isCursor =
     selection !== undefined &&
-    props.index !== undefined &&
-    selection.focusedIndex === props.index;
+    index !== undefined &&
+    selection.focusedIndex === index;
   const selected = isSelected || isFocused;
 
   const onClickRef = useRef(props.onClick);
   onClickRef.current = props.onClick;
   useEffect(() => {
-    if (!selection || props.index === undefined) return;
-    return selection.register(props.index, () =>
+    if (!selection || index === undefined) return;
+    return selection.register(index, () =>
       onClickRef.current?.(undefined as never)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection, props.index]);
+  }, [selection, index]);
 
   const openContextMenu = async (event: UIMouseEvent) => {
     event.preventDefault();
@@ -175,8 +190,8 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
         }
       }}
       onClick={(event) => {
-        if (selection && props.index !== undefined)
-          selection.onItemPress(props.index, item.id, event, () =>
+        if (selection && index !== undefined)
+          selection.onItemPress(index, item.id, event, () =>
             props.onClick?.(event)
           );
         else props.onClick?.(event);

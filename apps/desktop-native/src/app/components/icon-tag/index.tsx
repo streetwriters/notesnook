@@ -30,6 +30,8 @@ import { Close, type Icon } from "../icons";
 
 type IconTagProps = {
   text: string;
+  /** Accepted for web's call sites; desktop has no stylesheet to match it. */
+  className?: string;
   title?: string;
   icon: Icon;
   iconSize?: number;

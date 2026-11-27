@@ -42,11 +42,10 @@ type ListItemWrapperProps = {
   data?: unknown;
   context?: Context;
   compact?: boolean;
-  index?: number;
 };
 
 export function ListItemWrapper(props: ListItemWrapperProps) {
-  const { group, compact, context, item, data, index } = props;
+  const { group, compact, context, item, data } = props;
 
   switch (item.type) {
     case "searchResult":
@@ -54,7 +53,6 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
     case "note": {
       return (
         <Note
-          index={index}
           compact={compact}
           item={item}
           date={getDate(item, group)}
@@ -64,26 +62,19 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       );
     }
     case "trash":
-      return (
-        <TrashItem index={index} item={item} date={getDate(item, group)} />
-      );
+      return <TrashItem item={item} date={getDate(item, group)} />;
     case "notebook":
       return (
         <Notebook
-          index={index}
           item={item}
           totalNotes={typeof data === "number" ? data : 0}
         />
       );
     case "reminder":
-      return <Reminder index={index} item={item} compact={compact} />;
+      return <Reminder item={item} compact={compact} />;
     case "tag":
       return (
-        <Tag
-          index={index}
-          item={item}
-          totalNotes={typeof data === "number" ? data : 0}
-        />
+        <Tag item={item} totalNotes={typeof data === "number" ? data : 0} />
       );
     case "attachment":
       return <Attachment item={item} compact={compact} />;

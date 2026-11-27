@@ -23,6 +23,7 @@ import {
   resolveAlpha,
   resolveColor,
   resolveCssVars,
+  resolveSx,
   withAlpha,
   withDisabledStyle
 } from "./resolve";
@@ -128,5 +129,23 @@ describe("CSS variables", () => {
         colors
       )
     ).toEqual({ ":hover": { bg: "#008837" }, color: "var(--nope)" });
+  });
+});
+
+describe("theme callbacks", () => {
+  test("are called with the theme, each with its own closure", () => {
+    const context = {
+      key: {},
+      theme: { space: { spacing2: 5 } },
+      colors: {}
+    } as never;
+    const at = (depth: number) =>
+      resolveSx(
+        { pl: (t) => (t.space as { spacing2: number }).spacing2 + depth * 10 },
+        context,
+        { breakpoint: 0 }
+      );
+    expect(JSON.stringify(at(1))).toContain("15");
+    expect(JSON.stringify(at(2))).toContain("25");
   });
 });

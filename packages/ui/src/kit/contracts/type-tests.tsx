@@ -159,8 +159,8 @@ export const unsupportedUnit: SxProp = {
 };
 
 export const unsupportedDisplay: SxProp = {
-  // @ts-expect-error only flex and none are display values
-  display: "block"
+  // @ts-expect-error grid is not a display value desktop can lay out
+  display: "grid"
 };
 
 export const dataColors: SxProp = {

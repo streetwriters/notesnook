@@ -126,7 +126,7 @@ export function resolveSx(
   context: ThemeContextValue,
   options: ResolveOptions
 ): ResolvedStyle {
-  const target = sx ?? EMPTY;
+  const target = withThemeCallbacks(sx ?? EMPTY, context.theme);
   const key = optionsKey(options);
 
   let byObject = identityCache.get(context.key);
@@ -150,6 +150,22 @@ export function resolveSx(
 }
 
 const EMPTY: SxProp = {};
+
+/**
+ * Calls theme callbacks (`pl: (t) => t.space.spacing6 - 2`) before the cache
+ * lookup: the cache keys sx by its JSON, which leaves functions out, so two
+ * callbacks that close over different values would share one result.
+ */
+function withThemeCallbacks(sx: SxProp, theme: object): SxProp {
+  let out: Record<string, unknown> | undefined;
+  for (const key in sx) {
+    const value = (sx as Record<string, unknown>)[key];
+    if (typeof value !== "function") continue;
+    out ??= { ...sx };
+    out[key] = (value as (theme: object) => unknown)(theme);
+  }
+  return (out ?? sx) as SxProp;
+}
 
 const ALPHA = /^alpha\((.+),\s*(-?\d*\.?\d+)\)$/;
 // CSS colour names apps/web passes to alpha(), so their opacity can be set.
@@ -249,7 +265,9 @@ function variantAtPath(theme: object, path: string): Declarations | undefined {
     if (!value || typeof value !== "object") return undefined;
     value = (value as Record<string, unknown>)[part];
   }
-  return value && typeof value === "object" ? (value as Declarations) : undefined;
+  return value && typeof value === "object"
+    ? (value as Declarations)
+    : undefined;
 }
 
 function compute(
