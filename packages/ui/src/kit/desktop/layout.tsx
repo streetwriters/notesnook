@@ -19,10 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Children,
+  createContext,
   forwardRef,
   isValidElement,
   memo,
   useCallback,
+  useContext,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -35,7 +37,13 @@ import {
   View
 } from "react-native";
 import type * as Contract from "../contracts/layout";
+import type { UIElement } from "../contracts/elements";
 import { config } from "@platform";
+import {
+  createScrollElement,
+  emptyScrollMetrics,
+  syntheticEvent
+} from "./scroll-element";
 import { useStyled } from "./style/use-styled";
 
 const AnyView = View as any;
@@ -352,24 +360,121 @@ const PaneView = memo(function PaneView({
   );
 });
 
-export function ScrollContainer(props: Contract.ScrollContainerProps) {
+/**
+ * The native scroll props a virtualized list hands to its scroller. A list
+ * renders its `components.Scroller` inside this context, and the first
+ * `ScrollContainer` in it becomes the list's scroll view, so a Scroller
+ * written for the web (a `ScrollContainer` with its own track and thumb
+ * styles) works as it is.
+ */
+export const ScrollerSlot = createContext<Record<string, any> | null>(null);
+
+function assignRef(ref: unknown, value: unknown) {
+  if (typeof ref === "function") ref(value);
+  else if (ref && typeof ref === "object")
+    (ref as { current: unknown }).current = value;
+}
+
+export const ScrollContainer = forwardRef<
+  UIElement,
+  Contract.ScrollContainerProps
+>(function ScrollContainer(props, ref) {
+  const slot = useContext(ScrollerSlot);
   const { viewStyle, nativeProps } = useStyled({
-    sx: props.sx,
-    testID: props.testID
-  });
+    // `style` wins over `sx`, as an inline style does on the web.
+    sx: props.style ? { ...props.sx, ...props.style } : props.sx,
+    testID: props["data-test-id"] ?? props.testID,
+    id: props.id,
+    onWheel: props.onWheel
+  } as never);
+
+  const native = useRef<any>(null);
+  const metrics = useRef(emptyScrollMetrics()).current;
+  const element = useMemo(
+    () => createScrollElement(() => native.current, metrics),
+    [metrics]
+  );
+  useImperativeHandle(ref, () => element, [element]);
+
+  const slotRef = slot?.ref;
+  const setNative = useCallback(
+    (node: unknown) => {
+      native.current = node;
+      assignRef(slotRef, node);
+    },
+    [slotRef]
+  );
+
+  const onScroll = props.onScroll;
+  const handleScroll = (event: any) => {
+    const scroll = event?.nativeEvent;
+    if (scroll?.contentOffset) {
+      metrics.top = scroll.contentOffset.y ?? 0;
+      metrics.left = scroll.contentOffset.x ?? 0;
+    }
+    if (scroll?.contentSize) {
+      metrics.contentWidth = scroll.contentSize.width ?? metrics.contentWidth;
+      metrics.contentHeight =
+        scroll.contentSize.height ?? metrics.contentHeight;
+    }
+    if (scroll?.layoutMeasurement) {
+      metrics.width = scroll.layoutMeasurement.width ?? metrics.width;
+      metrics.height = scroll.layoutMeasurement.height ?? metrics.height;
+    }
+    slot?.onScroll?.(event);
+    onScroll?.(syntheticEvent(element, { nativeEvent: scroll }));
+  };
+
+  // The web scrolls on both axes unless one is suppressed. A native scroll
+  // view scrolls on one: vertical, or horizontal when only Y is suppressed.
+  const horizontal =
+    slot?.horizontal ?? (!!props.suppressScrollY && !props.suppressScrollX);
+  const scrollEnabled = !(props.suppressScrollX && props.suppressScrollY);
+
   return (
-    // flexGrow makes the content at least as tall as the viewport, so a child
-    // with `flex: 1` (the native editor) fills the page instead of collapsing
-    // to its content, as in a web `overflow: auto` column.
     <AnyScrollView
+      {...slot}
       {...nativeProps}
-      style={viewStyle}
-      contentContainerStyle={{ flexGrow: 1 }}
+      ref={setNative}
+      horizontal={horizontal}
+      scrollEnabled={scrollEnabled}
+      scrollEventThrottle={16}
+      style={slot?.style ? [slot.style, viewStyle] : viewStyle}
+      // flexGrow makes the content at least as tall as the viewport, so a child
+      // with `flex: 1` (the native editor) fills the page instead of collapsing
+      // to its content, as in a web `overflow: auto` column.
+      contentContainerStyle={
+        slot ? slot.contentContainerStyle : { flexGrow: 1 }
+      }
+      onScroll={handleScroll}
+      onContentSizeChange={(width: number, height: number) => {
+        metrics.contentWidth = width;
+        metrics.contentHeight = height;
+        slot?.onContentSizeChange?.(width, height);
+      }}
+      onLayout={(event: any) => {
+        const layout = event?.nativeEvent?.layout;
+        if (layout) {
+          metrics.width = layout.width;
+          metrics.height = layout.height;
+        }
+        native.current?.measureInWindow?.((x: number, y: number) => {
+          metrics.x = x;
+          metrics.y = y;
+        });
+        slot?.onLayout?.(event);
+      }}
     >
-      {props.children}
+      {slot ? (
+        <ScrollerSlot.Provider value={null}>
+          {props.children ?? slot.children}
+        </ScrollerSlot.Provider>
+      ) : (
+        props.children
+      )}
     </AnyScrollView>
   );
-}
+}) as unknown as typeof Contract.ScrollContainer;
 
 export function LayoutRoot(props: Contract.LayoutRootProps) {
   return <LayoutConformance mode="strict">{props.children}</LayoutConformance>;

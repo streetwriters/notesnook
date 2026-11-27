@@ -22,7 +22,10 @@ import { create } from "zustand";
 import type * as Contract from "../contracts/overlays";
 import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
+import { popupPosition, type PopupSize } from "../shared/popup-position";
+import { useEscape } from "../shared/use-escape";
 import { useWindowSize } from "./hooks";
+import { lastPointer } from "./style/use-styled";
 import { Box, Flex } from "./primitives";
 import { ThemeScope } from "./theme";
 
@@ -170,4 +173,149 @@ function PopoverEntry(props: {
       </Box>
     </ThemeScope>
   );
+}
+
+function measure(element: UIElement): Promise<Contract.AnchorRect> {
+  const rect = (element as Partial<UIElement>).getBoundingClientRect?.();
+  if (rect)
+    return Promise.resolve({
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height
+    });
+  return new Promise((resolve) =>
+    element.measureInWindow((x, y, width, height) =>
+      resolve({ x, y, width, height })
+    )
+  );
+}
+
+async function anchorOf(
+  position: Contract.PositionOptions | undefined,
+  pointer: { x: number; y: number }
+): Promise<Contract.AnchorRect> {
+  const target = position?.target;
+  if (!target || target === "mouse")
+    return { x: pointer.x, y: pointer.y, width: 0, height: 0 };
+  const rect = await measure(target);
+  if (!position.yAnchor) return rect;
+  const anchor = await measure(position.yAnchor);
+  return { x: rect.x, y: anchor.y, width: rect.width, height: anchor.height };
+}
+
+function Presenter(props: Contract.PopupPresenterProps) {
+  const {
+    isOpen: _isOpen,
+    position,
+    onClose,
+    blocking = true,
+    focusOnRender = true,
+    movable: _movable,
+    isMobile: _isMobile,
+    container: _container,
+    scope,
+    children,
+    sx,
+    ...rest
+  } = props;
+  const window = useWindowSize();
+  const content = useRef<UIElement>(null);
+  // A popup at the pointer stays where the pointer was when it opened.
+  const [pointer] = useState(() => ({ x: lastPointer.x, y: lastPointer.y }));
+  const [anchor, setAnchor] = useState<Contract.AnchorRect>();
+  const [size, setSize] = useState<PopupSize>();
+  useEscape(onClose, true);
+
+  useEffect(() => {
+    let cancelled = false;
+    anchorOf(position, pointer).then((next) => {
+      if (!cancelled) setAnchor(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [position, pointer, window.width, window.height]);
+
+  // The popup's own size is known only once it is laid out, and changes with
+  // its content (a lazy menu item loading), so it is read after every render.
+  useEffect(() => {
+    let cancelled = false;
+    content.current?.measureInWindow((_x, _y, width, height) => {
+      if (cancelled) return;
+      setSize((current) =>
+        current?.width === width && current?.height === height
+          ? current
+          : { width, height }
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
+
+  useEffect(() => {
+    if (focusOnRender) content.current?.focus?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const placed =
+    anchor && size
+      ? popupPosition(anchor, size, position ?? {}, window)
+      : undefined;
+  const popup = (
+    <Flex
+      testID="popup-presenter"
+      {...rest}
+      ref={content}
+      onPress={(event) => event.stopPropagation()}
+      sx={{
+        position: "absolute",
+        zIndex: 1000,
+        top: placed?.top ?? anchor?.y ?? 0,
+        left: placed?.left ?? anchor?.x ?? 0,
+        maxHeight: placed?.maxHeight,
+        // Drawn invisibly first, to be measured before it is placed.
+        opacity: placed ? 1 : 0,
+        ...sx
+      }}
+    >
+      {children}
+    </Flex>
+  );
+  // A blocking popup covers the window: a click outside it closes it and
+  // reaches nothing else. A non-blocking one leaves the window usable.
+  const body = blocking ? (
+    <Box
+      testID="popup-backdrop"
+      onPress={onClose}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1000
+      }}
+    >
+      {popup}
+    </Box>
+  ) : (
+    popup
+  );
+  return scope ? <ThemeScope scope={scope}>{body}</ThemeScope> : body;
+}
+
+/**
+ * `PopupPresenter` from `@notesnook/ui`: shows its children as a popup placed
+ * by `position` while `isOpen`, and calls `onClose` on Escape and on a click
+ * outside it. `movable`, `isMobile` and `container` are accepted and unused.
+ */
+export function PopupPresenter(props: Contract.PopupPresenterProps) {
+  if (!props.isOpen) return null;
+  return <Presenter {...props} />;
 }

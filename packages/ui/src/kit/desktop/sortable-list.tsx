@@ -30,7 +30,7 @@ export function SortableList<T extends Contract.SortableItem>(
 
   return (
     <Flex
-      testID={props.testID}
+      testID={props["data-test-id"] ?? props.testID}
       sx={{
         flexDirection: direction === "vertical" ? "column" : "row",
         ...props.sx

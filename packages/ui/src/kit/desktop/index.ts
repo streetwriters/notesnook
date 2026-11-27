@@ -18,16 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export { AvatarEditor } from "./avatar-editor";
-export { Dialog, DialogButton } from "./dialog";
+export { Dialog, DialogButton, Modal } from "./dialog";
 export { DragGhostHost } from "./drag-ghost";
 export * from "./hooks";
 export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
-export { VirtualList } from "./lists";
+export { GroupedVirtuoso, TableVirtuoso, VirtualList, Virtuoso } from "./lists";
+export { MenuPresenter } from "./menu";
 export { SortableList } from "./sortable-list";
 export * from "./overlays";
 export * from "./primitives";
 export { ColorPicker } from "./color-picker";
-export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
+export {
+  Popover,
+  PopoverHost,
+  PopupPresenter,
+  ResponsivePresenter
+} from "./popover";
 export { QRCode } from "./qrcode";
 export { Select } from "./select";
 export { WebView } from "./webview";
