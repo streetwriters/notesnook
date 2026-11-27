@@ -96,7 +96,7 @@ export async function createWritableStream(path: string) {
       return desktop.backups.close.mutate({ id });
     },
     abort() {
-      return desktop.backups.close.mutate({ id });
+      return desktop.backups.abort.mutate({ id });
     }
   });
 }
