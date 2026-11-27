@@ -203,11 +203,11 @@ function VirtuosoCore(props: CoreProps) {
               const key: any = keyboardEvent("keydown", event);
               const native = key.nativeEvent ?? {
                 ...key,
-                code: key.code ?? key.key
+                code: key.code || key.key
               };
               onKeyDown({
                 ...key,
-                code: key.code ?? key.key,
+                code: key.code || key.key,
                 target: element,
                 currentTarget: element,
                 nativeEvent: native
