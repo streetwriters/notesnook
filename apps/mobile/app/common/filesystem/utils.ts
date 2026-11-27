@@ -65,22 +65,26 @@ export function parseS3Error(data?: string) {
   }
 }
 
+export type CancelToken = {
+  canceled?: boolean;
+  cancel: (reason?: string) => Promise<void>;
+};
+
 export function cancelable(
   operation: (
     filename: string,
     requestOptions: RequestOptions,
-    cancelToken: {
-      cancel: (reason?: string) => Promise<void>;
-    }
+    cancelToken: CancelToken
   ) => Promise<boolean>
 ) {
   return (filename: string, requestOptions: RequestOptions) => {
-    const cancelToken = {
+    const cancelToken: CancelToken = {
       cancel: async (reason?: string) => {}
     };
     return {
       execute: () => operation(filename, requestOptions, cancelToken),
       cancel: async () => {
+        cancelToken.canceled = true;
         await cancelToken.cancel();
       }
     };
