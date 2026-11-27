@@ -78,8 +78,13 @@ export function optionsOf(children: ReactNode): Contract.SelectOption[] {
 export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
   function Select(props, ref) {
     const { onValueChange, onChange } = props;
-    const options = [...(props.options ?? []), ...optionsOf(props.children)];
-    const [own, setOwn] = useState(props.defaultValue ?? options[0]?.value);
+    const children = optionsOf(props.children);
+    const options = [...(props.options ?? []), ...children];
+    // Like HTML, an uncontrolled `<select>` shows its first `<option>`; the
+    // deprecated `options` prop keeps showing no choice until a value is set.
+    const [own, setOwn] = useState(
+      props.defaultValue ?? (props.options ? undefined : children[0]?.value)
+    );
     const value = props.value ?? own;
     const trigger = useRef<DesktopElement | null>(null);
     const control = useRef<ElementControl>({}).current;
