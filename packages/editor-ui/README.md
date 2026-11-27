@@ -8,6 +8,8 @@ The editor's UI layer, split out of `@notesnook/editor`: the toolbar (tools, pop
 
 `@notesnook/editor` re-exports this package's barrel (`export * from "@notesnook/editor-ui"`), so existing `@notesnook/editor` imports keep working.
 
+This package installs its own copies of `@tiptap/*` and `prosemirror-*`, which are separate from `@notesnook/editor`'s. `apps/web`'s Vite config aliases them to `@notesnook/editor`'s copies, because two copies of prosemirror-view crash the editor (`localsInner`). Keep the two packages' ProseMirror and Tiptap versions equal.
+
 ## Reading and changing the editor
 
 Tools, popups and floating menus talk to an `EditorController`, never to Tiptap: they read with queries (`useControllerQuery(editor, q.isActive("link"))`) and change the document with `editor.run({ name, args })`. A new query goes in `queries/queries.ts` with a Tiptap evaluator in `queries/store.ts` and a native one in native-editor's `src/engine/host-api.ts`; a new command is a Tiptap command plus an engine command of the same name.
