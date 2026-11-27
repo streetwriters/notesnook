@@ -962,11 +962,6 @@
       "reason": "Startup sequencing for the native host (database, key store)."
     },
     {
-      "path": "hooks/use-keyboard-list-navigation.ts",
-      "category": "platform",
-      "reason": "Handles the kit's UIKeyboardEvent/UIMouseEvent (no DOM KeyboardEvent/MouseEvent) and keeps the arrow-key handling inline instead of web's keydownHandler helper."
-    },
-    {
       "path": "common/locale-sync.ts",
       "category": "desktop-only",
       "reason": "Synchronous start-up locale for the native boot and the web kit target; web only has the async initLocale."
