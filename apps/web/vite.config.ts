@@ -105,6 +105,13 @@ export default defineConfig({
 
     alias: [
       {
+        // one copy of the editor's ProseMirror and tiptap packages: editor-ui
+        // installs its own, and two copies of prosemirror-view crash the editor
+        // ("Cannot read properties of undefined (reading 'localsInner')")
+        find: /^(prosemirror-(?:view|model|state|transform)|@tiptap\/(?:core|pm|extension-text-style))(\/.*)?$/,
+        replacement: path.join(__dirname, "../../packages/editor/node_modules") + "/$1$2"
+      },
+      {
         // the shared editor UI's web target (packages/ui/src/kit/web)
         find: /^@notesnook\/ui-kit$/,
         replacement: path.join(__dirname, "../../packages/ui/src/kit/web/index.ts")
