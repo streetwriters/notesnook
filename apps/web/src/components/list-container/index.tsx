@@ -216,7 +216,18 @@ function ListContainer(props: ListContainerProps) {
             <ListLoader />
           ) : (
             <Flex
-              sx={{ pt: "spacing6", px: "spacing6" }}
+              sx={{
+                pt: "spacing6",
+                px: "spacing6",
+                ...(props.isSearching
+                  ? {
+                      flex: 1,
+                      pt: 0,
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }
+                  : {})
+              }}
               className="list-container-placeholder"
               data-test-id="list-placeholder"
             >
@@ -377,7 +388,11 @@ function ItemRenderer({
     <>
       {resolvedItem.group && group && renderGroupHeader ? (
         renderGroupHeader(resolvedItem.group.title, index)
-      ) : resolvedItem.group && group ? (
+      ) : resolvedItem.group &&
+        group &&
+        !(
+          resolvedItem.item.type === "searchResult" && !resolvedItem.group.title
+        ) ? (
         <GroupHeader
           title={resolvedItem.group.title}
           showGroupCounts={showGroupCounts}

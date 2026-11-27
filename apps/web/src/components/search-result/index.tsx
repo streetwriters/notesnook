@@ -23,7 +23,7 @@ import React, { Fragment, useState } from "react";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import ListItem from "../list-item";
-import { ChevronDown, ChevronRight } from "../icons";
+import { CaretDownSvgIcon } from "../icons";
 import { noteMenuItems } from "../note";
 import { db } from "../../common/db";
 import { MenuItem } from "@notesnook/ui";
@@ -41,147 +41,200 @@ function SearchResult(props: SearchResultProps) {
   const isCompact = useNoteStore((store) => store.viewMode === "compact");
 
   if (!item.title.length && !item.content.length) return null;
+
+  const showMatches = isExpanded && !isCompact;
+  const matchCount =
+    item.content?.reduce((count, next) => next.length + count, 0) || 0;
+  const titleHasMatch = item.title.some((match) => !!match.match);
+
   return (
-    <Flex sx={{ flexDirection: "column" }}>
-      <ListItem
-        isFocused={isOpened}
-        item={item}
-        menuItems={menuItems}
-        onClick={() => {
-          useEditorStore.getState().openSession(item.id, {
-            rawContent: item.rawContent,
-            force: true
-          });
+    <Flex
+      sx={{
+        flexDirection: "column",
+        px: "spacing6",
+        "[data-item-index='0'] > &": { pt: "spacing4" },
+        "[data-item-index]:last-child > &": {
+          ".search-result-content": { borderBottom: "none" }
+        }
+      }}
+    >
+      <Flex
+        className="search-result-content"
+        sx={{
+          flexDirection: "column",
+          gap: "spacing3",
+          py: "spacing2",
+          borderBottom: "1px solid",
+          borderBottomColor: "separator"
         }}
-        onMiddleClick={() => {
-          useEditorStore.getState().openSession(item.id, {
-            openInNewTab: true,
-            rawContent: item.rawContent
-          });
-        }}
-        title={
-          <Flex sx={{ alignItems: "center", gap: "small" }}>
-            {isExpandable && !isCompact ? (
-              <Button
-                variant="secondary"
-                sx={{
-                  bg: "transparent",
-                  p: 0,
-                  borderRadius: 100,
-                  flexShrink: 0
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpanded((s) => !s);
-                }}
-              >
-                {isExpanded ? (
-                  <ChevronDown
-                    size={14}
-                    color={isOpened ? "icon-selected" : "icon"}
-                  />
-                ) : (
-                  <ChevronRight
-                    size={14}
-                    color={isOpened ? "icon-selected" : "icon"}
-                  />
-                )}
-              </Button>
-            ) : null}
+      >
+        <ListItem
+          isFocused={isOpened}
+          item={item}
+          menuItems={menuItems}
+          colors={{
+            heading: "heading",
+            accent: "accent",
+            background: showMatches ? "hover" : "transparent",
+            backgroundSelected: "background-selected"
+          }}
+          onClick={() => {
+            useEditorStore.getState().openSession(item.id, {
+              rawContent: item.rawContent,
+              force: true
+            });
+          }}
+          onMiddleClick={() => {
+            useEditorStore.getState().openSession(item.id, {
+              openInNewTab: true,
+              rawContent: item.rawContent
+            });
+          }}
+          title={
             <Flex
               sx={{
                 alignItems: "center",
                 justifyContent: "space-between",
-                flex: 1
+                gap: "spacing3",
+                minWidth: 0
               }}
             >
-              <Text
-                data-test-id={`title`}
-                variant={"body"}
-                color={isOpened ? "paragraph-selected" : "paragraph"}
+              <Flex
                 sx={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  fontWeight: isCompact ? "bold" : "bolder",
-                  display: "block",
-                  ".match": {
-                    bg: "accent-secondary",
-                    color: "accentForeground-secondary"
-                  }
+                  alignItems: "center",
+                  gap: "spacing3",
+                  minWidth: 0
                 }}
               >
-                {item.title.map((match) => (
-                  <Match match={match} />
-                ))}
-              </Text>
-
-              <Text variant="subBody">
-                {item.content?.reduce(
-                  (count, next) => next.length + count,
-                  0
-                ) || 0}
-              </Text>
-            </Flex>
-          </Flex>
-        }
-        sx={{
-          my: "small",
-          borderRadius: "default",
-          mx: 1
-        }}
-      />
-      {isExpanded && !isCompact
-        ? item.content.map((match, index) => (
-            <ListItem
-              key={`${item.id}${index}`}
-              isFocused={false}
-              item={item}
-              menuItems={menuItems}
-              onClick={() => {
-                useEditorStore.getState().openSession(item.id, {
-                  rawContent: item.rawContent,
-                  force: true,
-                  activeSearchResultId: match[0].id
-                });
-              }}
-              onMiddleClick={() => {
-                useEditorStore.getState().openSession(item.id, {
-                  openInNewTab: true,
-                  rawContent: item.rawContent,
-                  activeSearchResultId: match[0].id
-                });
-              }}
-              title={
+                {isExpandable && !isCompact ? (
+                  <Button
+                    variant="secondary"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      bg: "transparent",
+                      p: 0,
+                      flexShrink: 0,
+                      ":hover:not(:disabled)": { bg: "transparent" },
+                      ":active:not(:disabled)": { bg: "transparent" }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExpanded((s) => !s);
+                    }}
+                  >
+                    <CaretDownSvgIcon
+                      size={11}
+                      color={isOpened ? "icon-selected" : "icon-secondary"}
+                      sx={{
+                        transform: isExpanded ? undefined : "rotate(-90deg)"
+                      }}
+                    />
+                  </Button>
+                ) : null}
                 <Text
                   data-test-id={`title`}
-                  variant={"body"}
-                  color={isOpened ? "paragraph-selected" : "paragraph"}
                   sx={{
-                    whiteSpace: "pre-wrap",
+                    ...textStyle,
+                    color: isOpened
+                      ? "paragraph-selected"
+                      : titleHasMatch
+                      ? "paragraph-secondary"
+                      : "paragraph",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                     display: "block",
-                    ".match": {
-                      bg: "accent-secondary",
-                      color: "accentForeground-secondary"
-                    }
+                    minWidth: 0
                   }}
                 >
-                  {match.map((match) => (
-                    <Match match={match} />
+                  {item.title.map((match) => (
+                    <Match key={match.id} match={match} />
                   ))}
                 </Text>
-              }
-              sx={{
-                px: 1,
-                borderBottom: "1px solid var(--border)",
-                mx: 1
-              }}
-            />
-          ))
-        : null}
+              </Flex>
+
+              {matchCount > 0 ? (
+                <Text
+                  sx={{
+                    ...textStyle,
+                    color: "paragraph",
+                    flexShrink: 0
+                  }}
+                >
+                  {matchCount}
+                </Text>
+              ) : null}
+            </Flex>
+          }
+          sx={{
+            p: "spacing2",
+            borderRadius: "radius1"
+          }}
+        />
+        {showMatches
+          ? item.content.map((match, index) => (
+              <ListItem
+                key={`${item.id}${index}`}
+                isFocused={false}
+                item={item}
+                menuItems={menuItems}
+                onClick={() => {
+                  useEditorStore.getState().openSession(item.id, {
+                    rawContent: item.rawContent,
+                    force: true,
+                    activeSearchResultId: match[0].id
+                  });
+                }}
+                onMiddleClick={() => {
+                  useEditorStore.getState().openSession(item.id, {
+                    openInNewTab: true,
+                    rawContent: item.rawContent,
+                    activeSearchResultId: match[0].id
+                  });
+                }}
+                title={
+                  <Text
+                    data-test-id={`title`}
+                    sx={{
+                      ...textStyle,
+                      color: "paragraph-secondary",
+                      whiteSpace: "pre-wrap",
+                      display: "block"
+                    }}
+                  >
+                    {match.map((match) => (
+                      <Match key={match.id} match={match} />
+                    ))}
+                  </Text>
+                }
+                sx={{
+                  p: "spacing2",
+                  borderRadius: "radius1",
+                  backgroundColor: "transparent",
+                  ":focus": { backgroundColor: "hover" },
+                  ":focus-visible": { backgroundColor: "hover" },
+                  ":hover": { backgroundColor: "hover" }
+                }}
+              />
+            ))
+          : null}
+      </Flex>
     </Flex>
   );
 }
+
+const textStyle = {
+  fontFamily: "body",
+  fontSize: "xs",
+  fontWeight: 400,
+  ".match": {
+    bg: "accent",
+    color: "accentForeground",
+    py: "spacing1"
+  }
+} as const;
 
 export default React.memo(SearchResult);
 
