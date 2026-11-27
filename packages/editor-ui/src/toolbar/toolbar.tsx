@@ -47,7 +47,7 @@ export type ControllerToolbarProps = {
   defaultFontSize: number;
   sx?: SxProp;
   className?: string;
-  testID?: string;
+  "data-test-id"?: string;
   floatingMenus?: ReactNode;
 };
 
@@ -59,7 +59,7 @@ export function ControllerToolbar(props: ControllerToolbarProps) {
     defaultFontFamily,
     defaultFontSize,
     sx,
-    testID = "editor-toolbar"
+    "data-test-id": testId = "editor-toolbar"
   } = props;
   const isMobile = useIsMobile();
   const isEditable = useEditorQuery(editor, q.editable(), true);
@@ -114,7 +114,7 @@ export function ControllerToolbar(props: ControllerToolbarProps) {
           ref={(ref) => {
             toolbarRef.current = ref;
           }}
-          testID={testID}
+          data-test-id={testId}
           sx={{
             flexDirection: "row",
             flexWrap: isMobile ? "nowrap" : "wrap",

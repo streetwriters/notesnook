@@ -61,7 +61,7 @@ function _Counter(props: CounterProps) {
 
       <Button
         variant="secondary"
-        testID={`counter-reset-${title}`}
+        data-test-id={`counter-reset-${title}`}
         title={disabled ? "" : strings.clickToReset(title)}
         disabled={disabled}
         onClick={disabled ? undefined : onReset}

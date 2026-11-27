@@ -100,12 +100,12 @@ function ListTool<TListStyleTypes extends string>(
           {subTypes.map((item) => (
             <Button
               key={item.title}
-              testID={`list-type-${item.type}`}
+              data-test-id={`list-type-${item.type}`}
               title={item.title}
               variant={"menuitem"}
               focusable={false}
               sx={{ width: 80, p: 0, m: "2px", borderRadius: "default" }}
-              onPress={() => {
+              onClick={() => {
                 close();
                 editor.run(
                   ...(isActive
@@ -118,7 +118,10 @@ function ListTool<TListStyleTypes extends string>(
                               : "toggleOrderedList"
                         }
                       ]),
-                  { name: "updateAttributes", args: [type, { listType: item.type }] }
+                  {
+                    name: "updateAttributes",
+                    args: [type, { listType: item.type }]
+                  }
                 );
               }}
             >

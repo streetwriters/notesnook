@@ -102,7 +102,7 @@ export function ColorPicker(props: ColorPickerProps) {
         {isPickerOpen ? (
           <>
             <UIColorPicker
-              testID="color-picker-custom"
+              data-test-id="color-picker-custom"
               value={currentColor}
               onChange={(color) => {
                 setCurrentColor(color);
@@ -117,7 +117,7 @@ export function ColorPicker(props: ColorPickerProps) {
               }}
             >
               <Input
-                testID="color-picker-hex"
+                data-test-id="color-picker-hex"
                 key={currentColor}
                 variant={"clean"}
                 placeholder="#000000"
@@ -133,7 +133,8 @@ export function ColorPicker(props: ColorPickerProps) {
                 }}
                 defaultValue={currentColor.toUpperCase()}
                 maxLength={7}
-                onChangeText={(value) => {
+                onChange={(e) => {
+                  const value = e.target.value;
                   if (!value) return;
                   if (colord(value).isValid()) {
                     setCurrentColor(value);
@@ -143,7 +144,7 @@ export function ColorPicker(props: ColorPickerProps) {
               />
               {onSave && (
                 <PaletteButton
-                  testID="color-picker-save"
+                  data-test-id="color-picker-save"
                   disabled={allColors.includes(currentColor)}
                   icon={Icons.save}
                   iconSize={18}
@@ -166,7 +167,7 @@ export function ColorPicker(props: ColorPickerProps) {
           >
             {!deleteMode && (
               <PaletteButton
-                testID="color-picker-clear"
+                data-test-id="color-picker-clear"
                 icon={Icons.colorClear}
                 onClick={onClear}
                 title={strings.clear()}
@@ -174,7 +175,7 @@ export function ColorPicker(props: ColorPickerProps) {
               />
             )}
             <PaletteButton
-              testID="color-picker-delete-mode"
+              data-test-id="color-picker-delete-mode"
               icon={Icons.delete}
               iconColor={deleteMode ? "icon-error" : "icon"}
               bg={deleteMode ? "background-error" : "transparent"}
@@ -184,7 +185,7 @@ export function ColorPicker(props: ColorPickerProps) {
             />
             {!deleteMode && (
               <PaletteButton
-                testID="color-picker-palette"
+                data-test-id="color-picker-palette"
                 icon={Icons.palette}
                 iconColor={tColor.isDark() ? WHITE : "icon"}
                 onClick={() => setIsPickerOpen((s) => !s)}
@@ -195,7 +196,7 @@ export function ColorPicker(props: ColorPickerProps) {
             )}
             {allColors.map((colorItem) => (
               <PaletteButton
-                testID={`color-${colorItem}`}
+                data-test-id={`color-${colorItem}`}
                 key={colorItem}
                 title={deleteMode ? strings.clickToRemove() : colorItem}
                 bg={toDataColor(colorItem)}
@@ -224,7 +225,7 @@ export function ColorPicker(props: ColorPickerProps) {
 }
 
 type PaletteButtonProps = {
-  testID?: string;
+  "data-test-id"?: string;
   title?: string;
   disabled?: boolean;
   onClick: () => void;
@@ -242,18 +243,18 @@ function PaletteButton(props: PaletteButtonProps) {
     iconSize = 20,
     bg,
     onClick,
-    testID,
+    "data-test-id": testId,
     title,
     disabled
   } = props;
   return (
     <Button
-      testID={testID}
+      data-test-id={testId}
       title={title}
       disabled={disabled}
       focusable={false}
       variant={"icon"}
-      onPress={onClick}
+      onClick={onClick}
       sx={{
         flexShrink: 0,
         width: PALETTE_SIZE,

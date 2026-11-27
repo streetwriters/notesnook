@@ -303,7 +303,7 @@ export function ControllerInsertBlock(props: ToolProps) {
       <Button
         ref={buttonRef}
         variant="secondary"
-        testID="tool-insertBlock"
+        data-test-id="tool-insertBlock"
         sx={{
           p: 1,
           m: 0,

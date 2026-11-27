@@ -47,8 +47,8 @@ export function ImageProperties(props: ImagePropertiesProps) {
           containerProps={{
             sx: { mr: 1 }
           }}
-          onChangeText={(text) => {
-            const value = Number(text);
+          onChange={(e) => {
+            const value = Number(e.target.value);
             editor.commands.setImageSize({
               width: value,
               height: aspectRatio ? value / aspectRatio : value
@@ -59,8 +59,8 @@ export function ImageProperties(props: ImagePropertiesProps) {
           label={strings.height()}
           type="number"
           value={String(height || 0)}
-          onChangeText={(text) => {
-            const value = Number(text);
+          onChange={(e) => {
+            const value = Number(e.target.value);
             editor.commands.setImageSize({
               width: aspectRatio ? value * aspectRatio : value,
               height: value

@@ -63,7 +63,7 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
               borderBottom: "2px solid",
               borderBottomColor: activeTab === index ? "accent" : "transparent"
             }}
-            onPress={() => {
+            onClick={() => {
               setActiveTab(index);
               onTabChanged?.(index);
             }}

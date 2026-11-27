@@ -44,7 +44,11 @@ type ImageAttrs = ImageDimensions & { align?: Align };
 
 /** The image the caret or selection is on, or null (these tools hide). */
 function useImage(editor: EditorController): ImageAttrs | null {
-  return useEditorQuery(editor, q.selectedNode("image"), null) as ImageAttrs | null;
+  return useEditorQuery(
+    editor,
+    q.selectedNode("image"),
+    null
+  ) as ImageAttrs | null;
 }
 
 export function ImageSettings(props: ToolProps) {
@@ -87,7 +91,9 @@ function alignTool(align: Align) {
       <ToolButton
         icon={props.icon}
         title={props.title}
-        toggled={align === "left" ? !current || current === "left" : current === align}
+        toggled={
+          align === "left" ? !current || current === "left" : current === align
+        }
         onClick={() => editor.run(setImageAlignmentCommand(align))}
       />
     );
@@ -132,7 +138,8 @@ export function ImagePropertiesPopup(props: ImagePropertiesPopupProps) {
             typing?.field === "width" ? typing.text : String(image.width || 0)
           }
           containerProps={{ sx: { mr: 1 } }}
-          onChangeText={(text) => {
+          onChange={(e) => {
+            const text = e.target.value;
             setTyping({ field: "width", text });
             const size = sizeForWidth(image, text, ratio.current ?? 0);
             if (size) editor.run(setImageSizeCommand(size));
@@ -143,11 +150,10 @@ export function ImagePropertiesPopup(props: ImagePropertiesPopupProps) {
           label={strings.height()}
           type="number"
           value={
-            typing?.field === "height"
-              ? typing.text
-              : String(image.height || 0)
+            typing?.field === "height" ? typing.text : String(image.height || 0)
           }
-          onChangeText={(text) => {
+          onChange={(e) => {
+            const text = e.target.value;
             setTyping({ field: "height", text });
             const size = sizeForHeight(image, text, ratio.current ?? 0);
             if (size) editor.run(setImageSizeCommand(size));

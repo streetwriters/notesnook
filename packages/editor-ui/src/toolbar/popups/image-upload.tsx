@@ -72,8 +72,8 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           autoFocus
           placeholder={strings.pasteImageURL()}
           value={url}
-          onChangeText={(text) => {
-            setUrl(text);
+          onChange={(e) => {
+            setUrl(e.target.value);
             setError(undefined);
           }}
         />

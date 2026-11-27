@@ -143,7 +143,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               placeholder={strings.enterEmbedSourceURL()}
               value={src}
               autoFocus
-              onChangeText={setSrc}
+              onChange={(e) => setSrc(e.target.value)}
               sx={{ fontSize: "body" }}
             />
             <Flex sx={{ alignItems: "center", mt: 1 }}>
@@ -154,7 +154,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 placeholder={strings.width()}
                 defaultValue={String(size.width)}
                 sx={{ mr: 1, fontSize: "body" }}
-                onChangeText={(text) => onSizeChange(parseNumber(text))}
+                onChange={(e) => onSizeChange(parseNumber(e.target.value))}
               />
               <InlineInput
                 label={strings.height()}
@@ -162,8 +162,8 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 placeholder={strings.height()}
                 defaultValue={String(size.height)}
                 sx={{ fontSize: "body" }}
-                onChangeText={(text) =>
-                  onSizeChange(undefined, parseNumber(text))
+                onChange={(e) =>
+                  onSizeChange(undefined, parseNumber(e.target.value))
                 }
               />
             </Flex>
@@ -177,7 +177,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 fontFamily: "monospace",
                 minHeight: [200, 100]
               }}
-              onChangeText={setSrc}
+              onChange={(e) => setSrc(e.target.value)}
               placeholder={strings.pasteEmbedCode()}
             />
           </Tab>

@@ -51,7 +51,7 @@ export function Dropdown(props: DropdownProps) {
     <>
       <Button
         variant="secondary"
-        testID={`dropdown-${id}`}
+        data-test-id={`dropdown-${id}`}
         ref={(ref) => {
           internalRef.current = ref;
           if (buttonRef) buttonRef.current = ref;

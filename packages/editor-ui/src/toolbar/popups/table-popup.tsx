@@ -90,7 +90,7 @@ export function TablePopup(props: TablePopupProps) {
         sx={{ px: 1, pt: 1, flexDirection: "column", alignItems: "center" }}
       >
         <Flex
-          testID="table-size-grid"
+          data-test-id="table-size-grid"
           sx={{
             flexDirection: "column",
             bg: "background",
@@ -124,8 +124,8 @@ export function TablePopup(props: TablePopupProps) {
                             borderColor: "border"
                           })
                     }}
-                    onHoverIn={() => setCellLocation(location)}
-                    onPress={() => {
+                    onMouseEnter={() => setCellLocation(location)}
+                    onClick={() => {
                       setCellLocation(location);
                       onInsertTable({
                         columns: location.column,
@@ -153,9 +153,10 @@ export function TablePopup(props: TablePopupProps) {
               placeholder={strings.totalColumns(cellLocation.column)}
               type="number"
               value={String(cellLocation.column)}
-              onChangeText={(text) =>
-                setCellLocation((l) => ({ ...l, column: Number(text) || 0 }))
-              }
+              onChange={(e) => {
+                const column = Number(e.target.value) || 0;
+                setCellLocation((l) => ({ ...l, column }));
+              }}
             />
             <InlineInput
               containerProps={{ sx: { flexShrink: 1 } }}
@@ -163,9 +164,10 @@ export function TablePopup(props: TablePopupProps) {
               placeholder={strings.totalRows(cellLocation.row)}
               type="number"
               value={String(cellLocation.row)}
-              onChangeText={(text) =>
-                setCellLocation((l) => ({ ...l, row: Number(text) || 0 }))
-              }
+              onChange={(e) => {
+                const row = Number(e.target.value) || 0;
+                setCellLocation((l) => ({ ...l, row }));
+              }}
             />
           </Flex>
         ) : (

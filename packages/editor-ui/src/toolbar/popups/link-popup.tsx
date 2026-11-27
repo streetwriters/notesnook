@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Input, Text } from "@notesnook/ui-kit";
+import { Flex, Input, Text, type UIKeyboardEvent } from "@notesnook/ui-kit";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { Popup } from "../components/popup.js";
 import { strings } from "@notesnook/intl";
@@ -70,6 +70,12 @@ export function LinkPopup(props: LinkPopupProps) {
     }
   };
 
+  const onEnter = (e: UIKeyboardEvent) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    handleDone();
+  };
+
   return (
     <Popup
       title={isEditing ? strings.editLink() : strings.insertLink()}
@@ -97,10 +103,10 @@ export function LinkPopup(props: LinkPopupProps) {
               placeholder={strings.linkText()}
               defaultValue={link.current?.title}
               sx={{ mb: 2 }}
-              onChangeText={(text) =>
-                (link.current = { ...link.current, title: text })
+              onChange={(e) =>
+                (link.current = { ...link.current, title: e.target.value })
               }
-              onSubmitEditing={handleDone}
+              onKeyDown={onEnter}
             />
           </>
         )}
@@ -120,11 +126,11 @@ export function LinkPopup(props: LinkPopupProps) {
           placeholder="https://example.com/"
           defaultValue={link.current?.href}
           variant={error ? "error" : "input"}
-          onChangeText={(text) => {
+          onChange={(e) => {
             if (error) setError(null);
-            link.current = { ...link.current, href: text };
+            link.current = { ...link.current, href: e.target.value };
           }}
-          onSubmitEditing={handleDone}
+          onKeyDown={onEnter}
         />
         {error && (
           <Text

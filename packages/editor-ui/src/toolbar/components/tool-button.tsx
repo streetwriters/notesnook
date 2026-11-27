@@ -41,7 +41,7 @@ export type ToolButtonProps = {
   buttonRef?: React.Ref<UIElement>;
   variant?: ToolButtonVariant;
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
   onClick?: () => void;
 };
 
@@ -58,7 +58,7 @@ export const ToolButton = React.memo(
       variant = "normal",
       title,
       disabled,
-      testID,
+      "data-test-id": testId,
       onClick
     } = props;
     const isMobile = useIsMobile();
@@ -68,7 +68,7 @@ export const ToolButton = React.memo(
         variant="secondary"
         ref={buttonRef}
         id={`tool-${id || icon}`}
-        testID={testID ?? `tool-${id || icon}`}
+        data-test-id={testId ?? `tool-${id || icon}`}
         title={title}
         disabled={disabled}
         onClick={onClick}

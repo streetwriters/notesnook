@@ -24,19 +24,12 @@ import {
   type UIElement
 } from "@notesnook/ui-kit";
 
-export type ButtonProps = UIButtonProps & { onClick?: () => void };
+export type ButtonProps = UIButtonProps;
 
 export const Button = forwardRef<UIElement, ButtonProps>(function Button(
   props,
   ref
 ) {
-  const { onClick, onPress, focusable = false, ...rest } = props;
-  return (
-    <UIButton
-      ref={ref}
-      focusable={focusable}
-      {...rest}
-      onPress={onPress ?? (onClick ? () => onClick() : undefined)}
-    />
-  );
+  const { focusable = false, ...rest } = props;
+  return <UIButton ref={ref} focusable={focusable} {...rest} />;
 });

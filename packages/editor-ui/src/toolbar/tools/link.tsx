@@ -299,7 +299,7 @@ export function OpenLink(props: ToolProps) {
       ) : (
         <Link
           href={href}
-          onPress={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             callHostAction(editor, "openLink", href);
             hide();

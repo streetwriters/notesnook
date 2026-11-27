@@ -99,7 +99,8 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               value={searchTerm}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              onChangeText={(text) => {
+              onChange={(e) => {
+                const text = e.target.value;
                 inlineDebounce("search", () => search(text), 100);
                 useEditorSearchStore.setState({ searchTerm: text });
               }}
@@ -198,8 +199,8 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               sx={{ mt: 1, p: "7px", fontFamily: "monospace" }}
               placeholder={strings.replace()}
               value={replaceTerm}
-              onChangeText={(text) =>
-                useEditorSearchStore.setState({ replaceTerm: text })
+              onChange={(e) =>
+                useEditorSearchStore.setState({ replaceTerm: e.target.value })
               }
             />
           )}

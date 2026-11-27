@@ -65,11 +65,11 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
                 {onPin ? (
                   <Button
-                    testID="popup-pin"
+                    data-test-id="popup-pin"
                     variant={"secondary"}
                     focusable={false}
                     sx={{ p: 0, bg: "transparent" }}
-                    onPress={onPin}
+                    onClick={onPin}
                   >
                     <Icon
                       path={Icons.pin}
@@ -80,11 +80,11 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
                 ) : null}
                 {onClose ? (
                   <Button
-                    testID="popup-close"
+                    data-test-id="popup-close"
                     variant={"secondary"}
                     focusable={false}
                     sx={{ p: 0, bg: "transparent" }}
-                    onPress={onClose}
+                    onClick={onClose}
                   >
                     <Icon path={Icons.close} size={"big"} />
                   </Button>
@@ -105,9 +105,9 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               }}
             >
               <Button
-                testID="popup-action"
+                data-test-id="popup-action"
                 variant="dialog"
-                onPress={
+                onClick={
                   action.disabled || action.loading ? undefined : action.onClick
                 }
                 disabled={action.disabled || action.loading}
@@ -127,7 +127,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
 
         {action && (
           <Button
-            testID="popup-action"
+            data-test-id="popup-action"
             variant="accent"
             sx={{
               alignSelf: "stretch",
@@ -136,7 +136,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               mx: 1,
               py: 2
             }}
-            onPress={action.disabled ? undefined : action?.onClick}
+            onClick={action.disabled ? undefined : action?.onClick}
             disabled={action.disabled}
           >
             {action.loading ? (

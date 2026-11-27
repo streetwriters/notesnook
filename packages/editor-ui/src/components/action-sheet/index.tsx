@@ -115,7 +115,7 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
       {canGoBack || current?.title ? (
         <Flex sx={{ alignItems: "center", mx: 0, mb: 1 }}>
           {canGoBack && (
-            <Button variant="icon" sx={{ p: 1, ml: 1 }} onPress={goBack}>
+            <Button variant="icon" sx={{ p: 1, ml: 1 }} onClick={goBack}>
               <Icon path={Icons.arrowLeft} size="big" />
             </Button>
           )}

@@ -32,15 +32,15 @@ export type ControllerToolbarGroupProps = {
   force?: boolean;
   groupId: string;
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
   className?: string;
 };
 export function ControllerToolbarGroup(props: ControllerToolbarGroupProps) {
-  const { tools, force, sx, groupId, testID, editor } = props;
+  const { tools, force, sx, groupId, "data-test-id": testId, editor } = props;
 
   return (
     <Flex
-      testID={testID}
+      data-test-id={testId}
       sx={{
         flexDirection: "row",
         alignItems: "center",

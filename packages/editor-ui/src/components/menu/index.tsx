@@ -134,12 +134,12 @@ export function MenuButton(props: {
     <>
       <Button
         ref={ref}
-        testID={`menu-button-${item.key}`}
+        data-test-id={`menu-button-${item.key}`}
         variant="menuitem"
         focusable={false}
         title={item.tooltip || item.title}
         disabled={item.isDisabled}
-        onPress={() => {
+        onClick={() => {
           if (submenu) {
             onToggleSubmenu?.();
             return;
@@ -163,10 +163,11 @@ export function MenuButton(props: {
             <Icon path={item.icon} size="medium" color="icon" />
           ) : null}
           <Text
-            numberOfLines={1}
             sx={{
+              lineClamp: 1,
               fontSize: "body",
-              color: item.variant === "dangerous" ? "paragraph-error" : "paragraph"
+              color:
+                item.variant === "dangerous" ? "paragraph-error" : "paragraph"
             }}
           >
             {item.title}
