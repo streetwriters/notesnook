@@ -134,7 +134,7 @@ describe("@notesnook/ui-kit import name", () => {
         const p = path.join(dir, e.name);
         if (e.isDirectory()) {
           if (e.name !== "node_modules") walk(p);
-        } else if (/\.(tsx?|mjs|js)$/.test(e.name)) {
+        } else if (/\.(tsx?|jsx?|mjs)$/.test(e.name)) {
           const s = fs.readFileSync(p, "utf8");
           if (/(from|import|require\()\s*["']@ui(\/[^"']*)?["']/.test(s))
             offenders.push(path.relative(repo, p));
