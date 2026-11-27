@@ -23,7 +23,7 @@ import {
   Flex,
   Text,
   type ColorValue,
-  type PressEvent,
+  type UIMouseEvent,
   type SxProp
 } from "@notesnook/ui-kit";
 import { Close, type Icon } from "../icons";
@@ -33,7 +33,7 @@ type IconTagProps = {
   title?: string;
   icon: Icon;
   iconSize?: number;
-  onClick?: (event: PressEvent) => void;
+  onClick?: (event: UIMouseEvent) => void;
   styles?: {
     icon?: { color?: ColorValue };
     text?: { color?: ColorValue; fontSize?: SxProp["fontSize"] };
@@ -64,9 +64,9 @@ function IconTag(props: IconTagProps) {
 
   return (
     <Flex
-      testID={testId}
+      data-test-id={testId}
       title={title || text}
-      onPress={
+      onClick={
         onClick
           ? (event) => {
               event.stopPropagation();
@@ -103,8 +103,8 @@ function IconTag(props: IconTagProps) {
         color={styles?.icon?.color ?? (highlight ? "accent" : "icon-secondary")}
       />
       <Text
-        numberOfLines={1}
         sx={{
+          lineClamp: 1,
           color: styles?.text?.color ?? (highlight ? "accent" : "paragraph"),
           fontSize: styles?.text?.fontSize ?? "3xs",
           fontWeight: "medium"
@@ -116,7 +116,7 @@ function IconTag(props: IconTagProps) {
         <Button
           variant="secondary"
           title={strings.remove()}
-          onPress={(event) => {
+          onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
             onDismiss();

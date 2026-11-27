@@ -87,12 +87,12 @@ function MenuButton(props: {
   const hasSubmenu = !!item.menu;
   return (
     <Button
-      testID={`menu-button-${item.key}`}
+      data-test-id={`menu-button-${item.key}`}
       variant="menuitem"
       title={item.tooltip || item.title}
       disabled={item.isDisabled}
-      onHoverIn={props.onHover}
-      onPress={() => {
+      onMouseEnter={props.onHover}
+      onClick={() => {
         if (hasSubmenu) {
           props.onOpenSubmenu?.();
           return;
@@ -136,8 +136,8 @@ function MenuButton(props: {
         ) : null}
         <Text
           variant="body"
-          numberOfLines={1}
           sx={{
+            lineClamp: 1,
             color: dangerous ? "paragraph-error" : "paragraph",
             fontSize: "xxs",
             fontWeight: 400,
@@ -150,7 +150,7 @@ function MenuButton(props: {
       </Flex>
       {item.isChecked || hasSubmenu || item.modifier || item.premium ? (
         <Flex
-          testID={`toggle-state-${item.isChecked ? "on" : "off"}`}
+          data-test-id={`toggle-state-${item.isChecked ? "on" : "off"}`}
           sx={{
             ml: 4,
             flexShrink: 0,
@@ -232,21 +232,18 @@ function MenuPanel(props: {
   const element = useRef<UIElement>(null);
   useEffect(() => {
     if (!onSize) return;
-    const frame = setTimeout(
-      () =>
-        element.current?.measureInWindow((_x, _y, width, height) =>
-          onSize({ width, height })
-        ),
-      0
-    );
+    const frame = setTimeout(() => {
+      const rect = element.current?.getBoundingClientRect();
+      if (rect) onSize({ width: rect.width, height: rect.height });
+    }, 0);
     return () => clearTimeout(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
   return (
     <Flex
       ref={element}
-      testID="menu-container"
-      onPress={(event) => event.stopPropagation()}
+      data-test-id="menu-container"
+      onClick={(event) => event.stopPropagation()}
       sx={{
         bg: "background",
         flexDirection: "column",
@@ -263,7 +260,7 @@ function MenuPanel(props: {
       {title ? (
         <>
           <Text
-            testID="menu-title"
+            data-test-id="menu-title"
             sx={{
               color: "accent",
               fontSize: "xxs",
@@ -388,7 +385,7 @@ function MenuItems(props: {
     <>
       {environment.isDev && focusKey ? (
         <Box
-          testID={`menu-cursor-${focusKey}`}
+          data-test-id={`menu-cursor-${focusKey}`}
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
@@ -470,8 +467,8 @@ export function MenuHost() {
   return (
     <ThemeScope scope="contextMenu">
       <Box
-        testID="menu-backdrop"
-        onPress={close}
+        data-test-id="menu-backdrop"
+        onClick={close}
         onContextMenu={(event) => {
           event.preventDefault();
           close();

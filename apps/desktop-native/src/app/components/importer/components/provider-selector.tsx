@@ -53,21 +53,22 @@ export function ProviderSelector(props: ProviderSelectorProps) {
         </Text>
       </Flex>
       <Select
-        options={[
-          { value: "", title: strings.selectNotesApp() },
-          ...ProviderFactory.getAvailableProviders().map((provider) => ({
-            value: provider as string,
-            title: ProviderFactory.getProvider(provider as Providers).name
-          }))
-        ]}
         value=""
-        onValueChange={(value) => {
+        onChange={(e) => {
+          const value = e.target.value;
           if (value === "") return;
           props.onProviderChanged(
             ProviderFactory.getProvider(value as Providers)
           );
         }}
-      />
+      >
+        <option value="">{strings.selectNotesApp()}</option>
+        {ProviderFactory.getAvailableProviders().map((provider) => (
+          <option key={provider} value={provider}>
+            {ProviderFactory.getProvider(provider as Providers).name}
+          </option>
+        ))}
+      </Select>
     </Flex>
   );
 }

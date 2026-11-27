@@ -59,7 +59,7 @@ export function DayPicker(props: DayPickerProps) {
         }}
       >
         <Flex
-          onPress={() => canGoBack && setCurrent((c) => c.subtract(1, "month"))}
+          onClick={() => canGoBack && setCurrent((c) => c.subtract(1, "month"))}
           sx={{ p: 1, opacity: canGoBack ? 1 : 0.3, borderRadius: "radius1" }}
         >
           <CaretLeft size={15} />
@@ -68,7 +68,7 @@ export function DayPicker(props: DayPickerProps) {
           {current.format("MMMM YYYY")}
         </Text>
         <Flex
-          onPress={() => canGoNext && setCurrent((c) => c.add(1, "month"))}
+          onClick={() => canGoNext && setCurrent((c) => c.add(1, "month"))}
           sx={{ p: 1, opacity: canGoNext ? 1 : 0.3, borderRadius: "radius1" }}
         >
           <CaretRight size={15} />
@@ -93,8 +93,8 @@ export function DayPicker(props: DayPickerProps) {
             return (
               <Flex
                 key={column}
-                testID={`day-${day.format("YYYY-MM-DD")}`}
-                onPress={() => {
+                data-test-id={`day-${day.format("YYYY-MM-DD")}`}
+                onClick={() => {
                   if (disabled) return;
                   setPicked(day);
                   onSelect(day.toDate());

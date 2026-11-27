@@ -153,7 +153,7 @@ export function PdfPreview(props: PdfPreviewProps) {
   if (!source)
     return (
       <Flex
-        testID="pdf-preview"
+        data-test-id="pdf-preview"
         sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}
       >
         <Text variant="body">{strings.attachmentPreviewFailed()}</Text>
@@ -161,31 +161,32 @@ export function PdfPreview(props: PdfPreviewProps) {
     );
 
   return (
-    <Flex testID="pdf-preview" sx={{ flex: 1, flexDirection: "column" }}>
+    <Flex data-test-id="pdf-preview" sx={{ flex: 1, flexDirection: "column" }}>
       <Flex sx={{ p: 1, pt: 0, justifyContent: "space-between" }}>
         <ToolbarGroup>
           <ToolbarButton
-            testID={strings.search()}
+            data-test-id={strings.search()}
             icon={Search}
             title={strings.search()}
-            onPress={() => {
+            onClick={() => {
               setSearchOpen((open) => !open);
               controller.current?.clearSearch();
             }}
           />
           <ToolbarButton
-            testID={strings.goToPreviousPage()}
+            data-test-id={strings.goToPreviousPage()}
             icon={ChevronUp}
             disabled={!ready || state.page <= 1}
             title={strings.goToPreviousPage()}
-            onPress={() => controller.current?.goToPage((state?.page ?? 1) - 1)}
+            onClick={() => controller.current?.goToPage((state?.page ?? 1) - 1)}
           />
           <Input
-            testID="pdf-page-input"
+            data-test-id="pdf-page-input"
             value={pageText}
-            onChangeText={setPageText}
-            onSubmitEditing={(text) => {
-              const page = parseInt(text, 10);
+            onChange={(e) => setPageText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== "Enter") return;
+              const page = parseInt(pageText, 10);
               if (page >= 1) controller.current?.goToPage(page);
             }}
             sx={{
@@ -202,42 +203,42 @@ export function PdfPreview(props: PdfPreviewProps) {
             / {state?.pageCount ?? 0}
           </Text>
           <ToolbarButton
-            testID={strings.goToNextPage()}
+            data-test-id={strings.goToNextPage()}
             icon={ChevronDown}
             disabled={!ready || state.page >= state.pageCount}
             title={strings.goToNextPage()}
-            onPress={() => controller.current?.goToPage((state?.page ?? 1) + 1)}
+            onClick={() => controller.current?.goToPage((state?.page ?? 1) + 1)}
           />
         </ToolbarGroup>
         <ToolbarGroup>
           <ToolbarButton
-            testID={strings.zoomOut()}
+            data-test-id={strings.zoomOut()}
             icon={ZoomOut}
             title={strings.zoomOut()}
-            onPress={() => controller.current?.zoomOut()}
+            onClick={() => controller.current?.zoomOut()}
           />
-          <Text testID="pdf-zoom" variant="body" sx={{ mx: 1 }}>
+          <Text data-test-id="pdf-zoom" variant="body" sx={{ mx: 1 }}>
             {`${Math.round((state?.zoom ?? 1) * 100)}%`}
           </Text>
           <ToolbarButton
-            testID={strings.zoomIn()}
+            data-test-id={strings.zoomIn()}
             icon={ZoomIn}
             title={strings.zoomIn()}
-            onPress={() => controller.current?.zoomIn()}
+            onClick={() => controller.current?.zoomIn()}
           />
         </ToolbarGroup>
         <ToolbarGroup>
           <ToolbarButton
-            testID={strings.network.download()}
+            data-test-id={strings.network.download()}
             icon={Download}
             title={strings.network.download()}
-            onPress={download}
+            onClick={download}
           />
           <ToolbarButton
-            testID={strings.enterFullScreen()}
+            data-test-id={strings.enterFullScreen()}
             icon={fullscreen ? ExitFullscreen : Fullscreen}
             title={strings.enterFullScreen()}
-            onPress={() =>
+            onClick={() =>
               fullscreen
                 ? windowControls.exitFullscreen()
                 : windowControls.enterFullscreen()
@@ -245,10 +246,10 @@ export function PdfPreview(props: PdfPreviewProps) {
           />
           {onClose ? (
             <ToolbarButton
-              testID={strings.close()}
+              data-test-id={strings.close()}
               icon={Close}
               title={strings.close()}
-              onPress={onClose}
+              onClick={onClose}
             />
           ) : null}
         </ToolbarGroup>
@@ -256,10 +257,13 @@ export function PdfPreview(props: PdfPreviewProps) {
       {searchOpen ? (
         <Flex sx={{ px: 1, pb: 1, gap: 1, alignItems: "center" }}>
           <Input
-            testID="pdf-search-input"
+            data-test-id="pdf-search-input"
             autoFocus
             placeholder={strings.search()}
-            onSubmitEditing={(text) => controller.current?.search(text)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter")
+                controller.current?.search(e.currentTarget.value);
+            }}
             sx={{ width: 240 }}
           />
           <Text variant="body">
@@ -272,12 +276,12 @@ export function PdfPreview(props: PdfPreviewProps) {
           <ToolbarButton
             icon={ChevronUp}
             title={strings.goToPreviousPage()}
-            onPress={() => controller.current?.previousHit()}
+            onClick={() => controller.current?.previousHit()}
           />
           <ToolbarButton
             icon={ChevronDown}
             title={strings.goToNextPage()}
-            onPress={() => controller.current?.nextHit()}
+            onClick={() => controller.current?.nextHit()}
           />
         </Flex>
       ) : null}
@@ -302,22 +306,24 @@ export function PdfPreview(props: PdfPreviewProps) {
             {strings.pdfLockedDesc()}.
           </Text>
           <Input
-            testID="document-password"
+            data-test-id="document-password"
             autoFocus
             type="password"
             value={password}
-            onChangeText={setPassword}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder={strings.enterPassword()}
-            onSubmitEditing={(text) => controller.current?.unlock(text)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") controller.current?.unlock(password);
+            }}
             sx={{ width: "95%", maxWidth: 400 }}
           />
           {state.passwordIncorrect ? (
             <ErrorText error={strings.passwordIncorrect()} />
           ) : null}
           <Button
-            testID="unlock-note-submit"
+            data-test-id="unlock-note-submit"
             variant="accent"
-            onPress={() => controller.current?.unlock(password)}
+            onClick={() => controller.current?.unlock(password)}
             sx={{ mt: 3, borderRadius: 100, px: 30 }}
           >
             <Text>{strings.unlock()}</Text>
@@ -329,7 +335,7 @@ export function PdfPreview(props: PdfPreviewProps) {
         </Flex>
       ) : null}
       <Flex
-        testID="pdf-viewer"
+        data-test-id="pdf-viewer"
         sx={{
           flex: state?.status === "locked" || state?.status === "error" ? 0 : 1
         }}
@@ -367,18 +373,18 @@ function ToolbarGroup(props: { children: React.ReactNode }) {
 }
 
 function ToolbarButton(props: {
-  testID?: string;
+  "data-test-id"?: string;
   title: string;
   icon: Icon;
   disabled?: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   return (
     <Button
-      testID={props.testID}
+      data-test-id={props["data-test-id"]}
       variant="secondary"
       disabled={props.disabled}
-      onPress={props.onPress}
+      onClick={props.onClick}
       sx={{
         bg: "transparent",
         borderRadius: 0,

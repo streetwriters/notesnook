@@ -36,9 +36,9 @@ export function SessionItem(props: SessionItemProps) {
   return (
     <Flex
       key={session.id}
-      testID="session-item"
+      data-test-id="session-item"
       title={strings.clickToPreview()}
-      onPress={() =>
+      onClick={() =>
         useEditorStore.getState().openDiffSession(noteId, session.id)
       }
       sx={{
@@ -53,9 +53,8 @@ export function SessionItem(props: SessionItemProps) {
       }}
     >
       <Text
-        testID="title"
-        numberOfLines={1}
-        sx={{ color: "paragraph", fontSize: "xs", lineHeight: 1 }}
+        data-test-id="title"
+        sx={{ lineClamp: 1, color: "paragraph", fontSize: "xs", lineHeight: 1 }}
       >
         {label}
       </Text>
@@ -68,7 +67,9 @@ export function SessionItem(props: SessionItemProps) {
           flexShrink: 0
         }}
       >
-        {session.locked && <Lock size={11} color="icon" testID="locked" />}
+        {session.locked && (
+          <Lock size={11} color="icon" data-test-id="locked" />
+        )}
         <TimeAgo
           live
           datetime={session.dateModified}

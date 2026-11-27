@@ -62,7 +62,7 @@ export function StatusBar() {
   return (
     <ThemeScope scope="statusBar">
       <Flex
-        testID="status-bar"
+        data-test-id="status-bar"
         sx={{
           flexDirection: "row",
           bg: "background",
@@ -86,7 +86,7 @@ export function StatusBar() {
                 {!user?.isEmailConfirmed && (
                   <StatusBarItem
                     variant="button"
-                    onPress={() => hashNavigate("/email/verify")}
+                    onClick={() => hashNavigate("/email/verify")}
                     text={strings.emailNotConfirmed()}
                   />
                 )}
@@ -96,9 +96,9 @@ export function StatusBar() {
               <StatusBarItem
                 variant="button"
                 icon={MobileLock}
-                onPress={relock}
+                onClick={relock}
                 title={strings.lock()}
-                testID="lock-app"
+                data-test-id="lock-app"
               />
             )}
             {statuses?.map((status) => {
@@ -126,7 +126,7 @@ export function StatusBar() {
                   color: updateStatus.type === "available" ? "accent" : "icon"
                 }}
                 text={statusToInfoText(updateStatus)}
-                onPress={async () => {
+                onClick={async () => {
                   if (updateStatus.type === "available") {
                     await showUpdateAvailableNotice(updateStatus);
                   } else if (updateStatus.type === "completed") {
@@ -142,8 +142,8 @@ export function StatusBar() {
                 variant="button"
                 icon={LockOpen}
                 text={strings.vaultUnlocked()}
-                onPress={lockVault}
-                testID="vault-unlocked"
+                onClick={lockVault}
+                data-test-id="vault-unlocked"
               />
             )}
           </Flex>
@@ -190,14 +190,14 @@ function SyncStatus() {
         rotateDirection: "counterclockwise",
         color: status.iconColor
       }}
-      onPress={() => (isSyncEnabled ? sync() : null)}
+      onClick={() => (isSyncEnabled ? sync() : null)}
       title={
         (status.text
           ? status.text({ lastSynced, type: syncStatus.type })
           : status.tooltip()) +
         (syncStatus.progress ? ` (${syncStatus.progress})` : "")
       }
-      testID={`sync-status-${status.key}`}
+      data-test-id={`sync-status-${status.key}`}
     />
   );
 }

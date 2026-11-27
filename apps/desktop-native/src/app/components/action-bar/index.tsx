@@ -28,7 +28,7 @@ import {
   Flex,
   SortableList,
   Text,
-  type DragEvent
+  type UIDragEvent
 } from "@notesnook/ui-kit";
 import { getDragData } from "../../utils/data-transfer";
 import { Menu } from "../../hooks/use-menu";
@@ -119,9 +119,9 @@ export function ActionBar(props: {
   return (
     <>
       <Button
-        testID="sidebar-toggle"
+        data-test-id="sidebar-toggle"
         variant="tertiary"
-        onPress={props.onSidebarToggle}
+        onClick={props.onSidebarToggle}
         sx={{
           bg: "transparent",
           flexShrink: 0,
@@ -143,10 +143,10 @@ export function ActionBar(props: {
       {isMobile ? (
         <Flex sx={{ flex: 1, ml: "spacing4" }}>
           <Button
-            testID="mobile-editor-back"
+            data-test-id="mobile-editor-back"
             variant="tertiary"
             disabled={!props.isMobileEditorActive}
-            onPress={() =>
+            onClick={() =>
               AppEventManager.publish(AppEvents.toggleEditor, false)
             }
             sx={{
@@ -179,10 +179,10 @@ export function ActionBar(props: {
         }}
       >
         <Button
-          testID="command-palette"
+          data-test-id="command-palette"
           variant="tertiary"
           title={strings.command()}
-          onPress={() => CommandPaletteDialog.show({ isCommandMode: true })}
+          onClick={() => CommandPaletteDialog.show({ isCommandMode: true })}
           sx={{
             flexDirection: "row",
             gap: "spacing3",
@@ -218,10 +218,10 @@ export function ActionBar(props: {
             }}
           >
             <Button
-              testID={tool.id}
+              data-test-id={tool.id}
               variant="secondary"
               disabled={!tool.enabled}
-              onPress={tool.onPress}
+              onClick={tool.onPress}
               sx={{
                 borderRadius: "radius1",
                 width: 20,
@@ -264,10 +264,10 @@ const TabStrip = memo(function TabStrip() {
         }}
       >
         <Button
-          testID="go-back"
+          data-test-id="go-back"
           variant="tertiary"
           disabled={!canGoBack}
-          onPress={() => useEditorStore.getState().goBack()}
+          onClick={() => useEditorStore.getState().goBack()}
           sx={{
             width: 20,
             height: 20,
@@ -281,10 +281,10 @@ const TabStrip = memo(function TabStrip() {
           <ArrowLeft size={15} color={canGoBack ? "icon" : "icon-disabled"} />
         </Button>
         <Button
-          testID="go-forward"
+          data-test-id="go-forward"
           variant="tertiary"
           disabled={!canGoForward}
-          onPress={() => useEditorStore.getState().goForward()}
+          onClick={() => useEditorStore.getState().goForward()}
           sx={{
             width: 20,
             height: 20,
@@ -302,11 +302,10 @@ const TabStrip = memo(function TabStrip() {
         </Button>
       </Flex>
       <Flex
-        testID="tabs"
-        droppable
+        data-test-id="tabs"
         onDoubleClick={() => useEditorStore.getState().addTab()}
         onDrop={(event) => {
-          const noteId = getDragData(event.payload, "note")?.[0];
+          const noteId = getDragData(event.dataTransfer, "note")?.[0];
           if (!noteId) return;
           useEditorStore.getState().openSession(noteId, { openInNewTab: true });
         }}
@@ -413,7 +412,7 @@ const TabStrip = memo(function TabStrip() {
                 }
                 onPin={() => useEditorStore.getState().pinTab(tab.id)}
                 onDrop={(event) => {
-                  const noteId = getDragData(event.payload, "note")?.[0];
+                  const noteId = getDragData(event.dataTransfer, "note")?.[0];
                   if (!noteId) return;
                   useEditorStore.getState().openSessionInTab(noteId, tab.id);
                 }}
@@ -423,9 +422,9 @@ const TabStrip = memo(function TabStrip() {
         />
       </Flex>
       <Button
-        testID="create-new-note"
+        data-test-id="create-new-note"
         variant="secondary"
-        onPress={() => useEditorStore.getState().addTab()}
+        onClick={() => useEditorStore.getState().addTab()}
         sx={{
           width: 20,
           height: 20,
@@ -463,7 +462,7 @@ function Tab(props: {
   onPin: () => void;
   onSave: () => void;
   onRevealInList?: () => void;
-  onDrop?: (event: DragEvent) => void;
+  onDrop?: (event: UIDragEvent) => void;
 }) {
   const { isActive, isPinned, isLocked, isUnsaved, type } = props;
   const { onRevealInList } = props;
@@ -480,9 +479,8 @@ function Tab(props: {
     : FileText;
   return (
     <Flex
-      testID={`tab-${props.id}`}
+      data-test-id={`tab-${props.id}`}
       group="tab"
-      droppable
       onDrop={props.onDrop}
       onContextMenu={(event) => {
         event.preventDefault();
@@ -547,9 +545,9 @@ function Tab(props: {
           { position: { x: event.pageX, y: event.pageY } }
         );
       }}
-      onPress={(event) => {
-        if (event.button === "auxiliary") props.onClose();
-        else props.onFocus();
+      onClick={() => props.onFocus()}
+      onAuxClick={(event) => {
+        if (event.button == 1) props.onClose();
       }}
       sx={{
         flexDirection: "row",
@@ -565,13 +563,13 @@ function Tab(props: {
     >
       {environment.isDev && isActive ? (
         <Box
-          testID="active-tab"
+          data-test-id="active-tab"
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
       <Flex sx={{ flexDirection: "row", alignItems: "center", flexShrink: 0 }}>
         <TabIcon
-          testID={isUnsaved ? "tab-icon-unsaved" : "tab-icon"}
+          data-test-id={isUnsaved ? "tab-icon-unsaved" : "tab-icon"}
           size={14}
           color={
             isUnsaved
@@ -582,10 +580,10 @@ function Tab(props: {
           }
         />
         <Text
-          testID="tab-title"
+          data-test-id="tab-title"
           variant="body"
-          numberOfLines={1}
           sx={{
+            lineClamp: 1,
             maxWidth: 120,
             height: 14.5,
             ml: 1,
@@ -599,7 +597,7 @@ function Tab(props: {
       {isPinned ? (
         <Button
           variant="secondary"
-          onPress={props.onPin}
+          onClick={props.onPin}
           sx={{
             ml: "spacing2",
             bg: "transparent",
@@ -615,9 +613,9 @@ function Tab(props: {
         </Button>
       ) : (
         <Button
-          testID="tab-close-button"
+          data-test-id="tab-close-button"
           variant="secondary"
-          onPress={props.onClose}
+          onClick={props.onClose}
           sx={{
             ml: "spacing2",
             bg: "transparent",

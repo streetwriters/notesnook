@@ -218,8 +218,11 @@ function AnnouncementImage({
   return (
     <Image
       src={item.src}
-      resizeMode="cover"
-      sx={{ maxHeight: 150, ...mapStyle(item.style || {}, layout) }}
+      sx={{
+        objectFit: "cover",
+        maxHeight: 150,
+        ...mapStyle(item.style || {}, layout)
+      }}
     />
   );
 }
@@ -388,7 +391,7 @@ function CalltoAction({
     <Button
       variant={variant}
       sx={sx}
-      onPress={async () => {
+      onClick={async () => {
         if (dismissAnnouncement) dismissAnnouncement();
         DialogManager.closeAll();
         switch (action.type) {

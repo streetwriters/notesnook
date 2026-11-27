@@ -32,8 +32,8 @@ function Toggle(props: ToggleProps) {
 
   return (
     <Flex
-      testID={props.testId}
-      onPress={() => onToggle(!isOn)}
+      data-test-id={props.testId}
+      onClick={() => onToggle(!isOn)}
       sx={{
         flexDirection: "row",
         cursor: "pointer",
@@ -44,7 +44,7 @@ function Toggle(props: ToggleProps) {
       }}
     >
       <Flex
-        testID={`toggle-state-${isOn ? "on" : "off"}`}
+        data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
         sx={{
           flexDirection: "row",
           alignItems: "center",
@@ -65,13 +65,13 @@ function Toggle(props: ToggleProps) {
         >
           <ToggleIcon size={15} color="icon" />
         </Flex>
-        <Text numberOfLines={1} sx={{ color: "heading", fontSize: "xs" }}>
+        <Text sx={{ lineClamp: 1, color: "heading", fontSize: "xs" }}>
           {label}
         </Text>
       </Flex>
       <Switch
         checked={isOn}
-        onCheckedChange={onToggle}
+        onChange={(e) => onToggle(e.target.checked)}
         sx={{ m: 0, bg: isOn ? "accent" : "icon-disabled", flexShrink: 0 }}
       />
     </Flex>

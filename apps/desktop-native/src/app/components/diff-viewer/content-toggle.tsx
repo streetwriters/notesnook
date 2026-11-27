@@ -50,7 +50,7 @@ function ContentToggle(props: ContentToggleProps) {
           {isOtherSelected && (
             <Button
               variant="accent"
-              onPress={() => resolveConflict(true)}
+              onClick={() => resolveConflict(true)}
               sx={{ mr: 2, p: 1, px: 2 }}
             >
               {strings.saveACopy()}
@@ -58,7 +58,7 @@ function ContentToggle(props: ContentToggleProps) {
           )}
           <Button
             variant={isOtherSelected ? "error" : "accent"}
-            onPress={() => {
+            onClick={() => {
               if (isOtherSelected) {
                 resolveConflict(false);
               } else {

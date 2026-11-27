@@ -252,9 +252,9 @@ export function NavigationMenu(props: {
 
   return (
     <Flex
-      testID="navigation-menu-root"
-      onHoverIn={() => clearTimeout(hoverTimeout.current)}
-      onHoverOut={() => {
+      data-test-id="navigation-menu-root"
+      onMouseEnter={() => clearTimeout(hoverTimeout.current)}
+      onMouseLeave={() => {
         clearTimeout(hoverTimeout.current);
         if (!isNavPaneCollapsed) return;
         hoverTimeout.current = setTimeout(() => {
@@ -334,7 +334,7 @@ export function NavigationMenu(props: {
                 variant="secondary"
                 title={strings.expandSidebar()}
                 disabled={!canExpand}
-                onPress={onExpand}
+                onClick={onExpand}
                 sx={{ p: 1, bg: "transparent" }}
               >
                 <ExpandSidebar size={13} color="icon" />
@@ -364,11 +364,11 @@ export function NavigationMenu(props: {
             {allTabs.map((tab) => (
               <TabItem
                 key={tab.id}
-                testID={`tab-${tab.id}`}
+                data-test-id={`tab-${tab.id}`}
                 icon={tab.icon}
                 selected={currentTab.id === tab.id}
                 isCollapsed={isCollapsed}
-                onPress={() => {
+                onClick={() => {
                   if (isNavPaneCollapsed) setExpanded(true);
                   setNavigationTab(tab.id);
                 }}
@@ -386,10 +386,10 @@ export function NavigationMenu(props: {
               {currentTab.actions.map((action) => (
                 <Button
                   key={action.id}
-                  testID={action.id}
+                  data-test-id={action.id}
                   variant="tertiary"
                   sx={{ p: 0, bg: "transparent" }}
-                  onPress={action.onPress}
+                  onClick={action.onPress}
                 >
                   <action.icon size={15} color="icon-secondary" />
                 </Button>
@@ -400,9 +400,9 @@ export function NavigationMenu(props: {
         <Separator />
         {isCollapsed || currentTab.id === "home" ? (
           <Button
-            testID="create-note-button"
+            data-test-id="create-note-button"
             variant="new_accent"
-            onPress={CREATE_BUTTON_MAP.notes.onClick}
+            onClick={CREATE_BUTTON_MAP.notes.onClick}
             sx={{
               flexDirection: "row",
               alignItems: "center",
@@ -425,7 +425,7 @@ export function NavigationMenu(props: {
       </Flex>
 
       <Flex
-        testID="navigation-menu"
+        data-test-id="navigation-menu"
         onContextMenu={async (event) => {
           event.preventDefault();
           Menu.openMenu(await getSidebarItemsAsMenuItems(), {
@@ -455,8 +455,8 @@ export function NavigationMenu(props: {
       {currentTab.id === "home" && !isCollapsed && shouldShowWrapped() ? (
         <Button
           variant="accent"
-          testID="wrapped-button"
-          onPress={() => hardNavigate("/wrapped")}
+          data-test-id="wrapped-button"
+          onClick={() => hardNavigate("/wrapped")}
           sx={{ m: 2 }}
         >
           <Text sx={{ color: "accentForeground" }}>
@@ -478,72 +478,73 @@ function ProfileButton() {
   return (
     <Button
       ref={element}
-      testID="profile-dropdown"
+      data-test-id="profile-dropdown"
       variant="secondary"
-      onPress={() =>
-        element.current?.measureInWindow((x, y, width, height) =>
-          Menu.openMenu(
-            [
-              {
-                type: "popup",
-                key: "profile",
-                component: UserProfileMinimal
-              },
-              { type: "separator", key: "sep" },
-              {
-                type: "button",
-                title: strings.darkMode(),
-                key: "toggle-theme-mode",
-                iconComponent: MoonStars,
-                isChecked: colorScheme === "dark",
-                onClick: () => {
-                  useThemeStore.getState().setFollowSystemTheme(false);
-                  useThemeStore.getState().toggleColorScheme();
-                }
-              },
-              {
-                type: "button",
-                title: strings.upgradeToPro(),
-                iconComponent: Pro,
-                key: "upgrade",
-                onClick: () => BuyDialog.show({}),
-                isHidden: notLoggedIn || !isSubscribed
-              },
-              {
-                type: "button",
-                title: strings.routes.Settings(),
-                key: "settings",
-                iconComponent: GearSix,
-                onClick: () => hashNavigate("/settings")
-              },
-              {
-                type: "button",
-                title: strings.helpAndSupport(),
-                iconComponent: Question,
-                key: "help-and-support",
-                onClick: () => shell.openUrl("https://notesnook.com/help/")
-              },
-              {
-                type: "button",
-                title: strings.login(),
-                iconComponent: SignIn,
-                key: "login",
-                isHidden: !notLoggedIn,
-                onClick: () => hardNavigate("/login")
-              },
-              {
-                type: "button",
-                title: strings.logout(),
-                iconComponent: SignOut,
-                key: "logout",
-                isHidden: notLoggedIn,
-                onClick: () => logout()
+      onClick={() => {
+        const rect = element.current?.getBoundingClientRect();
+        if (!rect) return;
+        const { x, y, width, height } = rect;
+        Menu.openMenu(
+          [
+            {
+              type: "popup",
+              key: "profile",
+              component: UserProfileMinimal
+            },
+            { type: "separator", key: "sep" },
+            {
+              type: "button",
+              title: strings.darkMode(),
+              key: "toggle-theme-mode",
+              iconComponent: MoonStars,
+              isChecked: colorScheme === "dark",
+              onClick: () => {
+                useThemeStore.getState().setFollowSystemTheme(false);
+                useThemeStore.getState().toggleColorScheme();
               }
-            ],
-            { position: { x, y, width, height } }
-          )
-        )
-      }
+            },
+            {
+              type: "button",
+              title: strings.upgradeToPro(),
+              iconComponent: Pro,
+              key: "upgrade",
+              onClick: () => BuyDialog.show({}),
+              isHidden: notLoggedIn || !isSubscribed
+            },
+            {
+              type: "button",
+              title: strings.routes.Settings(),
+              key: "settings",
+              iconComponent: GearSix,
+              onClick: () => hashNavigate("/settings")
+            },
+            {
+              type: "button",
+              title: strings.helpAndSupport(),
+              iconComponent: Question,
+              key: "help-and-support",
+              onClick: () => shell.openUrl("https://notesnook.com/help/")
+            },
+            {
+              type: "button",
+              title: strings.login(),
+              iconComponent: SignIn,
+              key: "login",
+              isHidden: !notLoggedIn,
+              onClick: () => hardNavigate("/login")
+            },
+            {
+              type: "button",
+              title: strings.logout(),
+              iconComponent: SignOut,
+              key: "logout",
+              isHidden: notLoggedIn,
+              onClick: () => logout()
+            }
+          ],
+          { position: { x, y, width, height } }
+        );
+      }}
       sx={{
         width: 32,
         height: 32,
@@ -570,8 +571,12 @@ function ProfileButton() {
       ) : (
         <Image
           src={profile.profilePicture}
-          resizeMode="contain"
-          sx={{ width: "100%", height: "100%", borderRadius: "radius5" }}
+          sx={{
+            objectFit: "contain",
+            width: "100%",
+            height: "100%",
+            borderRadius: "radius5"
+          }}
         />
       )}
     </Button>
@@ -801,7 +806,7 @@ function ItemCount(props: {
 
   return (
     <Text
-      testID="item-count"
+      data-test-id="item-count"
       variant="subBody"
       sx={{
         fontSize: "3xs",
@@ -880,7 +885,7 @@ function RouteItem({
       isCollapsed={isCollapsed}
       selected={selected}
       onDrop={(event) =>
-        handleDrop(event.payload, {
+        handleDrop(event.dataTransfer, {
           type:
             item.path === "/trash"
               ? "trash"
@@ -891,7 +896,7 @@ function RouteItem({
               : undefined
         })
       }
-      onPress={() => {
+      onClick={() => {
         navigateToRoute(item.path);
         collapse();
       }}
@@ -999,7 +1004,7 @@ function Colors({ collapse, isCollapsed }: SectionContext) {
             {showAllColors ? "" : `+${visibleColors.length - 6} more`}
           </Text>
           <Button
-            onPress={() => setShowAllColors((expanded) => !expanded)}
+            onClick={() => setShowAllColors((expanded) => !expanded)}
             sx={{
               color: "accent",
               fontSize: "xs",
@@ -1036,9 +1041,9 @@ function ColorItem({
       iconSize={10}
       collapsedIconSize={10}
       selected={currentContext?.id === color.id}
-      onDrop={(event) => handleDrop(event.payload, color)}
+      onDrop={(event) => handleDrop(event.dataTransfer, color)}
       color={dataColor(color.colorCode)}
-      onPress={() => {
+      onClick={() => {
         navigateToRoute(`/colors/${color.id}`);
         collapse();
       }}
@@ -1171,8 +1176,8 @@ function ShortcutItem({
       }
       iconSize={14}
       selected={currentContext?.id === item.id}
-      onDrop={(event) => handleDrop(event.payload, item)}
-      onPress={() => {
+      onDrop={(event) => handleDrop(event.dataTransfer, item)}
+      onClick={() => {
         navigateToRoute(
           item.type === "notebook"
             ? `/notebooks/${item.id}`
@@ -1197,7 +1202,7 @@ function HomeTab(props: { isCollapsed?: boolean; collapse: () => void }) {
   return (
     <ScrollContainer>
       <Flex
-        testID="home-tab"
+        data-test-id="home-tab"
         sx={{
           flexDirection: "column",
           gap: props.isCollapsed ? "spacing2" : "spacing1",

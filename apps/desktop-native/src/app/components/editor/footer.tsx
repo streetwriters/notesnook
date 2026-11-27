@@ -134,9 +134,9 @@ export default function EditorFooter() {
             <Flex key={tool.title} sx={{ alignItems: "center" }}>
               <StatusBarItem
                 variant="button"
-                testID={tool.title}
+                data-test-id={tool.title}
                 title={tool.title}
-                onPress={tool.onPress}
+                onClick={tool.onPress}
                 icon={tool.icon}
               />
               <EditorFooterSeparator />
@@ -145,9 +145,9 @@ export default function EditorFooter() {
         <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
           <StatusBarItem
             variant="button"
-            testID="editor-zoom-out"
+            data-test-id="editor-zoom-out"
             icon={Minus}
-            onPress={() =>
+            onClick={() =>
               setEditorConfig({
                 zoom: Math.max(
                   EDITOR_ZOOM.MIN,
@@ -159,17 +159,17 @@ export default function EditorFooter() {
           />
           <StatusBarItem
             variant="button"
-            testID="editor-zoom"
+            data-test-id="editor-zoom"
             title={strings.clickToReset(strings.zoom().toLocaleLowerCase())}
-            onPress={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
+            onClick={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
             sx={{ width: 34, px: 0, overflow: "visible" }}
             text={`${editorConfig.zoom}%`}
           />
           <StatusBarItem
             variant="button"
-            testID="editor-zoom-in"
+            data-test-id="editor-zoom-in"
             icon={Plus}
-            onPress={() =>
+            onClick={() =>
               setEditorConfig({
                 zoom: Math.min(
                   EDITOR_ZOOM.MAX,
@@ -191,8 +191,8 @@ export default function EditorFooter() {
       <Flex ref={statisticsRef}>
         <StatusBarItem
           variant="button"
-          testID="editor-word-count"
-          onPress={() => setIsStatisticsPopupOpen(true)}
+          data-test-id="editor-word-count"
+          onClick={() => setIsStatisticsPopupOpen(true)}
           text={`${strings.totalWords(statistics.words.total)}${
             statistics.words.selected
               ? ` (${strings.selectedWords(statistics.words.selected)})`
@@ -219,7 +219,7 @@ export default function EditorFooter() {
         {(Object.keys(statistics) as (keyof NoteStatistics)[]).map((key) => (
           <Flex
             key={key}
-            testID={`editor-statistics-${key}`}
+            data-test-id={`editor-statistics-${key}`}
             sx={{
               justifyContent: "space-between",
               gap: "spacing4",
@@ -244,7 +244,7 @@ export default function EditorFooter() {
         <>
           <StatusBarItem
             variant="text"
-            testID="editor-date-edited"
+            data-test-id="editor-date-edited"
             title={dateEdited.toString()}
             text={getFormattedDate(dateEdited)}
           />
@@ -255,7 +255,7 @@ export default function EditorFooter() {
         <StatusBarItem
           variant="button"
           icon={SaveStateIcon}
-          testID={`editor-save-state-${
+          data-test-id={`editor-save-state-${
             saveState === SaveState.Saved
               ? "saved"
               : saveState === SaveState.NotSaved
@@ -273,7 +273,7 @@ export default function EditorFooter() {
           title={
             saveState === SaveState.NotSaved ? strings.clickToSave() : undefined
           }
-          onPress={() => {
+          onClick={() => {
             if (saveState !== SaveState.NotSaved) return;
             const { activeEditorId, getEditor } = useEditorManager.getState();
             const editor = getEditor(activeEditorId || "")?.editor;

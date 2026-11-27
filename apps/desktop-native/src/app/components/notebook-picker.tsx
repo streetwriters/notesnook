@@ -165,7 +165,7 @@ export function NotebookPicker(props: {
 
   return (
     <Flex
-      testID="subnotebooks"
+      data-test-id="subnotebooks"
       sx={{
         flexDirection: "column",
         flex: 1,
@@ -181,7 +181,8 @@ export function NotebookPicker(props: {
         styles={{ input: { pl: 30 } }}
         placeholder={strings.searchNotebooks()}
         leftIcon={SearchIcon}
-        onChangeText={async (text) => {
+        onChange={async (e) => {
+          const text = e.target.value;
           setQuery(text);
           const id = ++searchId.current;
           const trimmed = text.trim();
@@ -244,10 +245,10 @@ export function NotebookPicker(props: {
             {strings.notebooksEmpty()}
           </Text>
           <Button
-            testID="add-new-notebook"
+            data-test-id="add-new-notebook"
             variant="secondary"
             sx={{ flexDirection: "row", alignItems: "center", gap: "spacing3" }}
-            onPress={() =>
+            onClick={() =>
               AddNotebookDialog.show({}).then((res: boolean | false) =>
                 res
                   ? db.notebooks.roots
@@ -331,8 +332,8 @@ export function NotebookItem(props: {
   return (
     <Flex sx={{ flexDirection: "column" }}>
       <Flex
-        testID="notebook"
-        onPress={(e) => {
+        data-test-id="notebook"
+        onClick={(e) => {
           if (!isExpandable) {
             onSelect(notebook, e.ctrlKey || e.metaKey);
             return;
@@ -363,12 +364,12 @@ export function NotebookItem(props: {
           <SelectedCheck
             size={15}
             item={notebook}
-            onPress={(ctrl) => onSelect(notebook, ctrl)}
+            onClick={(ctrl) => onSelect(notebook, ctrl)}
           />
           <Text
-            testID="notebook-title"
-            numberOfLines={1}
+            data-test-id="notebook-title"
             sx={{
+              lineClamp: 1,
               minWidth: 0,
               color: isSelected ? "paragraph-selected" : "paragraph",
               fontSize: "sm"
@@ -378,7 +379,7 @@ export function NotebookItem(props: {
           </Text>
         </Flex>
         <Flex
-          testID="notebook-tools"
+          data-test-id="notebook-tools"
           sx={{
             flexDirection: "row",
             alignItems: "center",
@@ -387,9 +388,9 @@ export function NotebookItem(props: {
           }}
         >
           <Flex
-            testID="add-sub-notebook"
+            data-test-id="add-sub-notebook"
             title={strings.newNotebook()}
-            onPress={async (e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               if (!(await checkFeature("notebooks"))) return;
               if (isExpandable && !isExpanded) toggle();
@@ -426,7 +427,7 @@ export function NotebookItem(props: {
       </Flex>
       {isAddingSubNotebook && (
         <Flex
-          testID="sub-notebook-editor"
+          data-test-id="sub-notebook-editor"
           sx={{
             ml: (depth + 1) * 20,
             flexDirection: "row",
@@ -439,10 +440,10 @@ export function NotebookItem(props: {
             autoFocus
             placeholder={strings.enterNotebookTitle()}
             value={subNotebookTitle}
-            onChangeText={setSubNotebookTitle}
-            onSubmitEditing={() => createSubNotebook()}
+            onChange={(e) => setSubNotebookTitle(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Escape") {
+              if (e.key === "Enter") createSubNotebook();
+              else if (e.key === "Escape") {
                 e.stopPropagation();
                 setIsAddingSubNotebook(false);
                 setSubNotebookTitle("");
@@ -454,7 +455,7 @@ export function NotebookItem(props: {
           <Flex sx={{ flexDirection: "row", gap: "spacing3" }}>
             <Flex
               title={strings.submit()}
-              onPress={() => createSubNotebook()}
+              onClick={() => createSubNotebook()}
               sx={{
                 width: 20,
                 height: 20,
@@ -467,7 +468,7 @@ export function NotebookItem(props: {
             </Flex>
             <Flex
               title={strings.cancel()}
-              onPress={() => {
+              onClick={() => {
                 setIsAddingSubNotebook(false);
                 setSubNotebookTitle("");
               }}

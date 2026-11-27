@@ -30,7 +30,7 @@ function AuthContainer(props: {
 }) {
   return (
     <Flex
-      testID="auth-container"
+      data-test-id="auth-container"
       sx={{
         flexDirection: "row",
         position: "relative",
@@ -93,8 +93,12 @@ function AuthContainer(props: {
             </Flex>
             <Image
               src={rasterAssets["auth/notesnook-phone.png"]}
-              resizeMode="contain"
-              sx={{ alignSelf: "center", width: "85%", aspectRatio: 1 }}
+              sx={{
+                objectFit: "contain",
+                alignSelf: "center",
+                width: "85%",
+                aspectRatio: 1
+              }}
             />
           </Flex>
           <Box
@@ -117,7 +121,7 @@ function AuthContainer(props: {
             >
               <Button
                 variant="new_anchor"
-                onPress={() =>
+                onClick={() =>
                   SettingsDialog.show({ activeSection: "servers" })
                 }
               >

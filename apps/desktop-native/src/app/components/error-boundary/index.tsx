@@ -111,7 +111,7 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
                 <Button
                   variant="error"
                   sx={{ alignSelf: "flex-start", px: 30, mt: 1 }}
-                  onPress={() =>
+                  onClick={() =>
                     help.fix().catch((e) => {
                       console.error(e);
                     })
@@ -123,7 +123,7 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
                 <Button
                   variant="error"
                   sx={{ alignSelf: "flex-start", px: 30, mt: 1 }}
-                  onPress={resetErrorBoundary}
+                  onClick={resetErrorBoundary}
                 >
                   <Text>{strings.reloadApp()}</Text>
                 </Button>
@@ -131,7 +131,7 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
               <Button
                 variant="secondary"
                 sx={{ alignSelf: "flex-start", px: 30, mt: 1 }}
-                onPress={async () => {
+                onClick={async () => {
                   await writeToClipboard({
                     "text/plain": errorToString(error)
                   });
@@ -142,7 +142,7 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
               <Button
                 variant="secondary"
                 sx={{ alignSelf: "flex-start", px: 30, mt: 1 }}
-                onPress={async () => {
+                onClick={async () => {
                   const body = encodeURIComponent(`${errorToString(error)}
 
 ---

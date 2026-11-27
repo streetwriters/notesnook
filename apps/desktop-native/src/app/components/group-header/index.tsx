@@ -316,8 +316,8 @@ function GroupHeader(props: GroupHeaderProps) {
   return (
     <Flex
       ref={groupHeaderRef}
-      testID="group-header"
-      onPress={async (e) => {
+      data-test-id="group-header"
+      onClick={async (e) => {
         if (e.ctrlKey || e.metaKey) {
           onSelectGroup?.();
           return;
@@ -338,12 +338,13 @@ function GroupHeader(props: GroupHeaderProps) {
         });
         if (!items.length) return;
 
-        groupHeaderRef.current?.measureInWindow((x, y, width, height) =>
-          Menu.openMenu(items, {
-            title: strings.jumpToGroup(),
-            position: { x, y, width, height: height + 5 }
-          })
-        );
+        const rect = groupHeaderRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        const { x, y, width, height } = rect;
+        Menu.openMenu(items, {
+          title: strings.jumpToGroup(),
+          position: { x, y, width, height: height + 5 }
+        });
       }}
       sx={{
         flexDirection: "row",
@@ -360,7 +361,7 @@ function GroupHeader(props: GroupHeaderProps) {
       >
         {title ? (
           <Text
-            testID="title"
+            data-test-id="title"
             sx={{
               fontSize: "xs",
               fontWeight: 400,

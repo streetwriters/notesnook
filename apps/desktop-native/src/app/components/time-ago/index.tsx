@@ -41,7 +41,7 @@ function TimeAgo({
   const time = useTimeAgo(datetime, { live, locale, interval });
 
   return (
-    <Text {...restProps} testID="time" sx={{ fontFamily: "body", ...sx }}>
+    <Text {...restProps} data-test-id="time" sx={{ fontFamily: "body", ...sx }}>
       {time}
     </Text>
   );

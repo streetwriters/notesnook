@@ -148,7 +148,7 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
           </Text>
           <Button
             variant="accent"
-            onPress={onStartImport}
+            onClick={onStartImport}
             sx={{ my: 4, alignSelf: "center" }}
           >
             <Text>{strings.startImporting()}</Text>

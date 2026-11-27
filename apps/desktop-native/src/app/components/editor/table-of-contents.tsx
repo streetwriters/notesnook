@@ -44,13 +44,13 @@ function TableOfContents(props: TableOfContentsProps) {
   return (
     <Section title={strings.toc()} sx={{ flex: 1, px: "spacing4" }}>
       <Flex
-        testID="table-of-contents"
+        data-test-id="table-of-contents"
         sx={{ flexDirection: "column", flex: 1 }}
       >
         {headings.length <= 0 ? (
           <Text
             sx={{ color: "paragraph-secondary", fontSize: "xs", lineHeight: 1 }}
-            testID="table-of-contents-empty"
+            data-test-id="table-of-contents-empty"
           >
             {strings.noHeadingsFound()}.
           </Text>
@@ -93,8 +93,8 @@ function TableOfContents(props: TableOfContentsProps) {
               <Button
                 variant="menuitem"
                 key={item.id}
-                testID="toc-item"
-                onPress={() =>
+                data-test-id="toc-item"
+                onClick={() =>
                   useEditorManager
                     .getState()
                     .getEditor(sessionId)
@@ -115,7 +115,7 @@ function TableOfContents(props: TableOfContentsProps) {
                 {item.hasChildren ? (
                   <Button
                     variant="secondary"
-                    onPress={() => (expanded ? collapse() : expand())}
+                    onClick={() => (expanded ? collapse() : expand())}
                     sx={{
                       bg: "transparent",
                       p: 0,

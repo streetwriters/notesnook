@@ -47,7 +47,7 @@ export function ImportErrors(props: ImportErrorsProps) {
         <Button
           variant="error"
           sx={{ alignSelf: "flex-start", mt: 2 }}
-          onPress={() =>
+          onClick={() =>
             shell.openUrl(
               "https://github.com/streetwriters/notesnook-importer/issues/new"
             )

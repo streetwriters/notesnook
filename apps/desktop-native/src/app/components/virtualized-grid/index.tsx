@@ -87,7 +87,7 @@ function VirtualizedGridInner<T>(
   return (
     <VirtualList
       ref={ref}
-      testID={testID || "virtualized-grid"}
+      data-test-id={testID || "virtualized-grid"}
       count={rowCount}
       itemKey={rowKey}
       renderItem={renderRow}

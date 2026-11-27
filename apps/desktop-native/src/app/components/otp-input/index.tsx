@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useRef } from "react";
-import { Flex, Input, type KeyEvent, type UIElement } from "@notesnook/ui-kit";
+import {
+  Flex,
+  Input,
+  type UIKeyboardEvent,
+  type UIElement
+} from "@notesnook/ui-kit";
 
 type OtpInputProps = {
   length?: number;
@@ -78,7 +83,7 @@ export function OtpInput({
   );
 
   const handleKeyDown = useCallback(
-    (index: number, e: KeyEvent) => {
+    (index: number, e: UIKeyboardEvent) => {
       if (e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
         const newValue = Array.from({ length }, (_, i) => value[i] || "");
@@ -129,12 +134,12 @@ export function OtpInput({
           ref={(el) => {
             inputRefs.current[index] = el;
           }}
-          testID={`otp-input-${index}`}
+          data-test-id={`otp-input-${index}`}
           type="text"
           value={value[index] || ""}
           disabled={disabled}
           selectTextOnFocus
-          onChangeText={(text) => handleChange(index, text)}
+          onChange={({ target: { value: text } }) => handleChange(index, text)}
           onKeyDown={(e) => handleKeyDown(index, e)}
           sx={{
             width: 45,

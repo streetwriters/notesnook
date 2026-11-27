@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { createContext, useContext } from "react";
-import type { PressEvent } from "@notesnook/ui-kit";
+import type { UIMouseEvent } from "@notesnook/ui-kit";
 
 export type ListSelection = {
   focusedIndex: number;
@@ -26,7 +26,7 @@ export type ListSelection = {
   onItemPress: (
     index: number,
     id: string,
-    event: PressEvent,
+    event: UIMouseEvent,
     open: () => void
   ) => void;
 };

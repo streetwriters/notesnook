@@ -189,9 +189,9 @@ function Note(props: NoteProps) {
         >
           {color ? <Circle size={10} color={primary} /> : null}
           <Text
-            testID="title"
-            numberOfLines={1}
+            data-test-id="title"
             sx={{
+              lineClamp: 1,
               color: "heading",
               minWidth: 0,
               fontWeight: 600,
@@ -231,7 +231,7 @@ function Note(props: NoteProps) {
       }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
-      onPress={() => useEditorStore.getState().openSession(note)}
+      onClick={() => useEditorStore.getState().openSession(note)}
       onMiddleClick={() =>
         useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
@@ -274,11 +274,11 @@ function Note(props: NoteProps) {
                 locale="short"
               />
               {note.conflicted && <Alert size={11} color="icon-error" />}
-              {locked && <Lock size={11} color="icon" testID="locked" />}
+              {locked && <Lock size={11} color="icon" data-test-id="locked" />}
               {note.readonly && <NoteReadonly size={11} color="icon" />}
               {note.favorite && (
                 <NoteFavorite
-                  testID="favorite"
+                  data-test-id="favorite"
                   size={11}
                   color={dataColor("#E5C131")}
                 />
@@ -976,12 +976,14 @@ function getMetadataItems(props: {
     note.conflicted && <Alert key="conflicted" size={15} color="icon-error" />,
     note.localOnly && <SyncOff key="local-only" size={15} color="icon" />,
     note.pinned && <NotePin key="pinned" size={15} color="icon" />,
-    locked && <Lock key="locked" size={15} color="icon" testID="locked" />,
+    locked && (
+      <Lock key="locked" size={15} color="icon" data-test-id="locked" />
+    ),
     note.readonly && <NoteReadonly key="readonly" size={15} color="icon" />,
     note.favorite && (
       <NoteFavorite
         key="favorite"
-        testID="favorite"
+        data-test-id="favorite"
         size={15}
         color={dataColor("#E5C131")}
       />

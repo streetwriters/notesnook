@@ -66,7 +66,7 @@ function Header(props: HeaderProps) {
 
   return (
     <Flex
-      testID="editor-tags"
+      data-test-id="editor-tags"
       sx={{
         alignItems: "center",
         flexWrap: "wrap",
@@ -178,11 +178,12 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
   const onOpenMenu = useCallback(
     (filtered: T[], text: string) => {
       if (!text && filtered.length <= 0) return closeMenu();
-      inputRef.current?.measureInWindow((x, y, width, height) =>
-        openMenu(toMenuItems(filtered, reset, text), {
-          position: { x, y, width, height }
-        })
-      );
+      const rect = inputRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const { x, y, width, height } = rect;
+      openMenu(toMenuItems(filtered, reset, text), {
+        position: { x, y, width, height }
+      });
     },
     [closeMenu, openMenu, reset, toMenuItems]
   );
@@ -195,7 +196,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
     <Input
       key={generation}
       ref={inputRef}
-      testID="editor-tag-input"
+      data-test-id="editor-tag-input"
       autoFocus={generation > 0}
       disabled={props.disabled}
       value={value}
@@ -211,10 +212,10 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
         if (skipOpen.current) return;
         if (!value.trim()) onOpenMenu(await defaultItems(), "");
       }}
-      onPress={async () => {
+      onClick={async () => {
         if (!value.trim()) onOpenMenu(await defaultItems(), "");
       }}
-      onChangeText={async (text) => {
+      onChange={async ({ target: { value: text } }) => {
         setValue(text);
         const trimmed = text.trim();
         latestText.current = trimmed;
@@ -222,14 +223,13 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
         const filtered = await filter(trimmed);
         if (latestText.current === trimmed) onOpenMenu(filtered, trimmed);
       }}
-      onSubmitEditing={(text) => {
-        const trimmed = text.trim();
-        if (!trimmed) return;
-        onAdd(trimmed);
-        reset();
-      }}
       onKeyDown={(event) => {
-        if (event.key === "Backspace" && !value) {
+        if (event.key === "Enter") {
+          const trimmed = value.trim();
+          if (!trimmed) return;
+          onAdd(trimmed);
+          reset();
+        } else if (event.key === "Backspace" && !value) {
           onRemove();
           closeMenu();
         } else if (event.key === "Escape") closeMenu();

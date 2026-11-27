@@ -155,15 +155,15 @@ function Reminder(props: ReminderProps) {
                     ? strings.markReminderIncomplete()
                     : strings.markReminderComplete()
                 }
-                testID="reminder-complete"
+                data-test-id="reminder-complete"
                 size={15}
                 checkboxUncheckedIconColor="border"
                 uncheckedGroupHoverColor="border-tertiary"
               />
               <Text
-                testID="title"
-                numberOfLines={1}
+                data-test-id="title"
                 sx={{
+                  lineClamp: 1,
                   color: "heading",
                   fontSize: compact ? "xs" : "sm",
                   fontWeight: compact ? 400 : 600,
@@ -184,7 +184,7 @@ function Reminder(props: ReminderProps) {
               <ElevatedIcon>
                 {reminder.disabled ? (
                   <ReminderOff
-                    testID="disabled"
+                    data-test-id="disabled"
                     size={11}
                     color="icon-secondary"
                   />
@@ -204,9 +204,9 @@ function Reminder(props: ReminderProps) {
       body={
         !compact && reminder.description ? (
           <Text
-            testID="description"
-            numberOfLines={1}
+            data-test-id="description"
             sx={{
+              lineClamp: 1,
               ml: "spacing8",
               color: "paragraph",
               fontSize: "xs"
@@ -218,7 +218,7 @@ function Reminder(props: ReminderProps) {
       }
       isDisabled={reminder.disabled}
       isCompact={false}
-      onPress={() => EditReminderDialog.show({ reminderId: reminder.id })}
+      onClick={() => EditReminderDialog.show({ reminderId: reminder.id })}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
           await Multiselect.moveRemindersToTrash(
@@ -247,7 +247,7 @@ function Reminder(props: ReminderProps) {
           }}
         >
           <Text
-            testID="reminder-time"
+            data-test-id="reminder-time"
             sx={{
               color:
                 group === "Past" ? "paragraph-error" : "paragraph-secondary",
@@ -259,7 +259,7 @@ function Reminder(props: ReminderProps) {
           </Text>
           {!compact && reminder.mode === "repeat" && reminder.recurringMode && (
             <Flex
-              testID="recurring-mode"
+              data-test-id="recurring-mode"
               sx={{
                 flexDirection: "row",
                 alignItems: "center",

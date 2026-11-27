@@ -62,7 +62,7 @@ function Notes(props: NotesProps) {
       compact={isCompact}
       context={context}
       items={filteredItems || contextNotes}
-      onDrop={(event) => handleDrop(event.payload, context)}
+      onDrop={(event) => handleDrop(event.dataTransfer, context)}
       isSearching={!!filteredItems}
       placeholder={
         <ListPanePlaceholder

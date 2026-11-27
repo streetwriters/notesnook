@@ -21,21 +21,21 @@ import { Flex, type ColorValue } from "@notesnook/ui-kit";
 import type { Icon } from "../icons";
 
 export function TabItem(props: {
-  testID: string;
+  "data-test-id": string;
   icon: Icon;
   selected: boolean;
   isCollapsed?: boolean;
   title?: string;
   size?: number;
   iconColor?: ColorValue;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const TabIcon = props.icon;
   return (
     <Flex
-      testID={props.testID}
+      data-test-id={props["data-test-id"]}
       title={props.title}
-      onPress={props.onPress}
+      onClick={props.onClick}
       sx={{
         alignItems: "center",
         justifyContent: "center",

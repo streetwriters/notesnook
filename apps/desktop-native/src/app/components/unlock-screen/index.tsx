@@ -53,16 +53,16 @@ function describeError(e: unknown) {
 }
 
 function SubmitArrow(props: {
-  testID: string;
+  "data-test-id": string;
   loading: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   return (
     <Button
-      testID={props.testID}
+      data-test-id={props["data-test-id"]}
       variant="new_accent"
       disabled={props.loading}
-      onPress={props.onPress}
+      onClick={props.onClick}
       sx={{
         width: 40,
         height: 40,
@@ -83,15 +83,15 @@ function SubmitArrow(props: {
 }
 
 function QuietButton(props: {
-  testID: string;
+  "data-test-id": string;
   text: string;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   return (
     <Button
-      testID={props.testID}
+      data-test-id={props["data-test-id"]}
       variant="new_anchor"
-      onPress={props.onPress}
+      onClick={props.onClick}
       sx={{ mt: "spacing6" }}
     >
       <Text sx={{ fontSize: "xs", color: "paragraph-secondary" }}>
@@ -156,7 +156,7 @@ export function UnlockScreen(props: {
 
   return (
     <Flex
-      testID="unlock-screen"
+      data-test-id="unlock-screen"
       sx={{
         flex: 1,
         flexDirection: "column",
@@ -176,7 +176,7 @@ export function UnlockScreen(props: {
       >
         <Logo size={36} />
         <Text
-          testID="unlock-note-title"
+          data-test-id="unlock-note-title"
           sx={{
             mt: "spacing8",
             mb: "spacing9",
@@ -201,7 +201,7 @@ export function UnlockScreen(props: {
             <Flex sx={{ flex: 1 }}>
               <Field
                 key={mode}
-                testID={
+                data-test-id={
                   mode === "password"
                     ? "app-lock-password"
                     : "app-lock-security-key-pin"
@@ -212,16 +212,18 @@ export function UnlockScreen(props: {
                 }
                 autoFocus
                 value={value}
-                onChangeText={setValue}
-                onSubmitEditing={unlock}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") unlock();
+                }}
                 sx={{ width: "100%" }}
                 styles={authFieldProps.styles}
               />
             </Flex>
             <SubmitArrow
-              testID="app-lock-submit"
+              data-test-id="app-lock-submit"
               loading={isUnlocking}
-              onPress={unlock}
+              onClick={unlock}
             />
           </Flex>
         )}
@@ -235,16 +237,16 @@ export function UnlockScreen(props: {
 
         {securityKey && mode !== "securityKey" ? (
           <QuietButton
-            testID="app-lock-use-security-key"
+            data-test-id="app-lock-use-security-key"
             text={strings.unlockWithSecurityKey()}
-            onPress={() => switchMode("securityKey")}
+            onClick={() => switchMode("securityKey")}
           />
         ) : null}
         {password && mode === "securityKey" ? (
           <QuietButton
-            testID="app-lock-use-password"
+            data-test-id="app-lock-use-password"
             text={strings.enterPassword()}
-            onPress={() => switchMode("password")}
+            onClick={() => switchMode("password")}
           />
         ) : null}
       </Flex>

@@ -213,12 +213,12 @@ function EditorProperties(props: EditorPropertiesProps) {
           {tabs.map((tab) => (
             <TabItem
               key={tab.id}
-              testID={`properties-tab-${tab.id}`}
+              data-test-id={`properties-tab-${tab.id}`}
               icon={tab.icon}
               size={30}
               iconColor="icon-secondary"
               selected={activeTab === tab.id}
-              onPress={() => useEditorStore.getState().setPropertiesTab(tab.id)}
+              onClick={() => useEditorStore.getState().setPropertiesTab(tab.id)}
             />
           ))}
         </Flex>
@@ -289,7 +289,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
 
   return (
     <Flex
-      testID="general-section"
+      data-test-id="general-section"
       sx={{ flexDirection: "column", px: "spacing4" }}
     >
       <Section title={strings.properties()}>
@@ -319,7 +319,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
                   borderRadius: "radius2",
                   cursor: "pointer"
                 }}
-                testID="properties-copy-link"
+                data-test-id="properties-copy-link"
               >
                 <Flex
                   sx={{
@@ -417,7 +417,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
                     {item.label}
                   </Text>
                   <Text
-                    testID={
+                    data-test-id={
                       item.key === "dateCreated" ? "date-created" : undefined
                     }
                     selectable
@@ -437,14 +437,14 @@ function Properties({ sessionId }: EditorPropertiesProps) {
                   <PencilSimple
                     size={15}
                     sx={{ cursor: "pointer", color: "icon", flexShrink: 0 }}
-                    onPress={() => {
+                    onClick={() => {
                       EditNoteCreationDateDialog.show({
                         noteId: session.note.id,
                         dateCreated: session.note.dateCreated,
                         dateEdited: session.note.dateEdited
                       });
                     }}
-                    testID="edit-date-created"
+                    data-test-id="edit-date-created"
                   />
                 )}
               </Flex>
@@ -499,7 +499,7 @@ function CopyNoteLink({ note }: { note: Note }) {
           bg: "transparent"
         }
       }}
-      onPress={async () => {
+      onClick={async () => {
         await copyNoteLink(note);
         setCopied(true);
       }}
@@ -712,14 +712,14 @@ function LinkedNote({
             gap: "spacing3",
             bg: isExpanded ? "background-selected" : "transparent"
           }}
-          onPress={() => useEditorStore.getState().openSession(item)}
+          onClick={() => useEditorStore.getState().openSession(item)}
         >
           {linkedBlocks.status === "fulfilled" &&
           linkedBlocks.value.length > 0 ? (
             <Button
               variant="secondary"
               sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
-              onPress={async (e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
                 if (isExpanded) return toggleExpand();
                 setBlocks(
@@ -767,7 +767,7 @@ function LinkedNote({
                   textAlign: "left",
                   alignItems: "center"
                 }}
-                onPress={() =>
+                onClick={() =>
                   useEditorStore
                     .getState()
                     .openSession(item, { activeBlockId: block.id })
@@ -843,12 +843,12 @@ function ReferencedIn({
             gap: "spacing3",
             bg: isExpanded ? "background-selected" : "transparent"
           }}
-          onPress={() => useEditorStore.getState().openSession(item)}
+          onClick={() => useEditorStore.getState().openSession(item)}
         >
           <Button
             variant="secondary"
             sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
-            onPress={(e) => {
+            onClick={(e) => {
               e.stopPropagation();
               if (isExpanded) return toggleExpand();
               toggleExpand();
@@ -887,7 +887,7 @@ function ReferencedIn({
                     width: "100%",
                     fontSize: "xs"
                   }}
-                  onPress={() =>
+                  onClick={() =>
                     useEditorStore
                       .getState()
                       .openSession(item, { activeBlockId: block.id })
@@ -938,7 +938,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
     >
       <Button
         aria-label={strings.addColor()}
-        onPress={addColor}
+        onClick={addColor}
         variant="secondary"
         sx={{
           alignItems: "center",
@@ -954,7 +954,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
           color: "paragraph",
           zIndex: result.status === "fulfilled" ? result.value.length + 1 : 1
         }}
-        testID="properties-add-color"
+        data-test-id="properties-add-color"
       >
         <Plus size={12} />
       </Button>
@@ -965,7 +965,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
             <Flex
               key={c.id}
               title={c.title}
-              onPress={() => noteStore.get().setColor(c.id, isChecked, noteId)}
+              onClick={() => noteStore.get().setColor(c.id, isChecked, noteId)}
               sx={{
                 cursor: "pointer",
                 position: "relative",
@@ -977,12 +977,12 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
                 ml: "-8px",
                 zIndex: result.value.length - index
               }}
-              testID={`properties-${c.title}`}
+              data-test-id={`properties-${c.title}`}
             >
               <Ellipse
                 size={25}
                 color={dataColor(c.colorCode)}
-                testID={`toggle-state-${isChecked ? "on" : "off"}`}
+                data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
               />
               {isChecked && (
                 <Checkmark
@@ -1164,7 +1164,7 @@ function Reminders({ noteId }: { noteId: string }) {
                 p: 0,
                 textDecorationLine: "none"
               }}
-              onPress={async () => {
+              onClick={async () => {
                 const note = await db.notes.note(noteId);
                 await AddReminderDialog.show({ note });
 
@@ -1198,7 +1198,7 @@ function Reminders({ noteId }: { noteId: string }) {
             index === 0 ? (
               <Button
                 sx={{ p: 0 }}
-                onPress={async () => {
+                onClick={async () => {
                   const note = await db.notes.note(noteId);
                   await AddReminderDialog.show({ note });
                   if (result.status === "fulfilled") {

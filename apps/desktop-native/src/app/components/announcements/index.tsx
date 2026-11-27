@@ -45,7 +45,7 @@ function Announcements() {
     >
       <Flex
         title={strings.dismissAnnouncement()}
-        onPress={() => dismiss(announcement.id)}
+        onClick={() => dismiss(announcement.id)}
         sx={{
           p: "2px",
           bg: ANNOUNCEMENT_DISMISS_COLORS.background,

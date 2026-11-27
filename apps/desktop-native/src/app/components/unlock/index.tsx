@@ -76,7 +76,7 @@ export function UnlockView(props: UnlockViewProps) {
       <Flex sx={{ flexDirection: "column", alignItems: "center" }}>
         <Lock size={100} color="icon" sx={{ opacity: 0.2 }} />
         <Text
-          testID="unlock-note-title"
+          data-test-id="unlock-note-title"
           variant="heading"
           sx={{ mx: 100, mt: 25, fontSize: 36, textAlign: "center" }}
         >
@@ -96,24 +96,26 @@ export function UnlockView(props: UnlockViewProps) {
         {subtitle}
       </Text>
       <Field
-        testID="unlock-note-password"
+        data-test-id="unlock-note-password"
         autoFocus
         value={password}
         sx={{ width: ["95%", "95%", 400] }}
         placeholder={strings.enterPassword()}
         type="password"
-        onChangeText={(text) => {
-          setPassword(text);
+        onChange={(e) => {
+          setPassword(e.target.value);
           if (errorMessage) setErrorMessage(undefined);
         }}
-        onSubmitEditing={submit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit();
+        }}
       />
       {errorMessage && <ErrorText sx={{ mt: 1 }} error={errorMessage} />}
       <Button
         variant="accent"
-        testID="unlock-note-submit"
+        data-test-id="unlock-note-submit"
         disabled={isUnlocking}
-        onPress={submit}
+        onClick={submit}
         sx={{ mt: 3, borderRadius: 100, px: 30 }}
       >
         {isUnlocking ? strings.unlocking() + "..." : buttonTitle}

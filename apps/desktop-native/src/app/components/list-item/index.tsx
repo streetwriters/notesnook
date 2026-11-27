@@ -26,11 +26,10 @@ import {
   Flex,
   Text,
   type ColorValue,
-  type ContextMenuEvent,
-  type DragEvent,
-  type KeyEvent,
+  type UIMouseEvent,
+  type UIDragEvent,
+  type UIKeyboardEvent,
   type MenuItem,
-  type PressEvent,
   type SxProp
 } from "@notesnook/ui-kit";
 import { useListSelection } from "../list-container/selection";
@@ -55,13 +54,13 @@ type ListItemProps<TItem extends Item = Item, TContext = unknown> = {
   isDisabled?: boolean;
   item: TItem;
   index?: number;
-  onPress?: (event: PressEvent) => void;
+  onClick?: (event: UIMouseEvent) => void;
   draggable?: boolean;
-  onDragEnter?: (event: DragEvent) => void;
-  onDragLeave?: (event: DragEvent) => void;
-  onDrop?: (event: DragEvent) => void;
+  onDragEnter?: (event: UIDragEvent) => void;
+  onDragLeave?: (event: UIDragEvent) => void;
+  onDrop?: (event: UIDragEvent) => void;
   onMiddleClick?: () => void;
-  onKeyPress?: (event: KeyEvent) => void;
+  onKeyPress?: (event: UIKeyboardEvent) => void;
   context?: TContext;
   menuItems?: (
     item: TItem,
@@ -105,17 +104,17 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     selection.focusedIndex === props.index;
   const selected = isSelected || isFocused;
 
-  const onPressRef = useRef(props.onPress);
-  onPressRef.current = props.onPress;
+  const onClickRef = useRef(props.onClick);
+  onClickRef.current = props.onClick;
   useEffect(() => {
     if (!selection || props.index === undefined) return;
     return selection.register(props.index, () =>
-      onPressRef.current?.(undefined as never)
+      onClickRef.current?.(undefined as never)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selection, props.index]);
 
-  const openContextMenu = async (event: ContextMenuEvent) => {
+  const openContextMenu = async (event: UIMouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     if (!props.menuItems) return;
@@ -148,20 +147,19 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
 
   return (
     <Flex
-      testID="list-item"
+      data-test-id="list-item"
       id={`id_${item.id}`}
       draggable={props.draggable}
       onDragStart={
         props.draggable
-          ? () => {
+          ? (event) => {
               let selectedItems = selectionStore.get().selectedItems;
               if (selectedItems.findIndex((i) => i === item.id) === -1)
                 selectedItems = [item.id];
-              return setDragData(item.type, selectedItems);
+              return setDragData(event.dataTransfer, item.type, selectedItems);
             }
           : undefined
       }
-      droppable={!!props.onDrop}
       onDragEnter={props.onDragEnter}
       onDragLeave={props.onDragLeave}
       onDrop={props.onDrop}
@@ -170,16 +168,18 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
       onKeyUp={(event) => {
         if (event.key !== "Enter") props.onKeyPress?.(event);
       }}
-      onPress={(event) => {
-        if (event.button === "auxiliary") {
-          props.onMiddleClick?.();
-          return;
+      onMouseDown={(event) => {
+        if (event.button == 1 && props.onMiddleClick) {
+          event.preventDefault();
+          props.onMiddleClick();
         }
+      }}
+      onClick={(event) => {
         if (selection && props.index !== undefined)
           selection.onItemPress(props.index, item.id, event, () =>
-            props.onPress?.(event)
+            props.onClick?.(event)
           );
-        else props.onPress?.(event);
+        else props.onClick?.(event);
       }}
       sx={{
         flexDirection: isCompact ? "row" : "column",
@@ -200,19 +200,19 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     >
       {environment.isDev && selected ? (
         <Box
-          testID="list-item-selected"
+          data-test-id="list-item-selected"
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
       {environment.isDev && isSelected ? (
         <Box
-          testID="list-item-in-selection"
+          data-test-id="list-item-in-selection"
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
       {environment.isDev && isCursor ? (
         <Box
-          testID="list-item-cursor"
+          data-test-id="list-item-cursor"
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
@@ -220,7 +220,7 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
       <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
         {typeof props.title === "string" ? (
           <Text
-            testID="title"
+            data-test-id="title"
             variant="body"
             sx={{
               whiteSpace: "nowrap",
@@ -241,9 +241,9 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
         {!isCompact && props.body ? (
           typeof props.body === "string" ? (
             <Text
-              testID="description"
-              numberOfLines={4}
+              data-test-id="description"
               sx={{
+                lineClamp: 4,
                 color: "paragraph",
                 fontSize: "xs",
                 width: "100%",

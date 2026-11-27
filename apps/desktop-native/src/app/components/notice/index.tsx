@@ -38,8 +38,8 @@ function Notice() {
   const NoticeData = NoticesData[notice.type];
   return (
     <Flex
-      testID="notice"
-      onPress={() => NoticeData.action()}
+      data-test-id="notice"
+      onClick={() => NoticeData.action()}
       sx={{
         flexDirection: "row",
         cursor: "pointer",
@@ -80,7 +80,7 @@ function Notice() {
       </Flex>
       {NoticeData.dismissable && (
         <Button
-          onPress={async (event) => {
+          onClick={async (event) => {
             event.stopPropagation();
             const dontShowAgain = await ConfirmDialog.show({
               title: strings.dontShowAgainConfirm(),

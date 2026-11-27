@@ -24,7 +24,13 @@ import {
   transform
 } from "@notesnook-importer/core";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
-import { Button, Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
+import {
+  Button,
+  Flex,
+  ScrollContainer,
+  Text,
+  type UIFile
+} from "@notesnook/ui-kit";
 import { files as platformFiles, type PickedFile } from "@platform";
 import { xxhash64 } from "../xxhash";
 import { useEffect, useRef, useState } from "react";
@@ -35,6 +41,18 @@ import Accordion from "../../accordion";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
 import { strings } from "@notesnook/intl";
+
+/** A dropped file as the importer reads it. Desktop's dropped files carry their `uri`. */
+function toPickedFile(file: UIFile): PickedFile {
+  return {
+    name: file.name,
+    size: file.size,
+    type: file.type,
+    uri: (file as Partial<PickedFile>).uri ?? "",
+    text: () => file.text(),
+    bytes: async () => new Uint8Array(await file.arrayBuffer())
+  };
+}
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -213,12 +231,20 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         </LinkText>
       </Text>
       <Flex
-        droppable
-        acceptsFiles={(provider?.supportedExtensions || []).concat([".zip"])}
-        onDropFiles={(dropped) =>
-          setFiles((files) => [...(dropped as PickedFile[]), ...files])
-        }
-        onPress={onSelectFiles}
+        onDrop={(event) => {
+          const extensions = (provider?.supportedExtensions || [])
+            .concat([".zip"])
+            .map((extension) => extension.toLowerCase());
+          const dropped = Array.from(event.dataTransfer.files)
+            .filter((file) =>
+              extensions.some((extension) =>
+                file.name.toLowerCase().endsWith(extension)
+              )
+            )
+            .map(toPickedFile);
+          if (dropped.length > 0) setFiles((files) => [...dropped, ...files]);
+        }}
+        onClick={onSelectFiles}
         sx={{
           justifyContent: "center",
           alignItems: "center",
@@ -278,7 +304,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
                       bg: "hover"
                     }
                   }}
-                  onPress={() => {
+                  onClick={() => {
                     setFiles((files) => {
                       const _files = files.slice();
                       _files.splice(index, 1);
@@ -329,7 +355,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           <Button
             variant="accent"
             sx={{ alignSelf: "center", mt: 2, px: 4 }}
-            onPress={onStartImport}
+            onClick={onStartImport}
           >
             <Text>{strings.startImporting()}</Text>
           </Button>

@@ -71,19 +71,21 @@ function CachedRouter() {
       routeKey={routeResult.key}
       type={routeResult.type}
     >
-      {Object.entries(isDatabaseReady ? cached.current : {}).map(([key, { Component, props }]) => (
-        <Activity
-          key={key}
-          mode={key === routeResult.key ? "visible" : "hidden"}
-        >
-          <Flex
-            testID={`route-${key}`}
-            sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
+      {Object.entries(isDatabaseReady ? cached.current : {}).map(
+        ([key, { Component, props }]) => (
+          <Activity
+            key={key}
+            mode={key === routeResult.key ? "visible" : "hidden"}
           >
-            <Component key={key} {...props} />
-          </Flex>
-        </Activity>
-      ))}
+            <Flex
+              data-test-id={`route-${key}`}
+              sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
+            >
+              <Component key={key} {...props} />
+            </Flex>
+          </Activity>
+        )
+      )}
     </RouteContainer>
   );
 }

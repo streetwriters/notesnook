@@ -55,8 +55,8 @@ export default function Accordion(props: AccordionProps) {
         }}
       >
         <Flex
-          testID={testId}
-          onPress={() => setIsContentHidden((s) => !s)}
+          data-test-id={testId}
+          onClick={() => setIsContentHidden((s) => !s)}
           sx={{
             flexDirection: "row",
             justifyContent: "space-between",
@@ -82,8 +82,8 @@ export default function Accordion(props: AccordionProps) {
   return (
     <Flex sx={{ flexDirection: "column", ...sx }}>
       <Flex
-        testID={testId}
-        onPress={() => setIsContentHidden((state) => !state)}
+        data-test-id={testId}
+        onClick={() => setIsContentHidden((state) => !state)}
         sx={{
           flexDirection: "row",
           justifyContent: "space-between",

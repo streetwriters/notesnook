@@ -25,7 +25,7 @@ import {
   Label,
   Text,
   type InputProps,
-  type PressEvent,
+  type UIMouseEvent,
   type SxProp,
   type UIInputElement
 } from "@notesnook/ui-kit";
@@ -35,7 +35,7 @@ import { AuthErrorText } from "../error-text";
 type Action = {
   id?: string;
   testId?: string;
-  onClick?: (event: PressEvent) => void;
+  onClick?: (event: UIMouseEvent) => void;
   disabled?: boolean;
   icon?: Icon;
   component?: ReactElement;
@@ -43,12 +43,11 @@ type Action = {
   sx?: SxProp;
 };
 
-export type FieldProps = Omit<InputProps, "onChange"> & {
+export type FieldProps = InputProps & {
   label?: string;
   helpText?: string;
   error?: string;
   validate?: (text: string) => boolean;
-  onChange?: (text: string) => void;
   styles?: {
     input?: SxProp;
     label?: SxProp;
@@ -93,8 +92,8 @@ function ActionButtons(props: {
           id={action.id}
           key={action.testId || action.id || index}
           variant="secondary"
-          testID={action.testId}
-          onPress={action.onClick}
+          data-test-id={action.testId}
+          onClick={action.onClick}
           disabled={action.disabled}
           sx={{
             p: 0,
@@ -137,7 +136,10 @@ function InlineIcon(props: { icon: Icon; side: "left" | "right" }) {
   );
 }
 
-const Field = forwardRef<UIInputElement, FieldProps>(function Field(props, ref) {
+const Field = forwardRef<UIInputElement, FieldProps>(function Field(
+  props,
+  ref
+) {
   const {
     label,
     styles,
@@ -151,6 +153,9 @@ const Field = forwardRef<UIInputElement, FieldProps>(function Field(props, ref) 
     leftIcon,
     rightIcon,
     onChange,
+    // Deprecated alias, still used by callers outside components until 5.1:
+    // raised here, after validation, and kept off the inner Input.
+    onChangeText,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -220,12 +225,12 @@ const Field = forwardRef<UIInputElement, FieldProps>(function Field(props, ref) 
             ...styles?.input,
             pointerEvents: disabled ? "none" : "auto"
           }}
-          onChangeText={(text) => {
-            const valid = !validate || validate(text);
+          onChange={(e) => {
+            const valid = !validate || validate(e.target.value);
             setIsValid(valid);
             if (valid) {
-              onChange?.(text);
-              inputProps.onChangeText?.(text);
+              onChange?.(e);
+              onChangeText?.(e.target.value);
             }
           }}
         />
@@ -233,7 +238,7 @@ const Field = forwardRef<UIInputElement, FieldProps>(function Field(props, ref) 
         {rightIcon ? <InlineIcon icon={rightIcon} side="right" /> : null}
         {type === "password" ? (
           <Flex
-            onPress={() => setIsPasswordVisible((s) => !s)}
+            onClick={() => setIsPasswordVisible((s) => !s)}
             sx={{
               flexDirection: "row",
               alignItems: "center",

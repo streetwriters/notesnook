@@ -76,7 +76,7 @@ function VirtualizedListInner<T, C>(
   return (
     <VirtualList
       ref={ref}
-      testID={testID || "virtualized-list"}
+      data-test-id={testID || "virtualized-list"}
       count={items.length}
       itemKey={itemKey}
       renderItem={renderItem}

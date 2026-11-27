@@ -59,11 +59,11 @@ type SvgImageProps = {
   width: number;
   height: number;
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
 };
 
 export function SvgImage(props: SvgImageProps) {
-  const { name, width, height, sx, testID } = props;
+  const { name, width, height, sx } = props;
   const variables = useThemeVariables();
   const xml = useMemo(
     () => resolveSvgVariables(svgAssets[name], variables),
@@ -72,7 +72,7 @@ export function SvgImage(props: SvgImageProps) {
 
   return (
     <Flex
-      testID={testID}
+      data-test-id={props["data-test-id"]}
       sx={{
         width,
         height,
@@ -92,19 +92,18 @@ type RasterImageProps = {
   name: RasterAssetName;
   width: number;
   height: number;
-  resizeMode?: "cover" | "contain" | "stretch";
+  objectFit?: "cover" | "contain" | "fill";
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
 };
 
 export function RasterImage(props: RasterImageProps) {
-  const { name, width, height, resizeMode = "contain", sx, testID } = props;
+  const { name, width, height, objectFit = "contain", sx } = props;
   return (
     <Image
-      testID={testID}
+      data-test-id={props["data-test-id"]}
       src={rasterAssets[name]}
-      resizeMode={resizeMode}
-      sx={{ width, height, flexShrink: 0, ...sx }}
+      sx={{ width, height, flexShrink: 0, objectFit, ...sx }}
     />
   );
 }

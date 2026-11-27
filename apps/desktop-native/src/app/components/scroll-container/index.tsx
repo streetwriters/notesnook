@@ -25,26 +25,27 @@ import type { ReactNode } from "react";
 
 export type ScrollContainerProps = {
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
   children?: ReactNode;
 };
 
-const ScrollContainer = ({ children, sx, testID }: ScrollContainerProps) => {
+const ScrollContainer = (props: ScrollContainerProps) => {
+  const { children, sx } = props;
   return (
-    <UIScrollContainer testID={testID} sx={{ height: "100%", ...sx }}>
+    <UIScrollContainer
+      data-test-id={props["data-test-id"]}
+      sx={{ height: "100%", ...sx }}
+    >
       {children}
     </UIScrollContainer>
   );
 };
 export default ScrollContainer;
 
-export function FlexScrollContainer({
-  children,
-  sx,
-  testID
-}: ScrollContainerProps) {
+export function FlexScrollContainer(props: ScrollContainerProps) {
+  const { children, sx } = props;
   return (
-    <UIScrollContainer testID={testID} sx={sx}>
+    <UIScrollContainer data-test-id={props["data-test-id"]} sx={sx}>
       {children}
     </UIScrollContainer>
   );

@@ -84,7 +84,7 @@ export default function TabsView() {
   return (
     <ThemeScope scope="editor">
       <Flex
-        testID="editor-tabs-view"
+        data-test-id="editor-tabs-view"
         sx={{ bg: "background", flex: 1, overflow: "hidden" }}
       >
         <SplitPane direction="vertical" autoSaveId="editor-panels">
@@ -100,7 +100,7 @@ export default function TabsView() {
                   mode={tab.id === activeTabId ? "visible" : "hidden"}
                 >
                   <Flex
-                    testID={
+                    data-test-id={
                       tab.id === activeTabId
                         ? "editor-session-active"
                         : "editor-session"
@@ -273,7 +273,7 @@ function EditorView({ session }: { session: EditableSession }) {
 
   return (
     <Flex
-      testID="editor-container"
+      data-test-id="editor-container"
       sx={{
         position: "relative",
         alignSelf: "stretch",
@@ -294,7 +294,10 @@ function EditorView({ session }: { session: EditableSession }) {
             px: isMobile ? 2 : 6
           }}
         >
-          <Flex testID="editor-toolbar" sx={{ height: 34, flexShrink: 0 }} />
+          <Flex
+            data-test-id="editor-toolbar"
+            sx={{ height: 34, flexShrink: 0 }}
+          />
           <TitleBox id={session.id} readonly={readonly} />
           <Header id={session.id} readonly={readonly} />
           <EditorSurface
@@ -420,7 +423,7 @@ function DownloadAttachmentProgress(props: { hash: string }) {
       <Button
         variant="secondary"
         sx={{ mt: 2 }}
-        onPress={() => {
+        onClick={() => {
           const note = useEditorStore.getState().getActiveNote();
           useEditorStore.setState({ documentPreview: undefined });
           if (note) db.fs().cancel(note.id).catch(console.error);
@@ -441,7 +444,7 @@ function UnlockNoteView(props: {
   const { session } = props;
   return (
     <Flex
-      testID="unlock-note-view"
+      data-test-id="unlock-note-view"
       sx={{ overflow: "hidden", alignItems: "center", flex: 1 }}
     >
       <UnlockView

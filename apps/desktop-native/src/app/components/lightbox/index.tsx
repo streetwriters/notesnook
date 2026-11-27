@@ -26,8 +26,8 @@ import {
   dataColor,
   Flex,
   Image,
-  type KeyEvent,
-  type PressEvent,
+  type UIKeyboardEvent,
+  type UIMouseEvent,
   type UIElement
 } from "@notesnook/ui-kit";
 import {
@@ -125,7 +125,7 @@ function LightboxView(props: LightboxProps) {
       zoomStep;
     setView((v) => ({ ...v, zoom: z }));
   };
-  const onKeyUp = (e: KeyEvent) => {
+  const onKeyUp = (e: UIKeyboardEvent) => {
     if (!keyboardInteraction) return;
     switch (e.key) {
       case "ArrowLeft":
@@ -159,7 +159,7 @@ function LightboxView(props: LightboxProps) {
     title: string;
     icon: Icon;
     enabled: boolean;
-    onClick: (e: PressEvent) => void;
+    onClick: (e: UIMouseEvent) => void;
     hidden?: boolean;
   }[] = [
     {
@@ -208,7 +208,7 @@ function LightboxView(props: LightboxProps) {
   return (
     <Flex
       ref={container}
-      testID="lightbox"
+      data-test-id="lightbox"
       onKeyUp={onKeyUp}
       sx={{
         zIndex: 50000,
@@ -240,11 +240,11 @@ function LightboxView(props: LightboxProps) {
             .map((tool) => (
               <Button
                 key={tool.title}
-                testID={tool.title}
+                data-test-id={tool.title}
                 disabled={!tool.enabled}
                 variant="secondary"
                 title={tool.title}
-                onPress={tool.onClick}
+                onClick={tool.onClick}
                 sx={{
                   height: "100%",
                   borderRadius: 0,
@@ -261,7 +261,7 @@ function LightboxView(props: LightboxProps) {
         </Flex>
       </Flex>
       <Flex
-        onPress={() => {
+        onClick={() => {
           if (clickOutsideToExit && zoom <= 1) onClose?.();
         }}
         sx={{
@@ -274,20 +274,20 @@ function LightboxView(props: LightboxProps) {
       >
         {moving ? (
           <Box
-            testID="lightbox-moving"
+            data-test-id="lightbox-moving"
             sx={{ position: "absolute", width: 0, height: 0 }}
           />
         ) : null}
         {loading ? (
           <Flex
-            testID="lightbox-loading"
+            data-test-id="lightbox-loading"
             sx={{ position: "absolute", alignSelf: "center" }}
           >
             <Loading color={dataColor("#ffffff")} size={60} />
           </Flex>
         ) : null}
         <Box
-          testID="lightbox-image"
+          data-test-id="lightbox-image"
           onPointerDown={(e) => {
             if (zoom <= 1) return;
             drag.current = { x: e.pageX, y: e.pageY, ox: x, oy: y };
@@ -320,15 +320,14 @@ function LightboxView(props: LightboxProps) {
           }}
         >
           <Box
-            onPress={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
             onDoubleClick={() => shockZoom()}
             sx={{ minWidth: 100, minHeight: 100 }}
           >
             <Image
               src={image}
               onLoad={() => setLoading(false)}
-              resizeMode="contain"
-              sx={{ width: "80%", height: "80%" }}
+              sx={{ objectFit: "contain", width: "80%", height: "80%" }}
             />
           </Box>
         </Box>

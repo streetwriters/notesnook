@@ -75,7 +75,7 @@ export function NotebookHeader(props: {
 
   return (
     <Flex
-      testID="notebook-header"
+      data-test-id="notebook-header"
       sx={{
         flexDirection: "column",
         mt: "spacing6",
@@ -93,7 +93,7 @@ export function NotebookHeader(props: {
           >
             <NotebookIcon size={17} color="icon" />
             <Text
-              testID="notebook-title"
+              data-test-id="notebook-title"
               sx={{ fontSize: "md", fontWeight: 500, color: "heading" }}
             >
               {notebook.title}
@@ -134,7 +134,7 @@ export function NotebookHeader(props: {
             title={
               isShortcut ? strings.removeShortcut() : strings.createShortcut()
             }
-            onPress={() => addToShortcuts(notebook)}
+            onClick={() => addToShortcuts(notebook)}
           >
             {isShortcut ? <LinkBreak size={15} /> : <LinkSimple size={15} />}
           </Button>
@@ -142,7 +142,7 @@ export function NotebookHeader(props: {
             variant="icon"
             sx={{ p: 0 }}
             title={strings.editNotebook()}
-            onPress={() => hashNavigate(`/notebooks/${notebook.id}/edit`)}
+            onClick={() => hashNavigate(`/notebooks/${notebook.id}/edit`)}
           >
             <PencilSimple size={15} />
           </Button>
@@ -169,7 +169,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
   return (
     <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
       <CrumbText
-        onPress={() => navigateCrumb(crumbs[0]?.id)}
+        onClick={() => navigateCrumb(crumbs[0]?.id)}
         text={crumbs[0]?.title}
       />
       <CaretRight color="icon-secondary" sx={{ mx: "spacing2" }} size={11} />
@@ -179,21 +179,22 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
             ref={moreCrumbsRef}
             variant="icon"
             sx={{ p: 0, flexShrink: 0 }}
-            onPress={() => {
-              moreCrumbsRef.current?.measureInWindow((x, y, width, height) =>
-                Menu.openMenu(
-                  crumbs
-                    .slice(1, -2)
-                    .reverse()
-                    .map((c) => ({
-                      type: "button" as const,
-                      title: c.title,
-                      key: c.id,
-                      iconComponent: NotebookIcon,
-                      onClick: () => navigateCrumb(c.id)
-                    })),
-                  { position: { x, y, width, height } }
-                )
+            onClick={() => {
+              const rect = moreCrumbsRef.current?.getBoundingClientRect();
+              if (!rect) return;
+              const { x, y, width, height } = rect;
+              Menu.openMenu(
+                crumbs
+                  .slice(1, -2)
+                  .reverse()
+                  .map((c) => ({
+                    type: "button" as const,
+                    title: c.title,
+                    key: c.id,
+                    iconComponent: NotebookIcon,
+                    onClick: () => navigateCrumb(c.id)
+                  })),
+                { position: { x, y, width, height } }
               );
             }}
           >
@@ -208,7 +209,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
       {crumbs.slice(crumbs.length > 2 ? -2 : -1).map((crumb, index, array) => (
         <Fragment key={crumb.id}>
           <CrumbText
-            onPress={() => navigateCrumb(crumb.id)}
+            onClick={() => navigateCrumb(crumb.id)}
             text={crumb.title}
           />
           {index === array.length - 1 ? null : (
@@ -223,7 +224,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
   );
 }
 
-function CrumbText(props: { text: string; onPress: () => void }) {
+function CrumbText(props: { text: string; onClick: () => void }) {
   return (
     <Text
       sx={{
@@ -235,7 +236,7 @@ function CrumbText(props: { text: string; onPress: () => void }) {
         cursor: "pointer",
         ":hover": { color: "paragraph" }
       }}
-      onPress={props.onPress}
+      onClick={props.onClick}
     >
       {props.text}
     </Text>

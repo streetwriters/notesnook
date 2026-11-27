@@ -51,7 +51,7 @@ function SearchResult(props: SearchResultProps) {
             rawContent: item.rawContent
           });
         }}
-        onPress={() => {
+        onClick={() => {
           useEditorStore.getState().openSession(item.id, {
             rawContent: item.rawContent,
             force: true
@@ -63,9 +63,9 @@ function SearchResult(props: SearchResultProps) {
           >
             {isExpandable && !isCompact ? (
               <Button
-                testID="search-result-expand"
+                data-test-id="search-result-expand"
                 variant="secondary"
-                onPress={(event) => {
+                onClick={(event) => {
                   event.stopPropagation();
                   setIsExpanded((expanded) => !expanded);
                 }}
@@ -98,10 +98,10 @@ function SearchResult(props: SearchResultProps) {
               }}
             >
               <Text
-                testID="title"
+                data-test-id="title"
                 variant="body"
-                numberOfLines={1}
                 sx={{
+                  lineClamp: 1,
                   color: isOpened ? "paragraph-selected" : "paragraph",
                   fontWeight: isCompact ? "bold" : 700
                 }}
@@ -135,7 +135,7 @@ function SearchResult(props: SearchResultProps) {
                   activeSearchResultId: match[0].id
                 });
               }}
-              onPress={() => {
+              onClick={() => {
                 useEditorStore.getState().openSession(item.id, {
                   rawContent: item.rawContent,
                   force: true,
@@ -144,7 +144,7 @@ function SearchResult(props: SearchResultProps) {
               }}
               title={
                 <Text
-                  testID="title"
+                  data-test-id="title"
                   variant="body"
                   sx={{
                     color: isOpened ? "paragraph-selected" : "paragraph",

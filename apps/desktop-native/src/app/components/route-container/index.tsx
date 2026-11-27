@@ -149,11 +149,11 @@ function HeaderActions(props: {
     >
       {routeButton && RouteIcon ? (
         <Button
-          testID="route-action"
+          data-test-id="route-action"
           title={routeButton.title}
           variant="tertiary"
           disabled={!isDatabaseReady}
-          onPress={routeButton.onClick}
+          onClick={routeButton.onClick}
           sx={{ p: 0 }}
         >
           <RouteIcon size={15} />
@@ -161,11 +161,11 @@ function HeaderActions(props: {
       ) : null}
       {hasItems ? (
         <Button
-          testID={`${groupingKey}-sort-button`}
+          data-test-id={`${groupingKey}-sort-button`}
           variant="tertiary"
           disabled={!isDatabaseReady}
           title={strings.groupAndSort()}
-          onPress={() =>
+          onClick={() =>
             showGroupOptionsMenu(groupingKey, props.refresh, {
               isSearching: props.isSearching,
               context: props.context
@@ -178,10 +178,10 @@ function HeaderActions(props: {
       ) : null}
       {hasItems && props.canToggleView && viewMode ? (
         <Button
-          testID={`${groupingKey}-view-mode-button`}
+          data-test-id={`${groupingKey}-view-mode-button`}
           variant="tertiary"
           disabled={!isDatabaseReady}
-          onPress={() =>
+          onClick={() =>
             props.setViewMode(viewMode === "compact" ? "detailed" : "compact")
           }
           sx={{ p: 0 }}
@@ -225,7 +225,7 @@ function Header(props: RouteContainerProps) {
   if (type === "notebook" && !hasItems) return null;
 
   return (
-    <Box testID="routeHeader" sx={{ zIndex: 2 }}>
+    <Box data-test-id="routeHeader" sx={{ zIndex: 2 }}>
       <Flex
         sx={{
           gap: hasItems ? "spacing6" : "spacing4",
@@ -248,9 +248,9 @@ function Header(props: RouteContainerProps) {
             }}
           >
             <Text
-              testID="route-title"
-              numberOfLines={1}
+              data-test-id="route-title"
               sx={{
+                lineClamp: 1,
                 color: "heading",
                 fontSize: "lg",
                 fontWeight: "bold",
@@ -281,7 +281,7 @@ function Header(props: RouteContainerProps) {
             <Flex sx={{ flex: 1, flexDirection: "row", height: 40 }}>
               <Input
                 key={inputKey}
-                testID="search-input"
+                data-test-id="search-input"
                 variant="clean"
                 defaultValue={query}
                 placeholder={strings.searchInRoute(headerTitle)}
@@ -295,7 +295,7 @@ function Header(props: RouteContainerProps) {
                       searchType: type
                     });
                 }}
-                onChangeText={(text) => {
+                onChange={({ target: { value: text } }) => {
                   clearTimeout(debounce.current);
                   debounce.current = setTimeout(
                     () => useSearchStore.setState({ query: text }),
@@ -327,9 +327,9 @@ function Header(props: RouteContainerProps) {
                   }}
                 >
                   <Button
-                    testID="search-button"
+                    data-test-id="search-button"
                     variant="secondary"
-                    onPress={() => {
+                    onClick={() => {
                       useSearchStore.getState().resetSearch();
                       setInputKey((key) => key + 1);
                     }}

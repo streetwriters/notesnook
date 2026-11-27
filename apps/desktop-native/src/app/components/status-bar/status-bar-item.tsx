@@ -39,12 +39,13 @@ type StatusBarTextItemProps = CommonProps & {
   variant: "text";
   text: ReactNode;
   title?: string;
-  testID?: string;
+  "data-test-id"?: string;
 };
 
 type StatusBarButtonProps = CommonProps &
-  Pick<ButtonProps, "onPress" | "disabled" | "title" | "testID"> & {
+  Pick<ButtonProps, "onClick" | "disabled" | "title"> & {
     variant: "button";
+    "data-test-id"?: string;
     icon?: Icon;
     iconProps?: StatusBarIconProps;
     text?: ReactNode;
@@ -74,9 +75,9 @@ function spin(direction: "clockwise" | "counterclockwise"): SxProp {
 
 export function StatusBarItem(props: StatusBarItemProps) {
   if (props.variant === "text") {
-    const { text, sx, title, testID } = props;
+    const { text, sx, title } = props;
     return (
-      <Text title={title} testID={testID} sx={{ ...TEXT_STYLE, ...sx }}>
+      <Text title={title} data-test-id={props["data-test-id"]} sx={{ ...TEXT_STYLE, ...sx }}>
         {text}
       </Text>
     );
@@ -97,7 +98,9 @@ export function StatusBarItem(props: StatusBarItemProps) {
         height: 15,
         borderRadius: "radius0",
         gap: "spacing3",
-        ...(hasText ? { fontSize: "3xs", px: "spacing1", py: 0 } : { width: 15 }),
+        ...(hasText
+          ? { fontSize: "3xs", px: "spacing1", py: 0 }
+          : { width: 15 }),
         ...sx
       }}
     >

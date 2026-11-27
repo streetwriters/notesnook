@@ -30,7 +30,7 @@ import {
   Flex,
   Text,
   type MenuItem,
-  type PressEvent
+  type UIMouseEvent
 } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import {
@@ -79,7 +79,7 @@ type NotebookProps = {
   expand?: () => void;
   collapse?: () => void;
   refresh?: () => void;
-  select?: (event?: PressEvent) => void;
+  select?: (event?: UIMouseEvent) => void;
   depth?: number;
 };
 
@@ -121,7 +121,7 @@ export function Notebook(props: NotebookProps) {
       }}
       onDrop={(event) => {
         clearTimeout(dragTimeout.current);
-        handleDrop(event.payload, item);
+        handleDrop(event.dataTransfer, item);
       }}
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
@@ -137,7 +137,7 @@ export function Notebook(props: NotebookProps) {
           );
         }
       }}
-      onPress={(event) => {
+      onClick={(event) => {
         select(event);
         navigate(`/notebooks/${item.id}`, { notify: true });
       }}
@@ -152,9 +152,9 @@ export function Notebook(props: NotebookProps) {
         >
           {isExpandable ? (
             <Button
-              testID="notebook-expand"
+              data-test-id="notebook-expand"
               variant="secondary"
-              onPress={(event) => {
+              onClick={(event) => {
                 select(event);
                 if (isExpanded) collapse();
                 else expand();
@@ -185,10 +185,10 @@ export function Notebook(props: NotebookProps) {
             />
           ) : null}
           <Text
-            testID="title"
+            data-test-id="title"
             variant="body"
-            numberOfLines={1}
             sx={{
+              lineClamp: 1,
               color: isOpened ? "paragraph-selected" : "paragraph",
               fontWeight: "normal",
               fontSize: "xs",

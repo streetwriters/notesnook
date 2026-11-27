@@ -52,7 +52,7 @@ export function ThemePreview(props: ThemePreviewProps) {
 
   return (
     <Flex
-      testID="theme-preview"
+      data-test-id="theme-preview"
       sx={{
         position: "relative",
         flexDirection: "column",

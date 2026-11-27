@@ -18,14 +18,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { pluralize } from "@notesnook/common";
-import { Flex, Text, type DragPayload } from "@notesnook/ui-kit";
+import {
+  Flex,
+  Text,
+  type DragPayload,
+  type UIDataTransfer
+} from "@notesnook/ui-kit";
+import { tryParse } from "./parse";
 
-export type ItemsDragPayload = DragPayload & { type: string; ids: string[] };
+const DRAG_MIME_TYPE = "application/vnd.notesnook.items";
 
-export function setDragData(type: string, ids: string[]): ItemsDragPayload {
+/**
+ * Puts the dragged items on the drag's data, as web does. Returns the drag
+ * ghost: desktop draws the value `onDragStart` returns under the pointer, as
+ * web's `setDragImage` does.
+ */
+export function setDragData(
+  dataTransfer: UIDataTransfer,
+  type: string,
+  ids: string[]
+): DragPayload {
+  dataTransfer.setData(DRAG_MIME_TYPE, JSON.stringify({ type: type, ids }));
   return {
-    type,
-    ids,
     ghost: (
       <Flex
         sx={{
@@ -44,8 +58,16 @@ export function setDragData(type: string, ids: string[]): ItemsDragPayload {
   };
 }
 
-export function getDragData(payload: unknown, type: string): string[] {
-  const data = payload as Partial<ItemsDragPayload> | undefined;
-  if (!data || data.type !== type || !Array.isArray(data.ids)) return [];
-  return data.ids;
+export function getDragData(
+  dataTransfer: UIDataTransfer,
+  type: string
+): string[] {
+  try {
+    const data = tryParse(dataTransfer.getData(DRAG_MIME_TYPE));
+    if (!data || data.type !== type || !data.ids) return [];
+    return data.ids;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
 }

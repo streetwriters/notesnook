@@ -89,10 +89,10 @@ function Tag(props: TagProps) {
             sx={{ flexShrink: 0 }}
           />
           <Text
-            testID="title"
+            data-test-id="title"
             variant="body"
-            numberOfLines={1}
             sx={{
+              lineClamp: 1,
               color: isSelected ? "paragraph-selected" : "paragraph",
               fontSize: "xs",
               fontWeight: "normal",
@@ -124,8 +124,8 @@ function Tag(props: TagProps) {
         }
       }}
       menuItems={tagMenuItems}
-      onDrop={(event) => handleDrop(event.payload, item)}
-      onPress={() => {
+      onDrop={(event) => handleDrop(event.dataTransfer, item)}
+      onClick={() => {
         navigate(`/tags/${id}`);
       }}
     />

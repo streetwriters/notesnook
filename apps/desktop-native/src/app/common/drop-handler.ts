@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ItemReference } from "@notesnook/core";
+import type { UIDataTransfer } from "@notesnook/ui-kit";
 import { Context } from "../components/list-container/types";
 import { getDragData } from "../utils/data-transfer";
 import { db } from "./db";
@@ -26,7 +27,7 @@ import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { useStore as useTagStore } from "../stores/tag-store";
 
 export async function handleDrop(
-  dragPayload: unknown,
+  dataTransfer: UIDataTransfer,
   item:
     | ItemReference
     | Context
@@ -34,8 +35,8 @@ export async function handleDrop(
 ) {
   if (!item.type) return;
 
-  const noteIds = getDragData(dragPayload, "note");
-  const notebookIds = getDragData(dragPayload, "notebook");
+  const noteIds = getDragData(dataTransfer, "note");
+  const notebookIds = getDragData(dataTransfer, "notebook");
   const {
     setColor,
     favorite,

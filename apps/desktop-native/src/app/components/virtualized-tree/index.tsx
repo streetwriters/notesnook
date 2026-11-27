@@ -28,7 +28,7 @@ import {
 } from "react";
 import {
   VirtualList,
-  type PressEvent,
+  type UIMouseEvent,
   type VirtualListHandle
 } from "@notesnook/ui-kit";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
@@ -68,7 +68,7 @@ type TreeViewProps<T> = {
     expanded: boolean;
     expand: () => void;
     collapse: () => void;
-    select: (event?: PressEvent) => void;
+    select: (event?: UIMouseEvent) => void;
   }) => ReactNode;
   saveKey?: string;
   testID?: string;
@@ -246,7 +246,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         ref={list}
         onKeyDown={onKeyDown}
         onBlur={() => setFocusedIndex(-1)}
-        testID={testID}
+        data-test-id={testID}
         count={nodes.length}
         itemKey={(index) => nodes[index]?.id ?? `${index}`}
         estimatedItemSize={itemHeight + itemGap}

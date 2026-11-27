@@ -32,8 +32,8 @@ import {
   Button,
   Flex,
   VirtualList,
-  type PressEvent,
-  type DragEvent,
+  type UIMouseEvent,
+  type UIDragEvent,
   type SxProp,
   type VirtualListHandle
 } from "@notesnook/ui-kit";
@@ -71,7 +71,7 @@ type ListContainerProps = {
   };
   sx?: SxProp;
   placeholderSx?: SxProp;
-  onDrop?: (event: DragEvent) => void;
+  onDrop?: (event: UIDragEvent) => void;
 };
 
 export default function ListContainer(props: ListContainerProps) {
@@ -150,7 +150,7 @@ export default function ListContainer(props: ListContainerProps) {
       onItemPress: (
         index: number,
         _id: string,
-        event: PressEvent,
+        event: UIMouseEvent,
         open: () => void
       ) => {
         onMouseUp(
@@ -224,7 +224,7 @@ export default function ListContainer(props: ListContainerProps) {
           <ListLoader />
         ) : (
           <Flex
-            testID="list-placeholder"
+            data-test-id="list-placeholder"
             sx={{
               flexDirection: "row",
               pt: "spacing6",
@@ -241,8 +241,7 @@ export default function ListContainer(props: ListContainerProps) {
   return (
     <ListSelectionContext.Provider value={selection}>
       <Flex
-        testID={`${type}-list`}
-        droppable={!!props.onDrop}
+        data-test-id={`${type}-list`}
         onDrop={props.onDrop}
         sx={{
           flexDirection: "column",
@@ -254,7 +253,7 @@ export default function ListContainer(props: ListContainerProps) {
         <VirtualList
           key={isSearching ? "search" : "list"}
           ref={list}
-          testID="virtual-list"
+          data-test-id="virtual-list"
           onKeyDown={onKeyDown}
           onBlur={() => {
             setFocusedGroupIndex(-1);
@@ -274,8 +273,8 @@ export default function ListContainer(props: ListContainerProps) {
         {props.button ? (
           <Button
             variant="accent"
-            testID={`${group}-action-button`}
-            onPress={props.button.onClick}
+            data-test-id={`${group}-action-button`}
+            onClick={props.button.onClick}
             sx={{
               position: "absolute",
               bottom: 0,
@@ -324,7 +323,7 @@ function ItemRenderer(props: {
     const placeholder = getListItemPlaceholderData(group, compact);
     return (
       <Flex
-        testID="list-item-skeleton"
+        data-test-id="list-item-skeleton"
         sx={{
           flexDirection: "column",
           pt: placeholder.padding[0],

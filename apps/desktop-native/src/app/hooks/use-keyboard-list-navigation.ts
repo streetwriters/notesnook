@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useRef } from "react";
-import type { KeyEvent, PressEvent } from "@notesnook/ui-kit";
+import type { UIKeyboardEvent, UIMouseEvent } from "@notesnook/ui-kit";
 
 enum DIRECTION {
   UP = -1,
@@ -76,10 +76,10 @@ export function useKeyboardListNavigation(
 
   const onMouseUp = useCallback(
     (
-      e: Pick<PressEvent, "button" | "ctrlKey" | "metaKey" | "shiftKey">,
+      e: Pick<UIMouseEvent, "button" | "ctrlKey" | "metaKey" | "shiftKey">,
       itemIndex: number
     ) => {
-      if (e.button !== "primary") return;
+      if (e.button !== 0) return;
       if (e.ctrlKey || e.metaKey) {
         select(itemIndex, true);
       } else if (e.shiftKey) {
@@ -104,7 +104,7 @@ export function useKeyboardListNavigation(
   );
 
   const onKeyDown = useCallback(
-    (e: KeyEvent) => {
+    (e: UIKeyboardEvent) => {
       const max = length - 1;
       const handled = (fn: () => boolean) => {
         if (fn()) e.preventDefault();

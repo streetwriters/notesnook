@@ -43,9 +43,9 @@ function TrashItem(props: TrashItemProps) {
       item={item}
       title={
         <Text
-          testID="title"
-          numberOfLines={1}
+          data-test-id="title"
           sx={{
+            lineClamp: 1,
             color: "heading",
             minWidth: 0,
             fontWeight: 600,
@@ -107,7 +107,7 @@ function TrashItem(props: TrashItemProps) {
         </Flex>
       }
       menuItems={trashMenuItems}
-      onPress={async () => {
+      onClick={async () => {
         if (item.itemType === "note")
           useEditorStore.getState().openSession(item);
       }}

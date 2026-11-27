@@ -187,7 +187,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         </Text>
       ) : (
         <Flex
-          testID="publishForm"
+          data-test-id="publishForm"
           sx={{ flexDirection: "column", mt: "spacing4", mb: "spacing7" }}
         >
           <Field
@@ -197,8 +197,13 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
             disabled={isLoading}
             error={errors.title}
             value={values.title}
-            onChangeText={(title) => setValues((v) => ({ ...v, title }))}
-            onSubmitEditing={handlePublish}
+            onChange={(e) => {
+              const title = e.target.value;
+              setValues((v) => ({ ...v, title }));
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handlePublish();
+            }}
             sx={{ width: "100%" }}
             styles={{
               input: { px: "spacing5", py: "spacing6", fontSize: "sm" }
@@ -316,7 +321,7 @@ function PublishedLinkCard({
         </Text>
         <Button
           variant="new_error_bordered"
-          onPress={onUnpublish}
+          onClick={onUnpublish}
           disabled={disabled}
           sx={{
             flexShrink: 0,
@@ -347,9 +352,9 @@ function PublishedLinkCard({
         }}
       >
         <Text
-          numberOfLines={1}
-          onPress={() => url && shell.openUrl(url)}
+          onClick={() => url && shell.openUrl(url)}
           sx={{
+            lineClamp: 1,
             fontFamily: "body",
             minWidth: 0,
             color: "accent",
@@ -360,10 +365,10 @@ function PublishedLinkCard({
           {url}
         </Text>
         <Button
-          testID="copyPublishLink"
+          data-test-id="copyPublishLink"
           variant="new_secondary"
           title={copied ? strings.copied() : strings.copy()}
-          onPress={() => url && copy(url)}
+          onClick={() => url && copy(url)}
           disabled={!url || disabled}
           sx={{
             flexShrink: 0,
@@ -429,7 +434,7 @@ function MonographStats({
               <Button
                 variant="tertiary"
                 disabled={disabled}
-                onPress={onRefresh}
+                onClick={onRefresh}
               >
                 <ArrowCounterClockwise
                   size={13}
@@ -441,7 +446,7 @@ function MonographStats({
           ) : monographAnalytics ? (
             <Button
               variant="anchor"
-              onPress={() =>
+              onClick={() =>
                 UpgradeDialog.show({ feature: monographAnalytics })
               }
               sx={{ fontWeight: 500, fontSize: "xs" }}
@@ -536,7 +541,7 @@ function ToggleSwitch({
       title={title}
       checked={isOn}
       disabled={disabled}
-      onCheckedChange={onChange}
+      onChange={(e) => onChange(e.target.checked)}
       sx={{ m: 0, flexShrink: 0, bg: isOn ? "accent" : "icon-disabled" }}
     />
   );
@@ -579,7 +584,7 @@ function PasswordProtection({
           placeholder={strings.enterYourPassword()}
           error={error}
           value={password}
-          onChangeText={onPasswordChange}
+          onChange={(e) => onPasswordChange(e.target.value)}
           sx={{ width: "100%", mt: "spacing4" }}
           styles={{
             input: { px: "spacing4", py: "spacing6", fontSize: "sm" }

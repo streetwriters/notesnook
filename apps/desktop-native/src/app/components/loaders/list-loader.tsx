@@ -61,7 +61,7 @@ function Bone(props: {
 
 export const ListLoader = memo(function ListLoader() {
   return (
-    <Flex testID="list-loader" sx={{ flexDirection: "column" }}>
+    <Flex data-test-id="list-loader" sx={{ flexDirection: "column" }}>
       {Lines.map((width) => (
         <Box key={width} sx={{ py: 2, px: 1 }}>
           <Bone height={16} width={`${width}%`} mb={5} />

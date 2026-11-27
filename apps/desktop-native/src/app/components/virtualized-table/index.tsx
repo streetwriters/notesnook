@@ -58,7 +58,7 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
 
   return (
     <VirtualList
-      testID={testID || "virtualized-table"}
+      data-test-id={testID || "virtualized-table"}
       count={items.length}
       itemKey={getItemKey}
       renderItem={renderItem}

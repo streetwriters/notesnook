@@ -43,7 +43,7 @@ export function ImportResult(props: ImportResultProps) {
         {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
         <Button
           variant="accent"
-          onPress={onReset}
+          onClick={onReset}
           sx={{ alignSelf: "center", mt: 2, px: 4 }}
         >
           <Text>{strings.startOver()}</Text>
@@ -63,7 +63,7 @@ export function ImportResult(props: ImportResultProps) {
       <Button
         variant="secondary"
         sx={{ alignSelf: "center" }}
-        onPress={onReset}
+        onClick={onReset}
       >
         <Text>{strings.startOver()}</Text>
       </Button>

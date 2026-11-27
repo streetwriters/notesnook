@@ -61,7 +61,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
   return (
     <>
       <Field
-        testID="filter-input"
+        data-test-id="filter-input"
         autoFocus
         value={text}
         sx={{ mb: "spacing7" }}
@@ -76,7 +76,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         placeholder={
           items.length <= 0 ? placeholders.empty : placeholders.filter
         }
-        onChangeText={(value) => _filter(value)}
+        onChange={(e) => _filter(e.target.value)}
         onKeyUp={async (e) => {
           if (e.key === "Enter" && noItemsFound && query) {
             await _createNewItem(query);
@@ -108,7 +108,7 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
       {noItemsFound && query ? (
         <Button
           variant="secondary"
-          onPress={async () => {
+          onClick={async () => {
             await _createNewItem(query);
           }}
           sx={{
@@ -121,8 +121,12 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
           }}
         >
           <Text
-            numberOfLines={1}
-            sx={{ color: "paragraph", fontSize: "sm", minWidth: 0 }}
+            sx={{
+              lineClamp: 1,
+              color: "paragraph",
+              fontSize: "sm",
+              minWidth: 0
+            }}
           >{`${strings.add()} "${query}"`}</Text>
           <Plus size={15} color="icon" />
         </Button>

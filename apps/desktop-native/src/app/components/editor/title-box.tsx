@@ -89,7 +89,7 @@ function TitleBox(props: TitleBoxProps) {
 
   return (
     <Textarea
-      testID="editor-title"
+      data-test-id="editor-title"
       variant="clean"
       value={title}
       placeholder={strings.noteTitle()}
@@ -106,7 +106,7 @@ function TitleBox(props: TitleBoxProps) {
         fontWeight: "heading",
         width: "100%"
       }}
-      onChangeText={(text) => {
+      onChange={({ target: { value: text } }) => {
         const submitted = /[\r\n]/.test(text);
         const next = replaceDateTime(text, dateFormat, timeFormat).replace(
           NEWLINE_STRIP_REGEX,

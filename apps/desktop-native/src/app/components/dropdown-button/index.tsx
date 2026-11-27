@@ -47,7 +47,7 @@ export default function DropdownButton(props: DropdownButtonProps) {
   return (
     <Flex sx={{ flexDirection: "row", ...sx }}>
       <Button
-        onPress={first.onClick}
+        onClick={first.onClick}
         sx={{
           borderTopRightRadius: 0,
           borderBottomRightRadius: 0,
@@ -60,7 +60,7 @@ export default function DropdownButton(props: DropdownButtonProps) {
       </Button>
       {options.length > 1 && (
         <Button
-          onPress={(event) =>
+          onClick={(event) =>
             Menu.openMenu(
               options.slice(1).map((option) => ({
                 ...option,

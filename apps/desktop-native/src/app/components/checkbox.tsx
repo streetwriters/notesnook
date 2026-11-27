@@ -24,7 +24,7 @@ type CheckboxProps = {
   checked: boolean;
   onToggle?: (ctrl: boolean) => void;
   "aria-label"?: string;
-  testID?: string;
+  "data-test-id"?: string;
   size?: number;
   checkboxUncheckedIconColor: ColorValue;
   uncheckedGroupHoverColor?: ColorValue;
@@ -34,7 +34,6 @@ export function Checkbox(props: CheckboxProps) {
   const {
     checked,
     onToggle,
-    testID,
     size = 18,
     checkboxUncheckedIconColor
   } = props;
@@ -43,9 +42,9 @@ export function Checkbox(props: CheckboxProps) {
 
   return (
     <Icon
-      testID={testID}
+      data-test-id={props["data-test-id"]}
       title={props["aria-label"]}
-      onPress={(event) => {
+      onClick={(event) => {
         if (!onToggle) return;
         event.stopPropagation();
         onToggle(event.ctrlKey || event.metaKey);

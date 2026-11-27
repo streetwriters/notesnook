@@ -129,7 +129,7 @@ export function UserProfileMinimal() {
 
   return (
     <Flex
-      testID="user-profile-minimal"
+      data-test-id="user-profile-minimal"
       sx={{
         flexDirection: "row",
         alignItems: "flex-start",
@@ -150,8 +150,7 @@ export function UserProfileMinimal() {
         {profile?.profilePicture ? (
           <Image
             src={profile.profilePicture}
-            resizeMode="contain"
-            sx={{ width: "100%", height: "100%" }}
+            sx={{ objectFit: "contain", width: "100%", height: "100%" }}
           />
         ) : (
           <UserIcon size={20} color="icon" />

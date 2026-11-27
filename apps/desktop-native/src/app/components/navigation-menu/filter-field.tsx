@@ -36,10 +36,10 @@ export function FilterField(props: {
       }}
     >
       <Input
-        testID="filter-input"
+        data-test-id="filter-input"
         variant="clean"
         placeholder={props.placeholder}
-        onChangeText={props.onChangeText}
+        onChange={(e) => props.onChangeText?.(e.target.value)}
         sx={{
           flex: 1,
           minWidth: 0,

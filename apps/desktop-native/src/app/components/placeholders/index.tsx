@@ -168,7 +168,7 @@ export function SidebarPlaceholder({
 
   return (
     <Flex
-      testID={`${variant}-placeholder`}
+      data-test-id={`${variant}-placeholder`}
       sx={{
         flexDirection: "column",
         gap: "spacing6",
@@ -211,7 +211,7 @@ export function SidebarPlaceholder({
         </Text>
       </Flex>
       <Button
-        onPress={button.onClick}
+        onClick={button.onClick}
         sx={{
           flexDirection: "row",
           alignItems: "center",

@@ -46,7 +46,7 @@ function ReadonlyContent(props: {
   nonce?: number;
 }) {
   return (
-    <Flex testID={`readonly-editor-${props.id}`} sx={{ flex: 1 }}>
+    <Flex data-test-id={`readonly-editor-${props.id}`} sx={{ flex: 1 }}>
       <EditorSurface
         sessionId={props.id}
         readonly
@@ -106,7 +106,7 @@ function DiffViewer(props: DiffViewerProps) {
 
   return (
     <Flex
-      testID="diff-viewer"
+      data-test-id="diff-viewer"
       sx={{
         flex: 1,
         flexDirection: "column",
@@ -116,8 +116,7 @@ function DiffViewer(props: DiffViewerProps) {
     >
       <Text
         variant="heading"
-        numberOfLines={1}
-        sx={{ flexShrink: 0, textAlign: "center", pt: 10 }}
+        sx={{ lineClamp: 1, flexShrink: 0, textAlign: "center", pt: 10 }}
       >
         {title}
       </Text>
@@ -133,8 +132,8 @@ function DiffViewer(props: DiffViewerProps) {
           <>
             <Button
               variant="secondary"
-              testID="restore-session"
-              onPress={async () => {
+              data-test-id="restore-session"
+              onClick={async () => {
                 const { closeTabs, openSession, getSessionsForNote } =
                   useEditorStore.getState();
 
@@ -161,7 +160,7 @@ function DiffViewer(props: DiffViewerProps) {
             {!content || !conflictedContent ? null : (
               <Button
                 variant="secondary"
-                onPress={async () => {
+                onClick={async () => {
                   const { closeTabs, openSession } = useEditorStore.getState();
 
                   const noteId = await createCopy(
@@ -188,7 +187,7 @@ function DiffViewer(props: DiffViewerProps) {
             )}
             <Button
               variant="errorSecondary"
-              onPress={() => {
+              onClick={() => {
                 const { openSession } = useEditorStore.getState();
                 openSession(session.note.id, { force: true });
               }}
@@ -220,7 +219,7 @@ function DiffViewer(props: DiffViewerProps) {
           }}
         >
           <Flex
-            testID="first-editor"
+            data-test-id="first-editor"
             sx={{
               flex: 1,
               flexDirection: "column",
@@ -277,7 +276,7 @@ function DiffViewer(props: DiffViewerProps) {
             )}
           </Flex>
           <Flex
-            testID="second-editor"
+            data-test-id="second-editor"
             sx={{ flex: 1, flexDirection: "column" }}
           >
             {conflictedContent.locked ? (

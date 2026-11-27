@@ -31,8 +31,8 @@ import {
   Checkbox,
   Flex,
   Text,
-  type ContextMenuEvent,
-  type KeyEvent,
+  type UIMouseEvent,
+  type UIKeyboardEvent,
   type MenuItem
 } from "@notesnook/ui-kit";
 import {
@@ -152,14 +152,14 @@ export function Attachment({
   }, [item.hash]);
 
   const FileIcon = getFileIcon(item.type);
-  const onContextMenu = (event: ContextMenuEvent) => {
+  const onContextMenu = (event: UIMouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     Menu.openMenu(AttachmentMenuItems(item, status), {
       position: { x: event.pageX, y: event.pageY }
     });
   };
-  const onKeyUp = async (event: KeyEvent) => {
+  const onKeyUp = async (event: UIKeyboardEvent) => {
     if (event.key === "Delete") {
       await Multiselect.deleteAttachments(
         useSelectionStore.getState().selectedItems
@@ -170,9 +170,9 @@ export function Attachment({
   if (compact) {
     return (
       <Flex
-        testID="attachment-item"
+        data-test-id="attachment-item"
         onContextMenu={onContextMenu}
-        onPress={onSelected}
+        onClick={onSelected}
         onKeyUp={onKeyUp}
         sx={{
           flexDirection: "row",
@@ -205,8 +205,12 @@ export function Attachment({
             <FileText color="icon" size={13} />
           )}
           <Text
-            numberOfLines={1}
-            sx={{ color: "paragraph", fontSize: "xs", minWidth: 0 }}
+            sx={{
+              lineClamp: 1,
+              color: "paragraph",
+              fontSize: "xs",
+              minWidth: 0
+            }}
           >
             {item.filename}
           </Text>
@@ -244,9 +248,9 @@ export function Attachment({
 
   return (
     <Flex
-      testID="attachment-item"
+      data-test-id="attachment-item"
       onContextMenu={onContextMenu}
-      onPress={onSelected}
+      onClick={onSelected}
       onKeyUp={onKeyUp}
       sx={{
         flexDirection: "row",
@@ -258,7 +262,7 @@ export function Attachment({
       <Cell width={ATTACHMENT_COLUMN_WIDTHS.select}>
         <Checkbox
           checked={isSelected}
-          onCheckedChange={() => onSelected?.()}
+          onChange={() => onSelected?.()}
           sx={{ width: 18, height: 18, color: isSelected ? "accent" : "icon" }}
         />
       </Cell>
@@ -290,8 +294,7 @@ export function Attachment({
         )}
         <Text
           variant="body"
-          numberOfLines={1}
-          sx={{ ml: 1, minWidth: 0, flexShrink: 1 }}
+          sx={{ lineClamp: 1, ml: 1, minWidth: 0, flexShrink: 1 }}
         >
           {item.filename}
         </Text>
@@ -314,8 +317,7 @@ export function Attachment({
       <Cell width={ATTACHMENT_COLUMN_WIDTHS.size}>
         <Text
           variant="body"
-          numberOfLines={1}
-          sx={{ color: status ? "accent" : "paragraph" }}
+          sx={{ lineClamp: 1, color: status ? "accent" : "paragraph" }}
         >
           {status
             ? `${formatBytes(status.loaded, 1)}/${formatBytes(status.total, 1)}`

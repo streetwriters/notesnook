@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import type { PressEvent } from "@notesnook/ui-kit";
+import type { UIMouseEvent } from "@notesnook/ui-kit";
 import { CheckboxRemove } from "./icons";
 import { Checkbox } from "./checkbox";
 import {
@@ -29,12 +29,15 @@ import {
 export function SelectedCheck({
   item,
   size = 20,
-  onPress
+  ...props
 }: {
   item?: { id: string };
   size?: number;
+  onClick?: (ctrl: boolean) => void;
+  /** @deprecated Use `onClick`. */
   onPress?: (ctrl: boolean) => void;
 }) {
+  const onClick = props.onClick ?? props.onPress;
   const selectedItems = useRelationChangesStore((store) => store.selected);
   const selectedItem =
     item && selectedItems[findSelectionIndex(item, selectedItems)];
@@ -43,9 +46,9 @@ export function SelectedCheck({
     return (
       <CheckboxRemove
         size={size}
-        onPress={(event: PressEvent) => {
+        onClick={(event: UIMouseEvent) => {
           event.stopPropagation();
-          onPress?.(event.ctrlKey || event.metaKey);
+          onClick?.(event.ctrlKey || event.metaKey);
         }}
         color="accent-error"
       />
@@ -54,7 +57,7 @@ export function SelectedCheck({
 
   return (
     <Checkbox
-      onToggle={onPress}
+      onToggle={onClick}
       size={size}
       checked={selectedItem?.op === "add"}
       aria-label={strings.selectItem()}

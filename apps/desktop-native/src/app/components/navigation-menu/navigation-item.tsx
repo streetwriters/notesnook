@@ -22,8 +22,8 @@ import {
   Flex,
   Text,
   type ColorValue,
-  type ContextMenuEvent,
-  type DragEvent,
+  type UIMouseEvent,
+  type UIDragEvent,
   type MenuItem
 } from "@notesnook/ui-kit";
 import type { Icon } from "../icons";
@@ -38,7 +38,9 @@ export function NavigationItem(props: {
   color?: ColorValue;
   selected?: boolean;
   isCollapsed?: boolean;
-  onDrop?: (event: DragEvent) => void;
+  onDrop?: (event: UIDragEvent) => void;
+  onClick?: () => void;
+  /** @deprecated Use `onClick`. */
   onPress?: () => void;
   menuItems?: MenuItem[];
   children?: ReactNode;
@@ -54,17 +56,16 @@ export function NavigationItem(props: {
   } = props;
   return (
     <Flex
-      testID="navigation-item"
-      droppable={!!onDrop}
+      data-test-id="navigation-item"
       onDrop={onDrop}
       title={props.title}
-      onPress={() => {
+      onClick={() => {
         AppEventManager.publish(AppEvents.toggleSideMenu, false);
-        props.onPress?.();
+        (props.onClick ?? props.onPress)?.();
       }}
       onContextMenu={
         menuItems
-          ? (event: ContextMenuEvent) => {
+          ? (event: UIMouseEvent) => {
               event.preventDefault();
               event.stopPropagation();
               Menu.openMenu(menuItems, {
@@ -101,10 +102,10 @@ export function NavigationItem(props: {
         ) : null}
         {isCollapsed ? null : (
           <Text
-            testID="title"
+            data-test-id="title"
             variant="body"
-            numberOfLines={1}
             sx={{
+              lineClamp: 1,
               fontSize: "xs",
               fontWeight: "normal",
               color: selected ? "paragraph-selected" : "paragraph",
