@@ -21,6 +21,7 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { Plus } from "../icons";
 import { strings } from "@notesnook/intl";
 import { CREATE_BUTTON_MAP } from "../../common";
+import { useStore as useSearchStore } from "../../stores/search-store";
 import listPaneEmptyHomeView from "../../assets/list-pane-empty-home-view.svg";
 import listPaneEmptyFavoriteView from "../../assets/list-pane-empty-favorite-view.svg";
 import listPaneEmptyTrashView from "../../assets/list-pane-empty-trash-view.svg";
@@ -120,7 +121,10 @@ export function SidebarPlaceholder({
   );
 }
 
-const getListPanePlaceholderVariants = () =>
+const getListPanePlaceholderVariants = (search: {
+  query?: string;
+  type?: string;
+}) =>
   ({
     home: {
       image: listPaneEmptyHomeView,
@@ -181,21 +185,15 @@ const getListPanePlaceholderVariants = () =>
       title: strings.noNotesInTag(),
       description: strings.noNotesInTagDesc()
     },
-    /**
-     * TODO: implement a proper placeholder for the search view.
-     */
     search: {
-      image: listPaneEmptyHomeView,
-      title: strings.createYourFirstNote(),
-      description: (
-        <>
-          {strings.createFirstNoteHint[0]()}{" "}
-          <Text as="span" sx={{ color: "accent" }}>
-            {strings.newNote()}
-          </Text>{" "}
-          {strings.createFirstNoteHint[1]()}
-        </>
-      )
+      image: undefined,
+      title: strings.noResultsForSearch(search.query || ""),
+      description:
+        search.type === "reminders"
+          ? "No reminders match your search. Try a different search or create a new reminder."
+          : search.type === "trash"
+          ? "No items in trash match your search. Try a different search."
+          : "No notes match your search. Try a different search or create a new note."
     }
   } as const);
 
@@ -204,8 +202,12 @@ export function ListPanePlaceholder({
 }: {
   variant: keyof ReturnType<typeof getListPanePlaceholderVariants>;
 }) {
-  const { image, title, description } =
-    getListPanePlaceholderVariants()[variant];
+  const query = useSearchStore((store) => store.query);
+  const searchType = useSearchStore((store) => store.searchType);
+  const { image, title, description } = getListPanePlaceholderVariants({
+    query,
+    type: searchType
+  })[variant];
 
   return (
     <Flex
@@ -216,7 +218,7 @@ export function ListPanePlaceholder({
         width: "100%"
       }}
     >
-      <img src={image} alt="" />
+      {image ? <img src={image} alt="" /> : null}
       <Flex
         sx={{
           flexDirection: "column",
