@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, type ReactNode } from "react";
-import { VirtualList, type SxProp } from "@notesnook/ui-kit";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { Flex, Virtuoso, type SxProp } from "@notesnook/ui-kit";
+import { ListHeader } from "../virtualized-list";
 
 export type VirtualizedTableRowProps<T, C> = {
   item: T;
@@ -33,9 +34,11 @@ type VirtualizedTableProps<T, C> = {
   context?: C;
   renderRow: (props: VirtualizedTableRowProps<T, C>) => ReactNode;
   header: ReactNode;
-  testID?: string;
+  "data-test-id"?: string;
   sx?: SxProp;
 };
+
+const COMPONENTS = { Header: ListHeader };
 
 export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
   const {
@@ -45,28 +48,36 @@ export function VirtualizedTable<T, C>(props: VirtualizedTableProps<T, C>) {
     estimatedSize,
     header,
     context,
-    testID,
     sx
   } = props;
 
-  const renderItem = useCallback(
+  const itemContent = useCallback(
     (index: number) => (
       <Row item={items[index]} index={index} context={context} />
     ),
     [items, context]
   );
+  const computeItemKey = useCallback(
+    (index: number) => getItemKey(index),
+    [getItemKey]
+  );
+  const listContext = useMemo(() => ({ header }), [header]);
 
   return (
-    <VirtualList
-      data-test-id={testID || "virtualized-table"}
-      count={items.length}
-      itemKey={getItemKey}
-      renderItem={renderItem}
-      estimatedItemSize={estimatedSize}
-      extraData={context}
-      header={header}
-      overscan={300}
-      sx={sx}
-    />
+    <Flex
+      data-test-id={props["data-test-id"] || "virtualized-table"}
+      sx={{ flex: 1, flexDirection: "column", overflow: "hidden", ...sx }}
+    >
+      <Virtuoso
+        style={{ flex: 1 }}
+        totalCount={items.length}
+        computeItemKey={computeItemKey}
+        itemContent={itemContent}
+        context={listContext}
+        components={COMPONENTS}
+        defaultItemHeight={estimatedSize}
+        increaseViewportBy={300}
+      />
+    </Flex>
   );
 }

@@ -71,7 +71,7 @@ The old names still type-check and still work, marked `@deprecated`, until every
 | `onHoverIn`, `onHoverOut` | `onMouseEnter`, `onMouseLeave` |
 | `testID` | `data-test-id` |
 | `onChangeText(text)` on `Input`, `Textarea` | `onChange(event)`, `event.target.value` |
-| `onSubmitEditing(text)` on `Input` | `onSubmit` on the enclosing `Box as="form"` |
+| `onSubmitEditing(text)` on `Input` | `onSubmit` on the enclosing `Box as="form"`, or `onKeyDown` with `event.key === "Enter"` as `apps/web`'s inputs do (a focused desktop input sends Enter to `onKeyDown` too) |
 | `onCheckedChange(checked)` on `Checkbox`, `Radio`, `Switch` | `onChange(event)`, `event.target.checked` |
 | `onValueChange(value)` on `Slider`, `Select` | `onChange(event)`, `event.target.value` |
 | `options` on `Select` | `<option>` children |

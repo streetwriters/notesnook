@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { forwardRef, useCallback, useMemo, type ReactNode } from "react";
 import {
   Flex,
-  VirtualList,
+  Virtuoso,
   type SxProp,
-  type VirtualListHandle
+  type VirtuosoHandle
 } from "@notesnook/ui-kit";
+import { ListHeader } from "../virtualized-list";
 
 type VirtualizedGridProps<T> = {
   items: T[];
@@ -33,13 +34,16 @@ type VirtualizedGridProps<T> = {
   columns: number;
   onEndReached?: () => void;
   header?: ReactNode;
-  testID?: string;
+  "data-test-id"?: string;
   sx?: SxProp;
 };
 
+const WITH_HEADER = { Header: ListHeader };
+const NO_COMPONENTS = {};
+
 function VirtualizedGridInner<T>(
   props: VirtualizedGridProps<T>,
-  ref: React.ForwardedRef<VirtualListHandle>
+  ref: React.ForwardedRef<VirtuosoHandle>
 ) {
   const {
     items,
@@ -49,8 +53,7 @@ function VirtualizedGridInner<T>(
     columns,
     onEndReached,
     header,
-    sx,
-    testID
+    sx
   } = props;
   const rowCount = Math.ceil(items.length / columns);
 
@@ -82,23 +85,27 @@ function VirtualizedGridInner<T>(
     },
     [columns, getItemKey]
   );
-  const extraData = useMemo(() => ({ items, columns }), [items, columns]);
+  const listContext = useMemo(() => ({ header }), [header]);
 
   return (
-    <VirtualList
-      ref={ref}
-      data-test-id={testID || "virtualized-grid"}
-      count={rowCount}
-      itemKey={rowKey}
-      renderItem={renderRow}
-      estimatedItemSize={estimatedSize}
-      extraData={extraData}
-      header={header}
-      sx={sx}
-    />
+    <Flex
+      data-test-id={props["data-test-id"] || "virtualized-grid"}
+      sx={{ flex: 1, flexDirection: "column", overflow: "hidden", ...sx }}
+    >
+      <Virtuoso
+        ref={ref}
+        style={{ flex: 1 }}
+        totalCount={rowCount}
+        computeItemKey={rowKey}
+        itemContent={renderRow}
+        context={listContext}
+        components={header ? WITH_HEADER : NO_COMPONENTS}
+        defaultItemHeight={estimatedSize}
+      />
+    </Flex>
   );
 }
 
 export const VirtualizedGrid = forwardRef(VirtualizedGridInner) as <T>(
-  props: VirtualizedGridProps<T> & { ref?: React.Ref<VirtualListHandle> }
+  props: VirtualizedGridProps<T> & { ref?: React.Ref<VirtuosoHandle> }
 ) => JSX.Element;

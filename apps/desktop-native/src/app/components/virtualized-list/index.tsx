@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useCallback, type ReactNode } from "react";
+import { forwardRef, useCallback, useMemo, type ReactNode } from "react";
 import {
   Box,
-  VirtualList,
+  Flex,
+  Virtuoso,
   type SxProp,
-  type VirtualListHandle
+  type VirtuosoHandle
 } from "@notesnook/ui-kit";
 
 export type VirtualizedListProps<T, C> = {
@@ -35,13 +36,21 @@ export type VirtualizedListProps<T, C> = {
   mode?: "fixed" | "dynamic";
   overscan?: number;
   header?: ReactNode;
-  testID?: string;
+  "data-test-id"?: string;
   sx?: SxProp;
 };
 
+/** Draws `context.header` above the rows, as the list container does. */
+export function ListHeader(props: { context?: { header?: ReactNode } }) {
+  return <>{props.context?.header}</>;
+}
+
+const WITH_HEADER = { Header: ListHeader };
+const NO_COMPONENTS = {};
+
 function VirtualizedListInner<T, C>(
   props: VirtualizedListProps<T, C>,
-  ref: React.ForwardedRef<VirtualListHandle>
+  ref: React.ForwardedRef<VirtuosoHandle>
 ) {
   const {
     items,
@@ -52,11 +61,10 @@ function VirtualizedListInner<T, C>(
     itemGap = 0,
     overscan = 400,
     header,
-    sx,
-    testID
+    sx
   } = props;
 
-  const renderItem = useCallback(
+  const itemContent = useCallback(
     (index: number) => (
       <Box sx={{ pb: itemGap }}>
         <Item
@@ -68,29 +76,34 @@ function VirtualizedListInner<T, C>(
     ),
     [items, context, itemGap]
   );
-  const itemKey = useCallback(
+  const computeItemKey = useCallback(
     (index: number) => getItemKey(index, items),
     [getItemKey, items]
   );
+  const listContext = useMemo(() => ({ header }), [header]);
 
   return (
-    <VirtualList
-      ref={ref}
-      data-test-id={testID || "virtualized-list"}
-      count={items.length}
-      itemKey={itemKey}
-      renderItem={renderItem}
-      estimatedItemSize={estimatedSize + itemGap}
-      extraData={context}
-      header={header}
-      overscan={overscan}
-      sx={sx}
-    />
+    <Flex
+      data-test-id={props["data-test-id"] || "virtualized-list"}
+      sx={{ flex: 1, flexDirection: "column", overflow: "hidden", ...sx }}
+    >
+      <Virtuoso
+        ref={ref}
+        style={{ flex: 1 }}
+        totalCount={items.length}
+        computeItemKey={computeItemKey}
+        itemContent={itemContent}
+        context={listContext}
+        components={header ? WITH_HEADER : NO_COMPONENTS}
+        defaultItemHeight={estimatedSize + itemGap}
+        increaseViewportBy={overscan}
+      />
+    </Flex>
   );
 }
 
 export const VirtualizedList = forwardRef(VirtualizedListInner) as <T, C>(
   props: VirtualizedListProps<T, C> & {
-    ref?: React.Ref<VirtualListHandle>;
+    ref?: React.Ref<VirtuosoHandle>;
   }
 ) => JSX.Element;

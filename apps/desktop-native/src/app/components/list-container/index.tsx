@@ -31,11 +31,11 @@ import {
   Box,
   Button,
   Flex,
-  VirtualList,
+  Virtuoso,
   type UIMouseEvent,
   type UIDragEvent,
   type SxProp,
-  type VirtualListHandle
+  type VirtuosoHandle
 } from "@notesnook/ui-kit";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { store as selectionStore } from "../../stores/selection-store";
@@ -74,9 +74,15 @@ type ListContainerProps = {
   onDrop?: (event: UIDragEvent) => void;
 };
 
+function ListHeader(props: { context?: { header?: ReactNode } }) {
+  return <>{props.context?.header}</>;
+}
+
+const LIST_COMPONENTS = { Header: ListHeader };
+
 export default function ListContainer(props: ListContainerProps) {
   const { type, group, items, context, header, compact, isSearching } = props;
-  const list = useRef<VirtualListHandle>(null);
+  const list = useRef<VirtuosoHandle>(null);
   const openers = useRef(new Map<number, () => void>());
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
@@ -197,16 +203,9 @@ export default function ListContainer(props: ListContainerProps) {
     ]
   );
   const itemKey = useCallback((index: number) => items.key(index), [items]);
-  const listData = useMemo(
-    () => ({
-      compact,
-      items,
-      isSearching,
-      context,
-      group,
-      focusedGroupIndex
-    }),
-    [compact, items, isSearching, context, group, focusedGroupIndex]
+  const listContext = useMemo(
+    () => ({ header: header ?? <Announcements /> }),
+    [header]
   );
 
   if (!items.length && props.placeholder)
@@ -250,25 +249,27 @@ export default function ListContainer(props: ListContainerProps) {
           ...props.sx
         }}
       >
-        <VirtualList
+        <Virtuoso
           key={isSearching ? "search" : "list"}
           ref={list}
           data-test-id="virtual-list"
+          style={{ flex: 1 }}
+          tabIndex={0}
           onKeyDown={onKeyDown}
           onBlur={() => {
             setFocusedGroupIndex(-1);
             setFocusedIndex(-1);
           }}
-          count={items.length}
-          itemKey={itemKey}
-          renderItem={renderItem}
-          estimatedItemSize={getListItemDefaultHeight(
+          totalCount={items.length}
+          computeItemKey={itemKey}
+          itemContent={renderItem}
+          context={listContext}
+          components={LIST_COMPONENTS}
+          defaultItemHeight={getListItemDefaultHeight(
             isSearching ? "search" : group,
             compact
           )}
-          extraData={listData}
-          header={header ?? <Announcements />}
-          overscan={200}
+          increaseViewportBy={200}
         />
         {props.button ? (
           <Button

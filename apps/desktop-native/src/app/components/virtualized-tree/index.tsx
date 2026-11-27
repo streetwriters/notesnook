@@ -27,9 +27,9 @@ import {
   type Ref
 } from "react";
 import {
-  VirtualList,
+  Virtuoso,
   type UIMouseEvent,
-  type VirtualListHandle
+  type VirtuosoHandle
 } from "@notesnook/ui-kit";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import {
@@ -71,7 +71,7 @@ type TreeViewProps<T> = {
     select: (event?: UIMouseEvent) => void;
   }) => ReactNode;
   saveKey?: string;
-  testID?: string;
+  "data-test-id"?: string;
   onSelect?: (id: string) => void;
   onDeselect?: (id: string) => void;
   bulkSelect?: (ids: string[]) => void;
@@ -88,14 +88,13 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     getChildNodes,
     treeRef,
     saveKey,
-    testID,
     onSelect,
     onDeselect,
     bulkSelect,
     deselectAll,
     isSelected
   } = props;
-  const list = useRef<VirtualListHandle>(null);
+  const list = useRef<VirtuosoHandle>(null);
   const openers = useRef(new Map<number, () => void>());
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
@@ -235,23 +234,19 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     [focusedIndex, onMouseUp]
   );
 
-  const extraData = useMemo(
-    () => ({ nodes, expandedIds }),
-    [nodes, expandedIds]
-  );
-
   return (
     <ListSelectionContext.Provider value={selection}>
-      <VirtualList
+      <Virtuoso
+        data-test-id={props["data-test-id"]}
         ref={list}
+        style={{ flex: 1 }}
+        tabIndex={0}
         onKeyDown={onKeyDown}
         onBlur={() => setFocusedIndex(-1)}
-        data-test-id={testID}
-        count={nodes.length}
-        itemKey={(index) => nodes[index]?.id ?? `${index}`}
-        estimatedItemSize={itemHeight + itemGap}
-        extraData={extraData}
-        renderItem={(index) => {
+        totalCount={nodes.length}
+        computeItemKey={(index) => nodes[index]?.id ?? `${index}`}
+        defaultItemHeight={itemHeight + itemGap}
+        itemContent={(index) => {
           const node = nodes[index];
           if (!node) return null;
           return (
