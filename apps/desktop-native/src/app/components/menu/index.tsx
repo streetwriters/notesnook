@@ -286,23 +286,45 @@ function MenuPanel(props: {
   );
 }
 
-type MenuNavigator = { handle: (key: string) => boolean };
+type MenuNavigator = {
+  handle: (key: string) => boolean;
+  hasFocus: () => boolean;
+};
 const navigators: MenuNavigator[] = [];
 let detachKeys: (() => void) | undefined;
+let detachEnter: (() => void) | undefined;
 
-const NAVIGATION_KEYS = ["up", "down", "left", "right", "home", "end", "enter"];
+const NAVIGATION_KEYS = ["up", "down", "left", "right", "home", "end"];
+
+function onNavigationKey(event: { key: string; preventDefault: () => void }) {
+  const top = navigators[navigators.length - 1];
+  if (!top) return;
+  if (top.handle(event.key)) event.preventDefault();
+}
 
 function attachKeys() {
   if (detachKeys) return;
-  detachKeys = keyboard.register(
-    NAVIGATION_KEYS,
-    (event) => {
-      const top = navigators[navigators.length - 1];
-      if (!top) return;
-      if (top.handle(event.key)) event.preventDefault();
-    },
-    { allowInTextInput: true }
-  );
+  detachKeys = keyboard.register(NAVIGATION_KEYS, onNavigationKey, {
+    allowInTextInput: true
+  });
+}
+
+/**
+ * Enter is registered only while a menu item has focus. A registered shortcut
+ * takes Enter from a focused text field even when the menu would not act on it,
+ * so with no item focused (the suggestions under the tag field) the field must
+ * keep Enter to add its text.
+ */
+function attachEnter() {
+  const wanted = navigators.some((navigator) => navigator.hasFocus());
+  if (wanted && !detachEnter) {
+    detachEnter = keyboard.register(["enter"], onNavigationKey, {
+      allowInTextInput: true
+    });
+  } else if (!wanted && detachEnter) {
+    detachEnter();
+    detachEnter = undefined;
+  }
 }
 
 function MenuItems(props: {
@@ -318,6 +340,7 @@ function MenuItems(props: {
   const setFocusKey = (key: string | undefined) => {
     focusRef.current = key;
     setFocusKeyState(key);
+    attachEnter();
   };
   const navigable = items.filter(
     (item): item is MenuButtonItem =>
@@ -370,7 +393,8 @@ function MenuItems(props: {
   useEffect(() => {
     if (!props.navigation) return;
     const navigator: MenuNavigator = {
-      handle: (key) => handleRef.current(key)
+      handle: (key) => handleRef.current(key),
+      hasFocus: () => focusRef.current !== undefined
     };
     navigators.push(navigator);
     attachKeys();
@@ -381,6 +405,7 @@ function MenuItems(props: {
         detachKeys?.();
         detachKeys = undefined;
       }
+      attachEnter();
     };
   }, [props.navigation]);
   return (
