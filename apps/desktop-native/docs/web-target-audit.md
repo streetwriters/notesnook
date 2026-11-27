@@ -5,6 +5,12 @@ Audited at commit `cb81efae2` (`src/ui/*.ts` against `src/targets/web/ui/*`).
 This is a read-through audit plus the existing type-level check: no contract
 file was edited, and no web code was changed by this audit.
 
+> The web kit has since been rewritten as a thin layer over theme-ui,
+> react-virtuoso and react-modal (see "The web implementation" in
+> `ui-kit-web-api.md`). `use-dom.tsx` and `style/engine.ts`, which this audit
+> refers to, no longer exist, and the test-id special cases listed under them
+> were removed with them.
+
 ## How to read it
 
 - **Verdict**: `Conforms` means the web implementation satisfies the contract's

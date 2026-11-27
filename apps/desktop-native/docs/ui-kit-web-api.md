@@ -41,6 +41,16 @@ The command exits with 1 when `apps/web` uses something the contract does not ha
 
 **Styles that replace React Native props.** `numberOfLines={2}` becomes `sx={{ lineClamp: 2 }}`; `resizeMode="cover"` becomes `sx={{ objectFit: "cover" }}`.
 
+## The web implementation
+
+On the web (`packages/ui/src/kit/web`) the kit is a thin layer, so what `apps/web` draws cannot change when it imports the kit:
+
+- `Box`, `Flex`, `Grid`, `Text`, `Button`, `Label`, `Link`, `Image`, `Input`, `Textarea`, `Checkbox`, `Radio`, `Select`, `Switch`, `Slider`, `Progress` and `Donut` are theme-ui's components (`primitives.tsx`); `sx` is handled by theme-ui.
+- `Virtuoso`, `GroupedVirtuoso` and `TableVirtuoso` are react-virtuoso's, `Modal` is react-modal's, `MenuPresenter` and `PopupPresenter` are `@notesnook/ui`'s, `useThemeUI` is theme-ui's, `ScrollContainer` is `mac-scrollbar` (as in `apps/web`).
+- `WebThemeProvider` and `ThemeScope` (`theme.tsx`) mount theme-ui's theme and the scope's CSS variables. Without a `WebThemeProvider` above (the kit embedded in `apps/web`) `ThemeScope` uses the app's own `@notesnook/theme` theme.
+- `legacy.tsx` is the only file that knows the deprecated names below: it renames them to the DOM props before theme-ui's component renders, and gives old call sites the layout defaults they were written for (a `Box` is a column flexbox, a `Button` a row). `sx.ts` rewrites the kit-only `sx` shapes (`transition` and `animation` objects, `transform` arrays, `lineClamp`, `:group-hover`, `:drag-over`, a colour token at the end of a `border`) into CSS theme-ui takes. Both go away with the deprecated names.
+- `Icon`, `QRCode`, `ColorPicker`, `SplitPane`, `TitleBar`, `LayoutRoot`, the toast and popover hosts, and the deprecated `Dialog`, `VirtualList` (now on `Virtuoso`) and `SortableList` keep a web version of their own, built on those primitives.
+
 ## Where the contract is stricter than the web
 
 The types reject what desktop cannot draw, so a mistake shows up at type-check and not as a screen that looks different:

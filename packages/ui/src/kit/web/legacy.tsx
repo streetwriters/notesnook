@@ -49,6 +49,8 @@ export interface LegacyOptions {
   value?: "string" | "number";
   /** Props the old kit set by default. */
   defaults?: Props;
+  /** Styles the old kit set by default; `sx` overrides them. */
+  sx?: Props;
 }
 
 /**
@@ -61,6 +63,10 @@ export const LEGACY_LAYOUT_CSS = `
 :where(.nn-box,.nn-flex){display:flex;flex-direction:column;position:relative;min-width:0;min-height:0;flex-shrink:1;align-items:stretch;align-content:flex-start}
 :where(.nn-flex){flex-direction:row}
 :where(.nn-text){display:block;margin:0;user-select:none;white-space:pre-wrap}
+:where(.nn-button){flex-direction:row;align-items:center;justify-content:center;flex-shrink:0}
+:where(.nn-button):disabled{cursor:not-allowed}
+:where(.nn-input)::placeholder{opacity:.6}
+:where(.nn-textarea){resize:none;flex-shrink:0}
 `;
 
 let dragPayload: unknown;
@@ -190,6 +196,7 @@ export function legacy<C>(
     const out: Props = { ...options.defaults, ...rest, ref: setRef };
 
     let sx = toThemeUISx(rest.sx);
+    if (options.sx) sx = { ...options.sx, ...sx };
     const addSx = (extra: Props) => (sx = { ...extra, ...sx });
     if (numberOfLines) sx = toThemeUISx({ lineClamp: numberOfLines, ...sx });
     if (resizeMode)

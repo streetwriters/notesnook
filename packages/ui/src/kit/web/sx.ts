@@ -178,7 +178,8 @@ export function toThemeUISx<T>(sx: T): T {
         });
     } else if (BORDER.test(key) && typeof value === "string") {
       const parts = value.split(" ");
-      const last = parts.length > 1 ? colorOf(parts[parts.length - 1]) : "";
+      // width, style and colour: only the third word can be a colour token
+      const last = parts.length > 2 ? colorOf(parts[parts.length - 1]) : "";
       if (last && last !== parts[parts.length - 1]) {
         parts[parts.length - 1] = last as string;
         edit()[key] = parts.join(" ");

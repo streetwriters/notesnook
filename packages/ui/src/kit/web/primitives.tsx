@@ -46,14 +46,23 @@ export const Grid = legacy<typeof Contract.Grid>(ThemeUI.Grid);
 export const Text = legacy<typeof Contract.Text>(ThemeUI.Text, {
   className: "nn-text"
 });
-export const Button = legacy<typeof Contract.Button>(ThemeUI.Button);
+export const Button = legacy<typeof Contract.Button>(ThemeUI.Button, {
+  className: "nn-button",
+  // theme-ui's button is `inline-block`; old call sites lay its children out
+  // in a row.
+  sx: { display: "flex" }
+});
 export const Label = legacy<typeof Contract.Label>(ThemeUI.Label);
 export const Link = legacy<typeof Contract.Link>(ThemeUI.Link, {
   defaults: { target: "_blank", rel: "noreferrer" }
 });
 export const Image = legacy<typeof Contract.Image>(ThemeUI.Image);
-export const Input = legacy<typeof Contract.Input>(ThemeUI.Input);
-export const Textarea = legacy<typeof Contract.Textarea>(ThemeUI.Textarea);
+export const Input = legacy<typeof Contract.Input>(ThemeUI.Input, {
+  className: "nn-input"
+});
+export const Textarea = legacy<typeof Contract.Textarea>(ThemeUI.Textarea, {
+  className: "nn-input nn-textarea"
+});
 export const Checkbox = legacy<typeof Contract.Checkbox>(ThemeUI.Checkbox);
 export const Radio = legacy<typeof Contract.Radio>(ThemeUI.Radio);
 export const Select = legacy<typeof Contract.Select>(ThemeUI.Select);

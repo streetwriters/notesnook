@@ -37,6 +37,7 @@ function Header(props: { context?: { header?: ReactNode } }) {
 }
 
 const COMPONENTS = { Header };
+const NO_COMPONENTS = {};
 
 /** @deprecated The old list API, mapped onto `Virtuoso`. Use `Virtuoso`. */
 export const VirtualList = forwardRef<
@@ -68,7 +69,7 @@ export const VirtualList = forwardRef<
         tabIndex={0}
         totalCount={count}
         context={{ header, extraData: props.extraData }}
-        components={header ? COMPONENTS : undefined}
+        components={header ? COMPONENTS : NO_COMPONENTS}
         itemContent={(index) => renderItem(index)}
         computeItemKey={(index) => itemKey(index)}
         defaultItemHeight={props.estimatedItemSize}
