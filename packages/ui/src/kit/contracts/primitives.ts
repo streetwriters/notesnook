@@ -103,6 +103,8 @@ export interface DataAttributes {
 }
 
 export interface AriaAttributes {
+  /** The DOM role (web e2e finds menus by it); the desktop kit ignores it. */
+  role?: string;
   "aria-label"?: string;
   "aria-hidden"?: boolean | "true" | "false";
   "aria-invalid"?: boolean | "true" | "false";

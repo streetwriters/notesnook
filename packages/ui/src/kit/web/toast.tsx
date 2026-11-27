@@ -37,7 +37,6 @@ type Entry = {
 };
 
 const useToasts = create<{ entries: Entry[] }>(() => ({ entries: [] }));
-let toastCounter = 0;
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function hide(id: string) {
@@ -55,11 +54,16 @@ export const showToast: typeof Contract.showToast = (
   actions,
   hideAfter = 5000
 ) => {
-  // Each call gets its own id, so equal messages stack and hide() only
-  // hides the toast it returned.
-  const id = `toast-${++toastCounter}`;
+  // As apps/web (`id: message`): a toast with the same message replaces the
+  // one on screen and restarts its timer, so equal messages never stack.
+  const id = message;
+  const existing = timers.get(id);
+  if (existing) clearTimeout(existing);
   useToasts.setState((state) => ({
-    entries: [...state.entries, { id, type, message, actions }]
+    entries: [
+      ...state.entries.filter((entry) => entry.id !== id),
+      { id, type, message, actions }
+    ]
   }));
   if (hideAfter && Number.isFinite(hideAfter))
     timers.set(

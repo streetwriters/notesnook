@@ -87,6 +87,7 @@ function MenuButton(props: {
   const hasSubmenu = !!item.menu;
   return (
     <Button
+      role="menuitem"
       data-test-id={`menu-button-${item.key}`}
       variant="menuitem"
       title={item.tooltip || item.title}
@@ -242,6 +243,7 @@ function MenuPanel(props: {
   return (
     <Flex
       ref={element}
+      role="menu"
       data-test-id="menu-container"
       onClick={(event) => event.stopPropagation()}
       sx={{
