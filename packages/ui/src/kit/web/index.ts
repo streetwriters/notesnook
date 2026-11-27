@@ -23,6 +23,65 @@ export * from "./hooks";
 export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./layout";
 export { GroupedVirtuoso, TableVirtuoso, Virtuoso } from "./lists";
+// The types the contract names: the primitives' and Modal's are the
+// contract's; the lists are react-virtuoso's own, so their types are too.
+export type {
+  AriaAttributes,
+  BaseProps,
+  BoxProps,
+  ButtonProps,
+  CheckboxProps,
+  ColorPickerProps,
+  DataAttributes,
+  DonutProps,
+  ElementTag,
+  FlexProps,
+  GridProps,
+  IconProps,
+  ImageProps,
+  InputProps,
+  LabelProps,
+  LinkProps,
+  ProgressProps,
+  QRCodeHandle,
+  QRCodeProps,
+  RadioProps,
+  SelectProps,
+  SliderProps,
+  SwitchProps,
+  TextareaProps,
+  TextProps,
+  TextVariantPath,
+  ThemeScopeProps
+} from "../contracts/primitives";
+export type { ModalProps, ModalStyles } from "../contracts/dialog";
+export type {
+  CalculateViewLocation,
+  CalculateViewLocationParams,
+  Components,
+  ComputeItemKey,
+  ContextProp,
+  FixedHeaderContent,
+  FlatIndexLocationWithAlign,
+  FlatScrollIntoViewLocation,
+  GroupContent,
+  GroupedVirtuosoHandle,
+  GroupedVirtuosoProps,
+  GroupItemContent,
+  IndexLocationWithAlign,
+  ItemContent,
+  ItemProps,
+  LocationOptions,
+  ScrollerProps,
+  ScrollIntoViewLocation,
+  ScrollIntoViewLocationOptions,
+  TableComponents,
+  TableVirtuosoHandle,
+  TableVirtuosoProps,
+  TopItemListProps,
+  VirtuosoHandle,
+  VirtuosoProps
+} from "react-virtuoso";
 export { SortableList } from "./sortable-list";
 export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
 // The menu and popup hosts are the ones apps/web already uses.
