@@ -57,7 +57,8 @@ On the web (`packages/ui/src/kit/web`) the kit is a thin layer, so what `apps/we
 
 The types reject what desktop cannot draw, so a mistake shows up at type-check and not as a screen that looks different:
 
-- `sx` and `style` take only the properties and values in `contracts/style.ts`. For example `float`, `display: "grid"` in `style`, and `objectFit: "scale-down"` are errors.
+- `sx` and `style` take only the properties and values in `contracts/style.ts`. For example `float`, `display: "grid"` in `style`, and `objectFit: "scale-down"` are errors. Also accepted and converted on desktop: `vw`/`vh` lengths (measured against the window when the component draws), `px`/`%` radii and `%` spacing, `overflow` arrays and `unset`, `cursor: "unset"`, and a dotted text variant path (`variant="text.body"`). `resize` is accepted and draws nothing (desktop text areas have no handle).
+- Forms: `Button` takes `autoFocus` and `form` (the `id` of a `Box as="form"` it submits from outside), and the kit exports `FormData`: `new FormData(event.target)` in a form's `onSubmit` holds the value of every named text field and every checked named checkbox or radio in it, as the browser's does. On the web it is the browser's own `FormData`.
 - `as` takes one of the tags in `ElementTag`; `as="canvas"` is an error.
 - A ref must match its component: an `Input` ref is a `UIInputElement`, not a plain `UIElement`.
 

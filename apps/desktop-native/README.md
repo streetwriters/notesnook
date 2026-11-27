@@ -129,8 +129,8 @@ npm run clean:build
 
 Top-level directories in `apps/desktop-native/`:
 
-- `src/app/`: the app itself, shared by every target (`views`, `dialogs`, `components`, `stores`, `navigation`, etc.)
-- `src/platform/`: the contracts for platform services (files, database, crypto, clipboard and so on), plus `globals.d.ts` (the build-time globals such as `IS_TESTING` that code shared with apps/web reads as bare names; the desktop target sets them in `src/targets/desktop/globals.ts`, the web target through Vite's `define`) and `react-compat.d.ts` (React 18's argument-less `useRef<T>()`, which apps/web uses and React 19's types dropped)
+- `src/app/`: the app itself, shared by every target (`views`, `dialogs`, `components`, `stores`, `navigation`, etc.). Dialogs copied from `apps/web` get what web takes from the browser or Electron (`window.open`, `window.location`, `desktop`, `IS_DESKTOP_APP`, `getPlatform`) by importing it from `dialogs/desktop-bridge.ts`, which implements it on `@platform`; `dialogs/web-globals.test.ts` fails on a browser global used without an import or a raw HTML element in a dialog
+- `src/platform/`: the contracts for platform services (files, database, crypto, clipboard and so on)
 - `../../packages/ui/src/kit/`: the `@notesnook/ui-kit` contracts (`contracts`), their desktop and web implementations (`desktop`, `web`) and the code both share (`shared`). Source only: app code imports the active target's kit as `@notesnook/ui-kit` (each target's tsconfig, Metro and Vite config map it), and target code reaches files in the kit as `@notesnook/ui-kit/<dir>/...`; the web build fails if `web` or `shared` imports a react-native package. The contracts follow the theme-ui, DOM, react-virtuoso and react-modal API that `apps/web` uses; [docs/ui-kit-web-api.md](docs/ui-kit-web-api.md) lists what is kept, what is a subset and what is deprecated
 - `src/targets/desktop/`: the desktop implementation of `@platform`, and `ui/`, which re-exports the kit's desktop implementation plus the app's `EditorSurface`
 - `src/targets/web/`: the same for the web target

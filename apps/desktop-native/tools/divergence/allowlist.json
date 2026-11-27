@@ -295,6 +295,231 @@
       "path": "components/navigation-menu/logo.tsx",
       "category": "platform",
       "reason": "apps/web draws the logo from an SVG sprite in index.html (<svg><use href=\"#full-logo\"/>); desktop has no page to hold the sprite, so the mark is an svgIcon here."
+    },
+    {
+      "path": "dialogs/buy-dialog/plan-list.tsx",
+      "category": "platform",
+      "reason": "Web measures the plan cards through HTMLDivElement refs and styles them with CSS the desktop renderer cannot draw; desktop lays the plan list out with the kit's flexbox props."
+    },
+    {
+      "path": "dialogs/add-reminder-dialog.tsx",
+      "category": "platform",
+      "reason": "Web uses CSS grid, a :hover:not(:disabled) selector and DOM input/button refs (inputRef, HTMLInputElement) for the date and time fields; desktop has no grid or selectors and uses the kit's date fields."
+    },
+    {
+      "path": "dialogs/attachments-dialog.tsx",
+      "category": "platform",
+      "reason": "Web draws the attachment list as an HTML table (th/td and table sx keys); desktop has no table layout and draws rows with the kit's Virtuoso list."
+    },
+    {
+      "path": "dialogs/settings/index.tsx",
+      "category": "platform",
+      "reason": "Web styles the settings rows through child selectors (& > *, & > label), reads inputs with document.getElementById and DOM element refs; desktop has no stylesheet or DOM."
+    },
+    {
+      "path": "dialogs/command-palette/command-palette-dialog.tsx",
+      "category": "platform",
+      "reason": "Web imports react-virtuoso directly, highlights matches with <b> elements and sizes with CSS min(); desktop draws through the kit's Virtuoso and Text."
+    },
+    {
+      "path": "dialogs/mfa/steps.tsx",
+      "category": "platform",
+      "reason": "Web uses the phone, file-saver and clipboard-polyfill packages, SVG asset URLs, the react-qrcode-logo re-export, CSS grid, :first-of-type selectors and DOM refs; desktop saves and copies through @platform and draws the QR code with the kit."
+    },
+    {
+      "path": "dialogs/settings/components/customize-toolbar.tsx",
+      "category": "native-editor",
+      "reason": "Web's toolbar editor reads Tiptap tool definitions from @notesnook/editor and uses document.querySelector, #id hover selectors and :last-of-type; the native editor's toolbar items come from common/toolbar-*."
+    },
+    {
+      "path": "dialogs/settings/components/billing-history.tsx",
+      "category": "platform",
+      "reason": "Web draws the transactions as an HTML table (thead/tbody/th) and opens receipts with window.open; desktop has no table layout and opens links through @platform shell."
+    },
+    {
+      "path": "dialogs/recovery-key-dialog.tsx",
+      "category": "platform",
+      "reason": "Web renders the recovery key to an HTMLCanvasElement, saves it with file-saver and copies with navigator.clipboard and clipboard-polyfill; desktop uses @platform files and clipboard."
+    },
+    {
+      "path": "dialogs/inbox-history-dialog.tsx",
+      "category": "platform",
+      "reason": "Web draws the history as a table (th, td selectors, tableLayout, borderCollapse), sizes text in em and copies with clipboard-polyfill; desktop has no table layout or em units."
+    },
+    {
+      "path": "dialogs/settings/components/user-profile.tsx",
+      "category": "platform",
+      "reason": "Web shows the edit button through a ':hover #profile-picture-edit' selector; desktop has no selectors and uses the kit's group hover."
+    },
+    {
+      "path": "dialogs/settings/components/themes-selector.tsx",
+      "category": "platform",
+      "reason": "Web's theme grid uses nested :hover selectors and DOM file reading; desktop draws the grid with the kit and reads files through @platform."
+    },
+    {
+      "path": "dialogs/buy-dialog/paddle.tsx",
+      "category": "platform",
+      "reason": "Web embeds Paddle.js checkout in an iframe (@paddle/paddle-js, window.addEventListener, window.location); desktop has no Paddle.js and opens checkout in the browser."
+    },
+    {
+      "path": "dialogs/create-color-dialog.tsx",
+      "category": "platform",
+      "reason": "Web passes a DOM input ref to Field (inputRef, HTMLInputElement) and sizes the colour swatch with theme space keys desktop types as lengths; desktop's Field has no inputRef."
+    },
+    {
+      "path": "dialogs/note-linking-dialog.tsx",
+      "category": "native-editor",
+      "reason": "Web imports LinkAttributes from @notesnook/editor (Tiptap) and react-virtuoso directly and draws a raw <div>; the native editor takes links through its host actions."
+    },
+    {
+      "path": "dialogs/email-change-dialog.tsx",
+      "category": "platform",
+      "reason": "Web reads the fields through DOM input refs (inputRef, HTMLInputElement) on Field; desktop's Field has no inputRef."
+    },
+    {
+      "path": "dialogs/buy-dialog/buy-dialog.tsx",
+      "category": "platform",
+      "reason": "Web imports an SVG asset as a URL (rocket.svg?url), uses <span> and the IS_TESTING build global; desktop takes assets from the generated asset modules."
+    },
+    {
+      "path": "dialogs/issue-dialog.tsx",
+      "category": "platform",
+      "reason": "Web copies with clipboard-polyfill, breaks lines with <br> and uses the forms.input variant path on a textarea; desktop copies through @platform clipboard."
+    },
+    {
+      "path": "dialogs/settings/components/inbox-api-keys.tsx",
+      "category": "platform",
+      "reason": "Web uses a native <option> select, navigator.clipboard, a '& + svg' selector and DOM input refs on Field; desktop has none of these."
+    },
+    {
+      "path": "dialogs/attach-files-dialog.tsx",
+      "category": "native-editor",
+      "reason": "Web takes the Attachment type from @notesnook/editor (Tiptap), compresses images with its web image-compressor and p-queue on DOM File objects; desktop attaches PickedFile objects to the native editor."
+    },
+    {
+      "path": "dialogs/settings/other-settings.ts",
+      "category": "platform",
+      "reason": "Web reads document.cookie, the service worker registration, navigator.clipboard and window.location/open; desktop has none of these and uses @platform updater, clipboard and shell."
+    },
+    {
+      "path": "dialogs/edit-profile-picture-dialog.tsx",
+      "category": "platform",
+      "reason": "Web crops with react-avatar-editor on a DOM canvas; desktop crops with the kit's AvatarEditor."
+    },
+    {
+      "path": "dialogs/edit-note-creation-date-dialog.tsx",
+      "category": "platform",
+      "reason": "Web anchors the date picker popup to a DOM input ref (inputRef, HTMLInputElement) and draws a raw CSS box-shadow; desktop anchors to the kit element and uses the theme's shadow."
+    },
+    {
+      "path": "dialogs/note-expiry-date-dialog.tsx",
+      "category": "platform",
+      "reason": "Web anchors the date picker popup to a DOM input ref (inputRef, HTMLInputElement) and draws a raw CSS box-shadow; desktop anchors to the kit element and uses the theme's shadow."
+    },
+    {
+      "path": "dialogs/buy-dialog/features.tsx",
+      "category": "platform",
+      "reason": "Web lays the feature table out with CSS grid and sizes text in rem; desktop lays out with flexbox only."
+    },
+    {
+      "path": "dialogs/settings/components/spell-checker-languages.tsx",
+      "category": "platform",
+      "reason": "Web lists languages with raw <input type=checkbox> and <span> elements; desktop uses the kit's Checkbox."
+    },
+    {
+      "path": "dialogs/settings/components/subscription-status.tsx",
+      "category": "platform",
+      "reason": "Web lays the status card out with CSS grid (gridTemplateRows, gridRow); desktop lays out with flexbox only."
+    },
+    {
+      "path": "dialogs/feature-dialog.tsx",
+      "category": "platform",
+      "reason": "Web reads Config.has and the IS_TESTING build global and opens links with window.open; desktop's config has no has() and opens links through @platform shell."
+    },
+    {
+      "path": "dialogs/prompt.tsx",
+      "category": "platform",
+      "reason": "Web passes a DOM input ref to Field (inputRef, HTMLInputElement); desktop's Field has no inputRef."
+    },
+    {
+      "path": "dialogs/buy-dialog/upgrade-dialog.tsx",
+      "category": "platform",
+      "reason": "Web colours the icon through a '& path' selector and uses <strong>; desktop has no selectors and colours the icon directly."
+    },
+    {
+      "path": "dialogs/keyboard-shortcuts-dialog.tsx",
+      "category": "platform",
+      "reason": "Web sizes the key caps in em units, which desktop's text layout has no parent font size for."
+    },
+    {
+      "path": "dialogs/settings/app-lock-settings.ts",
+      "category": "platform",
+      "reason": "Web registers security keys with the browser's WebAuthn and window.crypto; desktop goes through @platform webauthn, whose calls take different arguments."
+    },
+    {
+      "path": "dialogs/migration-dialog.tsx",
+      "category": "platform",
+      "reason": "Web links to support with raw <a> elements; desktop uses the kit's Link."
+    },
+    {
+      "path": "dialogs/export-errors-dialog.tsx",
+      "category": "platform",
+      "reason": "Web lists the errors as an HTML <ol>/<li> list; desktop has no list elements and numbers Text rows."
+    },
+    {
+      "path": "dialogs/email-verification-dialog.tsx",
+      "category": "platform",
+      "reason": "Web emphasises part of the notice with a raw <b> element; desktop uses the kit's Text."
+    },
+    {
+      "path": "dialogs/mfa/multi-factor-dialog.tsx",
+      "category": "platform",
+      "reason": "Web's Next button submits the 2faForm form in steps.tsx; desktop's steps.tsx (allowlisted) submits through mfa/submit.ts, so the button calls submitStep."
+    },
+    {
+      "path": "dialogs/buy-dialog/helpers.ts",
+      "category": "platform",
+      "reason": "Web reads Vite's import.meta.env.DEV and the IS_TESTING global; desktop reads the same from @platform environment."
+    },
+    {
+      "path": "dialogs/buy-dialog/paddle-types.ts",
+      "category": "platform",
+      "reason": "The Paddle.js checkout types web imports from @paddle/paddle-js, which desktop does not ship."
+    },
+    {
+      "path": "dialogs/theme-metadata.ts",
+      "category": "desktop-only",
+      "reason": "The theme listing type web imports from the @notesnook/themes-server package, which desktop-native does not depend on."
+    },
+    {
+      "path": "dialogs/desktop-bridge.ts",
+      "category": "platform",
+      "reason": "What the shared dialogs use outside React on web (the Electron bridge, IS_DESKTOP_APP, getPlatform, window.open/location) implemented on @platform services."
+    },
+    {
+      "path": "dialogs/settings/editor-fonts.ts",
+      "category": "native-editor",
+      "reason": "The font list web takes from @notesnook/editor (Tiptap), which the native editor does not ship."
+    },
+    {
+      "path": "dialogs/settings/platform-gaps.ts",
+      "category": "platform",
+      "reason": "Restart, reload, backup directory and release track calls on @platform for the settings files that are not yet web-identical."
+    },
+    {
+      "path": "dialogs/mfa/submit.ts",
+      "category": "platform",
+      "reason": "Submits the current MFA step from the dialog's Next button for desktop's steps.tsx, which does not use web's form/id submission."
+    },
+    {
+      "path": "dialogs/components/**",
+      "category": "platform",
+      "reason": "Desktop stand-ins for what web's dialogs draw with raw HTML or DOM (date input, markdown HTML, radio input, anchored popover, field with DOM refs); used by the allowlisted dialogs."
+    },
+    {
+      "path": "dialogs/settings/components/circle-partners.tsx",
+      "category": "platform",
+      "reason": "Web draws the partner logos with a raw <img> element; desktop uses the kit's Image."
     }
   ]
 }
