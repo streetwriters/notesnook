@@ -21,52 +21,59 @@ import { useState } from "react";
 import type * as Contract from "../contracts/lists";
 import { Flex } from "./primitives";
 
+// The item being dragged, shared so a list can refuse another list's items.
+let active: Contract.SortableItem | undefined;
+
 export function SortableList<T extends Contract.SortableItem>(
   props: Contract.SortableListProps<T>
 ) {
   const { items, renderItem, onMove, direction = "vertical" } = props;
   const [dragging, setDragging] = useState<string>();
   const [over, setOver] = useState<string>();
+  const flexDirection = direction === "vertical" ? "column" : "row";
+  const accepts = (item: T) => !!active && active.group === item.group;
 
   return (
     <Flex
-      testID={props.testID}
-      sx={{
-        flexDirection: direction === "vertical" ? "column" : "row",
-        ...props.sx
-      }}
+      data-test-id={props["data-test-id"] ?? props.testID}
+      sx={{ flexDirection, ...props.sx }}
     >
       {items.map((item, index) => (
         <Flex
           key={item.id}
-          sx={{ flexDirection: direction === "vertical" ? "column" : "row" }}
+          sx={{ flexDirection }}
           draggable
-          droppable
-          onDragStart={() => {
+          onDragStart={(event) => {
+            active = { id: item.id, group: item.group };
+            event.dataTransfer.setData("text/plain", item.id);
+            event.dataTransfer.effectAllowed = "move";
             setDragging(item.id);
-            return { id: item.id, group: item.group };
           }}
           onDragEnd={() => {
+            active = undefined;
             setDragging(undefined);
             setOver(undefined);
           }}
-          onDragEnter={(event) => {
-            const payload = event.payload as Contract.SortableItem | undefined;
-            if (payload && payload.group !== item.group) return;
+          onDragOver={(event) => {
+            if (!accepts(item)) return;
+            event.preventDefault();
             setOver(item.id);
           }}
-          onDragLeave={() =>
-            setOver((current) => (current === item.id ? undefined : current))
-          }
+          onDragLeave={(event) => {
+            const to = (event as { relatedTarget?: object }).relatedTarget;
+            if (to && event.currentTarget.contains(to)) return;
+            setOver((current) => (current === item.id ? undefined : current));
+          }}
           onDrop={(event) => {
-            const payload = event.payload as Contract.SortableItem | undefined;
+            const dragged = active;
             setDragging(undefined);
             setOver(undefined);
-            if (!payload || payload.id === item.id) return;
-            if (payload.group !== item.group) return;
-            if (!items.some((other) => other.id === payload.id)) return;
+            if (!dragged || !accepts(item)) return;
+            event.preventDefault();
+            if (dragged.id === item.id) return;
+            if (!items.some((other) => other.id === dragged.id)) return;
             onMove({
-              activeId: payload.id,
+              activeId: dragged.id,
               overId: item.id,
               index,
               group: item.group

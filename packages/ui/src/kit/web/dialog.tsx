@@ -26,13 +26,14 @@ import { ScrollContainer } from "./layout";
 import { ThemeScope, useThemeContext } from "./theme";
 
 export function DialogButton(props: Contract.DialogButtonProps) {
-  const { disabled, onClick, loading, text, variant, testID, sx } = props;
+  const { disabled, onClick, loading, text, variant, sx } = props;
+  const testId = props["data-test-id"] ?? props.testID;
   return (
     <Button
-      testID={testID}
+      data-test-id={testId}
       variant={variant ?? "dialog"}
       disabled={disabled}
-      onPress={disabled ? undefined : onClick}
+      onClick={disabled ? undefined : onClick}
       sx={{
         maxWidth: "100%",
         overflow: "hidden",
@@ -98,12 +99,13 @@ export function Dialog(props: Contract.DialogProps) {
     }
   };
   if (!isOpen) return null;
+  const testId = props["data-test-id"] ?? props.testID;
 
   return (
     <ThemeScope scope="dialog">
       <Flex
-        testID={props.testID ? `${props.testID}-backdrop` : "dialog-backdrop"}
-        onPress={props.onClose}
+        data-test-id={testId ? `${testId}-backdrop` : "dialog-backdrop"}
+        onClick={props.onClose}
         sx={{
           position: "absolute",
           top: 0,
@@ -125,8 +127,8 @@ export function Dialog(props: Contract.DialogProps) {
           style={{ display: "contents" }}
         >
         <Flex
-          testID={props.testID ?? "dialog"}
-          onPress={(event) => event.stopPropagation()}
+          data-test-id={testId ?? "dialog"}
+          onClick={(event) => event.stopPropagation()}
           sx={
             {
               flexDirection: "column",
@@ -166,7 +168,7 @@ export function Dialog(props: Contract.DialogProps) {
                     }}
                   >
                     <Text
-                      testID="dialog-title"
+                      data-test-id="dialog-title"
                       variant="heading"
                       sx={{
                         fontSize: "lg",
@@ -198,8 +200,8 @@ export function Dialog(props: Contract.DialogProps) {
             ) : null}
             {props.showCloseButton ? (
               <Button
-                testID="dialog-close"
-                onPress={props.onClose}
+                data-test-id="dialog-close"
+                onClick={props.onClose}
                 sx={{ bg: "transparent", p: 0, zIndex: 999 }}
               >
                 <Close size={16} />
@@ -237,7 +239,7 @@ export function Dialog(props: Contract.DialogProps) {
               {props.negativeButton ? (
                 <DialogButton
                   {...props.negativeButton}
-                  testID="dialog-no"
+                  data-test-id="dialog-no"
                   role="negative-button"
                   variant={props.negativeButton.variant ?? "new_tertiary"}
                 />
@@ -245,7 +247,7 @@ export function Dialog(props: Contract.DialogProps) {
               {props.positiveButton ? (
                 <DialogButton
                   {...props.positiveButton}
-                  testID="dialog-yes"
+                  data-test-id="dialog-yes"
                   role="positive-button"
                   variant={props.positiveButton.variant ?? "new_accent"}
                 />

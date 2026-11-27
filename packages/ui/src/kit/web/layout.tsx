@@ -26,12 +26,19 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactElement
+  type ReactElement,
+  type Ref
 } from "react";
 import type * as Contract from "../contracts/layout";
+import type { UIElement } from "../contracts/elements";
 import { config } from "@platform";
+import { Global } from "@emotion/react";
+import { Box as ThemeUIBox } from "@theme-ui/components";
+import { MacScrollbar } from "mac-scrollbar";
+import "mac-scrollbar/dist/mac-scrollbar.css";
 import { Box, Flex } from "./primitives";
-import { injectBaseStyles } from "./style/engine";
+import { LEGACY_LAYOUT_CSS } from "./legacy";
+import { toThemeUISx } from "./sx";
 
 export const TITLE_BAR_HEIGHT = 45;
 
@@ -167,6 +174,7 @@ export const SplitPane = forwardRef<
   const position = (event: { clientX: number; clientY: number }) =>
     horizontal ? event.clientX : event.clientY;
 
+  const testId = props["data-test-id"] ?? props.testID;
   const items: JSX.Element[] = [];
   children.forEach((child, index) => {
     const size = sizes[index];
@@ -174,7 +182,11 @@ export const SplitPane = forwardRef<
     items.push(
       <Flex
         key={child.props.id}
-        testID={child.props.testID ?? `pane-${child.props.id}`}
+        data-test-id={
+          child.props["data-test-id"] ??
+          child.props.testID ??
+          `pane-${child.props.id}`
+        }
         sx={{
           flexDirection: "column",
           ...(fixed
@@ -195,7 +207,7 @@ export const SplitPane = forwardRef<
       items.push(
         <div
           key={`sash-${index}`}
-          data-test-id={`${props.testID ?? "split-pane"}-sash-${index}`}
+          data-test-id={`${testId ?? "split-pane"}-sash-${index}`}
           onPointerDown={(event) => {
             if (!resizable) return;
             event.currentTarget.setPointerCapture(event.pointerId);
@@ -252,7 +264,7 @@ export const SplitPane = forwardRef<
 
   return (
     <Box
-      testID={props.testID}
+      data-test-id={testId}
       sx={{
         flexDirection: horizontal ? "row" : "column",
         flex: 1,
@@ -275,23 +287,37 @@ export const SplitPane = forwardRef<
   );
 });
 
-export function ScrollContainer(props: Contract.ScrollContainerProps) {
+/**
+ * The scroll container `apps/web` uses (`mac-scrollbar`), with `sx` handled
+ * by theme-ui.
+ */
+export const ScrollContainer = forwardRef(function ScrollContainer(
+  props: Contract.ScrollContainerProps,
+  ref: Ref<UIElement>
+) {
+  const { sx, testID, children, ...rest } = props;
   return (
-    <Box
-      testID={props.testID}
+    <ThemeUIBox
+      as={MacScrollbar as never}
+      data-test-id={testID}
+      {...(rest as Record<string, unknown>)}
+      ref={ref as never}
+      {...{ minThumbSize: 40 }}
       sx={
         {
-          overflowY: "auto",
-          overflowX: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
+          minHeight: 0,
           "> *": { flexShrink: 0 },
-          ...props.sx
+          ...toThemeUISx(sx)
         } as never
       }
     >
-      {props.children}
-    </Box>
+      {children}
+    </ThemeUIBox>
   );
-}
+}) as typeof Contract.ScrollContainer;
 
 export function TitleBar({
   height = TITLE_BAR_HEIGHT,
@@ -300,7 +326,7 @@ export function TitleBar({
 }: Contract.TitleBarProps) {
   return (
     <Flex
-      testID="title-bar"
+      data-test-id="title-bar"
       sx={{
         flexDirection: "row",
         alignItems: "center",
@@ -314,8 +340,16 @@ export function TitleBar({
   );
 }
 
+// The page reset a standalone app needs (`apps/web` has its own stylesheet),
+// plus the layout defaults old call sites still rely on.
+const BASE_CSS = `
+*,*::before,*::after{box-sizing:border-box}
+*{outline:none;scrollbar-width:thin;scrollbar-color:var(--nn-scrollbar,rgba(128,128,128,.4)) transparent}
+html,body,#root{height:100%;margin:0;padding:0}
+body{overflow:hidden}
+${LEGACY_LAYOUT_CSS}`;
+
 export function LayoutRoot(props: Contract.LayoutRootProps) {
-  injectBaseStyles();
   return (
     <Flex
       sx={{
@@ -331,6 +365,7 @@ export function LayoutRoot(props: Contract.LayoutRootProps) {
         fontSize: "body"
       }}
     >
+      <Global styles={BASE_CSS} />
       {props.children}
     </Flex>
   );

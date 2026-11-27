@@ -46,10 +46,10 @@ async function start() {
   function App() {
     const colorScheme = themeStore.useStore((store) => store.colorScheme);
     return (
-      <LayoutRoot>
-        <WebThemeProvider
-          theme={colorScheme === "dark" ? THEME_DARK : THEME_LIGHT}
-        >
+      <WebThemeProvider
+        theme={colorScheme === "dark" ? THEME_DARK : THEME_LIGHT}
+      >
+        <LayoutRoot>
           <Root
             colorScheme={colorScheme}
             onToggleColorScheme={() =>
@@ -58,8 +58,8 @@ async function start() {
               })
             }
           />
-        </WebThemeProvider>
-      </LayoutRoot>
+        </LayoutRoot>
+      </WebThemeProvider>
     );
   }
 

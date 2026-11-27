@@ -62,9 +62,18 @@ export function Popover(props: Contract.PopoverProps) {
       put({ id, rect: props.anchorRect, props });
       return;
     }
-    props.anchorRef?.current?.measureInWindow((x, y, width, height) =>
-      put({ id, rect: { x, y, width, height }, props })
-    );
+    const anchor = props.anchorRef?.current?.getBoundingClientRect();
+    if (anchor)
+      put({
+        id,
+        rect: {
+          x: anchor.left,
+          y: anchor.top,
+          width: anchor.width,
+          height: anchor.height
+        },
+        props
+      });
   });
 
   useEffect(() => () => remove(id), [id]);
@@ -120,10 +129,11 @@ function PopoverEntry(props: {
 
   useEffect(() => {
     let cancelled = false;
-    ref.current?.measureInWindow((_x, _y, width, height) => {
+    const size = ref.current?.getBoundingClientRect();
+    if (size)
       popoverPosition(
         rect,
-        { width, height },
+        { width: size.width, height: size.height },
         popover.placement ?? "bottom-start",
         window
       ).then((next) => {
@@ -134,7 +144,6 @@ function PopoverEntry(props: {
             : next
         );
       });
-    });
     return () => {
       cancelled = true;
     };
@@ -143,7 +152,7 @@ function PopoverEntry(props: {
   return (
     <ThemeScope scope="contextMenu">
       <Box
-        onPress={popover.onClose}
+        onClick={popover.onClose}
         sx={{
           position: "absolute",
           top: 0,
@@ -155,7 +164,7 @@ function PopoverEntry(props: {
       >
         <Flex
           ref={ref}
-          onPress={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
           sx={{
             position: "absolute",
             top: position?.top ?? rect.y,

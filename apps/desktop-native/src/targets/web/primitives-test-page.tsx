@@ -112,8 +112,8 @@ export function PrimitivesTestPage() {
   const anchor = useRef<UIElement>(null);
 
   return (
-    <LayoutRoot>
-      <WebThemeProvider theme={dark ? THEME_DARK : THEME_LIGHT}>
+    <WebThemeProvider theme={dark ? THEME_DARK : THEME_LIGHT}>
+      <LayoutRoot>
         <ThemeScope scope="base">
           <Flex
             testID="primitives-test-page"
@@ -295,7 +295,7 @@ export function PrimitivesTestPage() {
             <ToastHost />
           </Flex>
         </ThemeScope>
-      </WebThemeProvider>
-    </LayoutRoot>
+      </LayoutRoot>
+    </WebThemeProvider>
   );
 }

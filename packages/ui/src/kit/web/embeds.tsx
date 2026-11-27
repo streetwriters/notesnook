@@ -29,12 +29,12 @@ import type * as PdfContract from "../contracts/pdf";
 import type * as WebViewContract from "../contracts/webview";
 import type * as OverlayContract from "../contracts/overlays";
 import { Flex, Text } from "./primitives";
-import { getDragPayload } from "./use-dom";
+import { getDragPayload } from "./legacy";
 
-function NotImplemented(props: { name: string; testID?: string }) {
+function NotImplemented(props: { name: string; testId?: string }) {
   return (
     <Flex
-      testID={props.testID}
+      data-test-id={props.testId}
       sx={{ flex: 1, alignItems: "center", justifyContent: "center", p: 2 }}
     >
       <Text sx={{ color: "paragraph" }}>
@@ -57,7 +57,7 @@ export const AvatarEditor = forwardRef<
     }),
     []
   );
-  return <NotImplemented name="AvatarEditor" testID={props.testID} />;
+  return <NotImplemented name="AvatarEditor" testId={props.testID} />;
 });
 
 export const PdfViewer = forwardRef<
@@ -84,7 +84,7 @@ export const PdfViewer = forwardRef<
     }),
     []
   );
-  return <NotImplemented name="PdfViewer" testID={props.testID} />;
+  return <NotImplemented name="PdfViewer" testId={props.testID} />;
 });
 
 export const WebView = forwardRef<

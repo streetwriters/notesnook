@@ -19,12 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export { AvatarEditor, DragGhostHost, PdfViewer, WebView } from "./embeds";
 export { Dialog, DialogButton } from "./dialog";
+export { default as Modal } from "react-modal";
 export * from "./hooks";
 export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./layout";
-export { VirtualList } from "./lists";
+export {
+  GroupedVirtuoso,
+  TableVirtuoso,
+  VirtualList,
+  Virtuoso
+} from "./lists";
 export { SortableList } from "./sortable-list";
 export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
+// The menu and popup hosts are the ones apps/web already uses.
+export { MenuPresenter, PopupPresenter } from "@notesnook/ui";
+export { useThemeUI } from "@theme-ui/core";
 export { showToast, ToastHost } from "./toast";
 export * from "./primitives";
 export { WebThemeProvider, ThemeScope } from "./theme";
