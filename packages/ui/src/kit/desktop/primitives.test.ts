@@ -193,6 +193,21 @@ describe("Button", () => {
   });
 });
 
+describe("Box and Flex", () => {
+  it("draw text written straight into them as text, as HTML does", () => {
+    const tree = render(h(Box, {}, "Hello ", 3, h(Box, { key: "b" })));
+    const texts = tree.root.findAll((node) => (node.type as any) === "Text");
+    expect(texts.map((node) => node.props.children)).toEqual(["Hello ", 3]);
+  });
+
+  it("leave element children as they are", () => {
+    const tree = render(h(Box, {}, h(Box, { key: "a" })));
+    expect(
+      tree.root.findAll((node) => (node.type as any) === "Text")
+    ).toHaveLength(0);
+  });
+});
+
 describe("Slider", () => {
   it("is a host element the primitives render", () => {
     render(h(Slider, { value: 5, onValueChange: vi.fn() }));

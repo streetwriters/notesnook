@@ -21,6 +21,25 @@ import { describe, expect, test } from "vitest";
 import { convertDeclarations, convertOutline, expandFlex } from "./convert";
 
 describe("sx keys taken from apps/web", () => {
+  test("start and end alignment are flex-start and flex-end", () => {
+    expect(
+      convertDeclarations({
+        alignSelf: "start",
+        alignItems: "end",
+        justifyContent: "start",
+        alignContent: "end"
+      }).style
+    ).toMatchObject({
+      alignSelf: "flex-start",
+      alignItems: "flex-end",
+      justifyContent: "flex-start",
+      alignContent: "flex-end"
+    });
+    expect(convertDeclarations({ alignItems: "center" }).style.alignItems).toBe(
+      "center"
+    );
+  });
+
   test("overflowX/overflowY set overflow; auto scrolls", () => {
     expect(convertDeclarations({ overflowY: "auto" }).style.overflow).toBe(
       "scroll"

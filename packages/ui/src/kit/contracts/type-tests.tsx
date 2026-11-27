@@ -127,9 +127,16 @@ export const mediaQuery: SxProp = {
   "@media (max-width: 480px)": { display: "none" }
 };
 
+// A theme token written as apps/web's CSS variable is that token.
 export const cssVariable: SxProp = {
-  // @ts-expect-error raw CSS variables are not tokens
-  color: "var(--paragraph)"
+  color: "var(--paragraph)",
+  border: "1px solid var(--border)",
+  alignSelf: "start"
+};
+
+export const unknownCssVariable: SxProp = {
+  // @ts-expect-error only theme tokens can be written as CSS variables
+  color: "var(--not-a-theme-color)"
 };
 
 export const unknownToken: SxProp = {

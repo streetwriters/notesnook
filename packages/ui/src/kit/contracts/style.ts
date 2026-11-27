@@ -25,7 +25,9 @@ export type ColorToken = ThemeColor | "transparent";
 
 declare const dataColorBrand: unique symbol;
 export type DataColor = string & { readonly [dataColorBrand]: true };
-export type ColorValue = ColorToken | DataColor;
+/** A theme token written as the CSS variable apps/web uses, `var(--accent)`. */
+export type CssVarColor = `var(--${ColorToken})`;
+export type ColorValue = ColorToken | DataColor | CssVarColor;
 
 /**
  * Colours that come from user data (a note's colour, a colour tag) are not
@@ -53,7 +55,8 @@ type BorderLineStyle = "solid" | "dashed" | "dotted";
 export type Border =
   | "none"
   | `${number}px ${BorderLineStyle}`
-  | `${number}px ${BorderLineStyle} ${ColorToken}`;
+  | `${number}px ${BorderLineStyle} ${ColorToken}`
+  | `${number}px ${BorderLineStyle} ${CssVarColor}`;
 
 export type Transform = {
   translateX?: number;
@@ -166,11 +169,21 @@ type LayoutProps = {
     "row" | "column" | "row-reverse" | "column-reverse"
   >;
   flexWrap?: "nowrap" | "wrap" | "wrap-reverse";
-  alignItems?: "flex-start" | "flex-end" | "center" | "stretch" | "baseline";
+  /** `start` and `end` are drawn as `flex-start` and `flex-end`. */
+  alignItems?:
+    | "flex-start"
+    | "flex-end"
+    | "start"
+    | "end"
+    | "center"
+    | "stretch"
+    | "baseline";
   alignSelf?:
     | "auto"
     | "flex-start"
     | "flex-end"
+    | "start"
+    | "end"
     | "center"
     | "stretch"
     | "baseline";
@@ -184,6 +197,8 @@ type LayoutProps = {
   justifyContent?:
     | "flex-start"
     | "flex-end"
+    | "start"
+    | "end"
     | "center"
     | "space-between"
     | "space-around"

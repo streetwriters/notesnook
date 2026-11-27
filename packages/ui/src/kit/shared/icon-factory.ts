@@ -16,28 +16,71 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { createElement, type ComponentType } from "react";
-import { Icon as UIIcon, type IconProps } from "@notesnook/ui-kit";
+import { createElement, type ReactElement } from "react";
+import {
+  Icon as UIIcon,
+  type IconProps as UIIconProps,
+  type SxProp
+} from "@notesnook/ui-kit";
 
 /**
- * An icon component. Like apps/web's icons it carries its drawing as `path`,
- * for APIs that take an icon as a string (a menu item's `icon`): an SVG path
- * for `mdiIcon`, the whole SVG document for `svgIcon`; `Icon`'s `path` prop
- * draws either.
+ * An app icon's props, as apps/web's icons take them: `rotate` spins the icon
+ * (a number turns it by that many degrees instead).
  */
-export type Icon = ComponentType<Omit<IconProps, "path" | "svg">> & {
-  /** Unset for an icon component written by hand. */
-  readonly path?: string;
+export type IconProps = Omit<UIIconProps, "path" | "svg" | "rotate"> & {
+  rotate?: boolean | number;
+  rotateDirection?: "clockwise" | "counterclockwise";
+};
+export type Icon = (props: IconProps) => ReactElement;
+
+const SPIN: Record<"clockwise" | "counterclockwise", SxProp> = {
+  clockwise: {
+    animation: {
+      keyframes: {
+        from: { transform: [{ rotate: "0deg" }] },
+        to: { transform: [{ rotate: "360deg" }] }
+      },
+      duration: 1000,
+      iterationCount: "infinite",
+      easing: "linear"
+    }
+  },
+  counterclockwise: {
+    animation: {
+      keyframes: {
+        from: { transform: [{ rotate: "360deg" }] },
+        to: { transform: [{ rotate: "0deg" }] }
+      },
+      duration: 1000,
+      iterationCount: "infinite",
+      easing: "linear"
+    }
+  }
 };
 
+function iconProps(
+  props: IconProps,
+  spins: boolean,
+  shape: { path?: string; svg?: string }
+): UIIconProps {
+  const { rotate = spins, rotateDirection, ...rest } = props;
+  if (typeof rotate === "number") return { ...rest, ...shape, rotate };
+  if (!rotate) return { ...rest, ...shape };
+  return {
+    ...rest,
+    ...shape,
+    sx: { ...SPIN[rotateDirection ?? "clockwise"], ...rest.sx }
+  };
+}
+
 export function mdiIcon(path: string, rotate = false): Icon {
-  const Component = (props: Omit<IconProps, "path" | "svg">) =>
-    createElement(UIIcon, { rotate: rotate ? 1 : undefined, ...props, path });
-  return Object.assign(Component, { path });
+  const Component: Icon = (props) =>
+    createElement(UIIcon, iconProps(props, rotate, { path }));
+  return Component;
 }
 
 export function svgIcon(svg: string, rotate = false): Icon {
-  const Component = (props: Omit<IconProps, "path" | "svg">) =>
-    createElement(UIIcon, { rotate: rotate ? 1 : undefined, ...props, svg });
-  return Object.assign(Component, { path: svg });
+  const Component: Icon = (props) =>
+    createElement(UIIcon, iconProps(props, rotate, { svg }));
+  return Component;
 }

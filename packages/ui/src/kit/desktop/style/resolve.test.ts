@@ -18,9 +18,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { describe, expect, test } from "vitest";
-import { alphaToken, resolveAlpha, resolveColor, withAlpha } from "./resolve";
+import {
+  alphaToken,
+  resolveAlpha,
+  resolveColor,
+  resolveCssVars,
+  withAlpha
+} from "./resolve";
 
 const colors = { accent: "#008837", background: "#fff" };
+
+describe("CSS variables", () => {
+  test("var(--token) is the token's colour, anywhere in a value", () => {
+    expect(resolveColor("var(--accent)", colors)).toBe("#008837");
+    expect(resolveCssVars("1px solid var(--background)", colors)).toBe(
+      "1px solid #fff"
+    );
+    expect(resolveCssVars("var(--unknown)", colors)).toBe("var(--unknown)");
+  });
+
+  test("are replaced in an sx object, states included", () => {
+    expect(
+      resolveAlpha(
+        {
+          bg: "var(--accent)",
+          border: "1px solid var(--background)",
+          ":hover": { color: "var(--background)" }
+        },
+        colors
+      )
+    ).toEqual({
+      bg: "#008837",
+      border: "1px solid #fff",
+      ":hover": { color: "#fff" }
+    });
+  });
+});
 
 describe("alpha", () => {
   test("a hex colour gets the opacity as its last two digits", () => {

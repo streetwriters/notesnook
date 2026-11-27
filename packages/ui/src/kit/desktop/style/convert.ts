@@ -244,9 +244,16 @@ export function convertDeclarations(
   let ellipsis = false;
 
   for (const key in declarations) {
-    const value = declarations[key];
+    let value = declarations[key];
     if (value === undefined || value === null) continue;
     switch (key) {
+      case "alignItems":
+      case "alignSelf":
+      case "alignContent":
+      case "justifyContent":
+        if (value === "start") value = "flex-start";
+        else if (value === "end") value = "flex-end";
+        break;
       case "display":
         if (value === "none") style.display = "none";
         else if (value === "flex") isFlex = true;

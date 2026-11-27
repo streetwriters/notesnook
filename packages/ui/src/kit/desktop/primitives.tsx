@@ -157,6 +157,12 @@ function useLabelControl(control: ElementControl) {
   useEffect(() => label?.register(control), [label, control]);
 }
 
+function hasText(children: ReactNode): boolean {
+  if (typeof children === "string" || typeof children === "number")
+    return true;
+  return Array.isArray(children) && children.some(hasText);
+}
+
 function Container(
   props: Contract.BoxProps & {
     variantGroup?: "variants";
@@ -196,12 +202,16 @@ function Container(
     [isForm, element]
   );
 
+  // Text written straight into a box, as HTML allows, is drawn as text.
+  const text = hasText(children)
+    ? wrapChildren(children, mergedTextStyle)
+    : children;
   let content = textStyle ? (
     <InheritedTextStyle.Provider value={mergedTextStyle}>
-      {children}
+      {text}
     </InheritedTextStyle.Provider>
   ) : (
-    children
+    text
   );
   if (form)
     content = (
@@ -910,8 +920,9 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   ref
 ) {
   const context = useThemeContext();
-  const { nativeProps, viewStyle } = useStyled(props);
+  const { resolved, nativeProps, viewStyle } = useStyled(props);
   const [setRef] = useElementRef(ref, { id: props.id });
+  const IconView = resolved.animated ? AnimatedView : AnyView;
   const size = props.size ?? 24;
   const svg = props.svg ?? (isSvgDocument(props.path) ? props.path : undefined);
   const pixels =
@@ -928,7 +939,7 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
       ]
     : viewStyle.transform;
   return (
-    <AnyView
+    <IconView
       ref={setRef}
       {...nativeProps}
       style={{
@@ -945,7 +956,7 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
           <Path d={props.path} fill={color} />
         </Svg>
       )}
-    </AnyView>
+    </IconView>
   );
 });
 

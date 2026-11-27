@@ -143,6 +143,12 @@ export function resolveSx(
 const EMPTY: SxProp = {};
 
 const ALPHA = /^alpha\((.+),\s*(-?\d*\.?\d+)\)$/;
+const CSS_VAR = /var\(--([A-Za-z0-9-]+)\)/g;
+
+/** `var(--token)` (as apps/web writes colours) replaced by the token's colour. */
+export function resolveCssVars(value: string, colors: Record<string, string>) {
+  return value.replace(CSS_VAR, (whole, token: string) => colors[token] ?? whole);
+}
 const HEX_COLOR = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
 /** The value `alpha()` from the kit's hooks returns for `color` at `amount`. */
@@ -167,13 +173,17 @@ export function withAlpha(color: string, amount: number) {
 
 /** The colour of a theme token, an `alpha()` value or a literal. */
 export function resolveColor(value: string, colors: Record<string, string>) {
+  if (value.includes("var(--")) return resolveCssVars(value, colors);
   const match = value.startsWith("alpha(") ? ALPHA.exec(value) : null;
   if (!match) return colors[value] ?? value;
   const color = match[1].trim();
   return withAlpha(colors[color] ?? color, parseFloat(match[2]));
 }
 
-/** Replaces every `alpha()` value in `declarations` with its colour. */
+/**
+ * Replaces every `alpha()` value, and every `var(--token)` in a value, in
+ * `declarations` with its colour.
+ */
 export function resolveAlpha<T extends object>(
   declarations: T,
   colors: Record<string, string>
@@ -184,6 +194,7 @@ export function resolveAlpha<T extends object>(
     let next = value;
     if (typeof value === "string") {
       if (value.startsWith("alpha(")) next = resolveColor(value, colors);
+      else if (value.includes("var(--")) next = resolveCssVars(value, colors);
     } else if (value && typeof value === "object" && !Array.isArray(value))
       next = resolveAlpha(value, colors);
     if (next !== value)
