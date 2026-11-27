@@ -24,10 +24,10 @@ import { db } from "../../common/db";
 import { handleInternalLink } from "../../common";
 import { parseInternalLink } from "@notesnook/core";
 import {
-  decryptAttachmentToTempFile,
   previewImageAttachment,
   saveAttachment
 } from "../../common/attachments";
+import { decryptAttachmentToTempFile } from "./attachment-temp";
 import { removeTempFile } from "../../common/fs";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useUserStore } from "../../stores/user-store";

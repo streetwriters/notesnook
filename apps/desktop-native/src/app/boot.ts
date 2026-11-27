@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EV, EVENTS } from "@notesnook/core";
 import { config, environment, history, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
-import { initLocaleSync } from "./common/locale";
+import { initLocaleSync } from "./common/locale-sync";
 import { getCurrentPath } from "./navigation";
 import { DEFAULT_ITERATIONS, useKeyStore } from "./interfaces/key-store";
 import { randomBytes } from "./interfaces/subtle";

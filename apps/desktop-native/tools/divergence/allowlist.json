@@ -567,26 +567,6 @@
       "reason": "Native has no HTML form: AuthFormContext carries field values and submit, fields are controlled inputs, and links open through the shell service instead of window.open."
     },
     {
-      "path": "views/wrapped.tsx",
-      "category": "platform",
-      "reason": "Slides use the kit's SxProp and a native visibility check instead of IntersectionObserver, which the GPUI host does not have."
-    },
-    {
-      "path": "views/plans.tsx",
-      "category": "platform",
-      "reason": "Uses data-test-id/flex layout of the native host and converts the plan colours with dataColor() because the host has no CSS colour strings."
-    },
-    {
-      "path": "views/notebooks.tsx",
-      "category": "platform",
-      "reason": "Filter box is the native FilterField and the tree handle/selection are typed for the native virtualized tree; web reads an HTMLInputElement ref."
-    },
-    {
-      "path": "views/tags.tsx",
-      "category": "platform",
-      "reason": "Filter box is the native FilterField (onChangeText, debounced) instead of an <Input ref> read through an HTMLInputElement, and the list uses placeholderSx."
-    },
-    {
       "path": "views/email-confirmed.tsx",
       "category": "platform",
       "reason": "Redirects through hardNavigate (no window.location) and lays out with the native Flex/ScrollContainer instead of overflowY on a div."
@@ -687,11 +667,6 @@
       "reason": "Menus are presented by the kit's menu presenter with a native anchor; the Electron native-menu bridge and PositionOptions do not exist."
     },
     {
-      "path": "hooks/use-resolved-item.ts",
-      "category": "desktop-only",
-      "reason": "Resolves an item for a list row on the native virtualized lists; web renders rows from the list itself."
-    },
-    {
       "path": "hooks/use-escape.ts",
       "category": "desktop-only",
       "reason": "Closes dialogs on Escape through the native keyboard service; web relies on DOM keydown handlers."
@@ -752,11 +727,6 @@
       "reason": "Reads environment.isTesting/isDesktopApp instead of the build constants IS_TESTING/IS_DESKTOP_APP."
     },
     {
-      "path": "common/vault.ts",
-      "category": "platform",
-      "reason": "Explicit Promise<boolean> return types; the native Dialog.show typing does not infer them."
-    },
-    {
       "path": "common/key-map.ts",
       "category": "platform",
       "reason": "Shortcuts are registered through keyboard.register and the editor check is KeyEvent.inEditor, replacing hotkeys-js and the DOM closest() lookup."
@@ -764,7 +734,7 @@
     {
       "path": "common/locale.ts",
       "category": "platform",
-      "reason": "Locale comes from environment.locale, and initLocaleSync wires the saved language to the intl package."
+      "reason": "Locale comes from environment.locale; web reads navigator.language and window.appLocale."
     },
     {
       "path": "common/index.ts",
@@ -784,7 +754,7 @@
     {
       "path": "common/attachments.tsx",
       "category": "platform",
-      "reason": "Adds decryptAttachmentToTempFile for the PDF/preview services and opens the lightbox with Lightbox.show instead of ReactDOM.render into #dialogContainer."
+      "reason": "Exports download for the native editor's temp-file helper, and opens the lightbox with Lightbox.show because the native host has no DOM (no #dialogContainer or ReactDOM.render)."
     },
     {
       "path": "common/db.ts",
@@ -792,14 +762,9 @@
       "reason": "Database key, storage and dialect come from the databaseHost service (WAL, keychain) instead of IndexedDB/OPFS and import.meta.env host overrides."
     },
     {
-      "path": "common/dialog-manager.tsx",
-      "category": "platform",
-      "reason": "Dialogs are tracked in a store and rendered by the root host instead of createRoot into a detached container."
-    },
-    {
       "path": "common/fs.ts",
       "category": "platform",
-      "reason": "Wraps @platform/files (saveBytes, temp files) for common/export and attachments; web uses file-saver and streams."
+      "reason": "Thin re-exports of the attachmentFiles platform service (decrypt, upload check, save, temp files); holds no logic of its own."
     },
     {
       "path": "common/not-implemented.ts",
@@ -1000,6 +965,16 @@
       "path": "hooks/use-keyboard-list-navigation.ts",
       "category": "platform",
       "reason": "Handles the kit's UIKeyboardEvent/UIMouseEvent (no DOM KeyboardEvent/MouseEvent) and keeps the arrow-key handling inline instead of web's keydownHandler helper."
+    },
+    {
+      "path": "common/locale-sync.ts",
+      "category": "desktop-only",
+      "reason": "Synchronous start-up locale for the native boot and the web kit target; web only has the async initLocale."
+    },
+    {
+      "path": "components/editor/attachment-temp.ts",
+      "category": "native-editor",
+      "reason": "Decrypts an attachment to a temp file for the native editor's PDF and preview host actions; web's Tiptap editor reads attachments in the page."
     }
   ]
 }
