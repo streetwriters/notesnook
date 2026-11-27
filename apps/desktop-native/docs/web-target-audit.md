@@ -241,7 +241,7 @@ primitive on the new test page (below):
 | F8 Dialog | Fixed | `role="dialog"`, `aria-modal`, `aria-label`, focus moved in on open and restored on close, Tab kept inside. Not portalled (see N12). |
 | F9 VirtualList | Fixed | Windowed: only the items in the viewport plus `overscan` pixels (default 200) are mounted, at offsets from measured heights. `scrollToIndex` works for unmounted items and honours `animated`; `initialScrollIndex` runs for any index above 0. |
 | F10 SortableList | Fixed | Drops and hover from another `group` are ignored. `index` stays the index of the drop target. |
-| F11 Popover | Partly fixed | Flip/clamp and rect anchoring came with 3.3, and Escape now closes it (through the shared escape stack). Still open: position does not follow scroll or anchor movement, no focus management, and every popover is a `contextMenu` scope. Left for the editor popups in 4.x/7.13. |
+| F11 Popover | Partly fixed | Flip/clamp and rect anchoring came with 3.3, and Escape now closes it (through the shared escape stack). On the web a popover draws in a `document.body` layer, so it no longer needs a `PopoverHost` that `apps/web` never mounted. Still open: position does not follow scroll or anchor movement, no focus management, and every popover is a `contextMenu` scope. Left for the editor popups in 4.x/7.13. |
 | F12 Toast | Fixed | One id per call (equal messages stack, `hide()` hides only its own), the container is `role="status"` with `aria-live`, action keys include the index. |
 | F13 EditorSurface | Open | Imports `apps/web`, so it stays in the app; its `sx`, preview and progress gaps belong to the editor integration (5.x/7.1(c)). |
 | F14 PdfViewer, AvatarEditor | Open | Placeholders by design; the editor UI does not use them. |
