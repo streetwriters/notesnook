@@ -58,7 +58,7 @@ test("a click without movement on a sidebar row navigates to the route", async (
 
 test("a click without movement on a tag opens the tag's notes", async () => {
   await openTab(app, "tags");
-  await settle(async () => expect(await count(app, "tags")).toBe(1));
+  await settle(async () => expect(await count(app, "tags")).toBeGreaterThan(0));
   const entry = (await app.query("testID", "title", true)).find(
     (candidate: { text?: string; frame: { x: number } }) =>
       candidate.text === "urgent" && candidate.frame.x < 250

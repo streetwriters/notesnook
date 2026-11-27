@@ -133,21 +133,23 @@ function EditorFooter() {
           height: "100%"
         }}
       >
-        {tools.map((tool) => (
-          <>
-            <StatusBarItem
-              variant="button"
-              data-test-id={tool.title}
-              disabled={!tool.enabled}
-              title={tool.title}
-              key={tool.title}
-              onClick={tool.onClick}
-              sx={{ display: tool.hidden ? "none" : "flex" }}
-              icon={tool.icon}
-            />
-            {!tool.hidden && <EditorFooterSeparator />}
-          </>
-        ))}
+        {tools
+          .filter((tool) => !tool.hidden)
+          .map((tool) => (
+            <>
+              <StatusBarItem
+                variant="button"
+                data-test-id={tool.title}
+                disabled={!tool.enabled}
+                title={tool.title}
+                key={tool.title}
+                onClick={tool.onClick}
+                sx={{ display: tool.hidden ? "none" : "flex" }}
+                icon={tool.icon}
+              />
+              {!tool.hidden && <EditorFooterSeparator />}
+            </>
+          ))}
         <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
           <StatusBarItem
             variant="button"

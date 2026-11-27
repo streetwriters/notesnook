@@ -54,7 +54,7 @@
     {
       "path": "components/editor/footer.tsx",
       "category": "platform",
-      "reason": "Fullscreen goes through @platform windowControls (utils/fullscreen) instead of document.documentElement.requestFullscreen(), the selected-words note is a kit Text instead of a DOM <span>, and the zoom and statistics controls carry the test ids the desktop e2e specs find them by; sx values the kit cannot draw (fit-content, a raw box-shadow, !important) use the nearest tokens."
+      "reason": "Fullscreen goes through @platform windowControls (utils/fullscreen) instead of document.documentElement.requestFullscreen(), hidden tools are left out rather than drawn with display: none (the desktop test driver finds hidden nodes by test id), the selected-words note is a kit Text instead of a DOM <span>, and the zoom and statistics controls carry the test ids the desktop e2e specs find them by; sx values the kit cannot draw (fit-content, a raw box-shadow, !important) use the nearest tokens."
     },
     {
       "path": "components/editor/title-box.tsx",

@@ -21,7 +21,7 @@ describe("opening a note", () => {
   test("the editor area has the title box, the tag row and an empty body", async () => {
     await clickId(app, "create-new-note");
     await settle(async () => expect(await count(app, "editor-title")).toBe(1));
-    expect(await count(app, "editor-tags")).toBe(1);
+    expect(await count(app, "tags")).toBe(1);
     expect(await count(app, "editor-body")).toBe(1);
     expect(await count(app, "editor-tabs-view")).toBe(1);
   });

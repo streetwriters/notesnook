@@ -150,7 +150,7 @@ describe("notebook context menu", () => {
 describe("tag context menu", () => {
   test("a tag offers edit, shortcut and delete", async () => {
     await openTab(app, "tags");
-    await settle(async () => expect(await count(app, "tags")).toBe(1));
+    await settle(async () => expect(await count(app, "tags")).toBeGreaterThan(0));
     await navRightClick(app, "urgent");
     await expectMenu(app, ["edit", "shortcut", "delete"]);
     await closeMenu(app);

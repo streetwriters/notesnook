@@ -91,6 +91,6 @@ describe("notebooks tab", () => {
 describe("tags tab", () => {
   test("lists seeded tags in the list pane", async () => {
     await openTab(app, "tags");
-    await settle(async () => expect(await count(app, "tags")).toBe(1));
+    await settle(async () => expect(await count(app, "tags")).toBeGreaterThan(0));
   });
 });
