@@ -16,7 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { normalizeToHtmlBody, sanitizeHtml } from "../html-parser.js";
+import {
+  extractMatchingBlocks,
+  normalizeToHtmlBody,
+  sanitizeHtml
+} from "../html-parser.js";
 import { expect, describe, it } from "vitest";
 
 const HTML_INPUT_TYPES: Array<{
@@ -295,5 +299,70 @@ describe("sanitizeHtml", () => {
     expect(result).toContain("Safe content");
     expect(result).toContain("<iframe");
     expect(result).toContain('src="https://example.com"');
+  });
+});
+
+describe("extractMatchingBlocks", () => {
+  const TAG = "nn-search-result";
+  const m = (text: string) => `<${TAG}>${text}</${TAG}>`;
+
+  it("returns only blocks that contain a match", () => {
+    expect(
+      extractMatchingBlocks(`<p>no match</p><p>a ${m("x")} b</p>`, TAG)
+    ).toEqual([`a ${m("x")} b`]);
+  });
+
+  it("keeps text around inline formatting in the same block", () => {
+    expect(
+      extractMatchingBlocks(`<p>a <u>b</u> <s>c</s> ${m("x")} d</p>`, TAG)
+    ).toEqual([`a b c ${m("x")} d`]);
+  });
+
+  it("does not split blocks on inline tags it doesn't know about", () => {
+    expect(
+      extractMatchingBlocks(
+        `<p>a <strike>old</strike> <font>f</font> b ${m("x")} c</p>`,
+        TAG
+      )
+    ).toEqual([`a old f b ${m("x")} c`]);
+  });
+
+  it("keeps a match in a list item that is followed by a nested list", () => {
+    expect(
+      extractMatchingBlocks(
+        `<ul><li>top ${m("x")}<ul><li>child</li></ul></li></ul>`,
+        TAG
+      )
+    ).toEqual([`top ${m("x")}`]);
+  });
+
+  it("keeps a match in a nested list item", () => {
+    expect(
+      extractMatchingBlocks(
+        `<ul><li>top<ul><li>child ${m("x")}</li></ul> tail</li></ul>`,
+        TAG
+      )
+    ).toEqual([`child ${m("x")}`]);
+  });
+
+  it("returns each matching block separately", () => {
+    expect(
+      extractMatchingBlocks(
+        `<h1>${m("x")} title</h1><p>skip</p><td>cell ${m("x")}</td>`,
+        TAG
+      )
+    ).toEqual([`${m("x")} title`, `cell ${m("x")}`]);
+  });
+
+  it("converts <br> to newlines", () => {
+    expect(extractMatchingBlocks(`<p>a<br>${m("x")}</p>`, TAG)).toEqual([
+      `a\n${m("x")}`
+    ]);
+  });
+
+  it("keeps the match id attribute", () => {
+    expect(
+      extractMatchingBlocks(`<p><${TAG} id="1">x</${TAG}></p>`, TAG)
+    ).toEqual([`<${TAG} id="1">x</${TAG}>`]);
   });
 });

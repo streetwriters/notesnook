@@ -512,7 +512,12 @@ export default class Lookup {
                     .where("data", "match", query)
                     .select("noteId")
                 ),
-              (regex) => eb("content.data", "regexp", sql<string>`${regex}`)
+              (regex) =>
+                eb(
+                  "content.data",
+                  "regexp",
+                  sql<string>`${`(^|>)([^<&]|&[#a-zA-Z0-9]+;)*(${regex})`}`
+                )
             )
           )
           .select([
@@ -1172,6 +1177,22 @@ function transformTokens(tokens: QueryTokens | undefined) {
 }
 
 /**
+ * SQLite's regexp extension has no case-insensitive flag so we
+ * expand each letter into a [xX] character class instead.
+ */
+function toCaseInsensitiveRegex(term: string) {
+  return Array.from(term)
+    .map((c) => {
+      const lower = c.toLowerCase();
+      const upper = c.toUpperCase();
+      if (lower !== upper && lower.length === 1 && upper.length === 1)
+        return `[${lower}${upper}]`;
+      return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    })
+    .join("");
+}
+
+/**
  * Compiles a query expression containing short terms into an SQL
  * expression. Short terms are matched as substrings using regex
  * while everything else is matched using FTS.
@@ -1184,7 +1205,7 @@ function compileExpression<DB, TB extends keyof DB>(
 ): Expression<SqlBool> {
   if (!hasShortTerms(expression)) return match(serializeExpression(expression));
   if (expression.type === "term")
-    return regex(expression.value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    return regex(toCaseInsensitiveRegex(expression.value));
 
   const left = compileExpression(eb, expression.left, match, regex);
   const right = compileExpression(eb, expression.right, match, regex);

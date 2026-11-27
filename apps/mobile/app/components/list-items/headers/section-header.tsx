@@ -39,7 +39,6 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 
-
 type SectionHeaderProps = {
   item: GroupHeader;
   index: number;
@@ -100,6 +99,7 @@ export const SectionHeader = React.memo<
           }}
         >
           <Pressable
+            disabled={screen === "Search"}
             onPress={() => {
               onOpenJumpToDialog();
             }}

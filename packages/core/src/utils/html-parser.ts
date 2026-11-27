@@ -332,57 +332,67 @@ export class HTMLParser {
   }
 }
 
-const INLINE_TAGS = [
-  "a",
-  "abbr",
-  "acronym",
-  "b",
-  "bdo",
-  "big",
-  "br",
-  "button",
-  "cite",
-  "code",
-  "dfn",
-  "em",
-  "i",
-  "img",
-  "input",
-  "kbd",
-  "label",
-  "map",
-  "object",
-  "output",
-  "q",
-  "samp",
-  "script",
-  "select",
-  "small",
-  "span",
-  "strong",
-  "sub",
-  "sup",
-  "textarea",
-  "time",
-  "tt",
-  "var"
-];
+const BLOCK_TAGS = new Set([
+  "address",
+  "article",
+  "aside",
+  "blockquote",
+  "body",
+  "caption",
+  "dd",
+  "details",
+  "div",
+  "dl",
+  "dt",
+  "fieldset",
+  "figcaption",
+  "figure",
+  "footer",
+  "form",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "hr",
+  "html",
+  "iframe",
+  "li",
+  "main",
+  "nav",
+  "ol",
+  "p",
+  "pre",
+  "section",
+  "summary",
+  "table",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "tr",
+  "ul"
+]);
 
 export function extractMatchingBlocks(html: string, matchTagName: string) {
   const matches: string[] = [];
   let text = "";
-  let openedTag: string | undefined = undefined;
   let hasMatches = false;
+
+  function flush() {
+    if (hasMatches && text) matches.push(text);
+    text = "";
+    hasMatches = false;
+  }
 
   const parser = new Parser(
     {
       ontext: (data) => (text += data),
       onopentag(name, attributes) {
-        if (!INLINE_TAGS.includes(name) && name !== matchTagName) {
-          openedTag = name;
-          text = "";
-          hasMatches = false;
-        }
+        if (BLOCK_TAGS.has(name)) flush();
         if (name === matchTagName) {
           hasMatches = true;
           let tagString = `<${name}`;
@@ -395,13 +405,8 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
       },
       onclosetag(name) {
         if (name === "br") text += "\n";
-        if (name === openedTag) {
-          if (hasMatches) matches.push(text);
-          text = "";
-          hasMatches = false;
-          openedTag = undefined;
-        }
         if (name === matchTagName) text += `</${name}>`;
+        else if (BLOCK_TAGS.has(name)) flush();
       }
     },
     {
@@ -410,7 +415,7 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
     }
   );
   parser.end(html);
-  if (hasMatches && text) matches.push(text);
+  flush();
 
   return matches;
 }

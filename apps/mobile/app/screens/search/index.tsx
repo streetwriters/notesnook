@@ -93,7 +93,6 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         if (currentQuery.current !== query) return;
         if (!results) {
           setSearchStatus(strings.noResultsFound(query));
-          setLoading(false);
           return;
         }
 
@@ -109,10 +108,11 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         } else {
           setSearchStatus(undefined);
         }
-        setLoading(false);
       } catch (e) {
         ToastManager.error(e as Error);
         DatabaseLogger.error(e);
+      } finally {
+        if (currentQuery.current === query) setLoading(false);
       }
     },
     [route.params?.items, route.params.type]
