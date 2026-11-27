@@ -520,6 +520,486 @@
       "path": "dialogs/settings/components/circle-partners.tsx",
       "category": "platform",
       "reason": "Web draws the partner logos with a raw <img> element; desktop uses the kit's Image."
+    },
+    {
+      "path": "components/editor/index.tsx",
+      "category": "native-editor",
+      "reason": "Hosts the native editor (EditorSurface with its toolbar, host actions and plan permissions) where web mounts Tiptap with its DOM drop zone, scroll restore and search-result scrolling; saveContent, the tabs view, the download progress and the unlock view follow web's."
+    },
+    {
+      "path": "components/editor/table-of-contents.tsx",
+      "category": "native-editor",
+      "reason": "A heading is reached by asking the native editor to scroll to it (scrollToHeading); web scrolls the DOM node (scrollIntoViewById) and marks the headings in view from the editor's DOM scroll position, which the native editor does not expose."
+    },
+    {
+      "path": "components/editor/use-denied-permissions.ts",
+      "category": "native-editor",
+      "reason": "Turns the plan's features into the command ids the native editor refuses (callout, outline and task lists, attachments, CSV tables); web's Tiptap editor checks them in its own permission handler."
+    },
+    {
+      "path": "components/editor/picker.ts",
+      "category": "platform",
+      "reason": "Picked files come from @platform/files (PickedFile) and are hashed from their bytes with the platform's xxh64; web streams a DOM File into hashStream, reads image sizes with an <img> element and queues with p-queue (not a desktop dependency, so a local queue with its API stands in)."
+    },
+    {
+      "path": "components/editor/footer.tsx",
+      "category": "platform",
+      "reason": "Fullscreen goes through @platform windowControls (utils/fullscreen) instead of document.documentElement.requestFullscreen(), hidden tools are left out rather than drawn with display: none (the desktop test driver finds hidden nodes by test id), the word count falls back to counting the stored note until the native editor reports its statistics, the selected-words note is a kit Text instead of a DOM <span>, and the zoom and statistics controls carry the test ids the desktop e2e specs find them by; sx values the kit cannot draw (fit-content, a raw box-shadow, !important) use the nearest tokens."
+    },
+    {
+      "path": "components/editor/action-bar.tsx",
+      "category": "platform",
+      "reason": "Desktop's tab strip and tools are written on the kit (SortableList instead of dnd-kit's ReorderableList, @platform window controls and drag data instead of DOM events, no publish tool wiring yet); web's EditorActionBar also reads DOM-only window state. Full alignment is filed as a follow-up."
+    },
+    {
+      "path": "components/editor/title-box.tsx",
+      "category": "platform",
+      "reason": "The kit's native text field is not a DOM textarea: it has no style.height or field-sizing to auto-grow, no selectionDirection, no instanceof HTMLTextAreaElement, no em font sizes or CSS font stacks, and preventDefault on Enter does not stop the newline, so the title is a controlled value that drops newlines and moves focus to the editor on Enter."
+    },
+    {
+      "path": "app.tsx",
+      "category": "platform",
+      "reason": "Root component of the native host: takes the title-bar inset, waits for the database host (useDatabaseReady), uses the kit's SplitPaneHandle and drops web-only startup code (WebExtensionRelay, console.timeEnd, window focus/fullscreen DOM state)."
+    },
+    {
+      "path": "views/auth.tsx",
+      "category": "platform",
+      "reason": "Native has no HTML form: AuthFormContext carries field values and submit, fields are controlled inputs, and links open through the shell service instead of window.open."
+    },
+    {
+      "path": "views/wrapped.tsx",
+      "category": "platform",
+      "reason": "Slides use the kit's SxProp and a native visibility check instead of IntersectionObserver, which the GPUI host does not have."
+    },
+    {
+      "path": "views/plans.tsx",
+      "category": "platform",
+      "reason": "Uses data-test-id/flex layout of the native host and converts the plan colours with dataColor() because the host has no CSS colour strings."
+    },
+    {
+      "path": "views/notebooks.tsx",
+      "category": "platform",
+      "reason": "Filter box is the native FilterField and the tree handle/selection are typed for the native virtualized tree; web reads an HTMLInputElement ref."
+    },
+    {
+      "path": "views/tags.tsx",
+      "category": "platform",
+      "reason": "Filter box is the native FilterField (onChangeText, debounced) instead of an <Input ref> read through an HTMLInputElement, and the list uses placeholderSx."
+    },
+    {
+      "path": "views/email-confirmed.tsx",
+      "category": "platform",
+      "reason": "Redirects through hardNavigate (no window.location) and lays out with the native Flex/ScrollContainer instead of overflowY on a div."
+    },
+    {
+      "path": "views/app-lock.tsx",
+      "category": "platform",
+      "reason": "Waits for the key store to initialize and reveals the window (useWindowReveal) once the lock screen is drawn; password entry is a controlled field because the native host has no input refs."
+    },
+    {
+      "path": "views/checkout.tsx",
+      "category": "platform",
+      "reason": "Checkout page of the native host: validates the plan without zod, draws the logo with <Logo>, and uses kit colour tokens/borders; web's ReactNativeWebView bridge and CSS-only sizes have no native counterpart."
+    },
+    {
+      "path": "views/payments.tsx",
+      "category": "platform",
+      "reason": "Paddle's overlay checkout cannot run in the GPUI host: the screen shows a toast and navigates back instead of initializePaddle."
+    },
+    {
+      "path": "views/recovery.tsx",
+      "category": "platform",
+      "reason": "Native has no history.replaceState/window.open (uses hardNavigate), no <input type=radio> (drawn with Flex/Box) and lays out with kit tokens instead of CSS strings."
+    },
+    {
+      "path": "views/notes.tsx",
+      "category": "platform",
+      "reason": "React 19 types have no global JSX namespace (ReactNode), and the drop handler receives the platform's UIDataTransfer event."
+    },
+    {
+      "path": "hooks/use-tip.ts",
+      "category": "platform",
+      "reason": "Opens help links through the shell service rather than window.open."
+    },
+    {
+      "path": "hooks/use-timer.ts",
+      "category": "platform",
+      "reason": "React 19 types require an initial argument to useRef (useRef<number | undefined>(undefined))."
+    },
+    {
+      "path": "hooks/use-auto-updater.ts",
+      "category": "platform",
+      "reason": "Reads environment.isDesktopApp instead of the IS_DESKTOP_APP build constant."
+    },
+    {
+      "path": "hooks/use-copy-to-clipboard.ts",
+      "category": "platform",
+      "reason": "Writes through the clipboard service instead of navigator.clipboard."
+    },
+    {
+      "path": "hooks/use-routes.ts",
+      "category": "platform",
+      "reason": "Reads the location with usePathname from the native navigation instead of wouter's useLocation."
+    },
+    {
+      "path": "hooks/use-system-theme.ts",
+      "category": "platform",
+      "reason": "System theme comes from the integration service (getSystemTheme/onSystemThemeChanged), not prefers-color-scheme or the Electron tRPC bridge."
+    },
+    {
+      "path": "hooks/use-window-focus.ts",
+      "category": "platform",
+      "reason": "Focus/blur comes from lifecycle.onVisibilityChanged, not window focus/blur events."
+    },
+    {
+      "path": "hooks/use-spell-checker.ts",
+      "category": "platform",
+      "reason": "Calls the spellChecker service instead of the Electron tRPC client, and re-exports the Language type from the service."
+    },
+    {
+      "path": "hooks/use-window-controls.ts",
+      "category": "platform",
+      "reason": "Re-exports the window state hook of the windowControls platform service; web subscribes to the Electron bridge and fullscreenchange."
+    },
+    {
+      "path": "hooks/use-drag-handler.ts",
+      "category": "platform",
+      "reason": "The native host reports drag enter/leave itself (no DOM bounds or HTMLElement targets), so the hook always reports an enter/leave."
+    },
+    {
+      "path": "hooks/use-media-query.ts",
+      "category": "platform",
+      "reason": "Re-exports the platform's media query hook; the GPUI host has no window.matchMedia."
+    },
+    {
+      "path": "hooks/use-hash-location.ts",
+      "category": "platform",
+      "reason": "Hash and query come from the native navigation (getCurrentHash, NavigationEvents) as there is no window.location or hashchange event."
+    },
+    {
+      "path": "hooks/use-slider.ts",
+      "category": "platform",
+      "reason": "Slides are driven by an index state, not by scroll positions of DOM nodes, since native has no scroll-snap container."
+    },
+    {
+      "path": "hooks/use-menu.ts",
+      "category": "platform",
+      "reason": "Menus are presented by the kit's menu presenter with a native anchor; the Electron native-menu bridge and PositionOptions do not exist."
+    },
+    {
+      "path": "hooks/use-resolved-item.ts",
+      "category": "desktop-only",
+      "reason": "Resolves an item for a list row on the native virtualized lists; web renders rows from the list itself."
+    },
+    {
+      "path": "hooks/use-escape.ts",
+      "category": "desktop-only",
+      "reason": "Closes dialogs on Escape through the native keyboard service; web relies on DOM keydown handlers."
+    },
+    {
+      "path": "stores/editor-store.ts",
+      "category": "platform",
+      "reason": "Waits for the database host (whenDatabaseReady) before creating a session; web's database is ready at startup."
+    },
+    {
+      "path": "stores/theme-store.ts",
+      "category": "platform",
+      "reason": "Calls integration.changeTheme instead of the Electron tRPC bridge."
+    },
+    {
+      "path": "stores/app-store.ts",
+      "category": "platform",
+      "reason": "Online state comes from lifecycle.isOnline() and fullscreen exit from the windowControls service, not navigator.onLine/document.fullscreenElement."
+    },
+    {
+      "path": "stores/user-store.ts",
+      "category": "platform",
+      "reason": "Session expiry navigates through the native navigation, and the logged-in flag is persisted to Config for the app lock boot path."
+    },
+    {
+      "path": "stores/announcement-store.js",
+      "category": "platform",
+      "reason": "Reads environment.platform/os/isTesting and the network policy instead of window.os, PLATFORM and IS_TESTING build constants."
+    },
+    {
+      "path": "stores/reminder-store.ts",
+      "category": "platform",
+      "reason": "Reminders are delivered through the notifications service instead of the Notification API or the Electron bridge."
+    },
+    {
+      "path": "stores/setting-store.ts",
+      "category": "platform",
+      "reason": "Desktop integration, updater and backup directory settings come from the integration/updater services instead of the Electron tRPC client and PATHS."
+    },
+    {
+      "path": "stores/boot-store.ts",
+      "category": "desktop-only",
+      "reason": "Tracks the native boot phases (database host, key store) before the app is drawn; web has no boot screen."
+    },
+    {
+      "path": "common/drop-handler.ts",
+      "category": "platform",
+      "reason": "The drop event carries the platform's UIDataTransfer, not the DOM DataTransfer."
+    },
+    {
+      "path": "common/store.ts",
+      "category": "platform",
+      "reason": "Reads environment.isDev instead of import.meta.env.DEV."
+    },
+    {
+      "path": "common/notices.ts",
+      "category": "platform",
+      "reason": "Reads environment.isTesting/isDesktopApp instead of the build constants IS_TESTING/IS_DESKTOP_APP."
+    },
+    {
+      "path": "common/vault.ts",
+      "category": "platform",
+      "reason": "Explicit Promise<boolean> return types; the native Dialog.show typing does not infer them."
+    },
+    {
+      "path": "common/key-map.ts",
+      "category": "platform",
+      "reason": "Shortcuts are registered through keyboard.register and the editor check is KeyEvent.inEditor, replacing hotkeys-js and the DOM closest() lookup."
+    },
+    {
+      "path": "common/locale.ts",
+      "category": "platform",
+      "reason": "Locale comes from environment.locale, and initLocaleSync wires the saved language to the intl package."
+    },
+    {
+      "path": "common/index.ts",
+      "category": "platform",
+      "reason": "Actions wait for the database host; titles are lazy getters so they follow the language; restoreBackupFile takes a PickedFile; IS_* constants are read from environment."
+    },
+    {
+      "path": "common/export.ts",
+      "category": "platform",
+      "reason": "Printing goes through shell.printHtml and files are saved with saveBytes (no iframe, file-saver or Buffer in the host)."
+    },
+    {
+      "path": "common/themes-router.ts",
+      "category": "platform",
+      "reason": "A small fetch-based client for the theme server replaces tRPC's browser client, which needs DOM fetch/React Query plumbing."
+    },
+    {
+      "path": "common/attachments.tsx",
+      "category": "platform",
+      "reason": "Adds decryptAttachmentToTempFile for the PDF/preview services and opens the lightbox with Lightbox.show instead of ReactDOM.render into #dialogContainer."
+    },
+    {
+      "path": "common/db.ts",
+      "category": "platform",
+      "reason": "Database key, storage and dialect come from the databaseHost service (WAL, keychain) instead of IndexedDB/OPFS and import.meta.env host overrides."
+    },
+    {
+      "path": "common/dialog-manager.tsx",
+      "category": "platform",
+      "reason": "Dialogs are tracked in a store and rendered by the root host instead of createRoot into a detached container."
+    },
+    {
+      "path": "common/fs.ts",
+      "category": "platform",
+      "reason": "Wraps @platform/files (saveBytes, temp files) for common/export and attachments; web uses file-saver and streams."
+    },
+    {
+      "path": "common/not-implemented.ts",
+      "category": "desktop-only",
+      "reason": "Placeholder actions for features that web has through browser APIs and native has not built yet."
+    },
+    {
+      "path": "common/toolbar-definitions.ts",
+      "category": "native-editor",
+      "reason": "Toolbar item definitions for the native editor toolbar. The Tiptap toolbar in web is defined inside the editor package."
+    },
+    {
+      "path": "common/toolbar-icons.ts",
+      "category": "native-editor",
+      "reason": "Icon map for the native editor toolbar. The Tiptap toolbar in web is defined inside the editor package."
+    },
+    {
+      "path": "common/toolbar-types.ts",
+      "category": "native-editor",
+      "reason": "Types for the native editor toolbar. The Tiptap toolbar in web is defined inside the editor package."
+    },
+    {
+      "path": "interfaces/key-value.ts",
+      "category": "platform",
+      "reason": "KVStore contract of @platform/kvStore (async key/value over MMKV); web's IndexedDB-backed interface is not available in the host."
+    },
+    {
+      "path": "interfaces/key-store.ts",
+      "category": "platform",
+      "reason": "Persists secrets through the platform kvStore/safeStorage (PlatformKVStore) and tracks isInitialized/app-lock state for boot; web uses IndexedDB and CryptoKey storage."
+    },
+    {
+      "path": "interfaces/subtle.ts",
+      "category": "platform",
+      "reason": "SubtleCrypto subset backed by the native crypto service; web uses window.crypto.subtle."
+    },
+    {
+      "path": "utils/stream-saver.ts",
+      "category": "platform",
+      "reason": "Saves streams through the files service; web's stream-saver uses a service worker (mitm) download."
+    },
+    {
+      "path": "utils/feature-check.ts",
+      "category": "platform",
+      "reason": "All browser feature checks (opfs, indexedDB, clonable CryptoKey, transferable streams) are fixed answers on the native host."
+    },
+    {
+      "path": "utils/webauthn.ts",
+      "category": "platform",
+      "reason": "Registration and authentication call the webauthn service instead of navigator.credentials."
+    },
+    {
+      "path": "utils/toast.ts",
+      "category": "platform",
+      "reason": "Toasts are rendered by the kit's native toast host; web uses react-hot-toast components (JSX)."
+    },
+    {
+      "path": "utils/updater.ts",
+      "category": "platform",
+      "reason": "Checks and installs updates with the updater service and the network policy instead of the Electron bridge and cookies."
+    },
+    {
+      "path": "utils/page-visibility.ts",
+      "category": "platform",
+      "reason": "Visibility changes come from lifecycle, not document.hidden and vendor-prefixed events."
+    },
+    {
+      "path": "utils/version.ts",
+      "category": "platform",
+      "reason": "Version, hash, platform and beta flag come from environment instead of build-time constants."
+    },
+    {
+      "path": "utils/task-scheduler.ts",
+      "category": "platform",
+      "reason": "Cron tasks run in-process with Cronos; web runs them in a Worker."
+    },
+    {
+      "path": "utils/html.ts",
+      "category": "platform",
+      "reason": "Parses HTML with a small DOM-free parser (HtmlNode) since the host has no DOMParser or document."
+    },
+    {
+      "path": "utils/data-transfer.tsx",
+      "category": "platform",
+      "reason": "Reads files from the platform's UIDataTransfer, not the DOM DataTransfer."
+    },
+    {
+      "path": "utils/config.ts",
+      "category": "platform",
+      "reason": "Config is stored in the platform config service (MMKV) instead of window.localStorage."
+    },
+    {
+      "path": "utils/file-picker.ts",
+      "category": "platform",
+      "reason": "Uses the files service and PickedFile instead of a hidden <input type=file> and File."
+    },
+    {
+      "path": "utils/platform.ts",
+      "category": "platform",
+      "reason": "The OS comes from environment.os, not the user agent."
+    },
+    {
+      "path": "utils/logger.ts",
+      "category": "platform",
+      "reason": "Log storage uses databaseHost.createDialect instead of wa-sqlite/OPFS feature checks."
+    },
+    {
+      "path": "utils/clipboard.ts",
+      "category": "platform",
+      "reason": "Writes to the clipboard service instead of ClipboardItem/navigator.clipboard."
+    },
+    {
+      "path": "utils/md.ts",
+      "category": "platform",
+      "reason": "Adds attributes to HTML with the DOM-free parser in utils/html instead of a detached element."
+    },
+    {
+      "path": "utils/network-check.ts",
+      "category": "platform",
+      "reason": "Waits for the internet through lifecycle.waitForInternet; web uses a Web Worker."
+    },
+    {
+      "path": "utils/streams/unzip-stream.ts",
+      "category": "platform",
+      "reason": "Reads zips from a PickedFile's bytes; ZipEntry is not a Blob in the host."
+    },
+    {
+      "path": "utils/streams/attachment-stream.ts",
+      "category": "platform",
+      "reason": "Attachments are passed as PickedFile and not read into a Uint8Array first."
+    },
+    {
+      "path": "utils/fullscreen.ts",
+      "category": "platform",
+      "reason": "Fullscreen goes through the windowControls service instead of the DOM fullscreen API."
+    },
+    {
+      "path": "utils/importer.ts",
+      "category": "platform",
+      "reason": "Creates the file with createPickedFile instead of new File."
+    },
+    {
+      "path": "utils/password-generator.ts",
+      "category": "platform",
+      "reason": "Uses the global crypto of the host rather than window.crypto."
+    },
+    {
+      "path": "utils/dom.ts",
+      "category": "platform",
+      "reason": "Title read/write goes through windowControls and environment.appTitle, not document.title."
+    },
+    {
+      "path": "utils/keyboard.ts",
+      "category": "platform",
+      "reason": "Key-up events come from keyboard.onKeyUp, not window.addEventListener."
+    },
+    {
+      "path": "utils/is-email.ts",
+      "category": "desktop-only",
+      "reason": "Email check helper added for native auth forms."
+    },
+    {
+      "path": "utils/migration-overlay.ts",
+      "category": "desktop-only",
+      "reason": "Overlay shown while the native app migrates the Electron database."
+    },
+    {
+      "path": "utils/network-policy.ts",
+      "category": "platform",
+      "reason": "Network-disabled switch for the native builds (privacy mode)."
+    },
+    {
+      "path": "utils/note-statistics.ts",
+      "category": "native-editor",
+      "reason": "Word and character counts are computed here for the native editor; Tiptap exposes them from the editor."
+    },
+    {
+      "path": "utils/picked-file.ts",
+      "category": "platform",
+      "reason": "PickedFile, the host's replacement for the browser File."
+    },
+    {
+      "path": "utils/replace-date-time.ts",
+      "category": "native-editor",
+      "reason": "Replaces date/time placeholders in note content for the native editor, which does not run Tiptap's date/time extension."
+    },
+    {
+      "path": "utils/secure-random.ts",
+      "category": "platform",
+      "reason": "Random bytes from the host crypto service."
+    },
+    {
+      "path": "utils/startup.ts",
+      "category": "platform",
+      "reason": "Startup sequencing for the native host (database, key store)."
+    },
+    {
+      "path": "hooks/use-keyboard-list-navigation.ts",
+      "category": "platform",
+      "reason": "Handles the kit's UIKeyboardEvent/UIMouseEvent (no DOM KeyboardEvent/MouseEvent) and keeps the arrow-key handling inline instead of web's keydownHandler helper."
     }
   ]
 }

@@ -67,10 +67,7 @@ export class ExportStream extends TransformStream<
             });
           } catch (e) {
             if (e instanceof Error) {
-              e.message = strings.failedToExportAttachment(
-                item.path,
-                e.message
-              );
+              e.message = strings.failedToExportAttachment(item.path, e.message);
               handleError(e);
             }
           }

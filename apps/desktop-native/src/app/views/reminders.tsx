@@ -38,20 +38,25 @@ function Reminders() {
 
   if (!reminders) return <ListLoader />;
   return (
-    <ListContainer
-      type="reminders"
-      group="reminders"
-      refresh={refresh}
-      items={filteredItems || reminders}
-      showGroupCounts
-      isSearching={!!filteredItems}
-      placeholder={
-        <ListPanePlaceholder variant={filteredItems ? "search" : "reminders"} />
-      }
-      button={{
-        onClick: () => hashNavigate("/reminders/create")
-      }}
-    />
+    <>
+      <ListContainer
+        type="reminders"
+        group="reminders"
+        refresh={refresh}
+        items={filteredItems || reminders}
+        showGroupCounts
+        isSearching={!!filteredItems}
+        placeholder={
+          <ListPanePlaceholder
+            variant={filteredItems ? "search" : "reminders"}
+          />
+        }
+        button={{
+          onClick: () => hashNavigate("/reminders/create")
+        }}
+      />
+    </>
   );
 }
+
 export default Reminders;

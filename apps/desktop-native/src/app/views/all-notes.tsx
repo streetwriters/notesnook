@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo, useEffect } from "react";
+import React, { useEffect } from "react";
 import { db } from "../common/db";
 import ListContainer from "../components/list-container";
 import { ListLoader } from "../components/loaders/list-loader";
@@ -69,4 +69,4 @@ function Home() {
     />
   );
 }
-export default memo(Home, () => true);
+export default React.memo(Home, () => true);
