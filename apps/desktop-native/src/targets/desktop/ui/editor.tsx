@@ -265,7 +265,7 @@ export const EditorSurface = forwardRef<
   const Native = NativeEditor;
   return (
     <Flex
-      data-test-id={props.testID ?? "editor-body"}
+      data-test-id={props["data-test-id"] ?? "editor-body"}
       sx={{ flex: 1, flexDirection: "column", ...props.sx }}
     >
       {Native && !props.readonly ? (

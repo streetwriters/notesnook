@@ -28,7 +28,7 @@ export interface AvatarEditorProps {
   color?: [number, number, number] | [number, number, number, number];
   scale?: number;
   style?: { width: number; height: number };
-  testID?: string;
+  "data-test-id"?: string;
 }
 
 export interface AvatarEditorHandle {

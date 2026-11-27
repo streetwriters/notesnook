@@ -67,6 +67,10 @@ import {
   type MenuItem,
   type PositionOptions
 } from "./overlays";
+import type { AvatarEditorProps } from "./avatar-editor";
+import type { EditorSurfaceProps } from "./editor";
+import type { PdfViewerProps } from "./pdf";
+import type { WebViewProps } from "./webview";
 
 export const overlays = [
   <Popover
@@ -372,7 +376,12 @@ export const webShaped = [
     <option value="b">B</option>
   </Select>,
   <Label key="14" htmlFor="box" />,
-  <Link key="15" href="https://notesnook.com" target="_blank" rel="noreferrer" />,
+  <Link
+    key="15"
+    href="https://notesnook.com"
+    target="_blank"
+    rel="noreferrer"
+  />,
   <Button key="16" type="submit" data-test-id="submit" />
 ];
 
@@ -520,6 +529,18 @@ export const removedAliases = [
   // @ts-expect-error `onDropFiles` was replaced by `onDrop`
   <Box key="10" onDropFiles={() => undefined} />
 ];
+
+// The four components that take `data-test-id` declare no `testID`. A key check, not
+// a JSX one: a @ts-expect-error would also pass for a missing required prop.
+export const noTestIdAlias: [
+  "testID" extends
+    | keyof PdfViewerProps
+    | keyof AvatarEditorProps
+    | keyof WebViewProps
+    | keyof EditorSurfaceProps
+    ? never
+    : true
+] = [true];
 
 export const strict = [
   // @ts-expect-error onChange delivers an event, not the checked value

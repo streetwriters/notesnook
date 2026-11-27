@@ -56,7 +56,7 @@ export interface PdfViewerProps {
   pageShadow?: boolean;
   onStateChange?: (state: PdfViewerState) => void;
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
 }
 
 export declare const PdfViewer: ForwardRefExoticComponent<

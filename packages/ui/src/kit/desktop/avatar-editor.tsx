@@ -150,7 +150,7 @@ export const AvatarEditor = forwardRef<
 
   return (
     <AnyView
-      testID={props.testID}
+      testID={props["data-test-id"]}
       onPointerDown={(event: {
         nativeEvent: { pageX: number; pageY: number };
       }) => {

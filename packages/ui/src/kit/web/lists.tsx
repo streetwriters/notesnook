@@ -17,24 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  type ReactNode
-} from "react";
-import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
-import type * as Contract from "../contracts/lists";
-import { Flex } from "./primitives";
-
 // The kit's lists on the web are react-virtuoso's own components.
 export { Virtuoso, GroupedVirtuoso, TableVirtuoso } from "react-virtuoso";
-
-const DEFAULT_OVERSCAN = 200;
-
-function Header(props: { context?: { header?: ReactNode } }) {
-  return <>{props.context?.header}</>;
-}
-
-const COMPONENTS = { Header };
-const NO_COMPONENTS = {};

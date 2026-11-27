@@ -255,6 +255,11 @@ Notes added by the fixes:
   `LayoutRoot`, not portalled, and `DialogButtonProps.role` is not mapped to a
   DOM attribute.
 
+The findings above that name a removed alias (`onDropFiles` and `acceptsFiles`
+in F6, `onPress` in N2, `testID` in N1 and N4) describe the shim before 5.1
+removed those names. The names no longer exist, so those findings no longer
+apply.
+
 ### Test page
 
 `npm run web`, then open `/?page=primitives`

@@ -32,7 +32,7 @@ export const PdfViewer = forwardRef<
 >(function PdfViewer(props, ref) {
   const theme = useThemeContext();
   const { viewStyle, nativeProps } = useStyled(
-    { sx: props.sx, "data-test-id": props.testID },
+    { sx: props.sx, "data-test-id": props["data-test-id"] },
     { defaults: { flex: 1 } }
   );
   return (

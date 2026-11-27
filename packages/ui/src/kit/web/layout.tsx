@@ -37,6 +37,7 @@ import { Box as ThemeUIBox } from "@theme-ui/components";
 import { MacScrollbar } from "mac-scrollbar";
 import "mac-scrollbar/dist/mac-scrollbar.css";
 import { Box, Flex } from "./primitives";
+import { LAYOUT_DEFAULTS_CSS } from "./kit-sx";
 import { toThemeUISx } from "./sx";
 
 export const TITLE_BAR_HEIGHT = 45;
@@ -124,7 +125,9 @@ export const SplitPane = forwardRef<
       : 0;
     const fixed = next.reduce<number>((sum, size) => sum + (size ?? 0), 0);
     onChange.current?.(
-      next.map((size) => (size === undefined ? Math.max(0, total - fixed) : size))
+      next.map((size) =>
+        size === undefined ? Math.max(0, total - fixed) : size
+      )
     );
   };
 
@@ -181,9 +184,7 @@ export const SplitPane = forwardRef<
     items.push(
       <Flex
         key={child.props.id}
-        data-test-id={
-          child.props["data-test-id"] ?? `pane-${child.props.id}`
-        }
+        data-test-id={child.props["data-test-id"] ?? `pane-${child.props.id}`}
         sx={{
           flexDirection: "column",
           ...(fixed
@@ -336,12 +337,14 @@ export function TitleBar({
   );
 }
 
-// The page reset a standalone app needs (`apps/web` has its own stylesheet).
+// The page reset a standalone app needs (`apps/web` has its own stylesheet),
+// plus the layout defaults the kit draws on its boxes.
 const BASE_CSS = `
 *,*::before,*::after{box-sizing:border-box}
 *{outline:none;scrollbar-width:thin;scrollbar-color:var(--nn-scrollbar,rgba(128,128,128,.4)) transparent}
 html,body,#root{height:100%;margin:0;padding:0}
-body{overflow:hidden}`;
+body{overflow:hidden}
+${LAYOUT_DEFAULTS_CSS}`;
 
 export function LayoutRoot(props: Contract.LayoutRootProps) {
   return (

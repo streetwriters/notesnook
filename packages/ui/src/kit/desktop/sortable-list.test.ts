@@ -97,23 +97,26 @@ test("shows which item is dragged and which it is over, and clears both after th
   expect(textOf(view.byTestId("tabs"))).toBe("notes tags trash ");
 });
 
-test("dropping an item on itself, or something that is not an item, reports nothing", async () => {
+test("dropping an item on itself, or a drop with no item dragged, reports nothing", async () => {
   const moves: SortableMove[] = [];
   const { item } = await list((move) => moves.push(move));
-  let payload: unknown;
-  await settle(() => (payload = item(1).props.onDragStart()));
+  const event = dragging();
+  await settle(() => item(1).props.onDragStart(event));
   await settle(() => item(1).props.onDrop(event));
-  await settle(() => item(0).props.onDrop({ payload: undefined }));
-  await settle(() => item(0).props.onDrop({}));
+  await settle(() => item(0).props.onDrop(dragging()));
   expect(moves).toEqual([]);
 });
 
 test("a drag that ends without a drop reports nothing and clears the state", async () => {
   const moves: SortableMove[] = [];
   const { view, item } = await list((move) => moves.push(move));
-  await settle(() => item(0).props.onDragStart());
+  const event = dragging();
+  await settle(() => item(0).props.onDragStart(event));
   await settle(() => item(2).props.onDragEnter());
-  await settle(() => item(0).props.onDragEnd());
+  expect(textOf(view.byTestId("tabs"))).toBe(
+    "notes(dragging) tags trash(over) "
+  );
+  await settle(() => item(0).props.onDragEnd(event));
   expect(moves).toEqual([]);
   expect(textOf(view.byTestId("tabs"))).toBe("notes tags trash ");
 });

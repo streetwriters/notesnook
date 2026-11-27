@@ -153,7 +153,7 @@ export interface EditorSurfaceProps {
    */
   deniedPermissions?: readonly string[];
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
 }
 
 export declare const EditorSurface: ForwardRefExoticComponent<

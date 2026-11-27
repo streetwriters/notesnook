@@ -27,19 +27,36 @@ import { withKitSx } from "./kit-sx";
 export { ThemeScope } from "./theme";
 
 /**
- * On the web the kit's primitives are theme-ui's own components; the only
- * thing added is the rewrite of the kit-only `sx` shapes.
+ * On the web the kit's primitives are theme-ui's own components, drawn with
+ * the kit's own handling (`kit-sx.tsx`): the kit-only `sx` shapes and props,
+ * and the layout defaults the kit has always set on these components.
  */
-export const Box = withKitSx<typeof Contract.Box>(ThemeUI.Box);
-export const Flex = withKitSx<typeof Contract.Flex>(ThemeUI.Flex);
+export const Box = withKitSx<typeof Contract.Box>(ThemeUI.Box, {
+  className: "nn-box"
+});
+export const Flex = withKitSx<typeof Contract.Flex>(ThemeUI.Flex, {
+  className: "nn-flex"
+});
 export const Grid = withKitSx<typeof Contract.Grid>(ThemeUI.Grid);
-export const Text = withKitSx<typeof Contract.Text>(ThemeUI.Text);
-export const Button = withKitSx<typeof Contract.Button>(ThemeUI.Button);
+export const Text = withKitSx<typeof Contract.Text>(ThemeUI.Text, {
+  className: "nn-text"
+});
+export const Button = withKitSx<typeof Contract.Button>(ThemeUI.Button, {
+  className: "nn-button",
+  // theme-ui's button is `inline-block`; the kit lays its children out in a row.
+  sx: { display: "flex" }
+});
 export const Label = withKitSx<typeof Contract.Label>(ThemeUI.Label);
-export const Link = withKitSx<typeof Contract.Link>(ThemeUI.Link);
+export const Link = withKitSx<typeof Contract.Link>(ThemeUI.Link, {
+  defaults: { target: "_blank", rel: "noreferrer" }
+});
 export const Image = withKitSx<typeof Contract.Image>(ThemeUI.Image);
-export const Input = withKitSx<typeof Contract.Input>(ThemeUI.Input);
-export const Textarea = withKitSx<typeof Contract.Textarea>(ThemeUI.Textarea);
+export const Input = withKitSx<typeof Contract.Input>(ThemeUI.Input, {
+  className: "nn-input"
+});
+export const Textarea = withKitSx<typeof Contract.Textarea>(ThemeUI.Textarea, {
+  className: "nn-input nn-textarea"
+});
 export const Checkbox = withKitSx<typeof Contract.Checkbox>(ThemeUI.Checkbox);
 export const Radio = withKitSx<typeof Contract.Radio>(ThemeUI.Radio);
 export const Select = withKitSx<typeof Contract.Select>(ThemeUI.Select);

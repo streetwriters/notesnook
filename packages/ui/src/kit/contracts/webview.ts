@@ -32,7 +32,7 @@ export interface WebViewProps {
   onLoad?: () => void;
   injectedJavaScript?: string;
   sx?: SxProp;
-  testID?: string;
+  "data-test-id"?: string;
 }
 
 export declare const WebView: ForwardRefExoticComponent<

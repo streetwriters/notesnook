@@ -150,7 +150,7 @@ export const EditorSurface = forwardRef<
 
   return (
     <div
-      data-test-id={props.testID ?? "editor-body"}
+      data-test-id={props["data-test-id"] ?? "editor-body"}
       style={{
         display: "flex",
         flexDirection: "column",

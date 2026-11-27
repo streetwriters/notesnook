@@ -22,6 +22,7 @@ import {
   DesktopElement,
   elementFor,
   getElementById,
+  measureInWindow,
   registerElementId,
   setScrollCommand,
   type ElementControl,
@@ -38,7 +39,7 @@ function node(
 afterEach(() => setScrollCommand(undefined));
 
 describe("a ref to a desktop primitive", () => {
-  it("has every member of the HTMLElement subset in the contract", () => {
+  it("has the HTMLElement subset the kit's presenters and web's code use, measureInWindow included", () => {
     const element = elementFor({})!;
     for (const method of [
       "focus",
@@ -148,6 +149,32 @@ describe("a ref to a desktop primitive", () => {
     expect(element.scrollHeight).toBe(900);
     expect(element.clientHeight).toBe(300);
     expect(element.offsetWidth).toBe(120);
+  });
+});
+
+describe("the measureInWindow helper the presenters call", () => {
+  it("uses the element's own measureInWindow when it has one", () => {
+    const native = vi.fn((callback) => callback(1, 2, 3, 4));
+    const callback = vi.fn();
+    measureInWindow(elementFor({ measureInWindow: native }) as never, callback);
+    expect(native).toHaveBeenCalledOnce();
+    expect(callback).toHaveBeenCalledWith(1, 2, 3, 4);
+  });
+
+  it("falls back to getBoundingClientRect on a plain node, as web's refs are", () => {
+    const callback = vi.fn();
+    measureInWindow(
+      node({ x: 5, y: 6, width: 7, height: 8 }) as never,
+      callback
+    );
+    expect(callback).toHaveBeenCalledOnce();
+    expect(callback).toHaveBeenCalledWith(5, 6, 7, 8);
+  });
+
+  it("reports nothing for no element", () => {
+    const callback = vi.fn();
+    measureInWindow(null, callback);
+    expect(callback).not.toHaveBeenCalled();
   });
 });
 

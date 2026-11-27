@@ -28,7 +28,7 @@ export const WebView = forwardRef<
 >(function WebView(props, ref) {
   const native = useRef<NativeWebView<object>>(null);
   const { viewStyle, nativeProps } = useStyled(
-    { sx: props.sx, "data-test-id": props.testID },
+    { sx: props.sx, "data-test-id": props["data-test-id"] },
     { defaults: { flex: 1 } }
   );
 

@@ -27,7 +27,9 @@ import {
 import type * as AvatarContract from "../contracts/avatar-editor";
 import type * as PdfContract from "../contracts/pdf";
 import type * as WebViewContract from "../contracts/webview";
+import type * as OverlayContract from "../contracts/overlays";
 import { Flex, Text } from "./primitives";
+import { getDragPayload } from "./kit-sx";
 
 function NotImplemented(props: { name: string; testId?: string }) {
   return (
@@ -55,7 +57,7 @@ export const AvatarEditor = forwardRef<
     }),
     []
   );
-  return <NotImplemented name="AvatarEditor" testId={props.testID} />;
+  return <NotImplemented name="AvatarEditor" testId={props["data-test-id"]} />;
 });
 
 export const PdfViewer = forwardRef<
@@ -82,7 +84,7 @@ export const PdfViewer = forwardRef<
     }),
     []
   );
-  return <NotImplemented name="PdfViewer" testId={props.testID} />;
+  return <NotImplemented name="PdfViewer" testId={props["data-test-id"]} />;
 });
 
 export const WebView = forwardRef<
@@ -94,7 +96,8 @@ export const WebView = forwardRef<
   useImperativeHandle(
     ref,
     () => ({
-      postMessage: (message) => frame.current?.contentWindow?.postMessage(message, "*"),
+      postMessage: (message) =>
+        frame.current?.contentWindow?.postMessage(message, "*"),
       reload: () => frame.current?.contentWindow?.location.reload(),
       injectJavaScript: () => {
         throw new Error("WebView.injectJavaScript is not implemented on web");
@@ -106,7 +109,9 @@ export const WebView = forwardRef<
     const listener = (event: MessageEvent) => {
       if (event.source === frame.current?.contentWindow)
         onMessage?.(
-          typeof event.data === "string" ? event.data : JSON.stringify(event.data)
+          typeof event.data === "string"
+            ? event.data
+            : JSON.stringify(event.data)
         );
     };
     window.addEventListener("message", listener);
@@ -116,7 +121,7 @@ export const WebView = forwardRef<
   return (
     <iframe
       ref={frame}
-      data-test-id={props.testID}
+      data-test-id={props["data-test-id"]}
       title="webview"
       sandbox="allow-scripts allow-forms allow-popups"
       src={"uri" in source ? source.uri : undefined}
@@ -132,6 +137,10 @@ export function DragGhostHost() {
   const [ghost, setGhost] = useState<React.ReactNode>();
   useEffect(() => {
     const move = (event: DragEvent) => {
+      const payload = getDragPayload() as
+        | OverlayContract.DragPayload
+        | undefined;
+      setGhost(payload?.ghost);
       setPosition({ x: event.clientX, y: event.clientY });
     };
     const end = () => setGhost(undefined);

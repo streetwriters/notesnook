@@ -90,9 +90,7 @@ const {
   Text,
   FormData,
   resolvePercentTranslate
-} = await import(
-  "./primitives"
-);
+} = await import("./primitives");
 const { createButtonVariant } = await import("./hooks");
 const { Select } = await import("./select");
 
@@ -202,9 +200,9 @@ describe("resolvePercentTranslate", () => {
     expect(resolvePercentTranslate("translateY(-50%)", 20, 10)).toBe(
       "translateY(-5px)"
     );
-    expect(resolvePercentTranslate("translateX(50%) rotate(4deg)", 20, 10)).toBe(
-      "translateX(10px) rotate(4deg)"
-    );
+    expect(
+      resolvePercentTranslate("translateX(50%) rotate(4deg)", 20, 10)
+    ).toBe("translateX(10px) rotate(4deg)");
     expect(resolvePercentTranslate("translate(-50%)", 20, 10)).toBe(
       "translate(-10px, -5px)"
     );
@@ -222,7 +220,13 @@ describe("resolvePercentTranslate", () => {
 describe("Text", () => {
   it("draws <br /> as a line break, in fragments too", () => {
     const tree = render(
-      h(Text, {}, "a", h("br", { key: "1" }), h(Fragment, { key: "f" }, "b", h("br"), "c"))
+      h(
+        Text,
+        {},
+        "a",
+        h("br", { key: "1" }),
+        h(Fragment, { key: "f" }, "b", h("br"), "c")
+      )
     );
     const text = tree.root.findAll((node) => (node.type as any) === "Text")[0];
     expect(text.props.children).toEqual(["a", "\n", "b", "\n", "c"]);
@@ -277,18 +281,6 @@ describe("Select", () => {
   function title() {
     return JSON.stringify(root.toJSON());
   }
-  it("with the deprecated options prop and no value shows no choice", () => {
-    render(
-      h(Select, {
-        options: [
-          { value: "a", title: "Alpha" },
-          { value: "b", title: "Beta" }
-        ]
-      })
-    );
-    expect(title()).not.toContain("Alpha");
-  });
-
   it("with option children and no value shows the first, like HTML", () => {
     render(
       h(
@@ -303,18 +295,16 @@ describe("Select", () => {
 
   it("shows the controlled value", () => {
     render(
-      h(Select, {
-        value: "b",
-        options: [
-          { value: "a", title: "Alpha" },
-          { value: "b", title: "Beta" }
-        ]
-      })
+      h(
+        Select,
+        { value: "b" },
+        h("option", { value: "a" }, "Alpha"),
+        h("option", { value: "b" }, "Beta")
+      )
     );
     expect(title()).toContain("Beta");
   });
 });
-
 
 describe("createButtonVariant", () => {
   it("draws web's button look with the hover and pressed states desktop has", () => {
@@ -404,7 +394,10 @@ describe("FormData", () => {
     fire(() => title.props.onChange({ nativeEvent: { text: "Renamed" } }));
     fire(() =>
       root.root
-        .findAll((n: any) => n.type === "Pressable" && n.props.accessibilityRole === "button")[0]
+        .findAll(
+          (n: any) =>
+            n.type === "Pressable" && n.props.accessibilityRole === "button"
+        )[0]
         .props.onPress(press())
     );
     expect(data).toBeDefined();
@@ -425,14 +418,11 @@ describe("FormData", () => {
 describe("nested input styles", () => {
   it("draws sx.input on the text fields inside, over their own styles", () => {
     render(
-      h(
-        Box,
-        { sx: { input: { px: 7 } } },
-        h(Input, { sx: { px: 1, py: 3 } })
-      )
+      h(Box, { sx: { input: { px: 7 } } }, h(Input, { sx: { px: 1, py: 3 } }))
     );
-    expect(
-      root.root.findByType("TextInput" as any).props.style
-    ).toMatchObject({ paddingLeft: 35, paddingTop: 15 });
+    expect(root.root.findByType("TextInput" as any).props.style).toMatchObject({
+      paddingLeft: 35,
+      paddingTop: 15
+    });
   });
 });
