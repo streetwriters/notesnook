@@ -19,12 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   Children,
+  createContext,
   forwardRef,
-  useState,
-  useImperativeHandle,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
   useRef,
+  useState,
   type ForwardedRef,
-  type ReactNode
+  type ReactNode,
+  type RefObject
 } from "react";
 import {
   Image as NativeImage,
@@ -34,7 +39,7 @@ import {
   View
 } from "react-native";
 import Animated from "react-native-reanimated";
-import Svg, { Path, SvgXml } from "react-native-svg";
+import Svg, { Circle, Path, SvgXml } from "react-native-svg";
 import { shell } from "@platform";
 import type * as Contract from "../contracts/primitives";
 import type {
@@ -42,10 +47,26 @@ import type {
   UIInputElement,
   UITextAreaElement
 } from "../contracts/elements";
+import type { UIMouseEvent } from "../contracts/events";
+import {
+  elementFor,
+  getElementById,
+  registerElementId,
+  type DesktopElement,
+  type ElementControl
+} from "./element";
+import { htmlToText } from "./html-text";
 import { useThemeContext } from "./theme";
 import {
+  changeEvent,
+  syntheticEvent,
+  type EventState,
+  type NativeEvent
+} from "./style/events";
+import { pressHandler, testIdOf } from "./style/native-props";
+import { resolveColor } from "./style/resolve";
+import {
   InheritedTextStyle,
-  pressHandler,
   useInheritedTextStyle,
   useMergedTextStyle,
   useStyled,
@@ -71,26 +92,69 @@ const AnimatedView = Animated.View as any;
 const AnimatedText = Animated.Text as any;
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable) as any;
 
-function useElementRef(ref: ForwardedRef<any>) {
-  const inner = useRef<{
-    focus?: () => void;
-    blur?: () => void;
-    measureInWindow?: (
-      callback: (x: number, y: number, width: number, height: number) => void
-    ) => void;
-  }>(null);
-  useImperativeHandle(
-    ref,
-    () =>
-      ({
-        focus: () => inner.current?.focus?.(),
-        blur: () => inner.current?.blur?.(),
-        measureInWindow: (callback) =>
-          inner.current?.measureInWindow?.(callback)
-      } as Pick<UIElement, "focus" | "blur" | "measureInWindow">),
-    []
+function assignRef<T>(ref: ForwardedRef<T> | undefined, value: T | null) {
+  if (typeof ref === "function") ref(value);
+  else if (ref) ref.current = value;
+}
+
+function wasPrevented(event: unknown) {
+  return !!(event as Partial<EventState> | undefined)?.defaultPrevented;
+}
+
+/**
+ * The ref to give the host component. It hands the caller's ref the node's
+ * `UIElement`, and keeps it for the component's own handlers.
+ */
+function useElementRef(
+  ref: ForwardedRef<any>,
+  options: { control?: ElementControl; id?: string } = {}
+) {
+  const { control, id } = options;
+  const current = useRef<DesktopElement | null>(null);
+  const release = useRef<(() => void) | undefined>(undefined);
+  const set = useCallback(
+    (node: unknown) => {
+      release.current?.();
+      release.current = undefined;
+      const element = elementFor(node, control);
+      current.current = element;
+      if (element && id) release.current = registerElementId(id, element);
+      assignRef(ref, element);
+    },
+    [ref, control, id]
   );
-  return inner;
+  return [set, current] as const;
+}
+
+/** As `useElementRef`, for a control drawn with another kit element. */
+function useControlRef(ref: ForwardedRef<any>, control: ElementControl) {
+  const current = useRef<DesktopElement | null>(null);
+  const set = useCallback(
+    (element: UIElement | null) => {
+      current.current = elementFor(element, control);
+      assignRef(ref, current.current);
+    },
+    [ref, control]
+  );
+  return [set, current] as const;
+}
+
+function useControl(): ElementControl {
+  const control = useRef<ElementControl | null>(null);
+  return (control.current ??= {});
+}
+
+const FormContext = createContext<{ submit(): void } | undefined>(undefined);
+
+interface LabelRegistry {
+  register(control: ElementControl): () => void;
+}
+const LabelContext = createContext<LabelRegistry | undefined>(undefined);
+
+/** Lets the label around a control activate it, as a `<label>` does. */
+function useLabelControl(control: ElementControl) {
+  const label = useContext(LabelContext);
+  useEffect(() => label?.register(control), [label, control]);
 }
 
 function Container(
@@ -109,16 +173,40 @@ function Container(
   const PressableComponent = resolved.animated
     ? AnimatedPressable
     : AnyPressable;
-  const inner = useElementRef(ref);
-  const onPress = pressHandler(props);
+  const [setRef, element] = useElementRef(ref, { id: props.id });
+  const clicks = useRef({ last: 0 });
+  const onPress = pressHandler(props, clicks.current);
   const mergedTextStyle = useMergedTextStyle(textStyle);
-  const content = textStyle ? (
+
+  // A form is whatever handles `onSubmit`: its submit buttons and the Enter
+  // key in its inputs raise the event.
+  const isForm = props.as === "form" || !!props.onSubmit;
+  const onSubmit = useRef(props.onSubmit);
+  onSubmit.current = props.onSubmit;
+  const form = useMemo(
+    () =>
+      isForm
+        ? {
+            submit: () =>
+              onSubmit.current?.(
+                syntheticEvent("submit", undefined, element.current)
+              )
+          }
+        : undefined,
+    [isForm, element]
+  );
+
+  let content = textStyle ? (
     <InheritedTextStyle.Provider value={mergedTextStyle}>
       {children}
     </InheritedTextStyle.Provider>
   ) : (
     children
   );
+  if (form)
+    content = (
+      <FormContext.Provider value={form}>{content}</FormContext.Provider>
+    );
   const style = { ...viewStyle };
   for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
   // Pressable things show the hand cursor unless the style says otherwise.
@@ -126,7 +214,7 @@ function Container(
   if (onPress)
     return (
       <PressableComponent
-        ref={inner}
+        ref={setRef}
         {...nativeProps}
         style={style}
         onPress={onPress}
@@ -136,7 +224,7 @@ function Container(
     );
   return (
     <ViewComponent
-      ref={inner}
+      ref={setRef}
       {...nativeProps}
       style={style}
       onLayout={(props as { onLayout?: unknown }).onLayout}
@@ -186,18 +274,30 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
   props,
   ref
 ) {
-  const { children, selectable, numberOfLines } = props;
+  const { selectable, numberOfLines, href, dangerouslySetInnerHTML } = props;
   const inherited = useInheritedTextStyle();
   const { resolved, viewStyle, nativeProps } = useStyled(props, {
     variantGroup: "text",
     defaultVariant: "default"
   });
-  const inner = useElementRef(ref);
-  const onPress = pressHandler(props);
+  const [setRef] = useElementRef(ref, { id: props.id });
+  const clicks = useRef({ last: 0 });
+  const onPress = pressHandler(
+    href
+      ? {
+          ...props,
+          onClick: (event: UIMouseEvent) => {
+            props.onClick?.(event);
+            if (!wasPrevented(event)) shell.openUrl(href);
+          }
+        }
+      : props,
+    clicks.current
+  );
   const TextComponent = resolved.animated ? AnimatedText : AnyText;
   return (
     <TextComponent
-      ref={inner}
+      ref={setRef}
       {...nativeProps}
       style={resolveLineHeight({
         ...inherited,
@@ -208,7 +308,9 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
       selectable={selectable ?? resolved.selectable}
       onPress={onPress}
     >
-      {children}
+      {dangerouslySetInnerHTML
+        ? htmlToText(dangerouslySetInnerHTML.__html)
+        : props.children}
     </TextComponent>
   );
 });
@@ -225,18 +327,34 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
         justifyContent: "center"
       }
     });
-    const inner = useElementRef(ref);
+    const [setRef] = useElementRef(ref, { id: props.id });
     const mergedTextStyle = useMergedTextStyle(textStyle);
-    const onPress = pressHandler(props);
+    const form = useContext(FormContext);
+    // As in HTML, a button in a form submits it unless its type says otherwise.
+    const submits = !!form && props.type !== "button" && props.type !== "reset";
+    const clicks = useRef({ last: 0 });
+    const onPress = pressHandler(
+      submits
+        ? {
+            ...props,
+            onClick: (event: UIMouseEvent) => {
+              props.onClick?.(event);
+              if (!wasPrevented(event)) form.submit();
+            }
+          }
+        : props,
+      clicks.current
+    );
     const style = { ...viewStyle };
     for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
-    if (style.cursor === undefined) style.cursor = disabled ? "default" : "pointer";
+    if (style.cursor === undefined)
+      style.cursor = disabled ? "default" : "pointer";
     const ButtonComponent = resolved.animated
       ? AnimatedPressable
       : AnyPressable;
     return (
       <ButtonComponent
-        ref={inner}
+        ref={setRef}
         {...nativeProps}
         focusable={props.focusable ?? nativeProps.focusable ?? true}
         accessibilityRole="button"
@@ -256,12 +374,43 @@ export const Label = forwardRef<UIElement, Contract.LabelProps>(function Label(
   props,
   ref
 ) {
+  const { htmlFor } = props;
+  const [control, setControl] = useState<ElementControl | null>(null);
+  const registry = useMemo<LabelRegistry>(
+    () => ({
+      register(next) {
+        // The first control in a label is the labelled one.
+        setControl((current) => current ?? next);
+        return () =>
+          setControl((current) => (current === next ? null : current));
+      }
+    }),
+    []
+  );
+  // A label with its own click handler keeps deciding what a click does.
+  const activates =
+    !props.onClick && !props.onPress && (!!htmlFor || !!control);
   return Container(
     {
       ...props,
       variant: undefined,
-      children: wrapChildren(props.children),
-      defaults: { display: "flex", alignItems: "center" }
+      onClick: activates
+        ? () => {
+            const target = htmlFor ? getElementById(htmlFor) : null;
+            if (target) target.click();
+            else control?.click?.();
+          }
+        : props.onClick,
+      children: (
+        <LabelContext.Provider value={registry}>
+          {wrapChildren(props.children)}
+        </LabelContext.Provider>
+      ),
+      defaults: {
+        display: "flex",
+        alignItems: "center",
+        ...(activates ? { cursor: "default" } : null)
+      }
     },
     ref
   );
@@ -271,63 +420,92 @@ export const Link = forwardRef<UIElement, Contract.LinkProps>(function Link(
   props,
   ref
 ) {
-  const { href, onPress, ...rest } = props;
   return (
     <Text
       ref={ref}
-      {...(rest as Contract.TextProps)}
+      {...(props as Contract.TextProps)}
       sx={{ color: "accent", textDecorationLine: "underline", ...props.sx }}
-      onPress={(event) => {
-        onPress?.(event);
-        if (href) shell.openUrl(href);
-      }}
     />
   );
 });
+
+const RESIZE_MODES = { cover: "cover", contain: "contain", fill: "stretch" };
 
 export const Image = forwardRef<UIElement, Contract.ImageProps>(function Image(
   props,
   ref
 ) {
-  const { viewStyle, nativeProps } = useStyled(props);
-  const inner = useElementRef(ref);
+  const { resolved, viewStyle, nativeProps } = useStyled(props);
+  const [setRef, element] = useElementRef(ref, { id: props.id });
+  const { onLoad } = props;
   return (
     <NativeImage
-      ref={inner as never}
+      ref={setRef as never}
       {...(nativeProps as object)}
       source={{ uri: props.src }}
-      onLoad={props.onLoad as never}
-      resizeMode={props.resizeMode}
+      onLoad={
+        onLoad
+          ? (((event: NativeEvent) =>
+              onLoad(syntheticEvent("load", event, element.current))) as never)
+          : undefined
+      }
+      resizeMode={
+        props.resizeMode ??
+        (resolved.objectFit
+          ? (RESIZE_MODES[resolved.objectFit] as "cover")
+          : undefined)
+      }
       accessibilityLabel={props.alt}
       style={viewStyle as never}
     />
   );
 });
 
-function TextField(
-  props: Contract.InputProps & { multiline?: boolean; rows?: number },
-  ref: ForwardedRef<UIInputElement>,
-  variant: "input" | "textarea"
+type TextFieldProps = Contract.InputProps & {
+  multiline?: boolean;
+  rows?: number;
+  field: "input" | "textarea";
+};
+
+const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
+  props,
+  ref
 ) {
   const context = useThemeContext();
   const { viewStyle, nativeProps } = useStyled(props, {
     variantGroup: "forms",
-    defaultVariant: variant,
+    defaultVariant: props.field,
     defaults: { p: 2 }
   });
-  const inner = useElementRef(ref);
+  const control = useControl();
+  if (props.value !== undefined) control.value = String(props.value);
+  else if (control.value === undefined)
+    control.value = String(props.defaultValue ?? "");
+  const [setRef, element] = useElementRef(ref, { control, id: props.id });
+  control.setValue = (text) => element.current?.node.setNativeProps?.({ text });
+  control.setSelection = (start, end) =>
+    element.current?.node.setNativeProps?.({ selection: { start, end } });
+  control.click = () => element.current?.focus();
+  useLabelControl(control);
+  const form = useContext(FormContext);
+  const { onChange, onChangeText, onSubmitEditing } = props;
+
   const fields: Record<string, unknown> = { ...nativeProps };
   delete fields.focusable;
   return (
     <AnyInput
-      ref={inner}
+      ref={setRef}
       {...fields}
       style={{
         cursor: props.disabled ? "default" : "text",
         ...viewStyle
       }}
-      value={props.value}
-      defaultValue={props.defaultValue}
+      value={props.value === undefined ? undefined : String(props.value)}
+      defaultValue={
+        props.defaultValue === undefined
+          ? undefined
+          : String(props.defaultValue)
+      }
       placeholder={props.placeholder}
       placeholderTextColor={context.colors["paragraph-secondary"]}
       editable={!props.disabled && !props.readOnly}
@@ -337,50 +515,157 @@ function TextField(
       selectTextOnFocus={props.selectTextOnFocus}
       multiline={props.multiline}
       numberOfLines={props.rows}
-      onChangeText={props.onChangeText}
+      onChange={(event: NativeEvent) => {
+        const text = String(event?.nativeEvent?.text ?? "");
+        control.value = text;
+        onChangeText?.(text);
+        onChange?.(changeEvent(element.current, event));
+      }}
+      onSelectionChange={(event: NativeEvent) => {
+        const selection = event?.nativeEvent?.selection;
+        if (!selection) return;
+        control.selectionStart = selection.start;
+        control.selectionEnd = selection.end;
+      }}
       onSubmitEditing={
-        props.onSubmitEditing
-          ? (event: { nativeEvent: { text: string } }) =>
-              props.onSubmitEditing?.(event.nativeEvent.text)
+        onSubmitEditing || (form && !props.multiline)
+          ? (event: NativeEvent) => {
+              onSubmitEditing?.(String(event?.nativeEvent?.text ?? ""));
+              if (!props.multiline) form?.submit();
+            }
           : undefined
       }
     />
   );
-}
+});
+
+const ColorField = forwardRef<UIInputElement, Contract.InputProps>(
+  function ColorField(props, ref) {
+    const [own, setOwn] = useState(String(props.defaultValue ?? "#000000"));
+    const value = props.value === undefined ? own : String(props.value);
+    const control = useControl();
+    control.value = value;
+    const [setRef, element] = useControlRef(ref, control);
+    // Required when drawn: the colour picker is built from these primitives.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { ColorPicker } = require("./color-picker") as {
+      ColorPicker: typeof Contract.ColorPicker;
+    };
+    return (
+      <ColorPicker
+        ref={setRef}
+        data-test-id={testIdOf(props)}
+        testID={testIdOf(props)}
+        sx={props.sx}
+        value={value}
+        onChange={(color) => {
+          control.value = color;
+          if (props.value === undefined) setOwn(color);
+          props.onChangeText?.(color);
+          props.onChange?.(changeEvent(element.current));
+        }}
+      />
+    );
+  }
+);
 
 export const Input = forwardRef<UIInputElement, Contract.InputProps>(
   function Input(props, ref) {
-    return TextField(props, ref, "input");
+    switch (props.type) {
+      case "hidden":
+        return null;
+      case "checkbox":
+        return (
+          <Checkbox
+            ref={ref}
+            {...(props as unknown as Contract.CheckboxProps)}
+          />
+        );
+      case "radio":
+        return (
+          <Radio ref={ref} {...(props as unknown as Contract.RadioProps)} />
+        );
+      case "color":
+        return <ColorField ref={ref} {...props} />;
+      default:
+        return <TextField ref={ref} {...props} field="input" />;
+    }
   }
 );
 export const Textarea = forwardRef<UITextAreaElement, Contract.TextareaProps>(
   function Textarea(props, ref) {
-    return TextField(
-      { ...(props as unknown as Contract.InputProps), multiline: true },
-      ref as ForwardedRef<UIInputElement>,
-      "textarea"
+    return (
+      <TextField
+        ref={ref as ForwardedRef<UIInputElement>}
+        {...(props as unknown as Contract.InputProps)}
+        multiline
+        field="textarea"
+      />
     );
   }
 );
 
 const CHECK_PATH = "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z";
 
-function Toggle(
-  props: Contract.CheckboxProps & { radio?: boolean },
-  ref: ForwardedRef<UIInputElement>
+/**
+ * The checked state of a toggle: the `checked` prop when it is given,
+ * otherwise the toggle's own, starting at `defaultChecked`.
+ */
+function useChecked(
+  props: {
+    checked?: boolean;
+    defaultChecked?: boolean;
+    onChange?: (event: any) => void;
+    onCheckedChange?: (checked: boolean) => void;
+  },
+  control: ElementControl,
+  element: RefObject<DesktopElement | null>,
+  next: (checked: boolean) => boolean
 ) {
-  const { checked, onCheckedChange, disabled, radio } = props;
+  const [own, setOwn] = useState(!!props.defaultChecked);
+  const checked = props.checked ?? own;
+  control.checked = checked;
+  control.setChecked = (value) => {
+    if (props.checked === undefined) setOwn(value);
+  };
+  const toggle = (event?: NativeEvent) => {
+    const value = next(checked);
+    control.checked = value;
+    if (props.checked === undefined) setOwn(value);
+    props.onCheckedChange?.(value);
+    if (value !== checked)
+      props.onChange?.(changeEvent(element.current, event));
+  };
+  return [checked, toggle] as const;
+}
+
+const Toggle = forwardRef<
+  UIInputElement,
+  Contract.CheckboxProps & { radio?: boolean; value?: string }
+>(function Toggle(props, ref) {
+  const { disabled, radio } = props;
   const context = useThemeContext();
+  const control = useControl();
+  control.value = props.value ?? "on";
+  const [setRef, element] = useControlRef(ref, control);
+  const [checked, toggle] = useChecked(props, control, element, (current) =>
+    radio ? true : !current
+  );
+  control.click = () => {
+    if (!disabled) toggle();
+  };
+  useLabelControl(control);
   const size = 18;
   return (
     <Box
-      ref={ref as ForwardedRef<UIElement>}
       {...(props as unknown as Contract.BoxProps)}
+      ref={setRef}
       variant={undefined}
-      onPress={(event) => {
+      onPress={disabled ? undefined : props.onPress}
+      onClick={(event) => {
         if (disabled) return;
-        props.onPress?.(event);
-        onCheckedChange?.(radio ? true : !checked);
+        (props.onClick as Contract.BoxProps["onClick"])?.(event);
+        toggle();
       }}
       sx={{
         display: "flex",
@@ -413,14 +698,16 @@ function Toggle(
       ) : null}
     </Box>
   );
-}
+});
 
 export const Checkbox = forwardRef<UIInputElement, Contract.CheckboxProps>(
-  Toggle
+  function Checkbox(props, ref) {
+    return <Toggle ref={ref} {...props} />;
+  }
 );
 export const Radio = forwardRef<UIInputElement, Contract.RadioProps>(
   function Radio(props, ref) {
-    return Toggle({ ...props, radio: true }, ref);
+    return <Toggle ref={ref} {...props} radio />;
   }
 );
 
@@ -428,22 +715,34 @@ export const Switch = forwardRef<UIInputElement, Contract.SwitchProps>(
   function Switch(props, ref) {
     const context = useThemeContext();
     const { viewStyle, nativeProps } = useStyled(props);
-    const inner = useElementRef(ref);
-    const checked = !!props.checked;
+    const control = useControl();
+    const [setRef, element] = useElementRef(ref, { control, id: props.id });
+    const [checked, toggle] = useChecked(
+      props,
+      control,
+      element,
+      (current) => !current
+    );
+    control.click = () => {
+      if (!props.disabled) toggle();
+    };
+    useLabelControl(control);
+    const onClick = pressHandler({ onClick: props.onClick });
     const background =
       (viewStyle as { backgroundColor?: string } | undefined)
         ?.backgroundColor ??
       (checked ? context.colors.accent : context.colors["icon-disabled"]);
     return (
       <Pressable
-        ref={inner as never}
+        ref={setRef as never}
         {...(nativeProps as object)}
         accessibilityRole="switch"
         accessibilityState={{ checked, disabled: !!props.disabled }}
         disabled={props.disabled}
         onPress={(event) => {
           event.stopPropagation();
-          props.onCheckedChange?.(!checked);
+          onClick?.(event as NativeEvent);
+          toggle(event as NativeEvent);
         }}
         style={[
           viewStyle as object,
@@ -509,27 +808,80 @@ export const Progress = forwardRef<UIElement, Contract.ProgressProps>(
   }
 );
 
+export const Donut = forwardRef<UIElement, Contract.DonutProps>(function Donut(
+  props,
+  ref
+) {
+  const { value, min = 0, max = 1, size = 128, strokeWidth = 2 } = props;
+  const context = useThemeContext();
+  const { viewStyle, nativeProps } = useStyled(props);
+  const [setRef] = useElementRef(ref, { id: props.id });
+  const radius = 16 - strokeWidth;
+  const circumference = 2 * radius * Math.PI;
+  const ratio =
+    max > min ? Math.max(0, Math.min(1, (value - min) / (max - min))) : 0;
+  const color =
+    (viewStyle.color as string | undefined) ?? context.colors.accent;
+  const style = { ...viewStyle };
+  delete style.color;
+  return (
+    <AnyView
+      ref={setRef}
+      {...nativeProps}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min, max, now: value }}
+      style={{ ...style, width: size, height: size }}
+    >
+      <Svg width={size} height={size} viewBox="0 0 32 32">
+        <Circle
+          cx={16}
+          cy={16}
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          opacity={1 / 8}
+        />
+        <Circle
+          cx={16}
+          cy={16}
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeDasharray={[circumference, circumference]}
+          strokeDashoffset={circumference - ratio * circumference}
+          transform="rotate(-90 16 16)"
+        />
+      </Svg>
+    </AnyView>
+  );
+});
+
 export const Slider = forwardRef<UIInputElement, Contract.SliderProps>(
   function Slider(props, ref) {
-    const {
-      value = 0,
-      min = 0,
-      max = 100,
-      step = 1,
-      onValueChange: onChange
-    } = props;
+    const { min = 0, max = 100, step = 1, onValueChange, onChange } = props;
+    const [own, setOwn] = useState(props.defaultValue ?? min);
+    const value = props.value ?? own;
+    const control = useControl();
+    control.value = String(value);
+    const [setRef, element] = useElementRef(ref, { control, id: props.id });
     const width = useRef(0);
     const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)));
     const update = (x: number) => {
       if (!width.current || props.disabled) return;
       const raw =
         min + Math.max(0, Math.min(1, x / width.current)) * (max - min);
-      onChange?.(Math.round(raw / step) * step);
+      const next = Math.round(raw / step) * step;
+      control.value = String(next);
+      if (props.value === undefined) setOwn(next);
+      onValueChange?.(next);
+      onChange?.(changeEvent(element.current));
     };
     return (
       <AnyView
-        ref={ref}
-        testID={props.testID}
+        ref={setRef}
+        testID={testIdOf(props)}
         style={{ height: 20, justifyContent: "center", flexShrink: 1 }}
         onLayout={(event: { nativeEvent: { layout: { width: number } } }) => {
           width.current = event.nativeEvent.layout.width;
@@ -551,17 +903,18 @@ export const Slider = forwardRef<UIInputElement, Contract.SliderProps>(
 
 export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   props,
-  _ref
+  ref
 ) {
   const context = useThemeContext();
   const { nativeProps, viewStyle } = useStyled(props);
+  const [setRef] = useElementRef(ref, { id: props.id });
   const size = props.size ?? 24;
   const pixels =
     typeof size === "number"
       ? size
       : (context.theme.iconSizes as Record<string, number>)[size] ?? 24;
   const color = props.color
-    ? context.colors[props.color] ?? props.color
+    ? resolveColor(props.color, context.colors)
     : context.colors.icon;
   const transform = props.rotate
     ? [
@@ -571,6 +924,7 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
     : viewStyle.transform;
   return (
     <AnyView
+      ref={setRef}
       {...nativeProps}
       style={{
         ...viewStyle,

@@ -83,9 +83,9 @@ describe("sx keys taken from apps/web", () => {
   });
 
   test("borderStyle passes through", () => {
-    expect(convertDeclarations({ borderStyle: "dashed" }).style).toMatchObject(
-      { borderStyle: "dashed" }
-    );
+    expect(convertDeclarations({ borderStyle: "dashed" }).style).toMatchObject({
+      borderStyle: "dashed"
+    });
   });
 
   test("textDecorationColor passes through", () => {
@@ -232,5 +232,40 @@ describe("outline shorthand", () => {
       ["outlineColor", "#ff0000"],
       ["outlineOffset", 0]
     ]);
+  });
+});
+
+describe("styles that replace React Native props", () => {
+  test("lineClamp becomes the number of lines and is not a style", () => {
+    const converted = convertDeclarations({ lineClamp: 2 });
+    expect(converted.numberOfLines).toBe(2);
+    expect(converted.style).not.toHaveProperty("lineClamp");
+  });
+
+  test("lineClamp wins over an ellipsis, and nowrap is always one line", () => {
+    expect(
+      convertDeclarations({ lineClamp: 3, textOverflow: "ellipsis" })
+        .numberOfLines
+    ).toBe(3);
+    expect(
+      convertDeclarations({ textOverflow: "ellipsis" }).numberOfLines
+    ).toBe(1);
+    expect(
+      convertDeclarations({ lineClamp: 3, whiteSpace: "nowrap" }).numberOfLines
+    ).toBe(1);
+  });
+
+  test("a lineClamp that is not a positive number is ignored", () => {
+    expect(convertDeclarations({ lineClamp: 0 }).numberOfLines).toBeUndefined();
+    expect(
+      convertDeclarations({ lineClamp: "none" }).numberOfLines
+    ).toBeUndefined();
+  });
+
+  test("objectFit is handed to the image and is not a style", () => {
+    const converted = convertDeclarations({ objectFit: "cover", width: 10 });
+    expect(converted.objectFit).toBe("cover");
+    expect(converted.style).not.toHaveProperty("objectFit");
+    expect(converted.style.width).toBe(10);
   });
 });

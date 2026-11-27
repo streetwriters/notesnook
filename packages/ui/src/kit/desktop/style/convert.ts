@@ -27,6 +27,7 @@ export interface ConvertedStyle {
   style: Record<string, unknown>;
   numberOfLines?: number;
   selectable?: boolean;
+  objectFit?: string;
 }
 
 const SHORTHANDS = new Set([
@@ -274,6 +275,14 @@ export function convertDeclarations(
           style[outlineKey] = outlineValue;
         continue;
       }
+      case "lineClamp":
+      case "WebkitLineClamp":
+        if (typeof value === "number" && value > 0)
+          converted.numberOfLines = value;
+        continue;
+      case "objectFit":
+        if (typeof value === "string") converted.objectFit = value;
+        continue;
       case "wordBreak":
       case "overflowWrap":
       case "wordWrap":
@@ -321,7 +330,8 @@ export function convertDeclarations(
   if (isFlex && style.flexDirection === undefined) style.flexDirection = "row";
   if (style.flexShrink === undefined && style.flex === undefined)
     style.flexShrink = 1;
-  if (nowrap || ellipsis) converted.numberOfLines = 1;
+  if (nowrap || (ellipsis && converted.numberOfLines === undefined))
+    converted.numberOfLines = 1;
   const ratio = lineHeightRatio(style.lineHeight);
   if (ratio !== undefined)
     style.lineHeight =

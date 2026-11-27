@@ -21,7 +21,8 @@ import { Appearance, Dimensions, useWindowDimensions } from "react-native";
 import { Platform, useColorScheme } from "react-native";
 import type * as Contract from "../contracts/hooks";
 import { formatShortcutFor, type ShortcutPlatform } from "../shared/shortcut";
-import { lastPointer } from "./style/use-styled";
+import { lastPointer } from "./style/events";
+import { alphaToken, withAlpha } from "./style/resolve";
 import { useThemeContext } from "./theme";
 
 function evaluate(
@@ -65,6 +66,19 @@ export const getPointerPosition: typeof Contract.getPointerPosition = () => ({
   x: lastPointer.x,
   y: lastPointer.y
 });
+
+export const useThemeUI: typeof Contract.useThemeUI = () => ({
+  theme: useThemeContext().theme
+});
+
+/**
+ * `color` at `amount` opacity. A colour literal is computed here; a theme
+ * token is resolved against the theme when the `sx` it is used in is drawn.
+ */
+export const alpha: typeof Contract.alpha = (color, amount) =>
+  (color.startsWith("#")
+    ? withAlpha(color, amount)
+    : alphaToken(color, amount)) as ReturnType<typeof Contract.alpha>;
 
 export const useThemeColor: typeof Contract.useThemeColor = (token) =>
   useThemeContext().colors[token] ?? "transparent";

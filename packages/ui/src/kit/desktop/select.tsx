@@ -17,27 +17,90 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useRef } from "react";
+import {
+  Children,
+  forwardRef,
+  isValidElement,
+  useRef,
+  useState,
+  type ReactNode
+} from "react";
 import type * as Contract from "../contracts/primitives";
 import type { UIElement, UISelectElement } from "../contracts/elements";
 import { useMenuStore } from "../shared/menu-store";
 import { CaretDown } from "../shared/icons";
+import {
+  elementFor,
+  type DesktopElement,
+  type ElementControl
+} from "./element";
 import { Button, Flex, Text } from "./primitives";
+import { changeEvent } from "./style/events";
+import { testIdOf } from "./style/native-props";
+
+function textOf(node: ReactNode): string {
+  return Children.toArray(node)
+    .map((child) =>
+      typeof child === "string" || typeof child === "number"
+        ? String(child)
+        : isValidElement<{ children?: ReactNode }>(child)
+        ? textOf(child.props.children)
+        : ""
+    )
+    .join("");
+}
+
+/** The options of a select: its `<option>` children, also inside `<optgroup>`. */
+export function optionsOf(children: ReactNode): Contract.SelectOption[] {
+  const options: Contract.SelectOption[] = [];
+  for (const child of Children.toArray(children)) {
+    if (
+      !isValidElement<{
+        value?: string | number;
+        disabled?: boolean;
+        label?: string;
+        children?: ReactNode;
+      }>(child)
+    )
+      continue;
+    if (child.type === "option") {
+      const title = child.props.label ?? textOf(child.props.children);
+      options.push({
+        value: child.props.value ?? title,
+        title,
+        disabled: child.props.disabled || undefined
+      });
+    } else options.push(...optionsOf(child.props.children));
+  }
+  return options;
+}
 
 export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
   function Select(props, ref) {
-    const { options = [], value, onValueChange: onChange } = props;
-    const trigger = useRef<UIElement>(null);
-    const selected = options.find((option) => option.value === value);
+    const { onValueChange, onChange } = props;
+    const options = [...(props.options ?? []), ...optionsOf(props.children)];
+    const [own, setOwn] = useState(props.defaultValue ?? options[0]?.value);
+    const value = props.value ?? own;
+    const trigger = useRef<DesktopElement | null>(null);
+    const control = useRef<ElementControl>({}).current;
+    control.value = value === undefined ? "" : String(value);
+    const selected = options.find(
+      (option) => String(option.value) === control.value
+    );
 
     return (
       <Button
-        ref={(node) => {
-          trigger.current = node;
-          if (typeof ref === "function") ref(node as UISelectElement | null);
-          else if (ref) ref.current = node as UISelectElement | null;
+        ref={(node: UIElement | null) => {
+          trigger.current = elementFor(node, control);
+          const element = trigger.current as UISelectElement | null;
+          if (typeof ref === "function") ref(element);
+          else if (ref) ref.current = element;
         }}
-        testID={props.testID}
+        type="button"
+        id={props.id}
+        title={props.title}
+        disabled={props.disabled}
+        testID={testIdOf(props)}
         onPress={() => {
           trigger.current?.measureInWindow((x, y, width, height) => {
             useMenuStore.getState().open(
@@ -46,8 +109,15 @@ export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
                 key: String(option.value),
                 title: option.title,
                 isDisabled: option.disabled,
-                isChecked: option.value === value,
-                onClick: () => onChange?.(String(option.value))
+                isChecked: String(option.value) === control.value,
+                onClick: () => {
+                  const next = String(option.value);
+                  const changed = next !== control.value;
+                  control.value = next;
+                  if (props.value === undefined) setOwn(option.value);
+                  onValueChange?.(next);
+                  if (changed) onChange?.(changeEvent(trigger.current));
+                }
               })),
               { x, y, width, height }
             );

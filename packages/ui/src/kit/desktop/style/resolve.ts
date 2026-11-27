@@ -36,6 +36,7 @@ export interface ResolvedStyle {
   animated?: boolean;
   numberOfLines?: number;
   selectable?: boolean;
+  objectFit?: "cover" | "contain" | "fill";
   hoverStyle?: Record<string, unknown>;
   activeStyle?: Record<string, unknown>;
   focusStyle?: Record<string, unknown>;
@@ -141,6 +142,56 @@ export function resolveSx(
 
 const EMPTY: SxProp = {};
 
+const ALPHA = /^alpha\((.+),\s*(-?\d*\.?\d+)\)$/;
+const HEX_COLOR = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+/** The value `alpha()` from the kit's hooks returns for `color` at `amount`. */
+export function alphaToken(color: string, amount: number) {
+  return `alpha(${color}, ${amount})`;
+}
+
+/** `color` with its opacity multiplied by `amount`, as `#rrggbbaa`. */
+export function withAlpha(color: string, amount: number) {
+  const match = HEX_COLOR.exec(color.trim());
+  if (!match) return color;
+  let hex = match[1];
+  if (hex.length <= 4)
+    hex = hex
+      .split("")
+      .map((digit) => digit + digit)
+      .join("");
+  const base = hex.length === 8 ? parseInt(hex.slice(6), 16) / 255 : 1;
+  const opacity = Math.round(Math.max(0, Math.min(1, base * amount)) * 255);
+  return `#${hex.slice(0, 6)}${opacity.toString(16).padStart(2, "0")}`;
+}
+
+/** The colour of a theme token, an `alpha()` value or a literal. */
+export function resolveColor(value: string, colors: Record<string, string>) {
+  const match = value.startsWith("alpha(") ? ALPHA.exec(value) : null;
+  if (!match) return colors[value] ?? value;
+  const color = match[1].trim();
+  return withAlpha(colors[color] ?? color, parseFloat(match[2]));
+}
+
+/** Replaces every `alpha()` value in `declarations` with its colour. */
+export function resolveAlpha<T extends object>(
+  declarations: T,
+  colors: Record<string, string>
+): T {
+  let result: Record<string, unknown> | undefined;
+  for (const key in declarations) {
+    const value = (declarations as Record<string, unknown>)[key];
+    let next = value;
+    if (typeof value === "string") {
+      if (value.startsWith("alpha(")) next = resolveColor(value, colors);
+    } else if (value && typeof value === "object" && !Array.isArray(value))
+      next = resolveAlpha(value, colors);
+    if (next !== value)
+      (result ??= { ...(declarations as Record<string, unknown>) })[key] = next;
+  }
+  return (result as T | undefined) ?? declarations;
+}
+
 function groupEntries(sx: SxProp) {
   const own: Record<string, unknown> = {};
   let groupHover: { group: string; style: Declarations } | undefined;
@@ -172,7 +223,10 @@ function compute(
       : undefined;
   const { own, groupHover, groupActive, transition, animation } =
     groupEntries(sx);
-  const merged = { ...normalizeVariant(variants, colors), ...own };
+  const merged = resolveAlpha(
+    { ...normalizeVariant(variants, colors), ...own },
+    colors
+  );
   const themed = css(withCssTransform(merged) as never)(
     theme as never
   ) as Declarations;
@@ -212,7 +266,8 @@ function compute(
     style: converted.style,
     animated: transition || animation ? true : undefined,
     numberOfLines: converted.numberOfLines,
-    selectable: converted.selectable
+    selectable: converted.selectable,
+    objectFit: converted.objectFit as ResolvedStyle["objectFit"]
   };
   for (const state in states) {
     resolved[STATE_KEYS[state as keyof typeof STATE_KEYS]] =
@@ -221,7 +276,7 @@ function compute(
   const resolveGroup = (entry: { group: string; style: Declarations }) => ({
     group: entry.group,
     style: convertStateDeclarations(
-      css(withCssTransform(entry.style) as never)(
+      css(withCssTransform(resolveAlpha(entry.style, colors)) as never)(
         theme as never
       ) as Declarations
     )

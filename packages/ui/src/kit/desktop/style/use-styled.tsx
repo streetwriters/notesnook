@@ -25,23 +25,26 @@ import {
   useSyncExternalStore,
   type ReactNode
 } from "react";
-import { Dimensions, Text as NativeText } from "react-native";
+import {
+  codegenNativeCommands,
+  Dimensions,
+  Text as NativeText
+} from "react-native";
 import { DragDrop } from "@react-native-gpui/core/desktop";
-import type {
-  BaseProps,
-  ContextMenuEvent,
-  DragEvent,
-  HoverEvent,
-  PointerMoveEvent,
-  KeyEvent,
-  PressEvent,
-  SxProp,
-  WheelEvent
-} from "../../contracts";
+import type { BaseProps, StyleProp, SxProp } from "../../contracts";
 import { toPickedFile } from "../picked-file";
 import { mergeShorthands } from "../../shared/style/shorthand";
 import { useThemeContext } from "../theme";
+import { setScrollCommand } from "../element";
+import { keyboardEvent, lastPointer } from "./events";
+import {
+  nativeEventProps,
+  pressHandler,
+  type NativeHost
+} from "./native-props";
 import { breakpointOf, resolveSx, type ResolvedStyle } from "./resolve";
+
+export { lastPointer, pressHandler };
 
 const TEXT_KEYS = [
   "color",
@@ -96,118 +99,31 @@ export interface StyledResult {
   nativeProps: Record<string, unknown>;
 }
 
-export const lastPointer = { x: 320, y: 120 };
+const host: NativeHost = {
+  getPayload: () => DragDrop.getPayload(),
+  setPayload: (payload) => DragDrop.setPayload(payload),
+  toFile: toPickedFile
+};
 
-function rememberPointer(native: { pageX?: number; pageY?: number }) {
-  if (typeof native.pageX === "number" && typeof native.pageY === "number") {
-    lastPointer.x = native.pageX;
-    lastPointer.y = native.pageY;
-  }
+const ScrollCommands = codegenNativeCommands<{
+  scrollTo: (ref: never, x: number, y: number, animated: boolean) => void;
+}>({ supportedCommands: ["scrollTo"] });
+setScrollCommand((node, x, y, animated) =>
+  ScrollCommands.scrollTo(node as never, x, y, animated)
+);
+
+/** @deprecated Use `keyboardEvent` from `./events`. */
+export function key(event: any) {
+  return keyboardEvent("keydown", event);
 }
 
-function legacy<T>(event: object): T {
-  return event as T;
-}
-
-function press(event: any): PressEvent {
-  const native = event?.nativeEvent ?? {};
-  rememberPointer(native);
-  return {
-    button: "primary",
-    detail: 1,
-    x: native.locationX ?? 0,
-    y: native.locationY ?? 0,
-    pageX: native.pageX ?? 0,
-    pageY: native.pageY ?? 0,
-    shiftKey: !!native.shiftKey,
-    ctrlKey: !!native.ctrlKey,
-    altKey: !!native.altKey,
-    metaKey: !!native.metaKey,
-    preventDefault() {},
-    stopPropagation() {
-      event?.stopPropagation?.();
-    }
-  };
-}
-
-export function key(event: any): KeyEvent {
-  const native = event?.nativeEvent ?? event ?? {};
-  return legacy<KeyEvent>({
-    key: native.key,
-    repeat: !!native.repeat,
-    shiftKey: !!native.shiftKey,
-    ctrlKey: !!native.ctrlKey,
-    altKey: !!native.altKey,
-    metaKey: !!native.metaKey,
-    preventDefault() {
-      event?.preventDefault?.();
-    },
-    stopPropagation() {
-      event?.stopPropagation?.();
-    }
-  });
-}
-
-function pointer(event: any): PointerMoveEvent {
-  const native = event?.nativeEvent ?? event ?? {};
-  rememberPointer(native);
-  return {
-    x: native.locationX ?? 0,
-    y: native.locationY ?? 0,
-    pageX: native.pageX ?? 0,
-    pageY: native.pageY ?? 0,
-    buttons: native.buttons ?? 0
-  };
-}
-
-function hover(event: any): HoverEvent {
-  const native = event?.nativeEvent ?? event ?? {};
-  rememberPointer(native);
-  return {
-    pageX: native.pageX ?? 0,
-    pageY: native.pageY ?? 0,
-    shiftKey: !!native.shiftKey,
-    ctrlKey: !!native.ctrlKey,
-    altKey: !!native.altKey,
-    metaKey: !!native.metaKey,
-    preventDefault() {},
-    stopPropagation() {
-      event?.stopPropagation?.();
-    }
-  };
-}
-
-function drag(event: any): DragEvent {
-  const native = event?.nativeEvent ?? event ?? {};
-  return legacy<DragEvent>({
-    payload: DragDrop.getPayload(),
-    x: native.x ?? 0,
-    y: native.y ?? 0,
-    pageX: native.pageX ?? 0,
-    pageY: native.pageY ?? 0
-  });
-}
-
-function contextMenu(event: any): ContextMenuEvent {
-  const native = event?.nativeEvent ?? event ?? {};
-  rememberPointer({
-    pageX: native.pageX ?? native.x,
-    pageY: native.pageY ?? native.y
-  });
-  return legacy<ContextMenuEvent>({
-    pageX: native.pageX ?? native.x ?? 0,
-    pageY: native.pageY ?? native.y ?? 0,
-    shiftKey: !!native.shiftKey,
-    ctrlKey: !!native.ctrlKey,
-    altKey: !!native.altKey,
-    metaKey: !!native.metaKey,
-    preventDefault() {
-      event?.preventDefault?.();
-    },
-    stopPropagation() {
-      event?.stopPropagation?.();
-    }
-  });
+/** `style` is laid over `sx`, as an inline style is over a class on the web. */
+function withInlineStyle(sx: SxProp | undefined, style: StyleProp | undefined) {
+  if (!style) return sx;
+  const inline: Record<string, unknown> = { ...style };
+  // Only the object form of `transition` is drawn on desktop.
+  if (typeof inline.transition === "string") delete inline.transition;
+  return { ...sx, ...inline } as SxProp;
 }
 
 export function useStyled(
@@ -216,7 +132,10 @@ export function useStyled(
 ): StyledResult {
   const context = useThemeContext();
   const breakpoint = useBreakpoint();
-  const sx = mergeShorthands(props, options.defaults);
+  const sx = withInlineStyle(
+    mergeShorthands(props, options.defaults),
+    props.style
+  );
   const resolved = resolveSx(sx, context, {
     variantGroup: options.variantGroup,
     variant: props.variant ?? options.defaultVariant,
@@ -232,126 +151,21 @@ export function useStyled(
     }
 
     const nativeProps: Record<string, unknown> = {
-      testID: props.testID,
-      nativeID: props.id,
-      tooltip: props.title || undefined,
-      group: props.group,
       hoverStyle: resolved.hoverStyle,
       activeStyle: resolved.activeStyle,
       focusStyle: resolved.focusStyle,
       focusVisibleStyle: resolved.focusVisibleStyle,
       dragOverStyle: resolved.dragOverStyle,
-      draggable: props.draggable || undefined,
-      droppable: props.droppable || undefined,
-      acceptsFiles: props.onDropFiles ? true : undefined,
-      onDragStart: props.onDragStart
-        ? (e: unknown) => DragDrop.setPayload(props.onDragStart?.(drag(e)))
-        : props.draggable
-        ? () => DragDrop.setPayload(undefined)
-        : undefined,
-      onDragEnd: props.onDragEnd
-        ? (e: any) =>
-            props.onDragEnd?.(
-              legacy<DragEvent>({ dropped: !!e?.nativeEvent?.dropped })
-            )
-        : undefined,
-      onDragEnter: props.onDragEnter
-        ? (e: unknown) => props.onDragEnter?.(drag(e))
-        : undefined,
-      onDragOver: props.onDragOver
-        ? (e: unknown) => props.onDragOver?.(drag(e))
-        : undefined,
-      onDragLeave: props.onDragLeave
-        ? (e: unknown) => props.onDragLeave?.(drag(e))
-        : undefined,
-      onDrop:
-        props.onDrop || props.onDropFiles
-          ? (e: any) => {
-              const files: { path: string; size: number }[] =
-                e?.nativeEvent?.files ?? [];
-              if (files.length > 0 && props.onDropFiles) {
-                const accepted = props.acceptsFiles?.map((extension) =>
-                  extension.replace(/^\./, "").toLowerCase()
-                );
-                const picked = files
-                  .filter(
-                    (file) =>
-                      !accepted ||
-                      accepted.includes(
-                        file.path.split(".").pop()?.toLowerCase() ?? ""
-                      )
-                  )
-                  .map((file) => toPickedFile(file.path, file.size));
-                if (picked.length > 0) props.onDropFiles(picked);
-              } else props.onDrop?.(drag(e));
-            }
-          : undefined,
       groupHoverStyle: resolved.groupHoverStyle,
       groupActiveStyle: resolved.groupActiveStyle,
-      onContextMenu: props.onContextMenu
-        ? (e: unknown) => props.onContextMenu?.(contextMenu(e))
-        : undefined,
-      onPointerEnter: props.onHoverIn
-        ? (e: unknown) => props.onHoverIn?.(hover(e))
-        : undefined,
-      onPointerLeave: props.onHoverOut
-        ? (e: unknown) => props.onHoverOut?.(hover(e))
-        : undefined,
-      onWheel: props.onWheel
-        ? (e: any) =>
-            props.onWheel?.(
-              legacy<WheelEvent>({
-                deltaX: e?.nativeEvent?.deltaX ?? 0,
-                deltaY: e?.nativeEvent?.deltaY ?? 0,
-                preventDefault: () => e?.preventDefault?.()
-              })
-            )
-        : undefined,
-      onPointerDown: props.onPointerDown
-        ? (e: unknown) => props.onPointerDown?.(pointer(e))
-        : undefined,
-      onPointerMove: props.onPointerMove
-        ? (e: unknown) => props.onPointerMove?.(pointer(e))
-        : undefined,
-      onPointerUp: props.onPointerUp
-        ? (e: unknown) => props.onPointerUp?.(pointer(e))
-        : undefined,
-      onFocus: props.onFocus as never,
-      onBlur: props.onBlur as never,
-      onKeyDown: props.onKeyDown
-        ? (e: unknown) => props.onKeyDown?.(key(e))
-        : undefined,
-      onKeyUp: props.onKeyUp
-        ? (e: unknown) => props.onKeyUp?.(key(e))
-        : undefined,
-      focusable:
-        props.onFocus ||
-        props.onBlur ||
-        props.onKeyDown ||
-        props.onKeyUp ||
-        resolved.focusStyle ||
-        resolved.focusVisibleStyle
-          ? true
-          : undefined
+      ...nativeEventProps(props, host)
     };
+    if (resolved.focusStyle || resolved.focusVisibleStyle)
+      nativeProps.focusable = true;
     for (const name in nativeProps)
       if (nativeProps[name] === undefined) delete nativeProps[name];
     return { resolved, viewStyle, textStyle, nativeProps };
   }, [resolved, props]);
-}
-
-export function pressHandler(props: BaseProps<any>) {
-  if (!props.onPress && !props.onDoubleClick) return undefined;
-  let lastPress = 0;
-  return (event: unknown) => {
-    const now = Date.now();
-    const pressEvent = press(event);
-    const isDouble = now - lastPress < 400;
-    lastPress = isDouble ? 0 : now;
-    if (isDouble) pressEvent.detail = 2;
-    props.onPress?.(pressEvent);
-    if (isDouble) props.onDoubleClick?.(legacy<ContextMenuEvent>(pressEvent));
-  };
 }
 
 export function useMergedTextStyle(own: Style | undefined): Style | undefined {
