@@ -124,7 +124,7 @@ export const SplitPane = forwardRef<
   const onChange = useRef(props.onChange);
   onChange.current = props.onChange;
   const { viewStyle, nativeProps } = useStyled(
-    { sx: props.sx, testID: props.testID },
+    { sx: props.sx, "data-test-id": props["data-test-id"] },
     {
       defaults: {
         display: "flex",
@@ -278,7 +278,7 @@ export const SplitPane = forwardRef<
           }}
         >
           <AnyView
-            testID={`${props.testID ?? "split-pane"}-sash-${index}`}
+            testID={`${props["data-test-id"] ?? "split-pane"}-sash-${index}`}
             style={{
               position: "absolute",
               ...(horizontal
@@ -337,7 +337,7 @@ const PaneView = memo(function PaneView({
   pane: Contract.PaneProps;
 }) {
   const { viewStyle, nativeProps } = useStyled(
-    { sx: pane.sx, testID: pane.testID ?? `pane-${pane.id}` },
+    { sx: pane.sx, "data-test-id": pane["data-test-id"] ?? `pane-${pane.id}` },
     { defaults: { display: "flex", flexDirection: "column" } }
   );
   const fixed = size !== undefined;
@@ -383,7 +383,7 @@ export const ScrollContainer = forwardRef<
   const { viewStyle, nativeProps } = useStyled({
     // `style` wins over `sx`, as an inline style does on the web.
     sx: props.style ? { ...props.sx, ...props.style } : props.sx,
-    testID: props["data-test-id"] ?? props.testID,
+    "data-test-id": props["data-test-id"],
     id: props.id,
     onWheel: props.onWheel
   } as never);

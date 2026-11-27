@@ -27,26 +27,18 @@ import type {
   UITextAreaElement
 } from "./elements";
 import type {
-  ContextMenuEvent,
-  FocusEvent,
-  HoverEvent,
-  KeyEvent,
-  PressEvent,
   UIChangeEvent,
   UIDragEvent,
   UIKeyboardEvent,
   UIMouseEvent
 } from "./events";
-import { Dialog, DialogButton, Modal } from "./dialog";
+import { Modal } from "./dialog";
 import { Pane, ScrollContainer, SplitPane } from "./layout";
 import {
   GroupedVirtuoso,
   TableVirtuoso,
-  VirtualList,
   Virtuoso,
   type Components,
-  type VirtualListHandle,
-  type VirtualListProps,
   type VirtuosoHandle
 } from "./lists";
 import {
@@ -228,15 +220,6 @@ export const elements = [
     <Pane id="nav" initialSize={250} minSize={50} snapSize={150} />
     <Pane id="editor" />
   </SplitPane>,
-  <VirtualList
-    key="14"
-    count={10}
-    itemKey={(index) => `${index}`}
-    renderItem={() => null}
-    estimatedItemSize={40}
-  />,
-  // @ts-expect-error a list needs its item size estimate
-  <VirtualList key="15" count={1} itemKey={() => ""} renderItem={() => null} />,
   // @ts-expect-error pane sizes are numbers
   <Pane key="16" id="x" initialSize="250px" />,
   <Grid key="10" columns={7} gap={1} rowGap={2} />,
@@ -515,73 +498,28 @@ export const menus = [
   />
 ];
 
-export const deprecatedAliases = [
-  <Button
-    key="1"
-    testID="button"
-    onPress={(event) => event.x + event.y}
-    onHoverIn={(event) => event.pageX}
-    onHoverOut={(event) => event.pageY}
-  />,
-  <Input
-    key="2"
-    onChangeText={(text) => text.length}
-    onSubmitEditing={(text) => text.length}
-  />,
-  <Text key="3" numberOfLines={1} />,
-  <Image key="4" src="a.png" resizeMode="cover" />,
-  <Checkbox key="5" onCheckedChange={(checked) => !checked} />,
-  <Switch key="6" onCheckedChange={(checked) => !checked} />,
-  <Slider key="7" onValueChange={(value) => value + 1} />,
-  <Select
-    key="8"
-    options={[{ value: "a", title: "A" }]}
-    onValueChange={(value) => value.length}
-  />,
-  <Box key="9" droppable onDropFiles={(files) => files.length} />,
-  <Dialog key="10" testID="dialog" isOpen />,
-  <Radio key="11" onCheckedChange={(checked) => !checked} />,
-  <Textarea key="12" onChangeText={(text) => text.length} />,
-  <Box key="13" acceptsFiles={["image/png"]} />,
-  <Box
-    key="14"
-    onDrop={(event) => [event.payload, event.x + event.y, event.dropped]}
-  />,
-  <VirtualList
-    key="15"
-    count={1}
-    renderItem={() => null}
-    itemKey={() => ""}
-    estimatedItemSize={10}
-    testID="list"
-  />,
-  <DialogButton key="16" text="OK" testID="ok" onClick={() => undefined} />
+export const removedAliases = [
+  // @ts-expect-error `testID` was replaced by `data-test-id`
+  <Button key="1" testID="button" />,
+  // @ts-expect-error `onPress` was replaced by `onClick`
+  <Button key="2" onPress={() => undefined} />,
+  // @ts-expect-error `onHoverIn` was replaced by `onMouseEnter`
+  <Button key="3" onHoverIn={() => undefined} />,
+  // @ts-expect-error `onChangeText` was replaced by `onChange`
+  <Input key="4" onChangeText={() => undefined} />,
+  // @ts-expect-error `numberOfLines` was replaced by `sx.lineClamp`
+  <Text key="5" numberOfLines={1} />,
+  // @ts-expect-error `resizeMode` was replaced by `sx.objectFit`
+  <Image key="6" src="a.png" resizeMode="cover" />,
+  // @ts-expect-error `onCheckedChange` was replaced by `onChange`
+  <Checkbox key="7" onCheckedChange={() => undefined} />,
+  // @ts-expect-error `onValueChange` was replaced by `onChange`
+  <Slider key="8" onValueChange={() => undefined} />,
+  // @ts-expect-error `options` was replaced by `<option>` children
+  <Select key="9" options={[]} />,
+  // @ts-expect-error `onDropFiles` was replaced by `onDrop`
+  <Box key="10" onDropFiles={() => undefined} />
 ];
-
-export function deprecatedMeasure(element: UIElement) {
-  element.measureInWindow((x, y, width, height) => x + y + width + height);
-}
-
-export function deprecatedEventTypes(
-  press: PressEvent,
-  hover: HoverEvent,
-  key: KeyEvent,
-  focus: FocusEvent,
-  menu: ContextMenuEvent
-) {
-  return [press.x + press.y, hover.pageX, key.key, focus.target, menu.clientX];
-}
-
-export function deprecatedListTypes(handle: VirtualListHandle) {
-  return handle.scrollToIndex;
-}
-
-export const deprecatedListProps: VirtualListProps = {
-  count: 1,
-  renderItem: () => null,
-  itemKey: () => "",
-  estimatedItemSize: 10
-};
 
 export const strict = [
   // @ts-expect-error onChange delivers an event, not the checked value

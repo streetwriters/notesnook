@@ -99,7 +99,7 @@ export function ToastHost() {
           return (
             <Flex
               key={entry.id}
-              testID="toast"
+              data-test-id="toast"
               sx={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -114,7 +114,7 @@ export function ToastHost() {
             >
               <Icon size={24} color={color} />
               <Text
-                testID="toast-message"
+                data-test-id="toast-message"
                 variant="body"
                 sx={{ fontSize: "body", color: "paragraph", flexShrink: 1 }}
               >
@@ -123,7 +123,7 @@ export function ToastHost() {
               {entry.actions?.map((action) => (
                 <Button
                   key={action.text}
-                  onPress={action.onClick}
+                  onClick={action.onClick}
                   sx={{
                     py: "7px",
                     px: "spacing3",

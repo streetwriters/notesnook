@@ -57,10 +57,6 @@ export interface UIElement {
   readonly offsetWidth: number;
   readonly offsetTop: number;
   readonly offsetLeft: number;
-  /** @deprecated Use `getBoundingClientRect`. */
-  measureInWindow(
-    callback: (x: number, y: number, width: number, height: number) => void
-  ): void;
 }
 
 export interface UITextAreaElement extends UIElement {

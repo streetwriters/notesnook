@@ -52,15 +52,16 @@ function call(props: Record<string, unknown>, name: string, event: object) {
 }
 
 describe("attributes", () => {
-  it("reads the test id from data-test-id, then from the deprecated testID", () => {
+  it("reads the test id from data-test-id only", () => {
     expect(testIdOf({ "data-test-id": "new" })).toBe("new");
-    expect(testIdOf({ testID: "old" })).toBe("old");
-    expect(testIdOf({ "data-test-id": "new", testID: "old" })).toBe("new");
+    expect(testIdOf({ testID: "old" } as never)).toBeUndefined();
     expect(testIdOf({})).toBeUndefined();
     expect(nativeEventProps({ "data-test-id": "save" }, host()).testID).toBe(
       "save"
     );
-    expect(nativeEventProps({ testID: "save" }, host()).testID).toBe("save");
+    expect(
+      nativeEventProps({ testID: "save" } as never, host()).testID
+    ).toBeUndefined();
   });
 
   it("maps id, title, aria-label, aria-hidden and tabIndex", () => {
@@ -213,24 +214,6 @@ describe("clicks", () => {
     expect(event.preventDefault).toBeTypeOf("function");
   });
 
-  it("the deprecated onPress still gets the old event, before onClick", () => {
-    const order: string[] = [];
-    const onPress = vi.fn((_event: object) => order.push("press"));
-    const onClick = vi.fn(() => order.push("click"));
-    pressHandler({ onPress, onClick })!({
-      nativeEvent: { pageX: 30, pageY: 40, locationX: 3, locationY: 4 }
-    });
-    expect(order).toEqual(["press", "click"]);
-    expect(onPress.mock.calls[0][0]).toMatchObject({
-      button: "primary",
-      detail: 1,
-      x: 3,
-      y: 4,
-      pageX: 30,
-      pageY: 40
-    });
-  });
-
   it("is not pressable without a click handler", () => {
     expect(pressHandler({})).toBeUndefined();
     expect(pressHandler({ onMouseDown: () => {} })).toBeUndefined();
@@ -264,23 +247,7 @@ describe("clicks", () => {
   });
 });
 
-describe("the deprecated handlers", () => {
-  it("onHoverIn and onHoverOut get the old event next to the new handlers", () => {
-    const onHoverIn = vi.fn();
-    const onHoverOut = vi.fn();
-    const onMouseEnter = vi.fn();
-    const props = nativeEventProps(
-      { onHoverIn, onHoverOut, onMouseEnter },
-      host()
-    );
-    call(props, "onPointerEnter", { nativeEvent: { pageX: 1, pageY: 2 } });
-    call(props, "onPointerLeave", { nativeEvent: { pageX: 1, pageY: 2 } });
-    expect(onHoverIn.mock.calls[0][0]).toMatchObject({ pageX: 1, pageY: 2 });
-    expect(onHoverIn.mock.calls[0][0]).not.toHaveProperty("clientX");
-    expect(onHoverOut).toHaveBeenCalledOnce();
-    expect(onMouseEnter).toHaveBeenCalledOnce();
-  });
-
+describe("handlers", () => {
   it("onPointerDown still gets the pointer event next to onMouseDown", () => {
     const onPointerDown = vi.fn();
     const onMouseDown = vi.fn();
@@ -304,7 +271,7 @@ describe("the deprecated handlers", () => {
     expect(onMouseDown).toHaveBeenCalledOnce();
   });
 
-  it("onDragStart's return value is still the payload a drop reads", () => {
+  it("onDragStart's return value is kept for the drag ghost", () => {
     const platform = host("stale");
     const source = nativeEventProps(
       { draggable: true, onDragStart: () => ({ id: "note-1" }) },
@@ -315,52 +282,17 @@ describe("the deprecated handlers", () => {
     expect(platform.payload).toEqual({ id: "note-1" });
 
     const onDrop = vi.fn();
-    const target = nativeEventProps({ droppable: true, onDrop }, platform);
+    const target = nativeEventProps({ onDrop }, platform);
     expect(target.droppable).toBe(true);
     call(target, "onDrop", { nativeEvent: { x: 1, y: 2 } });
-    expect(onDrop.mock.calls[0][0]).toMatchObject({
-      payload: { id: "note-1" },
-      x: 1,
-      y: 2
-    });
+    expect(onDrop.mock.calls[0][0]).toMatchObject({ clientX: 1, clientY: 2 });
+    expect(onDrop.mock.calls[0][0]).not.toHaveProperty("payload");
   });
 
   it("a draggable without onDragStart clears the payload", () => {
     const platform = host("stale");
     call(nativeEventProps({ draggable: true }, platform), "onDragStart", {});
     expect(platform.payload).toBeUndefined();
-  });
-
-  it("onDropFiles still gets the files, filtered by acceptsFiles", () => {
-    const onDropFiles = vi.fn();
-    const onDrop = vi.fn();
-    const props = nativeEventProps(
-      { onDropFiles, onDrop, acceptsFiles: [".txt"] },
-      host()
-    );
-    expect(props.acceptsFiles).toBe(true);
-    call(props, "onDrop", {
-      nativeEvent: {
-        files: [
-          { path: "/tmp/a.TXT", size: 1 },
-          { path: "/tmp/b.png", size: 2 }
-        ]
-      }
-    });
-    expect(onDrop).not.toHaveBeenCalled();
-    expect(onDropFiles).toHaveBeenCalledOnce();
-    expect(onDropFiles.mock.calls[0][0]).toHaveLength(1);
-    expect(onDropFiles.mock.calls[0][0][0]).toMatchObject({
-      name: "a.TXT",
-      size: 1,
-      uri: "file:///tmp/a.TXT"
-    });
-    // Nothing accepted: neither handler runs, as before.
-    call(props, "onDrop", {
-      nativeEvent: { files: [{ path: "/tmp/b.png", size: 2 }] }
-    });
-    expect(onDropFiles).toHaveBeenCalledOnce();
-    expect(onDrop).not.toHaveBeenCalled();
   });
 });
 

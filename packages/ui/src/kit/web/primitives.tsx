@@ -22,51 +22,31 @@ import * as ThemeUI from "@theme-ui/components";
 import { useTheme } from "@emotion/react";
 import qrcode from "qrcode-generator";
 import type * as Contract from "../contracts/primitives";
-import { legacy } from "./legacy";
+import { withKitSx } from "./kit-sx";
 
 export { ThemeScope } from "./theme";
 
 /**
- * On the web the kit's primitives are theme-ui's own components. `legacy`
- * adds nothing to them but the deprecated React Native style prop names,
- * until the last call site has moved off those (plan item 5.1).
+ * On the web the kit's primitives are theme-ui's own components; the only
+ * thing added is the rewrite of the kit-only `sx` shapes.
  */
-export const Box = legacy<typeof Contract.Box>(ThemeUI.Box, {
-  className: "nn-box"
-});
-export const Flex = legacy<typeof Contract.Flex>(ThemeUI.Flex, {
-  className: "nn-flex"
-});
-export const Grid = legacy<typeof Contract.Grid>(ThemeUI.Grid);
-export const Text = legacy<typeof Contract.Text>(ThemeUI.Text, {
-  className: "nn-text"
-});
-export const Button = legacy<typeof Contract.Button>(ThemeUI.Button, {
-  className: "nn-button",
-  // theme-ui's button is `inline-block`; old call sites lay its children out
-  // in a row.
-  sx: { display: "flex" }
-});
-export const Label = legacy<typeof Contract.Label>(ThemeUI.Label);
-export const Link = legacy<typeof Contract.Link>(ThemeUI.Link, {
-  defaults: { target: "_blank", rel: "noreferrer" }
-});
-export const Image = legacy<typeof Contract.Image>(ThemeUI.Image);
-export const Input = legacy<typeof Contract.Input>(ThemeUI.Input, {
-  className: "nn-input"
-});
-export const Textarea = legacy<typeof Contract.Textarea>(ThemeUI.Textarea, {
-  className: "nn-input nn-textarea"
-});
-export const Checkbox = legacy<typeof Contract.Checkbox>(ThemeUI.Checkbox);
-export const Radio = legacy<typeof Contract.Radio>(ThemeUI.Radio);
-export const Select = legacy<typeof Contract.Select>(ThemeUI.Select);
-export const Switch = legacy<typeof Contract.Switch>(ThemeUI.Switch);
-export const Slider = legacy<typeof Contract.Slider>(ThemeUI.Slider, {
-  value: "number"
-});
-export const Progress = legacy<typeof Contract.Progress>(ThemeUI.Progress);
-export const Donut = legacy<typeof Contract.Donut>(ThemeUI.Donut);
+export const Box = withKitSx<typeof Contract.Box>(ThemeUI.Box);
+export const Flex = withKitSx<typeof Contract.Flex>(ThemeUI.Flex);
+export const Grid = withKitSx<typeof Contract.Grid>(ThemeUI.Grid);
+export const Text = withKitSx<typeof Contract.Text>(ThemeUI.Text);
+export const Button = withKitSx<typeof Contract.Button>(ThemeUI.Button);
+export const Label = withKitSx<typeof Contract.Label>(ThemeUI.Label);
+export const Link = withKitSx<typeof Contract.Link>(ThemeUI.Link);
+export const Image = withKitSx<typeof Contract.Image>(ThemeUI.Image);
+export const Input = withKitSx<typeof Contract.Input>(ThemeUI.Input);
+export const Textarea = withKitSx<typeof Contract.Textarea>(ThemeUI.Textarea);
+export const Checkbox = withKitSx<typeof Contract.Checkbox>(ThemeUI.Checkbox);
+export const Radio = withKitSx<typeof Contract.Radio>(ThemeUI.Radio);
+export const Select = withKitSx<typeof Contract.Select>(ThemeUI.Select);
+export const Switch = withKitSx<typeof Contract.Switch>(ThemeUI.Switch);
+export const Slider = withKitSx<typeof Contract.Slider>(ThemeUI.Slider);
+export const Progress = withKitSx<typeof Contract.Progress>(ThemeUI.Progress);
+export const Donut = withKitSx<typeof Contract.Donut>(ThemeUI.Donut);
 
 // Kit-only components: theme-ui has no equivalent, so these keep a web
 // version of their own, built on the primitives above.

@@ -91,8 +91,8 @@ function ModalContent(props: Contract.ModalProps) {
   const modal = (
     <Flex
       id={props.id}
-      testID={testId ? `${testId}-overlay` : "modal-overlay"}
-      onPress={
+      data-test-id={testId ? `${testId}-overlay` : "modal-overlay"}
+      onClick={
         shouldCloseOnOverlayClick && onRequestClose
           ? (event) => onRequestClose(event as never)
           : undefined
@@ -113,9 +113,9 @@ function ModalContent(props: Contract.ModalProps) {
     >
       <Flex
         ref={content}
-        testID={testId ?? "modal-content"}
+        data-test-id={testId ?? "modal-content"}
         aria-label={props.contentLabel}
-        onPress={(event) => event.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
         sx={
           {
             position: "absolute",
@@ -161,202 +161,3 @@ export const Modal: typeof Contract.Modal = Object.assign(
     setAppElement: () => {}
   }
 );
-
-/** @deprecated Build dialog buttons with `Button`, as apps/web's dialog does. */
-export function DialogButton(props: Contract.DialogButtonProps) {
-  const { disabled, onClick, loading, text, variant, testID, sx } = props;
-  return (
-    <Button
-      testID={testID}
-      variant={variant ?? "dialog"}
-      disabled={disabled}
-      onPress={disabled ? undefined : onClick}
-      sx={{
-        maxWidth: "100%",
-        overflow: "hidden",
-        px: "spacing8",
-        py: "spacing6",
-        ...sx
-      }}
-    >
-      {loading ? (
-        <Loading
-          size={16}
-          color={variant === "new_accent" ? "accentForeground" : "paragraph"}
-        />
-      ) : (
-        text
-      )}
-    </Button>
-  );
-}
-
-/** @deprecated Use `Modal`. */
-export function Dialog(props: Contract.DialogProps) {
-  const { definition } = useThemeContext();
-  const { viewStyle } = useStyled({
-    sx: {
-      flexDirection: "column",
-      width: ["100%", "90%", props.width ?? 480],
-      maxHeight: ["100%", "80%", props.height ?? "70%"],
-      bg: "background",
-      alignSelf: "center",
-      overflow: "hidden",
-      borderRadius: "radius4",
-      ...props.sx
-    } as never
-  });
-  const isOpen = props.isOpen !== false;
-  const onOpen = props.onOpen;
-  useEffect(() => {
-    if (isOpen) onOpen?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-  useEscape(props.onClose, isOpen);
-  if (!isOpen) return null;
-
-  return (
-    <ThemeScope scope="dialog">
-      <Flex
-        testID={props.testID ? `${props.testID}-backdrop` : "dialog-backdrop"}
-        onPress={props.onClose}
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 999,
-          bg: "backdrop",
-          flexDirection: "column",
-          justifyContent: "center"
-        }}
-      >
-        <AnyPressable
-          testID={props.testID ?? "dialog"}
-          focusable={false}
-          onPress={(event: { stopPropagation?: () => void }) =>
-            event.stopPropagation?.()
-          }
-          style={{
-            ...viewStyle,
-            boxShadow:
-              definition.colorScheme === "dark"
-                ? undefined
-                : "0px 4px 34px 0px rgba(0, 0, 0, 0.1)"
-          }}
-        >
-          <Flex
-            sx={{
-              flexDirection: "row",
-              padding: "spacing7",
-              pb: 0,
-              gap: "spacing3"
-            }}
-          >
-            {props.title || props.description ? (
-              <Flex sx={{ flexDirection: "column", gap: "spacing4", flex: 1 }}>
-                {props.title ? (
-                  <Flex
-                    sx={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent:
-                        props.textAlignment === "center"
-                          ? "center"
-                          : "space-between"
-                    }}
-                  >
-                    <Text
-                      testID="dialog-title"
-                      variant="heading"
-                      sx={{
-                        fontSize: "lg",
-                        fontWeight: 600,
-                        lineHeight: "100%",
-                        textAlign: props.textAlignment ?? "left",
-                        color: "heading"
-                      }}
-                    >
-                      {props.title}
-                    </Text>
-                    {props.titleAction}
-                  </Flex>
-                ) : null}
-                {props.description ? (
-                  <Text
-                    variant="body"
-                    sx={{
-                      textAlign: props.textAlignment ?? "left",
-                      color: "paragraph",
-                      fontSize: "md",
-                      lineHeight: 1.4
-                    }}
-                  >
-                    {props.description}
-                  </Text>
-                ) : null}
-              </Flex>
-            ) : null}
-            {props.showCloseButton ? (
-              <Button
-                testID="dialog-close"
-                onPress={props.onClose}
-                sx={{ bg: "transparent", p: 0, zIndex: 999 }}
-              >
-                <Close size={16} />
-              </Button>
-            ) : null}
-          </Flex>
-
-          {props.noScroll ? (
-            props.children
-          ) : (
-            <Flex sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}>
-              <ScrollContainer sx={{ flex: 1, px: 20 }}>
-                {props.children}
-              </ScrollContainer>
-            </Flex>
-          )}
-
-          {props.positiveButton || props.negativeButton ? (
-            <Flex
-              sx={{
-                flexDirection: "row",
-                justifyContent:
-                  props.buttonsAlignment === "start"
-                    ? "flex-start"
-                    : props.buttonsAlignment === "center"
-                    ? "center"
-                    : "flex-end",
-                gap: "spacing4",
-                bg: "background-secondary",
-                p: 0,
-                px: "spacing7",
-                py: "spacing4"
-              }}
-            >
-              {props.negativeButton ? (
-                <DialogButton
-                  {...props.negativeButton}
-                  testID="dialog-no"
-                  role="negative-button"
-                  variant={props.negativeButton.variant ?? "new_tertiary"}
-                />
-              ) : null}
-              {props.positiveButton ? (
-                <DialogButton
-                  {...props.positiveButton}
-                  testID="dialog-yes"
-                  role="positive-button"
-                  variant={props.positiveButton.variant ?? "new_accent"}
-                />
-              ) : null}
-            </Flex>
-          ) : null}
-          {props.footer}
-        </AnyPressable>
-      </Flex>
-    </ThemeScope>
-  );
-}

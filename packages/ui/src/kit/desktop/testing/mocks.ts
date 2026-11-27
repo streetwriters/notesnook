@@ -155,7 +155,7 @@ export function useStyledModule() {
       textStyle: undefined,
       viewStyle: { ...options.defaults, ...props.sx },
       nativeProps: {
-        ...(props.testID ? { testID: props.testID } : {}),
+        ...(props["data-test-id"] ? { testID: props["data-test-id"] } : {}),
         ...(props.id ? { nativeID: props.id } : {}),
         ...(props.onWheel ? { onWheel: props.onWheel } : {})
       }
@@ -238,7 +238,11 @@ export function legendList() {
       ),
       props.ListFooterComponent
     );
-    const scrollProps = { testID: "list-scroll", children };
+    const scrollProps = {
+      "data-test-id": "list-scroll",
+      testID: "list-scroll",
+      children
+    };
     return props.renderScrollComponent
       ? props.renderScrollComponent(scrollProps)
       : createElement("ScrollView", scrollProps);

@@ -220,39 +220,6 @@ export declare const TableVirtuoso: <ItemData = any, Context = any>(
   }
 ) => ReactElement;
 
-/** @deprecated Use the location argument of `VirtuosoHandle.scrollToIndex`. */
-export interface ScrollToIndexOptions {
-  index: number;
-  align?: "start" | "center" | "end";
-  animated?: boolean;
-}
-
-/** @deprecated Use `VirtuosoHandle`. */
-export interface VirtualListHandle {
-  scrollToIndex(options: ScrollToIndexOptions): void;
-}
-
-/** @deprecated Use `VirtuosoProps`. */
-export interface VirtualListProps {
-  count: number;
-  renderItem: (index: number) => ReactNode;
-  itemKey: (index: number) => string;
-  estimatedItemSize: number;
-  extraData?: unknown;
-  header?: ReactNode;
-  overscan?: number;
-  initialScrollIndex?: number;
-  onKeyDown?: (event: UIKeyboardEvent) => void;
-  onBlur?: () => void;
-  sx?: SxProp;
-  testID?: string;
-}
-
-/** @deprecated Use `Virtuoso`. */
-export declare const VirtualList: ForwardRefExoticComponent<
-  VirtualListProps & RefAttributes<VirtualListHandle>
->;
-
 export interface SortableItem {
   id: string;
   group?: string;
@@ -275,8 +242,6 @@ export interface SortableListProps<T extends SortableItem> {
   direction?: "vertical" | "horizontal";
   sx?: SxProp;
   "data-test-id"?: string;
-  /** @deprecated Use `data-test-id`. */
-  testID?: string;
 }
 
 export declare function SortableList<T extends SortableItem>(

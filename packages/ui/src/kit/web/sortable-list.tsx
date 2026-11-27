@@ -35,7 +35,7 @@ export function SortableList<T extends Contract.SortableItem>(
 
   return (
     <Flex
-      data-test-id={props["data-test-id"] ?? props.testID}
+      data-test-id={props["data-test-id"]}
       sx={{ flexDirection, ...props.sx }}
     >
       {items.map((item, index) => (

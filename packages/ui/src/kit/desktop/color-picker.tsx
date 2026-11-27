@@ -49,8 +49,8 @@ export const ColorPicker = forwardRef<UIElement, Contract.ColorPickerProps>(
       <>
         <Box
           ref={setRefs}
-          testID={props.testID}
-          onPress={() => setIsOpen((open) => !open)}
+          data-test-id={props["data-test-id"]}
+          onClick={() => setIsOpen((open) => !open)}
           sx={{
             width: 40,
             height: 33,

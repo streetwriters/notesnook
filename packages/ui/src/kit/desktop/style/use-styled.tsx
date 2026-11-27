@@ -117,11 +117,6 @@ setScrollCommand((node, x, y, animated) =>
   ScrollCommands.scrollTo(node as never, x, y, animated)
 );
 
-/** @deprecated Use `keyboardEvent` from `./events`. */
-export function key(event: any) {
-  return keyboardEvent("keydown", event);
-}
-
 /** `style` is laid over `sx`, as an inline style is over a class on the web. */
 function withInlineStyle(sx: SxProp | undefined, style: StyleProp | undefined) {
   if (!style) return sx;

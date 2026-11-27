@@ -38,9 +38,6 @@ export type BaseMenuItem<TType extends MenuItemTypes> = {
 
 export type MenuSeperatorItem = BaseMenuItem<"separator">;
 
-/** @deprecated Use `MenuSeperatorItem`, the name `@notesnook/ui` exports. */
-export type MenuSeparatorItem = MenuSeperatorItem;
-
 export type MenuPopupItem = BaseMenuItem<"popup"> & {
   component: ComponentType<MenuItemComponentProps>;
 };

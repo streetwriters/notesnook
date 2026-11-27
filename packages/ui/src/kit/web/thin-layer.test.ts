@@ -146,9 +146,8 @@ describe("the web kit is a thin layer", () => {
       const source = read(file);
       expect(source, file).not.toMatch(/use-dom|style\/engine/);
       expect(source, file).not.toMatch(/resolveClassName|useDom\(/);
-      // deprecated names are understood in one file only
-      if (file !== "legacy.tsx")
-        expect(source, file).not.toMatch(/\b(onPress|onChangeText|onHoverIn)\b/);
+      // the deprecated React Native names are understood nowhere
+      expect(source, file).not.toMatch(/\b(onPress|onChangeText|onHoverIn)\b/);
     }
   });
 });

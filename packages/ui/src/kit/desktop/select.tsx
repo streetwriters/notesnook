@@ -31,6 +31,7 @@ import { useMenuStore } from "../shared/menu-store";
 import { CaretDown } from "../shared/icons";
 import {
   elementFor,
+  measureInWindow,
   type DesktopElement,
   type ElementControl
 } from "./element";
@@ -50,9 +51,15 @@ function textOf(node: ReactNode): string {
     .join("");
 }
 
+interface SelectOption {
+  value: string | number;
+  title: string;
+  disabled?: boolean;
+}
+
 /** The options of a select: its `<option>` children, also inside `<optgroup>`. */
-export function optionsOf(children: ReactNode): Contract.SelectOption[] {
-  const options: Contract.SelectOption[] = [];
+export function optionsOf(children: ReactNode): SelectOption[] {
+  const options: SelectOption[] = [];
   for (const child of Children.toArray(children)) {
     if (
       !isValidElement<{
@@ -77,14 +84,10 @@ export function optionsOf(children: ReactNode): Contract.SelectOption[] {
 
 export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
   function Select(props, ref) {
-    const { onValueChange, onChange } = props;
-    const children = optionsOf(props.children);
-    const options = [...(props.options ?? []), ...children];
-    // Like HTML, an uncontrolled `<select>` shows its first `<option>`; the
-    // deprecated `options` prop keeps showing no choice until a value is set.
-    const [own, setOwn] = useState(
-      props.defaultValue ?? (props.options ? undefined : children[0]?.value)
-    );
+    const { onChange } = props;
+    const options = optionsOf(props.children);
+    // Like HTML, an uncontrolled `<select>` shows its first `<option>`.
+    const [own, setOwn] = useState(props.defaultValue ?? options[0]?.value);
     const value = props.value ?? own;
     const trigger = useRef<DesktopElement | null>(null);
     const control = useRef<ElementControl>({}).current;
@@ -105,9 +108,9 @@ export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
         id={props.id}
         title={props.title}
         disabled={props.disabled}
-        testID={testIdOf(props)}
-        onPress={() => {
-          trigger.current?.measureInWindow((x, y, width, height) => {
+        data-test-id={testIdOf(props)}
+        onClick={() => {
+          measureInWindow(trigger.current, (x, y, width, height) => {
             useMenuStore.getState().open(
               options.map((option) => ({
                 type: "button" as const,
@@ -120,7 +123,6 @@ export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
                   const changed = next !== control.value;
                   control.value = next;
                   if (props.value === undefined) setOwn(option.value);
-                  onValueChange?.(next);
                   if (changed) onChange?.(changeEvent(trigger.current));
                 }
               })),

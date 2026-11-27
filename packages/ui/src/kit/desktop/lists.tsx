@@ -38,7 +38,8 @@ import {
   emptyScrollMetrics,
   syntheticEvent
 } from "./scroll-element";
-import { key as keyEvent, useStyled } from "./style/use-styled";
+import { useStyled } from "./style/use-styled";
+import { keyboardEvent } from "./style/events";
 import {
   groupRows,
   resolveScrollIntoView,
@@ -91,7 +92,7 @@ function VirtuosoCore(props: CoreProps) {
   const { viewStyle, nativeProps } = useStyled(
     {
       sx: common.style,
-      testID: common["data-test-id"],
+      "data-test-id": common["data-test-id"],
       id: common.id
     } as never,
     { defaults: { display: "flex", flexDirection: "column", flex: 1 } }
@@ -199,7 +200,7 @@ function VirtuosoCore(props: CoreProps) {
       onKeyDown={
         onKeyDown
           ? (event: any) => {
-              const key: any = keyEvent(event);
+              const key: any = keyboardEvent("keydown", event);
               const native = key.nativeEvent ?? {
                 ...key,
                 code: key.code ?? key.key
@@ -434,72 +435,3 @@ export const TableVirtuoso = forwardRef(function TableVirtuoso(
     <AnyView style={style}>{body}</AnyView>
   );
 }) as unknown as typeof Contract.TableVirtuoso;
-
-/** @deprecated Use `Virtuoso`. */
-export const VirtualList = forwardRef<
-  Contract.VirtualListHandle,
-  Contract.VirtualListProps
->(function VirtualList(props, ref) {
-  const { count, renderItem, itemKey, estimatedItemSize, header, overscan } =
-    props;
-  const list = useRef<LegendListRef>(null);
-  const { viewStyle, nativeProps } = useStyled(
-    { sx: props.sx, testID: props.testID },
-    { defaults: { display: "flex", flexDirection: "column", flex: 1 } }
-  );
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      scrollToIndex: ({ index, align = "start", animated = false }) => {
-        list.current?.scrollToIndex({
-          index,
-          animated,
-          viewPosition: align === "start" ? 0 : align === "center" ? 0.5 : 1
-        });
-      }
-    }),
-    []
-  );
-
-  const data = useMemo(
-    () => Array.from({ length: count }, (_, index) => index),
-    [count]
-  );
-  const keyExtractor = useCallback(
-    (index: number) => itemKey(index),
-    [itemKey]
-  );
-  const render = useCallback(
-    ({ item }: { item: number }) => renderItem(item),
-    [renderItem]
-  );
-
-  return (
-    <AnyView
-      {...nativeProps}
-      style={viewStyle}
-      focusable
-      onKeyDown={
-        props.onKeyDown
-          ? (event: any) => props.onKeyDown?.(keyEvent(event))
-          : undefined
-      }
-      onBlur={props.onBlur}
-    >
-      <LegendList
-        ref={list}
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={render}
-        estimatedItemSize={estimatedItemSize}
-        extraData={props.extraData}
-        drawDistance={overscan}
-        initialScrollIndex={props.initialScrollIndex}
-        ListHeaderComponent={header ? <Flex>{header}</Flex> : undefined}
-        recycleItems={false}
-        style={{ flex: 1 }}
-      />
-    </AnyView>
-  );
-});

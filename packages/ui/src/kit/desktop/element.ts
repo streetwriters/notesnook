@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type {
+  UIElement,
   UIInputElement,
   UIRect,
   UIScrollIntoViewOptions,
@@ -143,6 +144,22 @@ function aligned(
         return offset - viewportSize + size;
       return scrolled;
   }
+}
+
+/**
+ * The window position and size of an element a kit ref gave. It asks the
+ * native node first, and falls back to the element's own rectangle.
+ */
+export function measureInWindow(
+  element: UIElement | null | undefined,
+  callback: (x: number, y: number, width: number, height: number) => void
+) {
+  const measure = (element as { measureInWindow?: unknown } | null | undefined)
+    ?.measureInWindow;
+  if (typeof measure === "function") return measure.call(element, callback);
+  if (!element) return;
+  const rect = element.getBoundingClientRect();
+  callback(rect.x, rect.y, rect.width, rect.height);
 }
 
 /** The subset of `HTMLElement` the kit gives as a ref and as an event target. */

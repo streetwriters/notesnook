@@ -73,11 +73,11 @@ test("a click on the overlay calls onRequestClose; a click on the content does n
   let stopped = false;
   view
     .byTestId("modal-content")
-    .props.onPress({ ...click, stopPropagation: () => (stopped = true) });
+    .props.onClick({ ...click, stopPropagation: () => (stopped = true) });
   expect(stopped).toBe(true);
   expect(closes).toBe(0);
 
-  view.byTestId("modal-overlay").props.onPress(click);
+  view.byTestId("modal-overlay").props.onClick(click);
   expect(closes).toBe(1);
 });
 
@@ -92,7 +92,7 @@ test("shouldCloseOnEsc and shouldCloseOnOverlayClick set to false keep it open",
     })
   );
   expect(pressKey("escape")).toBe(false);
-  expect(view.byTestId("modal-overlay").props.onPress).toBeUndefined();
+  expect(view.byTestId("modal-overlay").props.onClick).toBeUndefined();
   expect(closes).toBe(0);
 });
 

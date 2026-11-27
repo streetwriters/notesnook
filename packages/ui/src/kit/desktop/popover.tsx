@@ -24,6 +24,7 @@ import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
 import { popupPosition, type PopupSize } from "../shared/popup-position";
 import { useEscape } from "../shared/use-escape";
+import { measureInWindow } from "./element";
 import { useWindowSize } from "./hooks";
 import { lastPointer } from "./style/use-styled";
 import { Box, Flex } from "./primitives";
@@ -63,7 +64,7 @@ export function Popover(props: Contract.PopoverProps) {
       put({ id, rect: props.anchorRect, props });
       return;
     }
-    props.anchorRef?.current?.measureInWindow((x, y, width, height) =>
+    measureInWindow(props.anchorRef?.current, (x, y, width, height) =>
       put({ id, rect: { x, y, width, height }, props })
     );
   });
@@ -121,7 +122,7 @@ function PopoverEntry(props: {
 
   useEffect(() => {
     let cancelled = false;
-    ref.current?.measureInWindow((_x, _y, width, height) => {
+    measureInWindow(ref.current, (_x, _y, width, height) => {
       popoverPosition(
         rect,
         { width, height },
@@ -144,7 +145,7 @@ function PopoverEntry(props: {
   return (
     <ThemeScope scope="contextMenu">
       <Box
-        onPress={popover.onClose}
+        onClick={popover.onClose}
         sx={{
           position: "absolute",
           top: 0,
@@ -156,7 +157,7 @@ function PopoverEntry(props: {
       >
         <Flex
           ref={ref}
-          onPress={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
           sx={{
             position: "absolute",
             top: position?.top ?? rect.y,
@@ -185,7 +186,7 @@ function measure(element: UIElement): Promise<Contract.AnchorRect> {
       height: rect.height
     });
   return new Promise((resolve) =>
-    element.measureInWindow((x, y, width, height) =>
+    measureInWindow(element, (x, y, width, height) =>
       resolve({ x, y, width, height })
     )
   );
@@ -241,7 +242,7 @@ function Presenter(props: Contract.PopupPresenterProps) {
   // its content (a lazy menu item loading), so it is read after every render.
   useEffect(() => {
     let cancelled = false;
-    content.current?.measureInWindow((_x, _y, width, height) => {
+    measureInWindow(content.current, (_x, _y, width, height) => {
       if (cancelled) return;
       setSize((current) =>
         current?.width === width && current?.height === height
@@ -265,10 +266,10 @@ function Presenter(props: Contract.PopupPresenterProps) {
       : undefined;
   const popup = (
     <Flex
-      testID="popup-presenter"
+      data-test-id="popup-presenter"
       {...rest}
       ref={content}
-      onPress={(event) => event.stopPropagation()}
+      onClick={(event) => event.stopPropagation()}
       sx={{
         position: "absolute",
         zIndex: 1000,
@@ -287,8 +288,8 @@ function Presenter(props: Contract.PopupPresenterProps) {
   // reaches nothing else. A non-blocking one leaves the window usable.
   const body = blocking ? (
     <Box
-      testID="popup-backdrop"
-      onPress={onClose}
+      data-test-id="popup-backdrop"
+      onClick={onClose}
       onContextMenu={(event) => {
         event.preventDefault();
         onClose();

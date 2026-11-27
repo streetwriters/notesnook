@@ -37,7 +37,6 @@ import { Box as ThemeUIBox } from "@theme-ui/components";
 import { MacScrollbar } from "mac-scrollbar";
 import "mac-scrollbar/dist/mac-scrollbar.css";
 import { Box, Flex } from "./primitives";
-import { LEGACY_LAYOUT_CSS } from "./legacy";
 import { toThemeUISx } from "./sx";
 
 export const TITLE_BAR_HEIGHT = 45;
@@ -174,7 +173,7 @@ export const SplitPane = forwardRef<
   const position = (event: { clientX: number; clientY: number }) =>
     horizontal ? event.clientX : event.clientY;
 
-  const testId = props["data-test-id"] ?? props.testID;
+  const testId = props["data-test-id"];
   const items: JSX.Element[] = [];
   children.forEach((child, index) => {
     const size = sizes[index];
@@ -183,9 +182,7 @@ export const SplitPane = forwardRef<
       <Flex
         key={child.props.id}
         data-test-id={
-          child.props["data-test-id"] ??
-          child.props.testID ??
-          `pane-${child.props.id}`
+          child.props["data-test-id"] ?? `pane-${child.props.id}`
         }
         sx={{
           flexDirection: "column",
@@ -295,11 +292,10 @@ export const ScrollContainer = forwardRef(function ScrollContainer(
   props: Contract.ScrollContainerProps,
   ref: Ref<UIElement>
 ) {
-  const { sx, testID, children, ...rest } = props;
+  const { sx, children, ...rest } = props;
   return (
     <ThemeUIBox
       as={MacScrollbar as never}
-      data-test-id={testID}
       {...(rest as Record<string, unknown>)}
       ref={ref as never}
       {...{ minThumbSize: 40 }}
@@ -340,14 +336,12 @@ export function TitleBar({
   );
 }
 
-// The page reset a standalone app needs (`apps/web` has its own stylesheet),
-// plus the layout defaults old call sites still rely on.
+// The page reset a standalone app needs (`apps/web` has its own stylesheet).
 const BASE_CSS = `
 *,*::before,*::after{box-sizing:border-box}
 *{outline:none;scrollbar-width:thin;scrollbar-color:var(--nn-scrollbar,rgba(128,128,128,.4)) transparent}
 html,body,#root{height:100%;margin:0;padding:0}
-body{overflow:hidden}
-${LEGACY_LAYOUT_CSS}`;
+body{overflow:hidden}`;
 
 export function LayoutRoot(props: Contract.LayoutRootProps) {
   return (

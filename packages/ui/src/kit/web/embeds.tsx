@@ -27,9 +27,7 @@ import {
 import type * as AvatarContract from "../contracts/avatar-editor";
 import type * as PdfContract from "../contracts/pdf";
 import type * as WebViewContract from "../contracts/webview";
-import type * as OverlayContract from "../contracts/overlays";
 import { Flex, Text } from "./primitives";
-import { getDragPayload } from "./legacy";
 
 function NotImplemented(props: { name: string; testId?: string }) {
   return (
@@ -134,8 +132,6 @@ export function DragGhostHost() {
   const [ghost, setGhost] = useState<React.ReactNode>();
   useEffect(() => {
     const move = (event: DragEvent) => {
-      const payload = getDragPayload() as OverlayContract.DragPayload | undefined;
-      setGhost(payload?.ghost);
       setPosition({ x: event.clientX, y: event.clientY });
     };
     const end = () => setGhost(undefined);

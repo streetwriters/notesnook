@@ -32,8 +32,6 @@ import type {
   UITextAreaElement
 } from "./elements";
 import type {
-  HoverEvent,
-  PressEvent,
   UIChangeEvent,
   UIClipboardEvent,
   UIDragEvent,
@@ -73,12 +71,6 @@ export interface PointerMoveEvent {
   pageY: number;
   buttons: number;
 }
-
-/** @deprecated Use `UIWheelEvent`. */
-export type WheelEvent = UIWheelEvent;
-
-/** @deprecated Use `UIDragEvent`. */
-export type DragEvent = UIDragEvent;
 
 export type ElementTag =
   | "a"
@@ -160,20 +152,6 @@ export interface BaseProps<T = UIElement>
   onDragOver?(event: UIDragEvent<T>): void;
   onDragLeave?(event: UIDragEvent<T>): void;
   onDrop?(event: UIDragEvent<T>): void;
-  /** @deprecated Use `data-test-id`. */
-  testID?: string;
-  /** @deprecated Use `onClick`. */
-  onPress?: (event: PressEvent) => void;
-  /** @deprecated Use `onMouseEnter`. */
-  onHoverIn?: (event: HoverEvent) => void;
-  /** @deprecated Use `onMouseLeave`. */
-  onHoverOut?: (event: HoverEvent) => void;
-  /** @deprecated Every element with `onDrop` accepts drops. */
-  droppable?: boolean;
-  /** @deprecated Use `onDrop` and read `event.dataTransfer.files`. */
-  acceptsFiles?: string[];
-  /** @deprecated Use `onDrop` and read `event.dataTransfer.files`. */
-  onDropFiles?: (files: DroppedFile[]) => void;
 }
 
 export interface BoxProps extends BaseProps {
@@ -202,8 +180,6 @@ export interface TextProps extends BaseProps {
   href?: string;
   target?: "_blank" | "_self";
   rel?: string;
-  /** @deprecated Use `sx.lineClamp`. */
-  numberOfLines?: number;
   children?: ReactNode;
 }
 
@@ -238,8 +214,6 @@ export interface ImageProps extends BaseProps {
   src: string;
   alt?: string;
   onLoad?: (event: UISyntheticEvent) => void;
-  /** @deprecated Use `sx.objectFit`. */
-  resizeMode?: "cover" | "contain" | "stretch";
 }
 
 export interface InputProps extends BaseProps<UIInputElement> {
@@ -280,10 +254,6 @@ export interface InputProps extends BaseProps<UIInputElement> {
     | "search";
   onPaste?: (event: UIClipboardEvent<UIInputElement>) => void;
   onChange?: (event: UIChangeEvent<UIInputElement>) => void;
-  /** @deprecated Use `onChange` and read `event.target.value`. */
-  onChangeText?: (text: string) => void;
-  /** @deprecated Wrap the input in a `Box as="form"` and use its `onSubmit`. */
-  onSubmitEditing?: (text: string) => void;
 }
 
 export interface TextareaProps extends BaseProps<UITextAreaElement> {
@@ -300,8 +270,6 @@ export interface TextareaProps extends BaseProps<UITextAreaElement> {
   wrap?: "soft" | "hard" | "off";
   selectTextOnFocus?: boolean;
   onChange?: (event: UIChangeEvent<UITextAreaElement>) => void;
-  /** @deprecated Use `onChange` and read `event.target.value`. */
-  onChangeText?: (text: string) => void;
 }
 
 export interface CheckboxProps extends BaseProps<UIInputElement> {
@@ -311,8 +279,6 @@ export interface CheckboxProps extends BaseProps<UIInputElement> {
   defaultChecked?: boolean;
   disabled?: boolean;
   onChange?: (event: UIChangeEvent<UIInputElement>) => void;
-  /** @deprecated Use `onChange` and read `event.target.checked`. */
-  onCheckedChange?: (checked: boolean) => void;
 }
 
 export interface RadioProps extends BaseProps<UIInputElement> {
@@ -323,8 +289,6 @@ export interface RadioProps extends BaseProps<UIInputElement> {
   name?: string;
   disabled?: boolean;
   onChange?: (event: UIChangeEvent<UIInputElement>) => void;
-  /** @deprecated Use `onChange` and read `event.target.checked`. */
-  onCheckedChange?: (checked: boolean) => void;
 }
 
 export interface SwitchProps extends BaseProps<UIInputElement> {
@@ -333,8 +297,6 @@ export interface SwitchProps extends BaseProps<UIInputElement> {
   defaultChecked?: boolean;
   disabled?: boolean;
   onChange?: (event: UIChangeEvent<UIInputElement>) => void;
-  /** @deprecated Use `onChange` and read `event.target.checked`. */
-  onCheckedChange?: (checked: boolean) => void;
 }
 
 export interface SliderProps extends BaseProps<UIInputElement> {
@@ -346,8 +308,6 @@ export interface SliderProps extends BaseProps<UIInputElement> {
   step?: number;
   disabled?: boolean;
   onChange?: (event: UIChangeEvent<UIInputElement>) => void;
-  /** @deprecated Use `onChange` and read `event.target.valueAsNumber`. */
-  onValueChange?: (value: number) => void;
 }
 
 export interface ProgressProps extends BaseProps {
@@ -398,13 +358,6 @@ export interface QRCodeHandle {
   toPNG(): Promise<Uint8Array>;
 }
 
-/** @deprecated Pass `<option>` children to `Select`. */
-export interface SelectOption {
-  value: string | number;
-  title: string;
-  disabled?: boolean;
-}
-
 export interface SelectProps extends BaseProps<UISelectElement> {
   variant?: keyof Theme["forms"];
   name?: string;
@@ -413,10 +366,6 @@ export interface SelectProps extends BaseProps<UISelectElement> {
   disabled?: boolean;
   onChange?: (event: UIChangeEvent<UISelectElement>) => void;
   children?: ReactNode;
-  /** @deprecated Pass `<option>` children. */
-  options?: SelectOption[];
-  /** @deprecated Use `onChange` and read `event.target.value`. */
-  onValueChange?: (value: string) => void;
 }
 
 export interface ThemeScopeProps {

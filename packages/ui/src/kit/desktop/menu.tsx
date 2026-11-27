@@ -25,6 +25,7 @@ import type { UIElement } from "../contracts/elements";
 import type { SxProp } from "../contracts/style";
 import { mdiIcon } from "../shared/icon-factory";
 import { dataColor } from "../shared/style/data-color";
+import { measureInWindow } from "./element";
 import { useWindowSize } from "./hooks";
 import { ScrollContainer } from "./layout";
 import { PopupPresenter } from "./popover";
@@ -89,12 +90,12 @@ function MenuButton(props: {
   const hasSubmenu = !!item.menu;
   return (
     <Button
-      testID={`menu-button-${item.key}`}
+      data-test-id={`menu-button-${item.key}`}
       variant="menuitem"
       title={item.tooltip || item.title}
       disabled={item.isDisabled}
-      onHoverIn={props.onHover}
-      onPress={() => {
+      onMouseEnter={props.onHover}
+      onClick={() => {
         if (hasSubmenu) {
           props.onOpenSubmenu?.();
           return;
@@ -138,8 +139,8 @@ function MenuButton(props: {
         ) : null}
         <Text
           variant="body"
-          numberOfLines={1}
           sx={{
+            lineClamp: 1,
             color: dangerous ? "paragraph-error" : "paragraph",
             fontSize: "xxs",
             fontWeight: 400,
@@ -152,7 +153,7 @@ function MenuButton(props: {
       </Flex>
       {item.isChecked || hasSubmenu || item.modifier || item.premium ? (
         <Flex
-          testID={`toggle-state-${item.isChecked ? "on" : "off"}`}
+          data-test-id={`toggle-state-${item.isChecked ? "on" : "off"}`}
           sx={{
             ml: 4,
             flexShrink: 0,
@@ -236,7 +237,7 @@ function MenuPanel(props: {
     if (!onSize) return;
     const frame = setTimeout(
       () =>
-        element.current?.measureInWindow((_x, _y, width, height) =>
+        measureInWindow(element.current, (_x, _y, width, height) =>
           onSize({ width, height })
         ),
       0
@@ -247,8 +248,8 @@ function MenuPanel(props: {
   return (
     <Flex
       ref={element}
-      testID="menu-container"
-      onPress={(event) => event.stopPropagation()}
+      data-test-id="menu-container"
+      onClick={(event) => event.stopPropagation()}
       sx={{
         bg: "background",
         flexDirection: "column",
@@ -265,7 +266,7 @@ function MenuPanel(props: {
       {title ? (
         <>
           <Text
-            testID="menu-title"
+            data-test-id="menu-title"
             sx={{
               color: "accent",
               fontSize: "xxs",
@@ -390,7 +391,7 @@ function MenuItems(props: {
     <>
       {environment.isDev && focusKey ? (
         <Box
-          testID={`menu-cursor-${focusKey}`}
+          data-test-id={`menu-cursor-${focusKey}`}
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}

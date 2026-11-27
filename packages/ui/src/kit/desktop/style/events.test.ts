@@ -282,8 +282,7 @@ describe("drag events", () => {
     const start = dragEvent(
       "dragstart",
       native({ pageX: 1, pageY: 2 }),
-      new DesktopDataTransfer(store),
-      undefined
+      new DesktopDataTransfer(store)
     );
     start.dataTransfer.setData("application/x-note", "id-1");
     start.dataTransfer.setData("text", "plain");
@@ -291,8 +290,7 @@ describe("drag events", () => {
     const drop = dragEvent(
       "drop",
       native({ x: 5, y: 6, pageX: 5, pageY: 6, dropped: true }),
-      new DesktopDataTransfer(store),
-      { legacy: true }
+      new DesktopDataTransfer(store)
     );
     for (const member of [...BASE, "dataTransfer", "clientX", "clientY"])
       expect(drop, member).toHaveProperty(member);
@@ -304,13 +302,8 @@ describe("drag events", () => {
       "text/plain"
     ]);
     expect(drop.dataTransfer.files).toHaveLength(0);
-    // The deprecated members are still there.
-    expect(drop).toMatchObject({
-      payload: { legacy: true },
-      x: 5,
-      y: 6,
-      dropped: true
-    });
+    expect(drop).not.toHaveProperty("payload");
+    expect(drop).not.toHaveProperty("dropped");
 
     drop.dataTransfer.clearData("text");
     expect(drop.dataTransfer.types).toEqual(["application/x-note"]);

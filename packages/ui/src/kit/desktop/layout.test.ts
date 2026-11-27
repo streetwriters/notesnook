@@ -121,10 +121,10 @@ test("scrolls sideways when only vertical scrolling is suppressed, and not at al
   expect(view.byTestId("scroller").props.scrollEnabled).toBe(false);
 });
 
-test("style is applied over sx, and the deprecated testID still names it", async () => {
+test("style is applied over sx", async () => {
   const view = await render(
     h(Scroll, {
-      testID: "old-name",
+      "data-test-id": "old-name",
       sx: { maxHeight: 100, flex: 1 },
       style: { maxHeight: 400 }
     })

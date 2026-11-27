@@ -112,7 +112,7 @@ describe("a ref to a desktop primitive", () => {
     expect(host.blur).toHaveBeenCalledOnce();
   });
 
-  it("still answers the deprecated measureInWindow", () => {
+  it("answers measureInWindow, which the kit's presenters use", () => {
     const native = vi.fn((callback) => callback(1, 2, 3, 4));
     const callback = vi.fn();
     elementFor({ measureInWindow: native })!.measureInWindow(callback);

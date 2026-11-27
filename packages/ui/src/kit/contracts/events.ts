@@ -31,9 +31,6 @@ export type Modifiers = {
   metaKey: boolean;
 };
 
-/** @deprecated `onClick` events carry the DOM's numeric `button`. */
-export type PointerButton = "primary" | "secondary" | "auxiliary";
-
 export interface UIEvent {
   preventDefault(): void;
   stopPropagation(): void;
@@ -151,39 +148,6 @@ export interface UIClipboardEvent<T = UIElement> extends UISyntheticEvent<T> {
 
 export interface UIDragEvent<T = UIElement> extends UIMouseEvent<T> {
   dataTransfer: UIDataTransfer;
-  /** @deprecated Read the dragged data from `dataTransfer`. */
-  payload: unknown;
-  /** @deprecated Use `clientX`. */
-  x: number;
-  /** @deprecated Use `clientY`. */
-  y: number;
-  /** @deprecated Use `dataTransfer.dropEffect`. */
-  dropped: boolean;
-}
-
-/** @deprecated Use `UIMouseEvent`, delivered by `onClick`. */
-export interface PressEvent extends UIEvent, Modifiers {
-  button: PointerButton;
-  detail: number;
-  x: number;
-  y: number;
-  pageX: number;
-  pageY: number;
-}
-
-/** @deprecated Use `UIMouseEvent`. */
-export type ContextMenuEvent = UIMouseEvent;
-
-/** @deprecated Use `UIKeyboardEvent`. */
-export type KeyEvent = UIKeyboardEvent;
-
-/** @deprecated Use `UIFocusEvent`. */
-export type FocusEvent = UIFocusEvent;
-
-/** @deprecated Use `UIMouseEvent`, delivered by `onMouseEnter` and `onMouseLeave`. */
-export interface HoverEvent extends UIEvent, Modifiers {
-  pageX: number;
-  pageY: number;
 }
 
 export interface ScrollEvent {

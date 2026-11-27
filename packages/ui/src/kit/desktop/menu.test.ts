@@ -148,12 +148,12 @@ test("Escape, a click outside and a right-click outside each close a popup; a cl
   let stopped = false;
   view
     .byTestId("popup-presenter")
-    .props.onPress({ ...click, stopPropagation: () => (stopped = true) });
+    .props.onClick({ ...click, stopPropagation: () => (stopped = true) });
   expect(stopped).toBe(true);
   expect(closes).toBe(0);
 
   pressKey("escape");
-  view.byTestId("popup-backdrop").props.onPress(click);
+  view.byTestId("popup-backdrop").props.onClick(click);
   let prevented = false;
   view.byTestId("popup-backdrop").props.onContextMenu({
     ...click,
@@ -249,7 +249,7 @@ test("clicking an item runs it and closes the menu", async () => {
   const log: string[] = [];
   const { element, log: closes } = menu([button("pin", "Pin", log)]);
   const view = await render(element);
-  view.byTestId("menu-button-pin").props.onPress(click);
+  view.byTestId("menu-button-pin").props.onClick(click);
   expect(log).toEqual(["pin"]);
   expect(closes).toEqual(["close"]);
 });
@@ -268,18 +268,18 @@ test("hovering an item with a submenu opens it, and its items run and close the 
   const view = await render(element);
   expect(view.queryByTestId("menu-button-work")).toBeUndefined();
 
-  await settle(() => view.byTestId("menu-button-move").props.onHoverIn());
+  await settle(() => view.byTestId("menu-button-move").props.onMouseEnter());
   expect(view.queryByTestId("menu-button-work")).toBeDefined();
 
   // Clicking the parent keeps the menu open; it only opens the submenu.
-  await settle(() => view.byTestId("menu-button-move").props.onPress(click));
+  await settle(() => view.byTestId("menu-button-move").props.onClick(click));
   expect(closes).toEqual([]);
 
-  view.byTestId("menu-button-work").props.onPress(click);
+  view.byTestId("menu-button-work").props.onClick(click);
   expect(log).toEqual(["work"]);
   expect(closes).toEqual(["close"]);
 
-  await settle(() => view.byTestId("menu-button-pin").props.onHoverIn());
+  await settle(() => view.byTestId("menu-button-pin").props.onMouseEnter());
   expect(view.queryByTestId("menu-button-work")).toBeUndefined();
 });
 

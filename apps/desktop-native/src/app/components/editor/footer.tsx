@@ -47,11 +47,7 @@ import { useWindowControls } from "../../hooks/use-window-controls";
 import { enterFullscreen, exitFullscreen } from "../../utils/fullscreen";
 import { useMemo, useRef, useState } from "react";
 import { getNoteStatistics } from "../../utils/note-statistics";
-import {
-  Box,
-  PopupPresenter,
-  type UIElement as HTMLButtonElement
-} from "@notesnook/ui-kit";
+import { Box, PopupPresenter } from "@notesnook/ui-kit";
 import { saveContent } from "./index";
 
 const SAVE_STATE_ICON_MAP = {

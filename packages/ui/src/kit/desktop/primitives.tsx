@@ -363,7 +363,7 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
   props,
   ref
 ) {
-  const { selectable, numberOfLines, href, dangerouslySetInnerHTML } = props;
+  const { selectable, href, dangerouslySetInnerHTML } = props;
   const inherited = useInheritedTextStyle();
   const { resolved, viewStyle, nativeProps } = useStyled(props, {
     variantGroup: "text",
@@ -393,7 +393,7 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
         ...(onPress ? { cursor: "pointer" } : {}),
         ...viewStyle
       })}
-      numberOfLines={numberOfLines ?? resolved.numberOfLines}
+      numberOfLines={resolved.numberOfLines}
       selectable={
         selectable ??
         resolved.selectable ??
@@ -493,7 +493,7 @@ export const Label = forwardRef<UIElement, Contract.LabelProps>(function Label(
   );
   // A label with its own click handler keeps deciding what a click does.
   const activates =
-    !props.onClick && !props.onPress && (!!htmlFor || !!control);
+    !props.onClick && (!!htmlFor || !!control);
   return Container(
     {
       ...props,
@@ -554,10 +554,9 @@ export const Image = forwardRef<UIElement, Contract.ImageProps>(function Image(
           : undefined
       }
       resizeMode={
-        props.resizeMode ??
-        (resolved.objectFit
+        resolved.objectFit
           ? (RESIZE_MODES[resolved.objectFit] as "cover")
-          : undefined)
+          : undefined
       }
       accessibilityLabel={props.alt}
       style={viewStyle as never}
@@ -597,7 +596,7 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
   useLabelControl(control);
   useFormField(props.name, control, false);
   const form = useContext(FormContext);
-  const { onChange, onChangeText, onSubmitEditing } = props;
+  const { onChange } = props;
 
   const fields: Record<string, unknown> = { ...nativeProps };
   delete fields.focusable;
@@ -627,7 +626,6 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
       onChange={(event: NativeEvent) => {
         const text = String(event?.nativeEvent?.text ?? "");
         control.value = text;
-        onChangeText?.(text);
         onChange?.(changeEvent(element.current, event));
       }}
       onSelectionChange={(event: NativeEvent) => {
@@ -637,11 +635,8 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
         control.selectionEnd = selection.end;
       }}
       onSubmitEditing={
-        onSubmitEditing || (form && !props.multiline)
-          ? (event: NativeEvent) => {
-              onSubmitEditing?.(String(event?.nativeEvent?.text ?? ""));
-              if (!props.multiline) form?.submit();
-            }
+        form && !props.multiline
+          ? () => form.submit()
           : undefined
       }
     />
@@ -664,13 +659,11 @@ const ColorField = forwardRef<UIInputElement, Contract.InputProps>(
       <ColorPicker
         ref={setRef}
         data-test-id={testIdOf(props)}
-        testID={testIdOf(props)}
         sx={props.sx}
         value={value}
         onChange={(color) => {
           control.value = color;
           if (props.value === undefined) setOwn(color);
-          props.onChangeText?.(color);
           props.onChange?.(changeEvent(element.current));
         }}
       />
@@ -725,7 +718,6 @@ function useChecked(
     checked?: boolean;
     defaultChecked?: boolean;
     onChange?: (event: any) => void;
-    onCheckedChange?: (checked: boolean) => void;
   },
   control: ElementControl,
   element: RefObject<DesktopElement | null>,
@@ -741,7 +733,6 @@ function useChecked(
     const value = next(checked);
     control.checked = value;
     if (props.checked === undefined) setOwn(value);
-    props.onCheckedChange?.(value);
     if (value !== checked)
       props.onChange?.(changeEvent(element.current, event));
   };
@@ -771,7 +762,6 @@ const Toggle = forwardRef<
       {...(props as unknown as Contract.BoxProps)}
       ref={setRef}
       variant={undefined}
-      onPress={disabled ? undefined : props.onPress}
       onClick={(event) => {
         if (disabled) return;
         (props.onClick as Contract.BoxProps["onClick"])?.(event);
@@ -970,7 +960,7 @@ export const Donut = forwardRef<UIElement, Contract.DonutProps>(function Donut(
 
 export const Slider = forwardRef<UIInputElement, Contract.SliderProps>(
   function Slider(props, ref) {
-    const { min = 0, max = 100, step = 1, onValueChange, onChange } = props;
+    const { min = 0, max = 100, step = 1, onChange } = props;
     const [own, setOwn] = useState(props.defaultValue ?? min);
     const value = props.value ?? own;
     const control = useControl();
@@ -985,7 +975,6 @@ export const Slider = forwardRef<UIInputElement, Contract.SliderProps>(
       const next = Math.round(raw / step) * step;
       control.value = String(next);
       if (props.value === undefined) setOwn(next);
-      onValueChange?.(next);
       onChange?.(changeEvent(element.current));
     };
     return (

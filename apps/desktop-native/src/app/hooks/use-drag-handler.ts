@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { DragEvent } from "@notesnook/ui-kit";
+import type { UIDragEvent } from "@notesnook/ui-kit";
 
 export function useDragHandler(_id: string) {
   return {
-    isDragEntering: (_event: DragEvent) => true,
-    isDragLeaving: (_event: DragEvent) => true
+    isDragEntering: (_event: UIDragEvent) => true,
+    isDragLeaving: (_event: UIDragEvent) => true
   };
 }

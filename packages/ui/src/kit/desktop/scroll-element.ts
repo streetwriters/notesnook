@@ -99,7 +99,11 @@ export function createScrollElement(
     node()?.scrollTo?.({ x: metrics.left, y: metrics.top, animated });
   };
 
-  const element: UIElement = {
+  const element: UIElement & {
+    measureInWindow: (
+      callback: (x: number, y: number, width: number, height: number) => void
+    ) => void;
+  } = {
     focus: () => node()?.focus?.(),
     blur: () => node()?.blur?.(),
     getBoundingClientRect: () => {

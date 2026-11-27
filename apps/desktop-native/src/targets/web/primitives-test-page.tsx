@@ -27,7 +27,6 @@ import {
   Button,
   Checkbox,
   ColorPicker,
-  Dialog,
   Flex,
   Grid,
   Icon,
@@ -52,7 +51,8 @@ import {
   Textarea,
   ThemeScope,
   ToastHost,
-  VirtualList,
+  Virtuoso,
+  Modal,
   WebThemeProvider,
   showToast
 } from "./ui";
@@ -70,7 +70,7 @@ const IMAGE =
 function Section(props: { title: string; children: ReactNode }) {
   return (
     <Flex
-      testID={`primitive-${props.title}`}
+      data-test-id={`primitive-${props.title}`}
       sx={{
         flexDirection: "column",
         gap: 2,
@@ -116,14 +116,14 @@ export function PrimitivesTestPage() {
       <LayoutRoot>
         <ThemeScope scope="base">
           <Flex
-            testID="primitives-test-page"
+            data-test-id="primitives-test-page"
             sx={{ flexDirection: "column", flex: 1, bg: "background" }}
           >
             <Flex sx={{ p: 3, gap: 2, alignItems: "center" }}>
               <Text sx={{ color: "heading", fontWeight: "bold", flex: 1 }}>
                 @notesnook/ui-kit primitives (web target)
               </Text>
-              <Button testID="theme-toggle" onPress={() => setDark(!dark)}>
+              <Button data-test-id="theme-toggle" onClick={() => setDark(!dark)}>
                 <Text>{dark ? "Dark" : "Light"} theme</Text>
               </Button>
             </Flex>
@@ -150,7 +150,7 @@ export function PrimitivesTestPage() {
                 <Icon path={STAR_PATH} size="big" color="accent" />
               </Section>
               <Section title="Button">
-                <Button onPress={() => showToast("success", "Pressed")}>
+                <Button onClick={() => showToast("success", "Pressed")}>
                   <Text>Default</Text>
                 </Button>
                 <Button variant="accent">
@@ -162,13 +162,13 @@ export function PrimitivesTestPage() {
               </Section>
               <Section title="Input, Textarea">
                 <Input
-                  testID="test-input"
+                  data-test-id="test-input"
                   placeholder="Input"
                   value={text}
-                  onChangeText={setText}
+                  onChange={(event) => setText(event.target.value)}
                 />
                 <Textarea
-                  testID="test-textarea"
+                  data-test-id="test-textarea"
                   placeholder="Textarea"
                   rows={2}
                   selectTextOnFocus
@@ -176,25 +176,24 @@ export function PrimitivesTestPage() {
                 />
               </Section>
               <Section title="Checkbox, Radio, Switch">
-                <Checkbox checked={checked} onCheckedChange={setChecked} />
-                <Radio checked={radio} onCheckedChange={setRadio} />
-                <Switch checked={on} onCheckedChange={setOn} />
+                <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} />
+                <Radio checked={radio} onChange={(event) => setRadio(event.target.checked)} />
+                <Switch checked={on} onChange={(event) => setOn(event.target.checked)} />
               </Section>
               <Section title="Select, Slider, Progress">
                 <Select
                   value={choice}
-                  onValueChange={setChoice}
-                  options={[
-                    { value: "a", title: "Option A" },
-                    { value: "b", title: "Option B" }
-                  ]}
-                />
+                  onChange={(event) => setChoice(event.target.value)}
+                >
+                  <option value="a">Option A</option>
+                  <option value="b">Option B</option>
+                </Select>
                 <Slider
-                  testID="test-slider"
+                  data-test-id="test-slider"
                   value={slider}
                   min={0}
                   max={100}
-                  onValueChange={setSlider}
+                  onChange={(event) => setSlider(event.target.valueAsNumber)}
                 />
                 <Progress value={slider} max={100} />
               </Section>
@@ -215,14 +214,14 @@ export function PrimitivesTestPage() {
                   </Pane>
                 </SplitPane>
               </Section>
-              <Section title="VirtualList (5000 items)">
-                <VirtualList
-                  testID="test-virtual-list"
-                  count={ITEMS.length}
-                  itemKey={(index) => ITEMS[index].id}
-                  estimatedItemSize={28}
-                  sx={{ height: 140, width: 300 }}
-                  renderItem={(index) => (
+              <Section title="Virtuoso (5000 items)">
+                <Virtuoso
+                  data-test-id="test-virtual-list"
+                  totalCount={ITEMS.length}
+                  computeItemKey={(index: number) => ITEMS[index].id}
+                  defaultItemHeight={28}
+                  style={{ height: 140, width: 300 }}
+                  itemContent={(index: number) => (
                     <Text sx={{ p: 1, height: 28 }}>Item {index}</Text>
                   )}
                 />
@@ -253,35 +252,33 @@ export function PrimitivesTestPage() {
                 />
               </Section>
               <Section title="Dialog, Popover, Toast">
-                <Button testID="open-dialog" onPress={() => setDialog(true)}>
+                <Button data-test-id="open-dialog" onClick={() => setDialog(true)}>
                   <Text>Dialog</Text>
                 </Button>
                 <Button
                   ref={anchor as never}
-                  testID="open-popover"
-                  onPress={() => setPopover(true)}
+                  data-test-id="open-popover"
+                  onClick={() => setPopover(true)}
                 >
                   <Text>Popover</Text>
                 </Button>
                 <Button
-                  testID="open-toast"
-                  onPress={() => showToast("info", "A toast")}
+                  data-test-id="open-toast"
+                  onClick={() => showToast("info", "A toast")}
                 >
                   <Text>Toast</Text>
                 </Button>
               </Section>
             </ScrollContainer>
-            <Dialog
-              isOpen={dialog}
-              onClose={() => setDialog(false)}
-              title="Dialog"
-              description="Rendered with the theme"
-              positiveButton={{ text: "OK", onClick: () => setDialog(false) }}
-              negativeButton={{
-                text: "Cancel",
-                onClick: () => setDialog(false)
-              }}
-            />
+            <Modal isOpen={dialog} onRequestClose={() => setDialog(false)}>
+              <Flex sx={{ flexDirection: "column", gap: 2, p: 3, bg: "background" }}>
+                <Text variant="subtitle">Dialog</Text>
+                <Text>Rendered with the theme</Text>
+                <Button variant="accent" onClick={() => setDialog(false)}>
+                  OK
+                </Button>
+              </Flex>
+            </Modal>
             <Popover
               isOpen={popover}
               onClose={() => setPopover(false)}

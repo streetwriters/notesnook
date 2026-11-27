@@ -22,12 +22,10 @@ import {
   DesktopDataTransfer,
   dragEvent,
   focusEvent,
-  hoverEvent,
   isKeyPress,
   keyboardEvent,
   mouseEvent,
   pointerEvent,
-  pressEvent,
   toUIFile,
   touchEvent,
   wheelEvent,
@@ -59,28 +57,15 @@ function all(
   };
 }
 
-function droppedFiles(
-  event: NativeEvent,
-  host: NativeHost,
-  accepts?: string[]
-) {
+function droppedFiles(event: NativeEvent, host: NativeHost) {
   const files: { path: string; size: number }[] =
     event?.nativeEvent?.files ?? [];
-  const accepted = accepts?.map((extension) =>
-    extension.replace(/^\./, "").toLowerCase()
-  );
-  return files
-    .filter(
-      (file) =>
-        !accepted ||
-        accepted.includes(file.path.split(".").pop()?.toLowerCase() ?? "")
-    )
-    .map((file) => toUIFile(host.toFile(file.path, file.size)));
+  return files.map((file) => toUIFile(host.toFile(file.path, file.size)));
 }
 
-/** The `data-test-id` of an element; the deprecated `testID` is read after it. */
+/** The `data-test-id` of an element. */
 export function testIdOf(props: Props): string | undefined {
-  const id = props["data-test-id"] ?? props.testID;
+  const id = props["data-test-id"];
   return id === undefined || id === false ? undefined : String(id);
 }
 
@@ -100,13 +85,11 @@ export function nativeEventProps(
         dragEvent(
           type,
           event,
-          new DesktopDataTransfer(dragData, droppedFiles(event, host)),
-          host.getPayload()
+          new DesktopDataTransfer(dragData, droppedFiles(event, host))
         )
       ));
   const acceptsDrops = !!(
     props.onDrop ||
-    props.onDropFiles ||
     props.onDragEnter ||
     props.onDragOver ||
     props.onDragLeave
@@ -123,8 +106,8 @@ export function nativeEventProps(
         ? undefined
         : props["aria-hidden"] === true || props["aria-hidden"] === "true",
     draggable: props.draggable || undefined,
-    droppable: props.droppable || acceptsDrops || undefined,
-    acceptsFiles: props.onDropFiles || props.onDrop ? true : undefined,
+    droppable: acceptsDrops || undefined,
+    acceptsFiles: props.onDrop ? true : undefined,
     onDragStart: props.onDragStart
       ? (event: NativeEvent) => {
           dragData.clear();
@@ -133,8 +116,7 @@ export function nativeEventProps(
               dragEvent(
                 "dragstart",
                 event,
-                new DesktopDataTransfer(dragData),
-                undefined
+                new DesktopDataTransfer(dragData)
               )
             )
           );
@@ -150,17 +132,7 @@ export function nativeEventProps(
     onDragOver: drag("dragover", props.onDragOver),
     onDragLeave: drag("dragleave", props.onDragLeave),
     onDrop:
-      props.onDrop || props.onDropFiles
-        ? (event: NativeEvent) => {
-            const hasFiles = (event?.nativeEvent?.files ?? []).length > 0;
-            if (hasFiles && props.onDropFiles) {
-              const picked = droppedFiles(event, host, props.acceptsFiles);
-              if (picked.length > 0) props.onDropFiles(picked);
-              return;
-            }
-            drag("drop", props.onDrop)?.(event);
-          }
-        : undefined,
+      props.onDrop ? drag("drop", props.onDrop) : undefined,
     onContextMenu:
       props.onContextMenu &&
       ((event: NativeEvent) =>
@@ -171,13 +143,11 @@ export function nativeEventProps(
         )),
     onPointerEnter: all(
       props.onMouseEnter &&
-        ((event) => props.onMouseEnter?.(mouseEvent("mouseenter", event))),
-      props.onHoverIn && ((event) => props.onHoverIn?.(hoverEvent(event)))
+        ((event) => props.onMouseEnter?.(mouseEvent("mouseenter", event)))
     ),
     onPointerLeave: all(
       props.onMouseLeave &&
-        ((event) => props.onMouseLeave?.(mouseEvent("mouseleave", event))),
-      props.onHoverOut && ((event) => props.onHoverOut?.(hoverEvent(event)))
+        ((event) => props.onMouseLeave?.(mouseEvent("mouseleave", event)))
     ),
     onPointerDown: all(
       props.onMouseDown &&
@@ -256,8 +226,7 @@ export interface ClickState {
 }
 
 /**
- * The handler for a native press. It raises the deprecated `onPress`, then
- * `onClick`, and `onDoubleClick` on the second press within 400 ms. `state`
+ * The handler for a native press. It raises `onClick`, and `onDoubleClick` on the second press within 400 ms. `state`
  * has to outlive a render for a double click to be seen across one.
  */
 export function pressHandler(
@@ -265,18 +234,13 @@ export function pressHandler(
   state: ClickState = { last: 0 },
   now: () => number = Date.now
 ) {
-  if (!props.onPress && !props.onClick && !props.onDoubleClick)
+  if (!props.onClick && !props.onDoubleClick)
     return undefined;
   return (event: NativeEvent) => {
     const time = now();
     const isDouble = time - state.last < 400;
     state.last = isDouble ? 0 : time;
     const detail = isDouble ? 2 : 1;
-    if (props.onPress) {
-      const legacy = pressEvent(event);
-      legacy.detail = detail;
-      props.onPress(legacy);
-    }
     props.onClick?.(mouseEvent("click", event, { button: 0, detail }));
     if (isDouble)
       props.onDoubleClick?.(

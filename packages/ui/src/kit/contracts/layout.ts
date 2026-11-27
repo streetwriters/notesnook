@@ -43,8 +43,6 @@ export interface SplitPaneProps {
   onChange?: (sizes: number[]) => void;
   sx?: SxProp;
   "data-test-id"?: string;
-  /** @deprecated Use `data-test-id`. */
-  testID?: string;
   children?: ReactNode;
 }
 
@@ -56,8 +54,6 @@ export interface PaneProps {
   snapSize?: number;
   sx?: SxProp;
   "data-test-id"?: string;
-  /** @deprecated Use `data-test-id`. */
-  testID?: string;
   children?: ReactNode;
 }
 
@@ -92,8 +88,6 @@ export interface ScrollContainerProps extends DataAttributes {
   thumbStyle?: (horizontal?: boolean) => StyleProp;
   onScroll?: (event: UISyntheticEvent) => void;
   onWheel?: (event: UIWheelEvent) => void;
-  /** @deprecated Use `data-test-id`. */
-  testID?: string;
   children?: ReactNode;
 }
 

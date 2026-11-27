@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { UIElement } from "../../contracts/elements";
 import type {
-  HoverEvent,
-  PressEvent,
   UIChangeEvent,
   UIDataTransfer,
   UIDragEvent,
@@ -311,51 +309,12 @@ export function dragEvent<T = UIElement>(
   type: string,
   event: NativeEvent | undefined,
   dataTransfer: UIDataTransfer,
-  payload: unknown,
   element?: DesktopElement | null
 ): UIDragEvent<T> & EventState {
   const native = payloadOf(event);
   return withMembers(mouseEvent<T>(type, event, {}, element), {
-    dataTransfer,
-    payload,
-    x: native.x ?? native.pageX ?? 0,
-    y: native.y ?? native.pageY ?? 0,
-    dropped: !!native.dropped
+    dataTransfer
   });
-}
-
-/** @deprecated The event `onPress` receives. */
-export function pressEvent(event?: NativeEvent): PressEvent {
-  const native = payloadOf(event);
-  rememberPointer(native.pageX, native.pageY);
-  return {
-    button: "primary",
-    detail: 1,
-    x: native.locationX ?? 0,
-    y: native.locationY ?? 0,
-    pageX: native.pageX ?? 0,
-    pageY: native.pageY ?? 0,
-    ...modifiers(native),
-    preventDefault() {},
-    stopPropagation() {
-      event?.stopPropagation?.();
-    }
-  };
-}
-
-/** @deprecated The event `onHoverIn` and `onHoverOut` receive. */
-export function hoverEvent(event?: NativeEvent): HoverEvent {
-  const native = payloadOf(event);
-  rememberPointer(native.pageX, native.pageY);
-  return {
-    pageX: native.pageX ?? 0,
-    pageY: native.pageY ?? 0,
-    ...modifiers(native),
-    preventDefault() {},
-    stopPropagation() {
-      event?.stopPropagation?.();
-    }
-  };
 }
 
 export function pointerEvent(event?: NativeEvent): PointerMoveEvent {

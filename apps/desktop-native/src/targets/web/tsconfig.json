@@ -16,8 +16,7 @@
   },
   "include": [
     "./**/*",
-    "../../platform",
-    "../../../../../packages/ui/src/kit/shared/dom-globals.d.ts"
+    "../../platform"
   ],
   "exclude": []
 }

@@ -56,6 +56,17 @@ async function list(onMove: (move: SortableMove) => void) {
   return { view, item };
 }
 
+/** The drag event the native layer raises: a data transfer shared by start and drop. */
+function dragging() {
+  const data = new Map<string, string>();
+  return {
+    dataTransfer: {
+      setData: (type: string, value: string) => void data.set(type, value),
+      getData: (type: string) => data.get(type) ?? ""
+    }
+  };
+}
+
 test("draws every item in order", async () => {
   const { view } = await list(() => {});
   expect(textOf(view.byTestId("tabs"))).toBe("notes tags trash ");
@@ -64,10 +75,10 @@ test("draws every item in order", async () => {
 test("dropping an item on another reports which moved, where to, and the target's group", async () => {
   const moves: SortableMove[] = [];
   const { item } = await list((move) => moves.push(move));
-  let payload: unknown;
-  await settle(() => (payload = item(0).props.onDragStart()));
+  const event = dragging();
+  await settle(() => item(0).props.onDragStart(event));
   await settle(() => item(2).props.onDragEnter());
-  await settle(() => item(2).props.onDrop({ payload }));
+  await settle(() => item(2).props.onDrop(event));
   expect(moves).toEqual([
     { activeId: "notes", overId: "trash", index: 2, group: "other" }
   ]);
@@ -75,14 +86,14 @@ test("dropping an item on another reports which moved, where to, and the target'
 
 test("shows which item is dragged and which it is over, and clears both after the drop", async () => {
   const { view, item } = await list(() => {});
-  let payload: unknown;
-  await settle(() => (payload = item(0).props.onDragStart()));
+  const event = dragging();
+  await settle(() => item(0).props.onDragStart(event));
   await settle(() => item(1).props.onDragEnter());
   expect(textOf(view.byTestId("tabs"))).toBe(
     "notes(dragging) tags(over) trash "
   );
 
-  await settle(() => item(1).props.onDrop({ payload }));
+  await settle(() => item(1).props.onDrop(event));
   expect(textOf(view.byTestId("tabs"))).toBe("notes tags trash ");
 });
 
@@ -91,7 +102,7 @@ test("dropping an item on itself, or something that is not an item, reports noth
   const { item } = await list((move) => moves.push(move));
   let payload: unknown;
   await settle(() => (payload = item(1).props.onDragStart()));
-  await settle(() => item(1).props.onDrop({ payload }));
+  await settle(() => item(1).props.onDrop(event));
   await settle(() => item(0).props.onDrop({ payload: undefined }));
   await settle(() => item(0).props.onDrop({}));
   expect(moves).toEqual([]);

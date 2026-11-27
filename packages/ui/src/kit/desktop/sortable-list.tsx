@@ -21,6 +21,8 @@ import { useState } from "react";
 import type * as Contract from "../contracts/lists";
 import { Flex } from "./primitives";
 
+const SORTABLE_TYPE = "application/x-notesnook-sortable";
+
 export function SortableList<T extends Contract.SortableItem>(
   props: Contract.SortableListProps<T>
 ) {
@@ -30,7 +32,7 @@ export function SortableList<T extends Contract.SortableItem>(
 
   return (
     <Flex
-      testID={props["data-test-id"] ?? props.testID}
+      data-test-id={props["data-test-id"]}
       sx={{
         flexDirection: direction === "vertical" ? "column" : "row",
         ...props.sx
@@ -41,10 +43,12 @@ export function SortableList<T extends Contract.SortableItem>(
           key={item.id}
           sx={{ flexDirection: direction === "vertical" ? "column" : "row" }}
           draggable
-          droppable
-          onDragStart={() => {
+          onDragStart={(event) => {
             setDragging(item.id);
-            return { id: item.id, group: item.group };
+            event.dataTransfer.setData(
+              SORTABLE_TYPE,
+              JSON.stringify({ id: item.id, group: item.group })
+            );
           }}
           onDragEnd={() => {
             setDragging(undefined);
@@ -55,7 +59,10 @@ export function SortableList<T extends Contract.SortableItem>(
             setOver((current) => (current === item.id ? undefined : current))
           }
           onDrop={(event) => {
-            const payload = event.payload as Contract.SortableItem | undefined;
+            const data = event.dataTransfer.getData(SORTABLE_TYPE);
+            const payload = (data ? JSON.parse(data) : undefined) as
+              | Contract.SortableItem
+              | undefined;
             setDragging(undefined);
             setOver(undefined);
             if (!payload || payload.id === item.id) return;

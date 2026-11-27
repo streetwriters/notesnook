@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Renders the desktop primitives with react-native swapped for plain host
  * elements, and drives the native callbacks they hand down, to check that
- * the deprecated names and the new web-shaped ones both still fire.
+ * the web-shaped names fire and the removed React Native ones do not.
  */
 import {
   createElement as h,
@@ -115,29 +115,18 @@ beforeEach(() => {
 });
 
 describe("Input", () => {
-  it("still raises onChangeText with the native text, and onChange", () => {
+  it("raises onChange with the native text, and not the removed onChangeText", () => {
     const onChangeText = vi.fn();
     const onChange = vi.fn();
-    render(h(Input, { onChangeText, onChange }));
+    render(h(Input, { onChangeText, onChange } as never));
     fire(() =>
       root.root
         .findByType("TextInput" as any)
         .props.onChange({ nativeEvent: { text: "hello" } })
     );
-    expect(onChangeText).toHaveBeenCalledWith("hello");
+    expect(onChangeText).not.toHaveBeenCalled();
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0].target.value).toBe("hello");
-  });
-
-  it("still raises onSubmitEditing with the text", () => {
-    const onSubmitEditing = vi.fn();
-    render(h(Input, { onSubmitEditing }));
-    fire(() =>
-      root.root
-        .findByType("TextInput" as any)
-        .props.onSubmitEditing({ nativeEvent: { text: "done" } })
-    );
-    expect(onSubmitEditing).toHaveBeenCalledWith("done");
   });
 
   it("submits the enclosing form on Enter", () => {
@@ -161,53 +150,48 @@ function pressable() {
 }
 
 describe("Checkbox and Switch", () => {
-  it("raise onCheckedChange then onChange, controlled", () => {
-    const calls: string[] = [];
-    render(
-      h(Checkbox, {
-        checked: false,
-        onCheckedChange: (v: boolean) => calls.push(`checked:${v}`),
-        onChange: (e: any) => calls.push(`change:${e.target.checked}`)
-      })
-    );
+  it("raise onChange with the new checked state, controlled", () => {
+    const onChange = vi.fn((e: any) => e.target.checked);
+    render(h(Checkbox, { checked: false, onChange }));
     fire(() => pressable().props.onPress(press()));
-    expect(calls).toEqual(["checked:true", "change:true"]);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange.mock.results[0].value).toBe(true);
   });
 
   it("controlled checked stays as given without a change", () => {
-    const onCheckedChange = vi.fn();
-    render(h(Switch, { checked: true, onCheckedChange }));
+    const onChange = vi.fn();
+    render(h(Switch, { checked: true, onChange }));
     fire(() => pressable().props.onPress(press()));
-    expect(onCheckedChange).toHaveBeenCalledWith(false);
     fire(() => pressable().props.onPress(press()));
-    // still controlled at true, so the next press asks for false again
-    expect(onCheckedChange).toHaveBeenLastCalledWith(false);
+    // still controlled at true, so each press asks for false
+    expect(onChange).toHaveBeenCalledTimes(2);
+    expect(onChange.mock.calls[1][0].target.checked).toBe(false);
   });
 
   it("uncontrolled starts at defaultChecked and toggles", () => {
-    const onCheckedChange = vi.fn();
-    render(h(Checkbox, { defaultChecked: true, onCheckedChange }));
+    const onChange = vi.fn();
+    render(h(Checkbox, { defaultChecked: true, onChange }));
     fire(() => pressable().props.onPress(press()));
-    expect(onCheckedChange).toHaveBeenLastCalledWith(false);
+    expect(onChange.mock.calls[0][0].target.checked).toBe(false);
     fire(() => pressable().props.onPress(press()));
-    expect(onCheckedChange).toHaveBeenLastCalledWith(true);
+    expect(onChange.mock.calls[1][0].target.checked).toBe(true);
   });
 
-  it("without checked or defaultChecked starts unchecked, as before", () => {
-    const onCheckedChange = vi.fn();
-    render(h(Checkbox, { onCheckedChange }));
+  it("without checked or defaultChecked starts unchecked", () => {
+    const onChange = vi.fn();
+    render(h(Checkbox, { onChange }));
     fire(() => pressable().props.onPress(press()));
-    expect(onCheckedChange).toHaveBeenCalledWith(true);
+    expect(onChange.mock.calls[0][0].target.checked).toBe(true);
   });
 });
 
 describe("Button", () => {
-  it("raises both onPress and onClick", () => {
+  it("raises onClick, and not the removed onPress", () => {
     const onPress = vi.fn();
     const onClick = vi.fn();
-    render(h(Button, { onPress, onClick }, "Go"));
+    render(h(Button, { onPress, onClick } as never, "Go"));
     fire(() => pressable().props.onPress(press()));
-    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onPress).not.toHaveBeenCalled();
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(typeof onClick.mock.calls[0][0].stopPropagation).toBe("function");
   });
@@ -284,7 +268,7 @@ describe("Box and Flex", () => {
 
 describe("Slider", () => {
   it("is a host element the primitives render", () => {
-    render(h(Slider, { value: 5, onValueChange: vi.fn() }));
+    render(h(Slider, { value: 5 }));
     expect(root.toJSON()).not.toBeNull();
   });
 });
