@@ -20,9 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Shared files (written for apps/web) type their refs with the DOM's names:
 // `useRef<HTMLDivElement>(null)` passed to a kit element. A kit ref is a
 // `UIElement`, which still has the deprecated `measureInWindow`, so a DOM
-// element type is not assignable to it. Until that alias is removed, desktop
-// gives the DOM's `Element` the member, which makes `HTMLDivElement` and the
-// other element types fit a kit ref as they do on the web.
+// element type is not assignable to it. Until that alias is removed, the DOM's
+// `Element` gets the member here, which makes `HTMLDivElement` and the other
+// element types fit a kit ref. On desktop every element is a kit element; on
+// the web the kit's legacy shim (`web/legacy.tsx`) adds `measureInWindow` to
+// the DOM node a kit ref receives. Remove this with the deprecated names.
 
 import type { UIElement } from "../contracts";
 

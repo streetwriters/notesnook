@@ -17,34 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef } from "react";
-import type {
+import {
   GroupHeader as GroupHeaderType,
   GroupingKey,
   GroupOptions
 } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import { usePromise } from "@notesnook/common";
 import {
-  Flex,
-  Text,
-  type MenuButtonItem,
-  type MenuItem,
-  type UIElement
-} from "@notesnook/ui-kit";
-import {
-  Ellipse,
+  SelectAll,
+  SortAscending,
   OrderAlphabeticalAscending,
   OrderAlphabeticalDescending,
   OrderNumericAscending,
   OrderNumericDescending,
-  SelectAll,
-  SortAscending
+  Ellipse
 } from "../icons";
+import { useEffect, useRef } from "react";
 import { db } from "../../common/db";
-import { Menu } from "../../hooks/use-menu";
+import { Menu, useMenuTrigger } from "../../hooks/use-menu";
+import {
+  Flex,
+  Text,
+  type MenuButtonItem,
+  type MenuItem
+} from "@notesnook/ui-kit";
+import { strings } from "@notesnook/intl";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import type { Context } from "../list-container/types";
+import { usePromise } from "@notesnook/common";
 
 type GroupingMenuOptions = {
   groupOptions: GroupOptions;
@@ -99,10 +98,10 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
           options.groupOptions.sortBy === "title"
             ? strings.aToZ()
             : options.groupOptions.sortBy === "dueDate"
-            ? strings.earliestFirst()
-            : options.groupOptions.sortBy === "relevance"
-            ? strings.leastRelevantFirst()
-            : strings.oldestToNewest()
+              ? strings.earliestFirst()
+              : options.groupOptions.sortBy === "relevance"
+                ? strings.leastRelevantFirst()
+                : strings.oldestToNewest()
       },
       {
         key: "desc",
@@ -110,10 +109,10 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
           options.groupOptions.sortBy === "title"
             ? strings.zToA()
             : options.groupOptions.sortBy === "dueDate"
-            ? strings.latestFirst()
-            : options.groupOptions.sortBy === "relevance"
-            ? strings.mostRelevantFirst()
-            : strings.newestToOldest()
+              ? strings.latestFirst()
+              : options.groupOptions.sortBy === "relevance"
+                ? strings.mostRelevantFirst()
+                : strings.newestToOldest()
       }
     ])
   }
@@ -228,8 +227,8 @@ function getGroupOptions(
     : context?.type === "notebook" ||
       context?.type === "tag" ||
       context?.type === "color"
-    ? db.settings.getGroupOptionsById(context.id, context.type)
-    : db.settings.getGroupOptions(groupingKey);
+      ? db.settings.getGroupOptionsById(context.id, context.type)
+      : db.settings.getGroupOptions(groupingKey);
 }
 
 async function setGroupOptions(
@@ -255,6 +254,8 @@ async function changeGroupOptions(
   options: GroupingMenuOptions,
   item: Omit<MenuButtonItem, "type">
 ) {
+  if (!parent) return false;
+
   const groupOptions: GroupOptions = { ...options.groupOptions };
   (groupOptions as any)[options.parentKey] = item.key;
 
@@ -285,19 +286,16 @@ function map(
 
 type GroupHeaderProps = {
   title: string;
-  groups?: () => Promise<{ index: number; group: GroupHeaderType }[]>;
-  onJump?: (index: number) => void;
-  onSelectGroup?: () => void;
-  isFocused?: boolean;
+  groups: () => Promise<{ index: number; group: GroupHeaderType }[]>;
+  onJump: (index: number) => void;
+  onSelectGroup: () => void;
+  isFocused: boolean;
   showGroupCounts?: boolean;
 };
 function GroupHeader(props: GroupHeaderProps) {
   const { title, showGroupCounts, groups, onJump, onSelectGroup, isFocused } =
     props;
-  const groupItemsPromise = usePromise(
-    () => (groups ? groups() : Promise.resolve([])),
-    [groups]
-  );
+  const groupItemsPromise = usePromise(() => groups(), [groups]);
   const groupItems =
     "value" in groupItemsPromise && groupItemsPromise.value
       ? groupItemsPromise.value
@@ -307,7 +305,8 @@ function GroupHeader(props: GroupHeaderProps) {
     ? groupItems?.find((item) => item.group.title === title)?.group.count
     : undefined;
 
-  const groupHeaderRef = useRef<UIElement>(null);
+  const groupHeaderRef = useRef<HTMLDivElement>(null);
+  const { openMenu } = useMenuTrigger();
 
   useEffect(() => {
     if (isFocused && groupHeaderRef.current) groupHeaderRef.current.focus();
@@ -316,14 +315,12 @@ function GroupHeader(props: GroupHeaderProps) {
   return (
     <Flex
       ref={groupHeaderRef}
-      data-test-id="group-header"
       onClick={async (e) => {
-        if (e.ctrlKey || e.metaKey) {
-          onSelectGroup?.();
+        if (e.ctrlKey) {
+          onSelectGroup();
           return;
         }
         e.stopPropagation();
-        if (!groups || !onJump) return;
 
         const resolvedGroupItems = groupItems || (await groups());
         const items: MenuItem[] = resolvedGroupItems.map(({ group, index }) => {
@@ -333,51 +330,67 @@ function GroupHeader(props: GroupHeaderProps) {
             key: groupTitle,
             title: groupTitle,
             onClick: () => onJump(index),
-            isChecked: group.title === title
-          } satisfies MenuItem;
+            checked: group.title === title
+          } as MenuItem;
         });
         if (!items.length) return;
 
-        const rect = groupHeaderRef.current?.getBoundingClientRect();
-        if (!rect) return;
-        const { x, y, width, height } = rect;
-        Menu.openMenu(items, {
+        openMenu(items, {
           title: strings.jumpToGroup(),
-          position: { x, y, width, height: height + 5 }
+          position: {
+            target: groupHeaderRef.current,
+            align: "start",
+            isTargetAbsolute: true,
+            location: "below",
+            yOffset: 10
+          }
         });
       }}
+      // mx={1}
+      // my={1}
+      // py={1}
+      // pl={1}
+      // pr={0}
       sx={{
-        flexDirection: "row",
         cursor: "pointer",
         px: "spacing6",
         my: "spacing6",
-        ":focus": { borderColor: "accent" },
+        // borderBottom: "1px solid var(--border)",
+        // border: isMenuTarget ? "1px solid" : "none",
+        // borderColor: isMenuTarget ? "accent" : "transparent",
+        ":focus": {
+          borderColor: "accent"
+        },
         alignItems: "center",
         justifyContent: "space-between"
       }}
+      tabIndex={0}
+      data-test-id="group-header"
     >
-      <Flex
-        sx={{ flexDirection: "row", gap: "spacing3", alignItems: "center" }}
-      >
-        {title ? (
-          <Text
-            data-test-id="title"
-            sx={{
-              fontSize: "xs",
-              fontWeight: 400,
-              color:
-                title === strings.conflicted() || title === "Conflicted"
-                  ? "paragraph-error"
-                  : "accent"
-            }}
-          >
-            {title}
-          </Text>
-        ) : null}
+      <Flex sx={{ gap: "spacing3", alignItems: "center" }}>
+        <Text
+          data-test-id="title"
+          sx={{
+            fontSize: "xs",
+            fontWeight: 400,
+            color:
+              title === strings.conflicted() || title === "Conflicted"
+                ? "paragraph-error"
+                : "accent"
+          }}
+        >
+          {title}
+        </Text>
         {count !== undefined && (
           <>
             <Ellipse size={4} color="accent" />
-            <Text sx={{ fontSize: "xs", fontWeight: 400, color: "accent" }}>
+            <Text
+              sx={{
+                fontSize: "xs",
+                fontWeight: 400,
+                color: "accent"
+              }}
+            >
               {count}
             </Text>
           </>

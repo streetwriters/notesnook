@@ -17,18 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { GroupingKey, Item } from "@notesnook/core";
-import { getSortValue } from "@notesnook/core";
-import { isNoteResolvedData } from "@notesnook/common";
-import { db } from "../../common/db";
 import Note from "../note";
 import Tag from "../tag";
 import TrashItem from "../trash-item";
+import { db } from "../../common/db";
 import Reminder from "../reminder";
+import { Context } from "./types";
+import { getSortValue } from "@notesnook/core";
+import { GroupingKey, Item } from "@notesnook/core";
+import { isNoteResolvedData } from "@notesnook/common";
 import { Attachment } from "../attachment";
 import { Notebook } from "../notebook";
 import SearchResult from "../search-result";
-import type { Context } from "./types";
+
+const SINGLE_LINE_HEIGHT = 1.4;
+const DEFAULT_LINE_HEIGHT =
+  // apps/web measures a paragraph of the page; desktop has no document.
+  16 - 1;
+export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 4 * DEFAULT_LINE_HEIGHT;
 
 type ListItemWrapperProps = {
   group?: GroupingKey;
@@ -43,7 +49,9 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   const { group, compact, context, item, data, index } = props;
 
   switch (item.type) {
-    case "note":
+    case "searchResult":
+      return <SearchResult item={item} />;
+    case "note": {
       return (
         <Note
           index={index}
@@ -54,8 +62,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           {...(isNoteResolvedData(data) ? data : {})}
         />
       );
-    case "searchResult":
-      return <SearchResult item={item} />;
+    }
     case "trash":
       return (
         <TrashItem index={index} item={item} date={getDate(item, group)} />
@@ -90,22 +97,32 @@ type PlaceholderData = {
   lines: { height: number; width: "random" | string | number }[];
   gap?: number;
 };
-
 const COMPACT_PLACEHOLDER_ITEM_DATA: PlaceholderData = {
   padding: [6, 5, 6, 5],
-  lines: [{ height: 16, width: "random" }]
+  lines: [{ height: 16, width: `random` }]
 };
 const FULL_PLACEHOLDER_ITEM_DATA: PlaceholderData = {
   padding: [10, 5, 10, 5],
   gap: 5,
   lines: [
-    { height: 16, width: "50%" },
-    { height: 12, width: "100%" },
-    { height: 12, width: "70%" },
-    { height: 10, width: 30 }
+    {
+      height: 16,
+      width: "50%"
+    },
+    {
+      height: 12,
+      width: "100%"
+    },
+    {
+      height: 12,
+      width: "70%"
+    },
+    {
+      height: 10,
+      width: 30
+    }
   ]
 };
-
 export function getListItemDefaultHeight(
   group: GroupingKey | undefined,
   compact: boolean | undefined
@@ -116,7 +133,6 @@ export function getListItemDefaultHeight(
   data.lines.forEach((line) => (height += line.height));
   return height;
 }
-
 export function getListItemPlaceholderData(
   group: GroupingKey | undefined,
   compact: boolean | undefined
@@ -141,7 +157,10 @@ function getDate(item: Item, groupType?: GroupingKey): number {
     getSortValue(
       groupType
         ? db.settings.getGroupOptions(groupType)
-        : { sortBy: "dateEdited", sortDirection: "desc" },
+        : {
+            sortBy: "dateEdited",
+            sortDirection: "desc"
+          },
       item as Parameters<typeof getSortValue>[1]
     ) || 0
   );

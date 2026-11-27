@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   getPointerPosition,
   type MenuItem,
-  type PositionOptions
+  type PositionOptions,
+  type UIElement
 } from "@notesnook/ui-kit";
 import { useMenuStore, type MenuAnchor } from "../components/menu/store";
 
@@ -28,25 +29,33 @@ export type MenuPosition = { x: number; y: number };
 
 export type MenuOptions = {
   title?: string;
-  /**
-   * A point, a rectangle, or apps/web's `PositionOptions`: the menu opens
-   * below `target` (an element), or at the pointer for `"mouse"` or none.
-   */
   position?: MenuPosition | MenuAnchor | PositionOptions;
-  /** apps/web's option; the desktop menu is always blocking. */
-  blocking?: boolean;
-  /** apps/web's option; the desktop menu is always the app's own. */
-  forceCustom?: boolean;
 };
 
-function toAnchor(
-  position?: MenuPosition | MenuAnchor | PositionOptions
-): MenuAnchor {
+function isElement(target: unknown): target is UIElement {
+  return (
+    typeof target === "object" &&
+    target !== null &&
+    "getBoundingClientRect" in target
+  );
+}
+
+function targetOf(position?: MenuOptions["position"]) {
+  return position && "target" in position ? position.target : undefined;
+}
+
+function toAnchor(position?: MenuOptions["position"]): MenuAnchor {
+  // Web's `PositionOptions`: below its target element, or at the pointer.
   if (position && !("x" in position)) {
-    const { target } = position;
-    if (target && target !== "mouse") {
-      const { x, y, width, height } = target.getBoundingClientRect();
-      return { x, y, width, height };
+    const target = position.target;
+    if (isElement(target)) {
+      const rect = target.getBoundingClientRect();
+      return {
+        x: rect.x + (position.xOffset ?? 0),
+        y: rect.y,
+        width: position.align === "start" ? 0 : rect.width,
+        height: rect.height + (position.yOffset ?? 0)
+      };
     }
     position = undefined;
   }
@@ -62,16 +71,24 @@ export const Menu = {
   openMenu: (items: MenuItem[], options: MenuOptions = {}) =>
     useMenuStore
       .getState()
-      .open(items, toAnchor(options.position), options.title),
+      .open(
+        items,
+        toAnchor(options.position),
+        options.title,
+        targetOf(options.position)
+      ),
   closeMenu: () => useMenuStore.getState().close(),
-  isOpen: () => useMenuStore.getState().items !== undefined
+  isOpen: () => useMenuStore.getState().items !== undefined,
+  target: () => useMenuStore.getState().target
 };
 
 export function useMenuTrigger() {
   const isOpen = useMenuStore((store) => store.items !== undefined);
+  const target = useMenuStore((store) => store.target);
   return {
     openMenu: Menu.openMenu,
     closeMenu: Menu.closeMenu,
-    isOpen
+    isOpen,
+    target
   };
 }

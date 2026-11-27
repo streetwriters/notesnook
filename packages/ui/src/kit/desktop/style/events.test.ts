@@ -207,6 +207,14 @@ describe("keyboard events", () => {
     });
   });
 
+  it("give nativeEvent the legacy keyCode the key handler falls back to", () => {
+    expect(
+      keyboardEvent("keydown", { key: "a", keyCode: 65 } as never).nativeEvent
+        .keyCode
+    ).toBe(65);
+    expect(keyboardEvent("keydown", undefined).nativeEvent.keyCode).toBe(0);
+  });
+
   it("count as a key press only for characters and Enter", () => {
     expect(isKeyPress("a")).toBe(true);
     expect(isKeyPress(" ")).toBe(true);

@@ -230,6 +230,51 @@
       "path": "components/unlock-screen/index.tsx",
       "category": "desktop-only",
       "reason": "Desktop's own lock screen. It unlocks with the native keychain through @platform safeStorage and with WebAuthn security keys through the platform service. Web's lock UI is inline in views/app-lock.tsx and uses the web key store's desktop.safeStorage bridge."
+    },
+    {
+      "path": "components/split-pane/index.tsx",
+      "category": "platform",
+      "reason": "apps/web's split pane is a DOM implementation (CSS class names, window mousemove/mouseup listeners, document.body classList); desktop re-exports the kit's SplitPane and Pane, which resize natively."
+    },
+    {
+      "path": "components/virtualized-list/index.tsx",
+      "category": "platform",
+      "reason": "apps/web virtualizes with @tanstack/react-virtual on the DOM scroll element it finds with closest('.ms-container') and positions rows with CSS transforms; desktop draws the same list with the kit's Virtuoso on the native list."
+    },
+    {
+      "path": "components/virtualized-grid/index.tsx",
+      "category": "platform",
+      "reason": "apps/web virtualizes with @tanstack/react-virtual on the DOM scroll element it finds with closest('.ms-container'); desktop lays the grid out in rows on the kit's Virtuoso."
+    },
+    {
+      "path": "components/virtualized-table/index.tsx",
+      "category": "platform",
+      "reason": "apps/web measures its DOM scroll container (closest('.ms-container')) for @tanstack/react-virtual; desktop uses the kit's TableVirtuoso, which owns its native scroll view."
+    },
+    {
+      "path": "components/virtualized-tree/index.tsx",
+      "category": "platform",
+      "reason": "apps/web renders each row in a raw <div> with onMouseUp and finds rows with document.getElementById to focus or click them (waitForElement); desktop has no DOM, so rows register an opener and the focused index with the list instead."
+    },
+    {
+      "path": "components/list-container/index.tsx",
+      "category": "platform",
+      "reason": "apps/web renders raw <div> items and skeletons, finds items with document.querySelector/getElementById (reveal flash with classList, waitForElement focus and click); desktop has no DOM, so items register with a selection context (list-container/selection.ts) instead."
+    },
+    {
+      "path": "components/list-container/selection.ts",
+      "category": "platform",
+      "reason": "Desktop-only stand-in for the DOM focus and click that apps/web's list uses (document.getElementById(...).focus()/click()): items register their open action and read the focused index."
+    },
+    {
+      "path": "components/navigation-menu/index.tsx",
+      "category": "platform",
+      "reason": "apps/web reorders the sidebar with @dnd-kit (DOM pointer sensors and CSS transforms); desktop reorders with the kit's SortableList."
+    },
+    {
+      "path": "components/navigation-menu/navigation-item.tsx",
+      "category": "platform",
+      "reason": "apps/web's SortableNavigationItem is built on @dnd-kit/sortable (DOM); desktop has no such item, the kit's SortableList moves the rows."
     }
   ]
 }

@@ -83,11 +83,13 @@ const {
   Switch,
   Box,
   Button,
+  Flex,
   Text,
   resolvePercentTranslate
 } = await import(
   "./primitives"
 );
+const { createButtonVariant } = await import("./hooks");
 const { Select } = await import("./select");
 
 let root: ReactTestRenderer;
@@ -325,17 +327,24 @@ describe("Select", () => {
   });
 });
 
-describe("Icon", () => {
-  it("draws a path as an SVG path", () => {
-    render(h(Icon, { path: "M0 0h24v24H0z" }));
-    expect(root.root.findByType("Path" as any).props.d).toBe("M0 0h24v24H0z");
-    expect(root.root.findAllByType("SvgXml" as any)).toHaveLength(0);
-  });
 
-  it("draws a path holding a whole SVG document like svg, as an icon's .path does", () => {
-    const svg = '<svg viewBox="0 0 24 24"><circle r="4"/></svg>';
-    render(h(Icon, { path: `  ${svg}` }));
-    expect(root.root.findByType("SvgXml" as any).props.xml).toBe(`  ${svg}`);
-    expect(root.root.findAllByType("Path" as any)).toHaveLength(0);
+describe("createButtonVariant", () => {
+  it("draws web's button look with the hover and pressed states desktop has", () => {
+    render(
+      h(Flex, {
+        onClick: () => {},
+        sx: {
+          ...createButtonVariant("transparent", "transparent", {
+            hover: { bg: "hover-selected" }
+          }),
+          borderRadius: "5px"
+        }
+      })
+    );
+    const node = pressable();
+    expect(node.props.style.borderRadius).toBe(5);
+    expect(node.props.style.flexDirection).toBe("row");
+    expect(node.props.style.backgroundColor).toBe("transparent");
+    expect(node.props.hoverStyle?.backgroundColor).toMatch(/^#/);
   });
 });

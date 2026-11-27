@@ -31,7 +31,14 @@ type MenuState = {
   items: MenuItem[] | undefined;
   anchor: MenuAnchor | undefined;
   title: string | undefined;
-  open: (items: MenuItem[], anchor: MenuAnchor, title?: string) => void;
+  /** The element the menu was opened from, as web's `position.target`. */
+  target: unknown;
+  open: (
+    items: MenuItem[],
+    anchor: MenuAnchor,
+    title?: string,
+    target?: unknown
+  ) => void;
   close: () => void;
 };
 
@@ -39,6 +46,13 @@ export const useMenuStore = create<MenuState>((set) => ({
   items: undefined,
   anchor: undefined,
   title: undefined,
-  open: (items, anchor, title) => set({ items, anchor, title }),
-  close: () => set({ items: undefined, anchor: undefined, title: undefined })
+  target: undefined,
+  open: (items, anchor, title, target) => set({ items, anchor, title, target }),
+  close: () =>
+    set({
+      items: undefined,
+      anchor: undefined,
+      title: undefined,
+      target: undefined
+    })
 }));

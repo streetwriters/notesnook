@@ -20,10 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useRef, useState } from "react";
 import Field from "../field";
 import { Close, Plus, SearchIcon } from "../icons";
-import { Button, Text } from "@notesnook/ui-kit";
 import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
 import { strings } from "@notesnook/intl";
-import { Box, useThemeUI } from "@notesnook/ui-kit";
+import { Button, Text, useThemeUI } from "@notesnook/ui-kit";
 
 type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string; emptyList: string };
