@@ -242,18 +242,29 @@ function groupEntries(sx: SxProp) {
   return { own, groupHover, groupActive, transition, animation };
 }
 
+/** theme-ui's dotted variant path from the theme root, `text.body`. */
+function variantAtPath(theme: object, path: string): Declarations | undefined {
+  let value: unknown = theme;
+  for (const part of path.split(".")) {
+    if (!value || typeof value !== "object") return undefined;
+    value = (value as Record<string, unknown>)[part];
+  }
+  return value && typeof value === "object" ? (value as Declarations) : undefined;
+}
+
 function compute(
   sx: SxProp,
   context: ThemeContextValue,
   options: ResolveOptions
 ): ResolvedStyle {
   const { theme, colors } = context;
-  const variants =
-    options.variantGroup && options.variant
-      ? (theme[options.variantGroup] as Record<string, Declarations>)[
-          options.variant
-        ]
-      : undefined;
+  const variants = options.variant?.includes(".")
+    ? variantAtPath(theme, options.variant)
+    : options.variantGroup && options.variant
+    ? (theme[options.variantGroup] as Record<string, Declarations>)[
+        options.variant
+      ]
+    : undefined;
   const { own, groupHover, groupActive, transition, animation } =
     groupEntries(sx);
   const merged = resolveAlpha(

@@ -192,8 +192,11 @@ export interface GridProps extends BoxProps {
   columns: number;
 }
 
+/** theme-ui's dotted variant path from the theme root, `text.body`. */
+export type TextVariantPath = `text.${keyof Theme["text"] & string}`;
+
 export interface TextProps extends BaseProps {
-  variant?: keyof Theme["text"];
+  variant?: keyof Theme["text"] | TextVariantPath;
   selectable?: boolean;
   dangerouslySetInnerHTML?: { __html: string };
   href?: string;
@@ -218,13 +221,13 @@ export interface ButtonProps extends BaseProps {
 }
 
 export interface LabelProps extends BaseProps {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | TextVariantPath;
   htmlFor?: string;
   children?: ReactNode;
 }
 
 export interface LinkProps extends BaseProps {
-  variant?: keyof Theme["variants"] | keyof Theme["text"];
+  variant?: keyof Theme["variants"] | keyof Theme["text"] | TextVariantPath;
   href?: string;
   target?: "_blank" | "_self";
   rel?: string;
@@ -433,6 +436,32 @@ export declare const Grid: Primitive<GridProps>;
 export declare const Text: Primitive<TextProps>;
 export declare const Button: Primitive<ButtonProps>;
 export declare const Label: Primitive<LabelProps>;
+
+/** The DOM FormData members apps/web reads. */
+export interface UIFormData {
+  get(name: string): string | File | null;
+  getAll(name: string): (string | File)[];
+  has(name: string): boolean;
+  set(name: string, value: string): void;
+  append(name: string, value: string): void;
+  delete(name: string): void;
+  entries(): IterableIterator<[string, string | File]>;
+  keys(): IterableIterator<string>;
+  values(): IterableIterator<string | File>;
+  forEach(
+    callback: (value: string | File, key: string, parent: UIFormData) => void
+  ): void;
+  [Symbol.iterator](): IterableIterator<[string, string | File]>;
+}
+
+/**
+ * The DOM's FormData. On desktop, `new FormData(event.target)` in a form's
+ * `onSubmit` holds the value of every field with a `name` in that form (text
+ * fields, and checkboxes and radios that are checked).
+ */
+export declare const FormData: {
+  new (form?: unknown): UIFormData;
+};
 export declare const Link: Primitive<LinkProps>;
 export declare const Image: Primitive<ImageProps>;
 export declare const Input: Primitive<InputProps, UIInputElement>;

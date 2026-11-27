@@ -58,6 +58,7 @@ import {
   type ElementControl
 } from "./element";
 import { htmlToText } from "./html-text";
+import { setFormFields, type FormField } from "./form-data";
 import { useThemeContext } from "./theme";
 import {
   changeEvent,
@@ -146,7 +147,25 @@ function useControl(): ElementControl {
   return (control.current ??= {});
 }
 
-const FormContext = createContext<{ submit(): void } | undefined>(undefined);
+interface FormHandle {
+  submit(): void;
+  /** Adds a named field to the form's FormData; returns its removal. */
+  register?(field: FormField): () => void;
+}
+const FormContext = createContext<FormHandle | undefined>(undefined);
+
+/** Puts a field with a `name` into its form's FormData. */
+function useFormField(
+  name: string | undefined,
+  control: ElementControl,
+  toggle: boolean
+) {
+  const form = useContext(FormContext);
+  useEffect(() => {
+    if (!name || !form?.register) return;
+    return form.register({ name, control, toggle });
+  }, [form, name, control, toggle]);
+}
 /** Forms with an `id`, for buttons outside them that name it in `form`. */
 const formsById = new Map<string, { submit(): void }>();
 
@@ -219,14 +238,22 @@ function Container(
   const isForm = props.as === "form" || !!props.onSubmit;
   const onSubmit = useRef(props.onSubmit);
   onSubmit.current = props.onSubmit;
-  const form = useMemo(
+  const fields = useRef(new Set<FormField>());
+  const form = useMemo<FormHandle | undefined>(
     () =>
       isForm
         ? {
-            submit: () =>
+            submit: () => {
+              if (element.current)
+                setFormFields(element.current, fields.current);
               onSubmit.current?.(
                 syntheticEvent("submit", undefined, element.current)
-              )
+              );
+            },
+            register: (field) => {
+              fields.current.add(field);
+              return () => fields.current.delete(field);
+            }
           }
         : undefined,
     [isForm, element]
@@ -559,6 +586,7 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
     element.current?.node.setNativeProps?.({ selection: { start, end } });
   control.click = () => element.current?.focus();
   useLabelControl(control);
+  useFormField(props.name, control, false);
   const form = useContext(FormContext);
   const { onChange, onChangeText, onSubmitEditing } = props;
 
@@ -727,6 +755,7 @@ const Toggle = forwardRef<
     if (!disabled) toggle();
   };
   useLabelControl(control);
+  useFormField(props.name, control, true);
   const size = 18;
   return (
     <Box
@@ -1045,3 +1074,5 @@ function isSvgDocument(path: string | undefined): path is string {
 }
 
 export type { ReactNode };
+
+export { FormData } from "./form-data";

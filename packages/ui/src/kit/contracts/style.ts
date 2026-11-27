@@ -232,10 +232,10 @@ type LayoutProps = {
   maxWidth?: Responsive<Length>;
   maxHeight?: Responsive<Length>;
   aspectRatio?: number;
-  overflow?: "visible" | "hidden" | "scroll";
+  overflow?: Responsive<"visible" | "hidden" | "scroll">;
   /** Desktop has one overflow for both axes; the last one written wins. */
-  overflowX?: "visible" | "hidden" | "scroll" | "auto";
-  overflowY?: "visible" | "hidden" | "scroll" | "auto";
+  overflowX?: Responsive<"visible" | "hidden" | "scroll" | "auto" | "unset">;
+  overflowY?: Responsive<"visible" | "hidden" | "scroll" | "auto" | "unset">;
   /** Sets top, right, bottom and left to the same length. */
   inset?: Length;
   /** theme-ui's width + height shorthand. */
@@ -280,13 +280,23 @@ type AppearanceProps = {
   outlineStyle?: "solid" | "dashed" | "dotted";
   boxShadow?: ShadowToken;
   transform?: Transform | CssTransform;
-  cursor?: "default" | "pointer" | "text" | "not-allowed" | "grab" | "move";
+  /** `unset` is the default cursor. */
+  cursor?:
+    | "default"
+    | "pointer"
+    | "text"
+    | "not-allowed"
+    | "grab"
+    | "move"
+    | "unset";
   /** Accepted and ignored: desktop form controls follow the kit theme. */
   colorScheme?: "light" | "dark" | "normal";
   /** `all` is drawn as `auto`. */
   pointerEvents?: "auto" | "none" | "all";
   userSelect?: "auto" | "none" | "text";
   objectFit?: "cover" | "contain" | "fill";
+  /** Accepted for parity; desktop text areas have no resize handle. */
+  resize?: "none" | "vertical" | "horizontal" | "both";
 };
 
 type TextStyleProps = {

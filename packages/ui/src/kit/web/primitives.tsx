@@ -152,41 +152,45 @@ export const ColorPicker = forwardRef<
   );
 });
 
-export const QRCode = forwardRef<Contract.QRCodeHandle, Contract.QRCodeProps>(
-  function QRCode(props, ref: Ref<Contract.QRCodeHandle>) {
-    const { value, size, ecLevel, logo: _logo, sx, ...rest } = props;
-    const svg = useMemo(() => {
-      const code = qrcode(0, ecLevel ?? "M");
-      code.addData(value);
-      code.make();
-      return code.createSvgTag({ cellSize: 1, margin: 0, scalable: true });
-    }, [value, ecLevel]);
-    useImperativeHandle(
-      ref,
-      () => ({
-        toSVG: () => svg,
-        toPNG: async () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = canvas.height = size;
-          const context = canvas.getContext("2d")!;
-          const image = new window.Image();
-          image.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-          await image.decode();
-          context.drawImage(image, 0, 0, size, size);
-          const blob = await new Promise<Blob | null>((resolve) =>
-            canvas.toBlob(resolve)
-          );
-          return new Uint8Array(await blob!.arrayBuffer());
-        }
-      }),
-      [svg, size]
-    );
-    return (
-      <Box
-        {...(rest as Any)}
-        {...({ dangerouslySetInnerHTML: { __html: svg } } as Any)}
-        sx={{ width: size, height: size, bg: "background", ...sx }}
-      />
-    );
-  }
-);
+export const QRCode = forwardRef<
+  Contract.QRCodeHandle,
+  Contract.QRCodeProps
+>(function QRCode(props, ref: Ref<Contract.QRCodeHandle>) {
+  const { value, size, ecLevel, logo: _logo, sx, ...rest } = props;
+  const svg = useMemo(() => {
+    const code = qrcode(0, ecLevel ?? "M");
+    code.addData(value);
+    code.make();
+    return code.createSvgTag({ cellSize: 1, margin: 0, scalable: true });
+  }, [value, ecLevel]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      toSVG: () => svg,
+      toPNG: async () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = size;
+        const context = canvas.getContext("2d")!;
+        const image = new window.Image();
+        image.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+        await image.decode();
+        context.drawImage(image, 0, 0, size, size);
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve)
+        );
+        return new Uint8Array(await blob!.arrayBuffer());
+      }
+    }),
+    [svg, size]
+  );
+  return (
+    <Box
+      {...(rest as Any)}
+      {...({ dangerouslySetInnerHTML: { __html: svg } } as Any)}
+      sx={{ width: size, height: size, bg: "background", ...sx }}
+    />
+  );
+});
+
+/** The browser's own FormData. */
+export const FormData = globalThis.FormData;

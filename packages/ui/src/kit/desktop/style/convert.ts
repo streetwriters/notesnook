@@ -145,6 +145,8 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
     result = [[key, LOGICAL.flex[value]]];
   else if (key === "textAlign" && LOGICAL.text[value])
     result = [[key, LOGICAL.text[value]]];
+  else if (key === "cursor" && value === "unset") result = [[key, "default"]];
+  else if (key === "resize") result = [];
   else if (SHORTHANDS.has(key) && /[\s]/.test(value)) {
     try {
       result = Object.entries(
@@ -317,7 +319,8 @@ export function convertDeclarations(
         continue;
       case "overflowX":
       case "overflowY":
-        style.overflow = value === "auto" ? "scroll" : value;
+        style.overflow =
+          value === "auto" ? "scroll" : value === "unset" ? "visible" : value;
         continue;
       case "inset":
         for (const side of ["top", "right", "bottom", "left"])

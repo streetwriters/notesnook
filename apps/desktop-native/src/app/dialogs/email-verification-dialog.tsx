@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect } from "react";
 import { Flex, Text } from "@notesnook/ui-kit";
-import Dialog from "../components/dialog";
 import { useStore as useUserStore } from "../stores/user-store";
 import { db } from "../common/db";
 import { useState } from "react";
@@ -28,6 +27,7 @@ import Accordion from "../components/accordion";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { showToast } from "../utils/toast";
+import Dialog from "../components/dialog";
 
 let interval = 0;
 type EmailVerificationDialogProps = BaseDialogProps<boolean>;
@@ -99,7 +99,6 @@ export const EmailVerificationDialog = DialogManager.register(
       >
         <Flex sx={{ flexDirection: "column" }}>
           <Text
-            as="span"
             variant="body"
             sx={{ borderRadius: "default", alignSelf: "stretch" }}
           >
@@ -110,13 +109,15 @@ export const EmailVerificationDialog = DialogManager.register(
             title={strings.confirmEmailTroubleshoot()}
             sx={{
               mt: 2,
-              bg: "var(--background-secondary)",
+              bg: "background-secondary",
               borderRadius: "default"
             }}
           >
-            <Text variant={"body"} px={1} pb={1}>
+            <Text variant="body" sx={{ px: 1, pb: 1 }}>
               {strings.confirmEmailTroubleshootNotice()[0]}{" "}
-              <b>{strings.confirmEmailTroubleshootNotice()[1]}</b>{" "}
+              <Text sx={{ fontWeight: "bold" }}>
+                {strings.confirmEmailTroubleshootNotice()[1]}
+              </Text>{" "}
               {strings.confirmEmailTroubleshootNotice()[2]}.
             </Text>
           </Accordion>

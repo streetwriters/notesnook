@@ -88,6 +88,7 @@ const {
   Button,
   Flex,
   Text,
+  FormData,
   resolvePercentTranslate
 } = await import(
   "./primitives"
@@ -393,5 +394,46 @@ describe("viewport units", () => {
       maxHeight: 200,
       height: 10
     });
+  });
+});
+
+describe("FormData", () => {
+  it("holds the named fields of the submitted form, as the DOM's does", () => {
+    let data: InstanceType<typeof FormData> | undefined;
+    render(
+      h(
+        Box,
+        {
+          as: "form",
+          onSubmit: (e: any) => {
+            data = new FormData(e.target);
+          }
+        },
+        h(Input, { name: "title", defaultValue: "Hello" }),
+        h(Input, { placeholder: "unnamed" }),
+        h(Checkbox, { name: "pinned", defaultChecked: true }),
+        h(Checkbox, { name: "locked" }),
+        h(Button, {}, "Save")
+      )
+    );
+    const [title] = root.root.findAllByType("TextInput" as any);
+    fire(() => title.props.onChange({ nativeEvent: { text: "Renamed" } }));
+    fire(() =>
+      root.root
+        .findAll((n: any) => n.type === "Pressable" && n.props.accessibilityRole === "button")[0]
+        .props.onPress(press())
+    );
+    expect(data).toBeDefined();
+    expect(Object.fromEntries(data!.entries())).toEqual({
+      title: "Renamed",
+      pinned: "on"
+    });
+    expect(data!.has("locked")).toBe(false);
+    expect(data!.get("missing")).toBeNull();
+  });
+
+  it("is empty for something that is not a submitted form", () => {
+    expect([...new FormData({}).keys()]).toEqual([]);
+    expect([...new FormData().keys()]).toEqual([]);
   });
 });
