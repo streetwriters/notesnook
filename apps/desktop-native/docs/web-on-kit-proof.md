@@ -38,4 +38,13 @@ Grouped by cause. Each is either a fix in apps/web or a widening of the kit's ty
 
 ## Web e2e
 
-**No usable result.** Full Playwright runs on baseline and proof were stopped at the user's request before finishing (empty JSON reports). At the stop each had about 54 failures, nearly all the same tests, already failing on the baseline ("Could not unwrap key", the login page); the one difference was an editor autosave test that failed only on the baseline. A follow-up 8-spec rerun matched no files (`No tests found`) and ran nothing. So nothing shows the app still works after the switch.
+Playwright, Chromium, apps/web's config with 4 workers and a 15 s test timeout, against a production build of each commit served locally. Specs: notes, notebooks, tags, colors, trash, search, navigation, reminders (plus keyboard-list-navigation, which the `notes.test.ts` filter also matches): 114 tests in 9 files.
+
+| | passed | failed |
+|---|---|---|
+| baseline (4b2b511c2) | 69 | 45 |
+| proof (872863230) | 72 | 42 |
+
+**No test fails on the proof that passes on the baseline.** The proof's 42 failures are a subset of the baseline's 45; the 3 baseline-only ones (`notes.test.ts` › unpin / assign a color / lock a note using properties) are flaky timeouts. Every failure on both is a `locator.waitFor` timeout, and they cluster in keyboard-list-navigation (16) and notebooks (18), so they come from the shortened timeout and the environment, not the switch.
+
+The full suite (219 tests) was not run to the end: those runs were stopped at the user's request.
