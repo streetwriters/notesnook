@@ -106,8 +106,8 @@ export function CustomizeToolbar() {
           {getAllPresets().map((preset) => (
             <Flex
               key={preset.id}
-              testID={`toolbar-preset-${preset.id}`}
-              onPress={() => {
+              data-test-id={`toolbar-preset-${preset.id}`}
+              onClick={() => {
                 if (preset.id === "custom" && !customToolbarPreset?.isAllowed)
                   return;
                 setCurrentPreset(getPreset(preset.id as PresetId));
@@ -119,7 +119,7 @@ export function CustomizeToolbar() {
                 disabled={
                   preset.id === "custom" && !customToolbarPreset?.isAllowed
                 }
-                onCheckedChange={() =>
+                onChange={() =>
                   setCurrentPreset(getPreset(preset.id as PresetId))
                 }
               />
@@ -133,10 +133,10 @@ export function CustomizeToolbar() {
         {currentPreset.editable && (
           <Button
             variant="secondary"
-            testID="toolbar-add-group"
+            data-test-id="toolbar-add-group"
             sx={{ flexShrink: 0, p: 1 }}
             title={strings.createAGroup()}
-            onPress={() => {
+            onClick={() => {
               setItems(addGroup);
               showToast("success", strings.groupAdded());
             }}
@@ -223,10 +223,10 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
 
   return (
     <Flex
-      testID={`toolbar-node-${item.id}`}
+      data-test-id={`toolbar-node-${item.id}`}
       group="toolbar-node"
       draggable={isDraggable}
-      droppable
+      onDragOver={() => {}}
       sx={{
         flexDirection: "row",
         p: 1,
@@ -269,7 +269,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
               opacity: 0,
               ":group-hover": { group: "toolbar-node", style: { opacity: 1 } }
             }}
-            onPress={() => onAddSubGroup()}
+            onClick={() => onAddSubGroup()}
           >
             <Icon path={Icons.plus} size={16} color="icon" />
           </Button>
@@ -282,7 +282,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
               opacity: 0,
               ":group-hover": { group: "toolbar-node", style: { opacity: 1 } }
             }}
-            onPress={() => (group ? onRemoveGroup : onRemoveItem)?.(item)}
+            onClick={() => (group ? onRemoveGroup : onRemoveItem)?.(item)}
           >
             <Icon path={Icons.delete} size={16} color="icon" />
           </Button>

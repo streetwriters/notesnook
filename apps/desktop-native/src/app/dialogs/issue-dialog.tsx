@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text, Box } from "@notesnook/ui-kit";
 import { clipboard } from "@platform";
 import { store as userstore } from "../stores/user-store";
 import { Debug, IssueReportResponse } from "@notesnook/core";
@@ -30,6 +30,7 @@ import { getSubscriptionInfo } from "./settings/components/user-profile";
 import { ErrorText } from "../components/error-text";
 import { Field } from "./components/field";
 import { LinkText } from "./components/link-text";
+import Dialog from "../components/dialog";
 
 type IssueDialogProps = BaseDialogProps<boolean>;
 
@@ -82,15 +83,24 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
       }}
     >
       <Flex sx={{ flexDirection: "column" }}>
-        <Field
-          required
-          label={strings.title()}
-          id="title"
-          placeholder={strings.issueTitlePlaceholder()}
-          autoFocus
-          onChangeText={(text) => (values.current.title = text)}
-          onSubmitEditing={() => onSubmit()}
-        />
+        <Box
+          as="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+        >
+          <Field
+            required
+            label={strings.title()}
+            id="title"
+            placeholder={strings.issueTitlePlaceholder()}
+            autoFocus
+            onChange={({ target: { value: text } }) =>
+              (values.current.title = text)
+            }
+          />
+        </Box>
         <Field
           as="textarea"
           required
@@ -99,7 +109,9 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           placeholder={strings.issuePlaceholder()}
           sx={{ mt: 1 }}
           styles={{ input: { minHeight: 150 } }}
-          onChangeText={(text) => (values.current.body = text)}
+          onChange={({ target: { value: text } }) =>
+            (values.current.body = text)
+          }
         />
         <Text
           variant="error"

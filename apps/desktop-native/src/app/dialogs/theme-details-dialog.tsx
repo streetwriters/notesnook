@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import type { getPreviewColors } from "@notesnook/theme";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { LinkText } from "./components/link-text";
 import { ThemePreview } from "../components/theme-preview";
+import Dialog from "../components/dialog";
 
 export type ThemeMetadata = {
   id: string;

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Dialog, Flex } from "@notesnook/ui-kit";
+import { Flex } from "@notesnook/ui-kit";
 import { getTimeFormat } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { db } from "../common/db";
@@ -31,6 +31,7 @@ import { setTimeOnly } from "../utils/date-time";
 import { showToast } from "../utils/toast";
 import { DateField } from "./components/date-field";
 import { Field } from "./components/field";
+import Dialog from "../components/dialog";
 
 dayjs.extend(customParseFormat);
 
@@ -52,7 +53,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
     return (
       <Dialog
         isOpen
-        testID="edit-note-creation-date-dialog"
+        testId="edit-note-creation-date-dialog"
         onClose={() => onClose(false)}
         title={strings.editCreationDate()}
         description={`${strings.creationDateCannotBeAfterLastEditedDate()}`}
@@ -92,7 +93,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
         >
           <DateField
             id="date-created"
-            testID="date-created-input"
+            data-test-id="date-created-input"
             label={strings.date()}
             date={date}
             onChange={setDate}
@@ -102,7 +103,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             id="time-created"
             label={strings.time()}
             required
-            testID="time-created-input"
+            data-test-id="time-created-input"
             placeholder={`${
               db.settings.getTimeFormat() === "12-hour"
                 ? "hh:mm AM/PM"
@@ -116,7 +117,9 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             defaultValue={date.format(
               getTimeFormat(db.settings.getTimeFormat())
             )}
-            onChangeText={(text) => setDate((d) => setTimeOnly(text, d))}
+            onChange={({ target: { value: text } }) =>
+              setDate((d) => setTimeOnly(text, d))
+            }
             rightActions={[{ icon: Clock }]}
           />
         </Flex>

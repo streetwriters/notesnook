@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect } from "react";
-import { Button, Dialog, Flex, Text, ThemeScope } from "@notesnook/ui-kit";
+import { Button, Flex, Text, ThemeScope } from "@notesnook/ui-kit";
 import { Loading, Coupon } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -46,6 +46,7 @@ import { usePromise } from "@notesnook/common";
 import { getCurrencySymbol } from "../../common/currencies";
 import { environment } from "@platform";
 import { SvgImage } from "../../components/svg-image";
+import Dialog from "../../components/dialog";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
@@ -249,8 +250,8 @@ export function CheckoutCompleted(props: {
       <Button
         variant="accent"
         sx={{ mt: 2, borderRadius: 100, px: 6 }}
-        onPress={onClose}
-        testID="see-all-plans"
+        onClick={onClose}
+        data-test-id="see-all-plans"
       >
         <Text>{buttonText || strings.continue()}</Text>
       </Button>
@@ -290,7 +291,7 @@ function SelectedPlan(props: SelectedPlanProps) {
       >
         <Flex sx={{ justifyContent: "space-between" }}>
           <Text
-            testID="checkout-plan-title"
+            data-test-id="checkout-plan-title"
             variant="body"
             sx={{ fontWeight: "bold", color: "heading" }}
           >
@@ -306,7 +307,7 @@ function SelectedPlan(props: SelectedPlanProps) {
           <Text variant="body">
             {strings.billedPeriod(formatRecurringPeriod(plan.period))}
           </Text>
-          <Button variant="anchor" onPress={onChangePlan}>
+          <Button variant="anchor" onClick={onChangePlan}>
             <Text>{strings.changePlan()}</Text>
           </Button>
         </Flex>
@@ -314,7 +315,7 @@ function SelectedPlan(props: SelectedPlanProps) {
           <Button
             variant="accentSecondary"
             sx={{ color: "accent", textAlign: "left" }}
-            onPress={() => selectPlan(upsellDetails.value?.plan)}
+            onClick={() => selectPlan(upsellDetails.value?.plan)}
           >
             {upsellDetails.value.text}
           </Button>
@@ -368,8 +369,10 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
     <Flex sx={{ flexDirection: "column" }}>
       {environment.isTesting ? (
         <Flex sx={{ flexDirection: "column" }}>
-          <Flex testID={`checkout-plan-country-${pricingInfo.country}`} />
-          {pricingInfo.coupon && <Flex testID="checkout-plan-coupon-applied" />}
+          <Flex data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
+          {pricingInfo.coupon && (
+            <Flex data-test-id="checkout-plan-coupon-applied" />
+          )}
         </Flex>
       ) : null}
       <Flex
@@ -484,13 +487,17 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
       >
         <Flex
           sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
-          testID={`checkout-price-item`}
+          data-test-id={`checkout-price-item`}
         >
-          <Text variant="body" testID={`label`} color="paragraph-secondary">
+          <Text
+            variant="body"
+            data-test-id={`label`}
+            color="paragraph-secondary"
+          >
             {strings.salesTax()}
           </Text>
           <Text
-            testID={`value`}
+            data-test-id={`value`}
             variant="body"
             sx={{ color: "paragraph-secondary" }}
           >
@@ -503,9 +510,13 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             alignSelf: "stretch",
             alignItems: "center"
           }}
-          testID={`checkout-price-item`}
+          data-test-id={`checkout-price-item`}
         >
-          <Text variant="body" testID={`label`} color="paragraph-secondary">
+          <Text
+            variant="body"
+            data-test-id={`label`}
+            color="paragraph-secondary"
+          >
             {strings.discount()}
           </Text>
           {isApplyingCoupon ? (
@@ -514,7 +525,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             <Flex sx={{ alignItems: "center", gap: 1 }}>
               <IconTag icon={Coupon} text={pricingInfo.coupon} />
               <Text
-                testID={`value`}
+                data-test-id={`value`}
                 variant="body"
                 sx={{ color: "paragraph-secondary" }}
               >
@@ -524,7 +535,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           ) : (
             <Button
               variant="anchor"
-              onPress={async () => {
+              onClick={async () => {
                 const code = await PromptDialog.show({
                   title: strings.discountCode(),
                   defaultValue: pricingInfo.coupon,
@@ -539,9 +550,9 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
         </Flex>
         <Flex
           sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
-          testID={`checkout-price-item`}
+          data-test-id={`checkout-price-item`}
         >
-          <Text variant="title" testID={`label`}>
+          <Text variant="title" data-test-id={`label`}>
             {strings.totalForToday()}
           </Text>
           {price.trial_period ? (
@@ -549,7 +560,11 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
               {formatPrice(0, pricingInfo.price.currency)}
             </Text>
           ) : (
-            <Text testID={`value`} variant="title" sx={{ textAlign: "right" }}>
+            <Text
+              data-test-id={`value`}
+              variant="title"
+              sx={{ textAlign: "right" }}
+            >
               {price.total}
             </Text>
           )}

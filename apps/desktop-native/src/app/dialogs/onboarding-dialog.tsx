@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { useStore as useUserStore } from "../stores/user-store";
 import { getSubscriptionInfo } from "./settings/components/user-profile";
 import { strings } from "@notesnook/intl";
+import Dialog from "../components/dialog";
 
 type OnboardingDialogProps = BaseDialogProps<boolean>;
 
@@ -49,7 +50,7 @@ export const OnboardingDialog = DialogManager.register(
           <Button
             variant="accent"
             sx={{ borderRadius: 50, px: 30, mb: 4, mt: 4 }}
-            onPress={() => onClose(false)}
+            onClick={() => onClose(false)}
           >
             <Text>{strings.continue()}</Text>
           </Button>

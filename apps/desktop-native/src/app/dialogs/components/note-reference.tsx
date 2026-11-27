@@ -24,22 +24,22 @@ import { formatDate } from "@notesnook/common";
 export function NoteReference(props: {
   item: Pick<Note, "id" | "title" | "headline">;
   date?: number;
-  onPress?: () => void;
+  onClick?: () => void;
   sx?: SxProp;
 }) {
   return (
     <Flex
-      testID="note-reference"
-      onPress={props.onPress}
+      data-test-id="note-reference"
+      onClick={props.onClick}
       sx={{
         flexDirection: "column",
         p: "spacing4",
         gap: "spacing2",
-        ":hover": props.onPress ? { bg: "hover" } : undefined,
+        ":hover": props.onClick ? { bg: "hover" } : undefined,
         ...props.sx
       }}
     >
-      <Text variant="subtitle" numberOfLines={1} sx={{ color: "heading" }}>
+      <Text variant="subtitle" sx={{ lineClamp: 1, color: "heading" }}>
         {props.item.title}
       </Text>
       {props.date ? (

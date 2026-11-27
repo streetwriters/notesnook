@@ -22,7 +22,6 @@ import { getFormattedDate, usePromise } from "@notesnook/common";
 import { InboxItemsHistoryErrorContext } from "@notesnook/core";
 import {
   Button,
-  Dialog,
   dataColor,
   Flex,
   ScrollContainer,
@@ -36,6 +35,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { Check, Copy, Trash } from "../components/icons";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "./confirm";
+import Dialog from "../components/dialog";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
@@ -136,7 +136,7 @@ function DetailsCell({ value }: { value: string }) {
       <Button
         variant="icon"
         title={strings.copy()}
-        onPress={handleCopy}
+        onClick={handleCopy}
         sx={{ p: "2px" }}
       >
         {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -192,7 +192,7 @@ export const InboxHistoryDialog = DialogManager.register(
         title={strings.failedInboxItems()}
         titleAction={
           result.status === "fulfilled" && result.value.length > 0 ? (
-            <Button variant="errorSecondary" onPress={deleteAll}>
+            <Button variant="errorSecondary" onClick={deleteAll}>
               <Text>{strings.deleteAll()}</Text>
             </Button>
           ) : undefined
@@ -278,7 +278,7 @@ export const InboxHistoryDialog = DialogManager.register(
                       <Button
                         variant="icon"
                         title={strings.delete()}
-                        onPress={async () => {
+                        onClick={async () => {
                           const ok = await ConfirmDialog.show({
                             title: strings.deleteItem(),
                             subtitle: strings.areYouSure(),

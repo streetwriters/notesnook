@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Dialog, Flex, Text, VirtualList } from "@notesnook/ui-kit";
+import { Button, Flex, Text, Virtuoso } from "@notesnook/ui-kit";
 import {
   ContentBlock,
   Note as NoteType,
@@ -37,6 +37,7 @@ import { Lock } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { UpgradeDialog } from "./buy-dialog/upgrade-dialog";
 import { Field } from "./components/field";
+import Dialog from "../components/dialog";
 
 export type LinkAttributes = {
   href: string;
@@ -106,7 +107,7 @@ export const NoteLinkingDialog = DialogManager.register(
               <Field
                 autoFocus
                 placeholder={strings.searchSectionToLinkPlaceholder()}
-                onChangeText={(text) => {
+                onChange={({ target: { value: text } }) => {
                   const query = text.trim().toLowerCase();
                   if (!query) {
                     setFilteredBlocks(undefined);
@@ -128,7 +129,7 @@ export const NoteLinkingDialog = DialogManager.register(
               <Button
                 variant="accentSecondary"
                 sx={{ mt: 1, flexShrink: 0 }}
-                onPress={() => {
+                onClick={() => {
                   setSelectedNote(undefined);
                   setIsNoteLocked(false);
                   setFilteredBlocks(undefined);
@@ -151,17 +152,16 @@ export const NoteLinkingDialog = DialogManager.register(
                       {strings.noBlocksOnNote()}
                     </Text>
                   ) : null}
-                  <VirtualList
-                    count={visibleBlocks.length}
-                    estimatedItemSize={36}
-                    itemKey={(index) => visibleBlocks[index].id}
-                    extraData={visibleBlocks}
-                    sx={{ flex: 1 }}
-                    renderItem={(index) => {
+                  <Virtuoso
+                    totalCount={visibleBlocks.length}
+                    defaultItemHeight={36}
+                    computeItemKey={(index) => visibleBlocks[index].id}
+                    style={{ flex: 1 }}
+                    itemContent={(index) => {
                       const item = visibleBlocks[index];
                       return (
                         <Flex
-                          onPress={() => {
+                          onClick={() => {
                             props.onClose({
                               title: selectedNote.title,
                               href: createInternalLink(
@@ -215,7 +215,7 @@ export const NoteLinkingDialog = DialogManager.register(
                 <Flex sx={{ flexDirection: "row", mt: 1, gap: 1 }}>
                   <Text variant="body">{blockLinkingAvailability?.error}</Text>
                   <Button
-                    onPress={() =>
+                    onClick={() =>
                       blockLinkingAvailability
                         ? UpgradeDialog.show({
                             feature: blockLinkingAvailability
@@ -234,7 +234,7 @@ export const NoteLinkingDialog = DialogManager.register(
               <Field
                 autoFocus
                 placeholder={strings.searchNoteToLinkPlaceholder()}
-                onChangeText={async (text) => {
+                onChange={async ({ target: { value: text } }) => {
                   const query = text.trim();
                   setNotes(
                     query
@@ -246,18 +246,17 @@ export const NoteLinkingDialog = DialogManager.register(
                 }}
               />
               {notes && (
-                <VirtualList
-                  count={notes.placeholders.length}
-                  estimatedItemSize={28}
-                  itemKey={(index) => notes.key(index)}
-                  extraData={notes}
-                  sx={{ flex: 1 }}
-                  renderItem={(index) => (
+                <Virtuoso
+                  totalCount={notes.placeholders.length}
+                  defaultItemHeight={28}
+                  computeItemKey={(index) => notes.key(index)}
+                  style={{ flex: 1 }}
+                  itemContent={(index) => (
                     <Flex sx={{ height: 28 }}>
                       <ResolvedItem items={notes} index={index} type="note">
                         {({ item: note, data }) => (
                           <Flex
-                            onPress={async () => {
+                            onClick={async () => {
                               setSelectedNote(note);
                               setIsNoteLocked(
                                 !!(data as NoteResolvedData).locked

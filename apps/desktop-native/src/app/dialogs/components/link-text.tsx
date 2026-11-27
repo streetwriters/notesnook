@@ -28,7 +28,7 @@ export function LinkText(props: {
 }) {
   return (
     <Text
-      onPress={() => shell.openUrl(props.href)}
+      onClick={() => shell.openUrl(props.href)}
       sx={{
         color: "accent",
         cursor: "pointer",

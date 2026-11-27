@@ -24,7 +24,7 @@ import {
   useState,
   type PropsWithChildren
 } from "react";
-import { Button, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text, Box } from "@notesnook/ui-kit";
 import { clipboard, files, shell } from "@platform";
 import { QRCode } from "@notesnook/ui-kit";
 import { useSessionState } from "../../hooks/use-session-state";
@@ -240,7 +240,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
       {filteredAuthenticators.map((auth, index) => (
         <Flex
           key={auth.type}
-          onPress={withFeatureCheck(
+          onClick={withFeatureCheck(
             auth.type === "sms" ? "sms2FA" : undefined,
             () => setSelected(index)
           )}
@@ -389,7 +389,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
         </Text>
         <Button
           variant="secondary"
-          onPress={async () => {
+          onClick={async () => {
             if (!authenticatorDetails.sharedKey) return;
             await clipboard.write({
               "text/plain": authenticatorDetails.sharedKey
@@ -463,7 +463,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
           variant="secondary"
           sx={{ p: 2, m: 0, alignSelf: "center" }}
           disabled={isSending || !enabled}
-          onPress={async () => {
+          onClick={async () => {
             setIsSending(true);
             try {
               await db.mfa.setup("email");
@@ -511,7 +511,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
         autoFocus
         required
         placeholder="+1234567890"
-        onChangeText={(text) => {
+        onChange={({ target: { value: text } }) => {
           const number = text.replace(/[\s-]/g, "");
           if (!number) return setError("");
 
@@ -532,7 +532,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
               elapsed={elapsed}
             />
           ),
-          onPress: async () => {
+          onClick: async () => {
             if (!phoneNumber) {
               setError(strings.phoneNumberNotEntered());
               return;
@@ -654,7 +654,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             key={action.title}
             variant="secondary"
             sx={{ mr: 1, py: 1, flexDirection: "row", alignItems: "center" }}
-            onPress={action.action}
+            onClick={action.action}
           >
             <action.icon size={15} />
             <Text>{action.title}</Text>
@@ -693,7 +693,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
       </Text>
       <Button
         sx={{ mt: 2, borderRadius: 100, px: 6 }}
-        onPress={() => props.onClose?.(true)}
+        onClick={() => props.onClose?.(true)}
       >
         <Text>{strings.done()}</Text>
       </Button>
@@ -701,7 +701,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
       <Button
         variant="anchor"
         sx={{ mt: 2 }}
-        onPress={() => {
+        onClick={() => {
           props.onClose && props.onClose(true);
           setTimeout(async () => {
             await MultifactorDialog.show({
@@ -746,7 +746,7 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
       </Text>
       <Button
         sx={{ mt: 2, borderRadius: 100, px: 6 }}
-        onPress={() => onClose?.(true)}
+        onClick={() => onClose?.(true)}
       >
         <Text>{strings.done()}</Text>
       </Button>
@@ -766,26 +766,35 @@ function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
   return (
     <Flex sx={{ flex: 1, flexDirection: "column" }}>
       {children}
-      <Field
-        id="code"
-        helpText={codeHelpText}
-        label={strings.enterSixDigitCode()}
-        sx={{ alignItems: "center", mt: 2 }}
-        required
-        placeholder="010101"
-        variant="clean"
-        maxLength={6}
-        styles={{
-          input: {
-            width: "100%",
-            fontSize: 38,
-            fontFamily: "monospace",
-            textAlign: "center"
-          }
+      <Box
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
         }}
-        onChangeText={(text) => (code.current = text.trim())}
-        onSubmitEditing={submit}
-      />
+      >
+        <Field
+          id="code"
+          helpText={codeHelpText}
+          label={strings.enterSixDigitCode()}
+          sx={{ alignItems: "center", mt: 2 }}
+          required
+          placeholder="010101"
+          variant="clean"
+          maxLength={6}
+          styles={{
+            input: {
+              width: "100%",
+              fontSize: 38,
+              fontFamily: "monospace",
+              textAlign: "center"
+            }
+          }}
+          onChange={({ target: { value: text } }) =>
+            (code.current = text.trim())
+          }
+        />
+      </Box>
     </Flex>
   );
 }

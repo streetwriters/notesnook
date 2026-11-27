@@ -21,7 +21,6 @@ import { useRef, useState } from "react";
 import {
   AvatarEditor,
   Button,
-  Dialog,
   Flex,
   Slider,
   Text,
@@ -36,6 +35,7 @@ import { showToast } from "../utils/toast";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import Dialog from "../components/dialog";
 
 export type EditProfilePictureDialogProps = BaseDialogProps<boolean> & {
   profile?: Profile;
@@ -152,7 +152,7 @@ export const EditProfilePictureDialog = DialogManager.register(
             <Button
               sx={{ flex: 1 }}
               variant="secondary"
-              onPress={async () => {
+              onClick={async () => {
                 const [file] = await showFilePicker({
                   acceptedFileTypes: "image/*"
                 });
@@ -174,7 +174,7 @@ export const EditProfilePictureDialog = DialogManager.register(
               <Button
                 sx={{ flex: 1 }}
                 variant="secondary"
-                onPress={async () => {
+                onClick={async () => {
                   if (picked) {
                     setPicked(undefined);
                   } else {
@@ -193,7 +193,7 @@ export const EditProfilePictureDialog = DialogManager.register(
               min={1}
               step={0.1}
               value={scale}
-              onValueChange={setScale}
+              onChange={(e) => setScale(e.target.valueAsNumber)}
             />
           ) : null}
         </Flex>

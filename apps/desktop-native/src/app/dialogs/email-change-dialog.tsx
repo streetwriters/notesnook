@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useRef, useState } from "react";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text, Box } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { useTimer } from "../hooks/use-timer";
 import { Loading } from "../components/icons";
@@ -26,6 +26,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { useStore as useUserStore } from "../stores/user-store";
 import { Field } from "./components/field";
+import Dialog from "../components/dialog";
 
 type EmailChangeState = {
   newEmail: string;
@@ -115,32 +116,41 @@ export const EmailChangeDialog = DialogManager.register(
       >
         <Flex sx={{ flexDirection: "column" }}>
           {emailChangeState ? (
-            <Field
-              id="code"
-              label={strings.sixDigitCode()}
-              helpText={strings.enterSixDigitCode()}
-              type="text"
-              required
-              onChangeText={(text) => (values.current.code = text)}
-              onSubmitEditing={() => onSubmit()}
-              action={{
-                disabled: isSending || !enabled,
-                component: (
-                  <Text variant="body">
-                    {isSending ? (
-                      <Loading size={18} />
-                    ) : enabled ? (
-                      strings.resendCode()
-                    ) : (
-                      strings.resendCode(elapsed)
-                    )}
-                  </Text>
-                ),
-                onPress: async () => {
-                  await sendCode(emailChangeState);
-                }
+            <Box
+              as="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit();
               }}
-            />
+            >
+              <Field
+                id="code"
+                label={strings.sixDigitCode()}
+                helpText={strings.enterSixDigitCode()}
+                type="text"
+                required
+                onChange={({ target: { value: text } }) =>
+                  (values.current.code = text)
+                }
+                action={{
+                  disabled: isSending || !enabled,
+                  component: (
+                    <Text variant="body">
+                      {isSending ? (
+                        <Loading size={18} />
+                      ) : enabled ? (
+                        strings.resendCode()
+                      ) : (
+                        strings.resendCode(elapsed)
+                      )}
+                    </Text>
+                  ),
+                  onClick: async () => {
+                    await sendCode(emailChangeState);
+                  }
+                }}
+              />
+            </Box>
           ) : (
             <>
               <Field
@@ -148,16 +158,27 @@ export const EmailChangeDialog = DialogManager.register(
                 label={strings.newEmail()}
                 type="email"
                 required
-                onChangeText={(text) => (values.current.newEmail = text)}
+                onChange={({ target: { value: text } }) =>
+                  (values.current.newEmail = text)
+                }
               />
-              <Field
-                id="password"
-                label={strings.accountPassword()}
-                type="password"
-                required
-                onChangeText={(text) => (values.current.password = text)}
-                onSubmitEditing={() => onSubmit()}
-              />
+              <Box
+                as="form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onSubmit();
+                }}
+              >
+                <Field
+                  id="password"
+                  label={strings.accountPassword()}
+                  type="password"
+                  required
+                  onChange={({ target: { value: text } }) =>
+                    (values.current.password = text)
+                  }
+                />
+              </Box>
               <Text variant="subBody" sx={{ mt: 1 }}>
                 {strings.changeEmailNotice()}
               </Text>

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState, useEffect } from "react";
-import { Button, Dialog, Flex, Input, Select, Text } from "@notesnook/ui-kit";
+import { Box, Button, Flex, Input, Select, Text } from "@notesnook/ui-kit";
 import { clipboard } from "@platform";
 import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
@@ -36,6 +36,7 @@ import { getFormattedDate, usePromise } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
 import { showPasswordDialog } from "../../password-dialog";
 import { strings } from "@notesnook/intl";
+import Dialog from "../../../components/dialog";
 
 export function InboxApiKeys() {
   const apiKeysPromise = usePromise(() => db.inboxApiKeys.get(), []);
@@ -55,7 +56,7 @@ export function InboxApiKeys() {
         <Text variant="body" sx={{ color: "paragraph-error" }}>
           {strings.failedToLoadApiKeys()}
         </Text>
-        <Button onPress={() => apiKeysPromise.refresh()}>
+        <Button onClick={() => apiKeysPromise.refresh()}>
           {strings.retry()}
         </Button>
       </Flex>
@@ -79,7 +80,7 @@ export function InboxApiKeys() {
           </Text>
           <Button
             variant="accent"
-            onPress={() => {
+            onClick={() => {
               if (apiKeys.length >= 10) {
                 ConfirmDialog.show({
                   title: strings.apiKeysLimitReached(),
@@ -277,7 +278,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           }}
         />
         {!viewing && (
-          <Button variant="icon" onPress={() => viewKey()}>
+          <Button variant="icon" onClick={() => viewKey()}>
             <PasswordInvisible size={14} />
           </Button>
         )}
@@ -294,7 +295,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
             >
               {secondsLeft}s
             </Text>
-            <Button variant="icon" onPress={() => copyToClipboard()}>
+            <Button variant="icon" onClick={() => copyToClipboard()}>
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </Button>
           </>
@@ -302,7 +303,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
         <Button
           variant="icon"
           disabled={isRevoking}
-          onPress={async () => {
+          onClick={async () => {
             const ok = await ConfirmDialog.show({
               title: strings.revokeInboxApiKey(apiKey.name),
               subtitle: strings.revokeApiKeyConfirmation(apiKey.name),
@@ -389,26 +390,35 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
       }}
     >
       <Flex sx={{ flexDirection: "column", gap: 2 }}>
-        <Field
-          autoFocus
-          label={strings.keyName()}
-          placeholder={strings.exampleKeyName()}
-          onChangeText={(text) => (name.current = text)}
-          onSubmitEditing={() => onSubmit()}
-          required
-        />
+        <Box
+          as="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+        >
+          <Field
+            autoFocus
+            label={strings.keyName()}
+            placeholder={strings.exampleKeyName()}
+            onChange={({ target: { value: text } }) => (name.current = text)}
+            required
+          />
+        </Box>
         <Flex sx={{ flexDirection: "column" }}>
           <Text variant="subtitle" sx={{ mb: 2, fontWeight: "bold" }}>
             {strings.expiresIn()}
           </Text>
           <Select
             value={String(selectedExpiry)}
-            onValueChange={(value) => setSelectedExpiry(Number(value))}
-            options={getExpiryOptions().map((option) => ({
-              title: option.label,
-              value: String(option.value)
-            }))}
-          />
+            onChange={(e) => setSelectedExpiry(Number(e.target.value))}
+          >
+            {getExpiryOptions().map((option) => (
+              <option key={option.value} value={String(option.value)}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
         </Flex>
       </Flex>
     </Dialog>

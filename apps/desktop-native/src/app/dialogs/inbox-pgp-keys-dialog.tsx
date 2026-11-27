@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 
 import { useState } from "react";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -27,6 +27,7 @@ import { showToast } from "../utils/toast";
 import { SerializedKeyPair } from "@notesnook/crypto";
 import { ConfirmDialog } from "./confirm";
 import { strings } from "@notesnook/intl";
+import Dialog from "../components/dialog";
 
 type InboxPGPKeysDialogProps = BaseDialogProps<boolean> & {
   keys?: SerializedKeyPair | null;
@@ -121,7 +122,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
             <Flex sx={{ flexDirection: "column", gap: 2 }}>
               <Button
                 variant="secondary"
-                onPress={handleAutoGenerate}
+                onClick={handleAutoGenerate}
                 disabled={isLoading}
                 sx={{ width: "100%" }}
               >
@@ -142,7 +143,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
               </Text>
               <Button
                 variant="secondary"
-                onPress={() => setMode("edit")}
+                onClick={() => setMode("edit")}
                 disabled={isLoading}
                 sx={{ width: "100%" }}
               >
@@ -177,7 +178,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
             as="textarea"
             required
             value={publicKey}
-            onChangeText={setPublicKey}
+            onChange={(e) => setPublicKey(e.target.value)}
             styles={{
               input: {
                 fontFamily: "monospace",
@@ -195,7 +196,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
             as="textarea"
             required
             value={privateKey}
-            onChangeText={setPrivateKey}
+            onChange={(e) => setPrivateKey(e.target.value)}
             styles={{
               input: {
                 fontFamily: "monospace",

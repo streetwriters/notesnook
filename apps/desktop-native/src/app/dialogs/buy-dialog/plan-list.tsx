@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import {
   CheckCircleOutline,
   Loading,
@@ -48,6 +48,7 @@ import { getCurrencySymbol } from "../../common/currencies";
 import { DialogManager } from "../../common/dialog-manager";
 import Accordion from "../../components/accordion";
 import { SvgImage } from "../../components/svg-image";
+import Dialog from "../../components/dialog";
 
 type PlansListProps = {
   selectedPlan?: string | null;
@@ -123,7 +124,7 @@ export function PlansList(props: PlansListProps) {
               p: "spacing6",
               fontSize: "md"
             }}
-            onPress={() => setPeriod(id as Period)}
+            onClick={() => setPeriod(id as Period)}
           >
             {period.title}
             {id === "yearly" && (
@@ -228,7 +229,7 @@ export function PlansList(props: PlansListProps) {
               justifyContent: "center",
               gap: "spacing3"
             }}
-            onPress={() => CancelInfoDialog.show({})}
+            onClick={() => CancelInfoDialog.show({})}
           >
             <Text
               sx={{
@@ -523,7 +524,7 @@ function PlanCard({
   const isRecommended = recommendedPlan === plan.plan;
   return (
     <Flex
-      testID={`checkout-plan`}
+      data-test-id={`checkout-plan`}
       sx={{
         bg: isRecommended ? "background-selected" : "background",
         border: isRecommended ? "1px solid" : "1px solid",
@@ -555,7 +556,11 @@ function PlanCard({
               alignItems: "center"
             }}
           >
-            <Text variant="heading" sx={{ fontSize: "xl" }} testID="title">
+            <Text
+              variant="heading"
+              sx={{ fontSize: "xl" }}
+              data-test-id="title"
+            >
               {metadata.title}
             </Text>
             {(plan.discount?.type === "regional" || isRecommended) && (
@@ -650,7 +655,7 @@ function PlanCard({
       ) : (
         <Button
           variant={isRecommended ? "new_accent" : "new_secondary"}
-          onPress={() => onPlanSelected(plan)}
+          onClick={() => onPlanSelected(plan)}
           sx={{
             width: "100%",
             fontSize: "md"

@@ -26,7 +26,7 @@ import {
 } from "@notesnook/common";
 import { DialogManager } from "../../common/dialog-manager";
 import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
-import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { FeatureCaption } from "./feature-caption";
 import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { formatRecurringPeriodShort } from "./plan-list";
@@ -40,6 +40,7 @@ import { Loading } from "../../components/icons";
 import { showToast } from "../../utils/toast";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { strings } from "@notesnook/intl";
+import Dialog from "../../components/dialog";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
@@ -74,7 +75,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
 
   return (
     <Dialog
-      testID="upgrade-dialog"
+      testId="upgrade-dialog"
       title={strings.unlockFeatureToday()}
       description={strings.upgradePlanTo(metadata.title)}
       isOpen={true}
@@ -140,7 +141,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             <Button
               variant="accent"
               disabled={!plan}
-              onPress={() => {
+              onClick={() => {
                 if (!plan) return;
                 onClose();
 
@@ -168,7 +169,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             </Button>
             <Button
               variant="tertiary"
-              onPress={() => {
+              onClick={() => {
                 onClose();
                 BuyDialog.show({});
               }}
@@ -180,7 +181,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           <Button
             variant="accent"
             disabled={!plan}
-            onPress={() => {
+            onClick={() => {
               if (
                 isUserSubscribed() &&
                 subscription?.provider !== SubscriptionProvider.PADDLE &&

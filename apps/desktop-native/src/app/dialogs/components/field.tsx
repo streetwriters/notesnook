@@ -27,6 +27,7 @@ import {
   type InputProps,
   type SxProp,
   type TextareaProps,
+  type UIChangeEvent,
   type UIInputElement
 } from "@notesnook/ui-kit";
 import {
@@ -39,7 +40,7 @@ import { AuthErrorText } from "./error-text";
 export type FieldAction = {
   id?: string;
   testId?: string;
-  onPress?: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   icon?: Icon;
   component?: ReactNode;
@@ -92,10 +93,10 @@ function ActionButtons(props: {
       {props.actions.map((action, index) => (
         <Button
           key={action.testId || action.id || index}
-          testID={action.testId}
+          data-test-id={action.testId}
           variant="secondary"
           disabled={action.disabled}
-          onPress={() => action.onPress?.()}
+          onClick={() => action.onClick?.()}
           sx={{
             p: 0,
             px: 1,
@@ -141,7 +142,7 @@ export const Field = forwardRef<UIInputElement, FieldProps>(function Field(
     name: _name,
     rightActions: rightActionsProp,
     leftActions: leftActionsProp,
-    onChangeText,
+    onChange: onChangeProp,
     variant,
     ...inputProps
   } = props;
@@ -163,10 +164,10 @@ export const Field = forwardRef<UIInputElement, FieldProps>(function Field(
     pl: leftActions.length > 0 || LeftIcon ? 30 : undefined,
     ...styles?.input
   };
-  const onChange = (text: string) => {
-    const valid = !validate || validate(text);
+  const onChange = (e: UIChangeEvent<UIInputElement>) => {
+    const valid = !validate || validate(e.target.value);
     setIsValid(valid);
-    if (valid) onChangeText?.(text);
+    if (valid) onChangeProp?.(e);
   };
 
   return (
@@ -208,7 +209,7 @@ export const Field = forwardRef<UIInputElement, FieldProps>(function Field(
             rows={rows}
             variant={resolvedVariant}
             disabled={disabled}
-            onChangeText={onChange}
+            onChange={onChange as TextareaProps["onChange"]}
             sx={inputSx}
           />
         ) : (
@@ -220,7 +221,7 @@ export const Field = forwardRef<UIInputElement, FieldProps>(function Field(
             type={
               type === "password" && isPasswordVisible ? "text" : type || "text"
             }
-            onChangeText={onChange}
+            onChange={onChange}
             sx={inputSx}
           />
         )}
@@ -256,7 +257,7 @@ export const Field = forwardRef<UIInputElement, FieldProps>(function Field(
         ) : null}
         {type === "password" ? (
           <Flex
-            onPress={() => setIsPasswordVisible((s) => !s)}
+            onClick={() => setIsPasswordVisible((s) => !s)}
             sx={{
               position: "absolute",
               right: 0,

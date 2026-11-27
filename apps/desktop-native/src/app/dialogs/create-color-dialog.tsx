@@ -18,13 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { ColorPicker, Dialog, Flex } from "@notesnook/ui-kit";
+import { ColorPicker, Flex, Box } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
 import { Field } from "./components/field";
+import Dialog from "../components/dialog";
 
 type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
@@ -48,7 +49,7 @@ export const CreateColorDialog = DialogManager.register(
 
     return (
       <Dialog
-        testID="new-color-dialog"
+        testId="new-color-dialog"
         isOpen={true}
         title={strings.newColor()}
         onClose={() => props.onClose(false)}
@@ -69,38 +70,52 @@ export const CreateColorDialog = DialogManager.register(
             gap: "spacing4"
           }}
         >
-          <Field
-            required
-            label={strings.title()}
-            id="title"
-            autoFocus
-            testID="title-input"
-            placeholder={strings.enterTitle()}
-            onChangeText={(text) => (title.current = text)}
-            onSubmitEditing={() => onSubmit()}
-          />
-          <Field
-            required
-            label={strings.color()}
-            value={color}
-            id="color"
-            testID="color-input"
-            placeholder={strings.selectColor()}
-            onChangeText={setColor}
-            onSubmitEditing={() => onSubmit()}
-            rightActions={[
-              {
-                component: (
-                  <ColorPicker
-                    value={validateHexColor(color) ? color : "#666666"}
-                    onChange={(value) => setColor(value)}
-                    sx={{ width: 40, height: 33, mx: "spacing4" }}
-                  />
-                ),
-                sx: { px: 0 }
-              }
-            ]}
-          />
+          <Box
+            as="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
+            <Field
+              required
+              label={strings.title()}
+              id="title"
+              autoFocus
+              data-test-id="title-input"
+              placeholder={strings.enterTitle()}
+              onChange={({ target: { value: text } }) => (title.current = text)}
+            />
+          </Box>
+          <Box
+            as="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
+            <Field
+              required
+              label={strings.color()}
+              value={color}
+              id="color"
+              data-test-id="color-input"
+              placeholder={strings.selectColor()}
+              onChange={(e) => setColor(e.target.value)}
+              rightActions={[
+                {
+                  component: (
+                    <ColorPicker
+                      value={validateHexColor(color) ? color : "#666666"}
+                      onChange={(value) => setColor(value)}
+                      sx={{ width: 40, height: 33, mx: "spacing4" }}
+                    />
+                  ),
+                  sx: { px: 0 }
+                }
+              ]}
+            />
+          </Box>
         </Flex>
       </Dialog>
     );

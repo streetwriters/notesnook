@@ -54,8 +54,8 @@ export function ReminderRadioButton(props: ReminderRadioButtonProps) {
   const { testId, label, selected, premium, sx, onClick } = props;
   return (
     <Flex
-      testID={testId}
-      onPress={premium ? undefined : onClick}
+      data-test-id={testId}
+      onClick={premium ? undefined : onClick}
       sx={{
         minWidth: 0,
         flexDirection: "row",

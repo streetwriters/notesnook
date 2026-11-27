@@ -33,7 +33,7 @@ dayjs.extend(customParseFormat);
 
 export function DateField(props: {
   id: string;
-  testID?: string;
+  "data-test-id"?: string;
   label: string;
   date: dayjs.Dayjs;
   onChange: (update: (date: dayjs.Dayjs) => dayjs.Dayjs) => void;
@@ -49,17 +49,19 @@ export function DateField(props: {
       <Field
         key={key}
         id={props.id}
-        testID={props.testID}
+        data-test-id={props["data-test-id"]}
         label={props.label}
         required
         placeholder={props.placeholder}
         action={{
           icon: CalendarDots,
-          onPress: () => setShowCalendar((s) => !s)
+          onClick: () => setShowCalendar((s) => !s)
         }}
         validate={(t) => dayjs(t, db.settings.getDateFormat(), true).isValid()}
         defaultValue={props.date.format(db.settings.getDateFormat())}
-        onChangeText={(text) => props.onChange((d) => setDateOnly(text, d))}
+        onChange={({ target: { value: text } }) =>
+          props.onChange((d) => setDateOnly(text, d))
+        }
       />
       <AnchoredPopover
         isOpen={showCalendar}

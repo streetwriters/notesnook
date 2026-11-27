@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useState } from "react";
 import { EVENTS } from "@notesnook/core";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { environment } from "@platform";
 import { createBackup } from "../common";
 import { db } from "../common/db";
@@ -28,6 +28,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { ErrorText } from "../components/error-text";
 import { LinkText } from "./components/link-text";
+import Dialog from "../components/dialog";
 
 type MigrationProgressEvent = {
   collection: string;

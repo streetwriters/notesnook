@@ -127,8 +127,7 @@ function Avatar(props: {
       {props.picture ? (
         <Image
           src={props.picture}
-          resizeMode="contain"
-          sx={{ width: "100%", height: "100%" }}
+          sx={{ objectFit: "contain", width: "100%", height: "100%" }}
         />
       ) : (
         <UserIcon size={props.iconSize} />
@@ -233,7 +232,7 @@ export function UserProfile({ minimal }: Props) {
 
   return (
     <Flex
-      testID="logged-in"
+      data-test-id="logged-in"
       sx={{
         borderRadius: "default",
         alignItems: "center",
@@ -253,7 +252,7 @@ export function UserProfile({ minimal }: Props) {
         >
           <Flex
             title={strings.editProfilePicture()}
-            onPress={async () => {
+            onClick={async () => {
               await EditProfilePictureDialog.show({ profile });
             }}
             sx={{
@@ -287,7 +286,7 @@ export function UserProfile({ minimal }: Props) {
             <Edit
               size={12}
               title={strings.editFullName()}
-              onPress={async () => {
+              onClick={async () => {
                 const fullName = await PromptDialog.show({
                   title: strings.editFullName(),
                   description: strings.setFullNameDesc(),

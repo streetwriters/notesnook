@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { Dialog, Flex, Image, Switch, Text } from "@notesnook/ui-kit";
+import { Flex, Image, Switch, Text } from "@notesnook/ui-kit";
 import { imageCompressor, type PickedFile } from "@platform";
 import { formatBytes } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -38,6 +38,7 @@ import {
   CloseCircle
 } from "../components/icons";
 import { createPickedFile } from "../utils/picked-file";
+import Dialog from "../components/dialog";
 
 type FileStatus = "pending" | "compressing" | "encrypting" | "done" | "error";
 
@@ -314,8 +315,8 @@ function FileRow({
       {thumbnail ? (
         <Image
           src={thumbnail}
-          resizeMode="cover"
           sx={{
+            objectFit: "cover",
             width: 40,
             height: 40,
             borderRadius: "default",
@@ -339,7 +340,7 @@ function FileRow({
       )}
 
       <Flex sx={{ flex: 1, flexDirection: "column", minWidth: 0 }}>
-        <Text variant="body" numberOfLines={1}>
+        <Text variant="body" sx={{ lineClamp: 1 }}>
           {activeFile.name}
         </Text>
         <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
@@ -362,7 +363,7 @@ function FileRow({
               : ""}
           </Text>
         ) : showCompressionToggle && isImage ? (
-          <Switch checked={compress} onCheckedChange={() => onToggleCompress?.()} />
+          <Switch checked={compress} onChange={() => onToggleCompress?.()} />
         ) : showCompressionToggle && !isImage ? (
           <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
             N/A

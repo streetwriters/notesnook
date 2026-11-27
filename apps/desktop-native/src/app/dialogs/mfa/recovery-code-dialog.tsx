@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Dialog } from "@notesnook/ui-kit";
+
 import { steps } from "./steps";
 import { ErrorText } from "../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import Dialog from "../../components/dialog";
 
 type RecoveryCodesDialogProps = BaseDialogProps<boolean> & {
   primaryMethod: AuthenticatorType;

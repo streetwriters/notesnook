@@ -17,14 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { strings } from "@notesnook/intl";
 import { debounce, useIsFeatureAvailable } from "@notesnook/common";
 import { withFeatureCheck } from "../../common";
 import { environment } from "@platform";
 import {
   Button,
-  Dialog,
   Flex,
   Input,
   ScrollContainer,
@@ -91,6 +90,7 @@ import type {
   Setting,
   SettingsGroup
 } from "./types";
+import Dialog from "../../components/dialog";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -224,7 +224,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
 
   return (
     <Dialog
-      testID="settings-dialog"
+      testId="settings-dialog"
       isOpen={true}
       width="968px"
       onClose={() => props.onClose(false)}
@@ -247,7 +247,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
           }}
         />
         <ScrollContainer
-          testID="settings-content"
+          data-test-id="settings-content"
           sx={{ flex: 1, bg: "background", p: 20 }}
         >
           <Flex sx={{ flexDirection: "column", gap: 20, pt: 20 }}>
@@ -322,15 +322,15 @@ function SettingsSideBar(props: {
     <ThemeScope scope="navigationMenu">
       <Flex sx={{ width: 240, flexShrink: 0, bg: "background" }}>
         <ScrollContainer
-          testID="settings-navigation-menu"
+          data-test-id="settings-navigation-menu"
           sx={{ flex: 1, bg: "background" }}
         >
           <Flex sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}>
             <Input
-              testID="settings-search"
+              data-test-id="settings-search"
               autoFocus
               placeholder={strings.search()}
-              onChangeText={props.onSearch}
+              onChange={(e) => props.onSearch(e.target.value)}
               sx={{ m: 1, bg: "background", py: "7px" }}
             />
             {sectionGroups.map((group) => (
@@ -457,7 +457,7 @@ function SettingItem(props: { item: Setting }) {
 
   return (
     <Flex
-      testID={`setting-${item.key}`}
+      data-test-id={`setting-${item.key}`}
       sx={{
         flexDirection: "column",
         pb: 4,
@@ -505,10 +505,10 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <Button
                     key={index}
-                    testID={`setting-${item.key}-button-${index}`}
+                    data-test-id={`setting-${item.key}-button-${index}`}
                     disabled={workIndex === index}
                     variant={component.variant}
-                    onPress={withFeatureCheck(feature, () =>
+                    onClick={withFeatureCheck(feature, () =>
                       workWithLoading(index, component.action)
                     )}
                   >
@@ -523,10 +523,10 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <Switch
                     key={index}
-                    testID={`setting-${item.key}-toggle-${index}`}
+                    data-test-id={`setting-${item.key}-toggle-${index}`}
                     disabled={workIndex === index}
                     checked={component.isToggled()}
-                    onCheckedChange={withFeatureCheck(feature, () =>
+                    onChange={withFeatureCheck(feature, () =>
                       workWithLoading(index, component.toggle)
                     )}
                   />
@@ -535,7 +535,7 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <SelectComponent
                     key={index}
-                    testID={`setting-${item.key}-dropdown-${index}`}
+                    data-test-id={`setting-${item.key}-dropdown-${index}`}
                     {...component}
                     onSelectionChanged={withFeatureCheck(
                       feature,
@@ -553,12 +553,10 @@ function SettingItem(props: { item: Setting }) {
                     onChange={component.onChange}
                   />
                 ) : (
-                  <Input
+                  <TextInput
                     key={index}
-                    type="text"
                     defaultValue={component.defaultValue()}
-                    onChangeText={debounce(component.onChange, 500)}
-                    sx={{ width: 250, mr: 1 }}
+                    onChange={component.onChange}
                   />
                 );
               case "icon":
@@ -585,7 +583,7 @@ function SettingItem(props: { item: Setting }) {
 }
 
 export function SelectComponent(
-  props: Omit<DropdownSettingComponent, "type"> & { testID?: string }
+  props: Omit<DropdownSettingComponent, "type"> & { "data-test-id"?: string }
 ) {
   const { onSelectionChanged, options } = props;
   const [selected, setSelected] = useState<string | number>();
@@ -596,13 +594,38 @@ export function SelectComponent(
 
   return (
     <Select
-      testID={props.testID}
-      options={options}
+      data-test-id={props["data-test-id"]}
       value={selected}
-      onValueChange={(value) => {
-        setSelected(value);
-        onSelectionChanged(value);
+      onChange={(e) => {
+        setSelected(e.target.value);
+        onSelectionChanged(e.target.value);
       }}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.title}
+        </option>
+      ))}
+    </Select>
+  );
+}
+
+function TextInput(props: {
+  defaultValue: string;
+  onChange: (value: string) => void;
+}) {
+  const onChange = useRef(props.onChange);
+  onChange.current = props.onChange;
+  const debounced = useMemo(
+    () => debounce((value: string) => onChange.current(value), 500),
+    []
+  );
+  return (
+    <Input
+      type="text"
+      defaultValue={props.defaultValue}
+      onChange={(e) => debounced(e.target.value)}
+      sx={{ width: 250, mr: 1 }}
     />
   );
 }
@@ -635,7 +658,7 @@ function NumberInput(props: {
         key={inputKey}
         type="number"
         defaultValue={text.current}
-        onChangeText={(value) => {
+        onChange={({ target: { value: value } }) => {
           text.current = value;
           if (timer.current) clearTimeout(timer.current);
           timer.current = setTimeout(() => {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Dialog, Flex } from "@notesnook/ui-kit";
+import { Flex, Box } from "@notesnook/ui-kit";
 import { ErrorText } from "../components/error-text";
 import { Field } from "./components/field";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -30,6 +30,7 @@ import { useStore as useAppStore } from "../stores/app-store";
 import { Color, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { checkFeature, truncateString } from "../common";
+import Dialog from "../components/dialog";
 
 type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -58,7 +59,7 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
 
   return (
     <Dialog
-      testID="item-dialog"
+      testId="item-dialog"
       isOpen={true}
       title={props.title}
       description={props.subtitle}
@@ -73,18 +74,25 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
       }}
     >
       <Flex sx={{ flexDirection: "column" }}>
-        <Field
-          required
-          label={strings.title()}
-          placeholder={props.placeholder}
-          id="title"
-          autoFocus
-          testID="title-input"
-          defaultValue={props.defaultValue}
-          onChangeText={(text) => (value.current = text)}
-          onSubmitEditing={onSubmit}
-          sx={{ mt: "spacing6", mb: "spacing7" }}
-        />
+        <Box
+          as="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+        >
+          <Field
+            required
+            label={strings.title()}
+            placeholder={props.placeholder}
+            id="title"
+            autoFocus
+            data-test-id="title-input"
+            defaultValue={props.defaultValue}
+            onChange={({ target: { value: text } }) => (value.current = text)}
+            sx={{ mt: "spacing6", mb: "spacing7" }}
+          />
+        </Box>
         <ErrorText error={error?.message} />
       </Flex>
     </Dialog>

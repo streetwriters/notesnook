@@ -35,7 +35,7 @@ export function DictionaryWords() {
           {words.map((word) => (
             <Flex
               key={word}
-              onPress={() => deleteWord(word)}
+              onClick={() => deleteWord(word)}
               sx={{ p: 1, borderRadius: "default", ":hover": { bg: "hover" } }}
             >
               <Text variant="body">{word}</Text>

@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback } from "react";
-import { Dialog, Flex } from "@notesnook/ui-kit";
+import { Flex } from "@notesnook/ui-kit";
 import AnnouncementBody from "../components/announcements/body";
 import { store as announcementStore } from "../stores/announcement-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import Dialog from "../components/dialog";
 
 type AnnouncementDialogProps = BaseDialogProps<boolean> & {
   announcement: {

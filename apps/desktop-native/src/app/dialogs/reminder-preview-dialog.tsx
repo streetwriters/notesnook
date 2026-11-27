@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { Reminder } from "@notesnook/core";
 import { Clock, Refresh } from "../components/icons";
@@ -26,6 +26,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import IconTag from "../components/icon-tag";
 import { NoteReference } from "./components/note-reference";
+import Dialog from "../components/dialog";
 
 export type ReminderPreviewDialogProps = BaseDialogProps<false> & {
   reminder: Reminder;
@@ -91,7 +92,7 @@ export const ReminderPreviewDialog = DialogManager.register(
             <Button
               key={time.id}
               variant="secondary"
-              onPress={() => {
+              onClick={() => {
                 db.reminders.add({
                   id: reminder.id,
                   snoozeUntil: Date.now() + time.interval

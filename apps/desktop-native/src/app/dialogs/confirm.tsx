@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef } from "react";
 import { Box, Checkbox, Flex, Text } from "@notesnook/ui-kit";
-import { Dialog } from "@notesnook/ui-kit";
+
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
 import { getChangelog } from "../utils/version";
@@ -28,6 +28,7 @@ import { strings } from "@notesnook/intl";
 import { ErrorText } from "../components/error-text";
 import { Field } from "./components/field";
 import { MarkdownText } from "./components/markdown-text";
+import Dialog from "../components/dialog";
 
 type Check = { text: string; default?: boolean };
 type Input = {
@@ -77,7 +78,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
 
   return (
     <Dialog
-      testID="confirm-dialog"
+      testId="confirm-dialog"
       isOpen={true}
       title={title}
       width={width}
@@ -134,7 +135,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                 helpText={input.helpText}
                 defaultValue={input.defaultValue}
                 required={input.required}
-                onChangeText={(text) => {
+                onChange={({ target: { value: text } }) => {
                   inputItems.current[id] = text;
                 }}
               />
@@ -152,10 +153,12 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                 }}
               >
                 <Checkbox
-                  testID={id}
+                  data-test-id={id}
                   defaultChecked={check.default}
                   sx={{ width: 18, height: 18 }}
-                  onCheckedChange={(checked) => (checkedItems.current[id] = checked)}
+                  onChange={({ target: { checked: checked } }) =>
+                    (checkedItems.current[id] = checked)
+                  }
                 />
                 <Text
                   variant="body"

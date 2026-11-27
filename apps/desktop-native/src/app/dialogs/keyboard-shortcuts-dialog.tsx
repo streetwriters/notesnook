@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Fragment } from "react";
 import { formatKey, getGroupedKeybindings } from "@notesnook/common";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { environment } from "@platform";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { isMac } from "../utils/platform";
 import { strings } from "@notesnook/intl";
+import Dialog from "../components/dialog";
 
 export const KeyboardShortcutsDialog = DialogManager.register(
   function KeyboardShortcutsDialog(props: BaseDialogProps<boolean>) {

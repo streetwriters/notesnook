@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useRef, useState } from "react";
 import dayjs, { type Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Dialog, Flex, Select, Text, type UIElement } from "@notesnook/ui-kit";
+import { Flex, Select, Text, type UIElement } from "@notesnook/ui-kit";
 import { notifications, environment } from "@platform";
 import {
   getFormattedDate,
@@ -43,6 +43,7 @@ import { DayPicker } from "../components/day-picker";
 import { AnchoredPopover } from "./components/anchored-popover";
 import { NoteReference } from "./components/note-reference";
 import { Fieldset, ReminderRadioButton } from "./components/radio-button";
+import Dialog from "../components/dialog";
 
 dayjs.extend(customParseFormat);
 
@@ -176,7 +177,7 @@ export const AddReminderDialog = DialogManager.register(
       <Dialog
         isOpen={true}
         title={reminder ? strings.editReminder() : strings.newReminder()}
-        testID="add-reminder-dialog"
+        testId="add-reminder-dialog"
         onClose={() => props.onClose(false)}
         width={700}
         positiveButton={{
@@ -242,22 +243,22 @@ export const AddReminderDialog = DialogManager.register(
               required
               value={title}
               placeholder={strings.reminderTitlePlaceholder()}
-              testID="title-input"
+              data-test-id="title-input"
               styles={{ input: { height: 45 } }}
-              onChangeText={setTitle}
+              onChange={(e) => setTitle(e.target.value)}
             />
             <Field
               as="textarea"
               id="description"
               label={`${strings.description()} (${strings.optional()})`}
-              testID="description-input"
+              data-test-id="description-input"
               placeholder={strings.reminderDetailsPlaceholder()}
               value={description}
               styles={{
                 input: { height: 100 },
                 helpText: { fontSize: "xs" }
               }}
-              onChangeText={setDescription}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </Flex>
         </Fieldset>
@@ -322,11 +323,11 @@ export const AddReminderDialog = DialogManager.register(
                   id="date"
                   label={strings.selectDate()}
                   required
-                  testID="date-input"
+                  data-test-id="date-input"
                   placeholder={`${db.settings.getDateFormat()}`}
                   action={{
                     icon: CalendarDots,
-                    onPress: () => setShowCalendar((s) => !s)
+                    onClick: () => setShowCalendar((s) => !s)
                   }}
                   sx={{ flex: 1 }}
                   styles={{ input: { height: 45 } }}
@@ -340,7 +341,9 @@ export const AddReminderDialog = DialogManager.register(
                     return isValid;
                   }}
                   defaultValue={date.format(db.settings.getDateFormat())}
-                  onChangeText={(text) => setDate((d) => setDateOnly(text, d))}
+                  onChange={({ target: { value: text } }) =>
+                    setDate((d) => setDateOnly(text, d))
+                  }
                 />
                 <AnchoredPopover
                   isOpen={showCalendar}
@@ -412,7 +415,7 @@ export const AddReminderDialog = DialogManager.register(
                 </Text>
                 <Flex
                   ref={monthlyAnchorRef}
-                  onPress={() => setShowMonthlyDays((s) => !s)}
+                  onClick={() => setShowMonthlyDays((s) => !s)}
                   sx={{
                     flex: 1,
                     flexDirection: "row",
@@ -450,8 +453,8 @@ export const AddReminderDialog = DialogManager.register(
                     return (
                       <Flex
                         key={day}
-                        testID={`day-${day}`}
-                        onPress={() => toggleDay(day)}
+                        data-test-id={`day-${day}`}
+                        onClick={() => toggleDay(day)}
                         sx={{
                           width: 43,
                           height: 29,
@@ -508,8 +511,8 @@ export const AddReminderDialog = DialogManager.register(
                     ?.options.map((day, i) => (
                       <Flex
                         key={day}
-                        testID={`day-${day}`}
-                        onPress={() => toggleDay(day)}
+                        data-test-id={`day-${day}`}
+                        onClick={() => toggleDay(day)}
                         sx={{
                           flex: 1,
                           minWidth: 0,
@@ -550,7 +553,7 @@ export const AddReminderDialog = DialogManager.register(
               id="time"
               label={strings.enterTime()}
               required
-              testID="time-input"
+              data-test-id="time-input"
               sx={{ flex: 1, alignSelf: "flex-start" }}
               rightIcon={Clock}
               placeholder={
@@ -571,7 +574,9 @@ export const AddReminderDialog = DialogManager.register(
               defaultValue={date.format(
                 getTimeFormat(db.settings.getTimeFormat())
               )}
-              onChangeText={(text) => setDate((d) => setTimeOnly(text, d))}
+              onChange={({ target: { value: text } }) =>
+                setDate((d) => setTimeOnly(text, d))
+              }
             />
           </Flex>
         </Fieldset>
@@ -611,7 +616,7 @@ export const AddReminderDialog = DialogManager.register(
         referencedNotes.value !== null &&
         referencedNotes.value.length > 0 ? (
           <Flex
-            testID="reminder-note-references"
+            data-test-id="reminder-note-references"
             sx={{
               mb: "spacing7",
               gap: "spacing4",
@@ -763,12 +768,17 @@ function ReminderSelect(props: ReminderSelectProps) {
       </Text>
       <Select
         id={id}
-        testID={id}
-        options={options}
+        data-test-id={id}
         value={value}
-        onValueChange={onSelectionChanged}
+        onChange={(e) => onSelectionChanged(e.target.value)}
         sx={{ height: 45 }}
-      />
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.title}
+          </option>
+        ))}
+      </Select>
     </Flex>
   );
 }

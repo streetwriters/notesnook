@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Input, Text } from "@notesnook/ui-kit";
 import { CheckCircleOutline, Loading } from "../../../components/icons";
 import {
@@ -50,6 +50,10 @@ type ThemeItemData = ThemeMetadata;
 
 export function ThemesSelector() {
   const [searchQuery, setSearchQuery] = useState<string>();
+  const onSearch = useMemo(
+    () => debounce((text: string) => setSearchQuery(text), 500),
+    []
+  );
   const [colorScheme, setColorScheme] = useState<"all" | "dark" | "light">(
     "all"
   );
@@ -150,7 +154,7 @@ export function ThemesSelector() {
       <Input
         placeholder={strings.searchThemes()}
         sx={{ mt: 2 }}
-        onChangeText={debounce((text: string) => setSearchQuery(text), 500)}
+        onChange={(e) => onSearch(e.target.value)}
       />
       <Flex
         sx={{
@@ -164,7 +168,7 @@ export function ThemesSelector() {
             <Button
               key={filter.id}
               variant="secondary"
-              onPress={() => setColorScheme(filter.id)}
+              onClick={() => setColorScheme(filter.id)}
               sx={{
                 borderRadius: 100,
                 minWidth: 50,
@@ -188,7 +192,7 @@ export function ThemesSelector() {
         <Flex sx={{ flexDirection: "row", mt: 2, gap: 1 }}>
           <Button
             variant="secondary"
-            onPress={async () => {
+            onClick={async () => {
               const [file] = await showFilePicker({
                 acceptedFileTypes: "application/json"
               });
@@ -257,7 +261,7 @@ function ThemeItem(props: ThemeItemProps) {
   return (
     <Flex
       group="theme-item"
-      onPress={async () => {
+      onClick={async () => {
         if (await ThemeDetailsDialog.show({ theme })) {
           await setTheme(theme);
         }
@@ -304,7 +308,7 @@ function ThemeItem(props: ThemeItemProps) {
               opacity: 0,
               ":group-hover": { group: "theme-item", style: { opacity: 1 } }
             }}
-            onPress={() => setTheme(theme)}
+            onClick={() => setTheme(theme)}
             disabled={isApplying}
           >
             {isApplying ? (

@@ -110,7 +110,7 @@ export function BillingHistory() {
               <Cell flex={20}>
                 <Text
                   variant="subBody"
-                  onPress={() => shell.openUrl(transaction.receipt_url)}
+                  onClick={() => shell.openUrl(transaction.receipt_url)}
                   sx={{ color: "accent", cursor: "pointer" }}
                 >
                   {strings.viewReceipt()}
@@ -138,7 +138,7 @@ export function BillingHistory() {
               <Cell flex={5}>
                 <Copy
                   size={16}
-                  onPress={() =>
+                  onClick={() =>
                     writeToClipboard({ "text/plain": transaction.id })
                   }
                 />
@@ -165,7 +165,7 @@ export function BillingHistory() {
               <Cell flex={20}>
                 <Button
                   variant="anchor"
-                  onPress={async () => {
+                  onClick={async () => {
                     const url = await TaskManager.startTask({
                       type: "modal",
                       title: strings.gettingInvoice(),

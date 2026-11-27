@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback } from "react";
 import { db } from "../common/db";
-import { Dialog } from "@notesnook/ui-kit";
+
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
@@ -31,6 +31,7 @@ import {
   useRelationChangesStore
 } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";
+import Dialog from "../components/dialog";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 
@@ -60,7 +61,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
 
   return (
     <Dialog
-      testID="move-note-dialog"
+      testId="move-note-dialog"
       isOpen={true}
       title={strings.selectNotebooks()}
       description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}

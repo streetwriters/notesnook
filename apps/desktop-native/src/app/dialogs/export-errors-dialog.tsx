@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text, Dialog } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import Dialog from "../components/dialog";
 
 type ExportErrorsDialogProps = BaseDialogProps<boolean> & {
   count: number;

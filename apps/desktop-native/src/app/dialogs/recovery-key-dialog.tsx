@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState } from "react";
 import {
-  Dialog,
   Flex,
   QRCode,
   ScrollContainer,
@@ -41,6 +40,7 @@ import {
   RecoveryKeyShieldCheck,
   type Icon
 } from "../components/icons";
+import Dialog from "../components/dialog";
 
 type RecoveryKeyDialogProps = BaseDialogProps<false>;
 
@@ -52,7 +52,7 @@ export const RecoveryKeyDialog = DialogManager.register(
 
     return (
       <Dialog
-        testID="recovery-key-dialog"
+        testId="recovery-key-dialog"
         isOpen={true}
         title={strings.saveRecoveryKey()}
         description={strings.saveRecoveryKeyDesc()}
@@ -81,11 +81,11 @@ export const RecoveryKeyDialog = DialogManager.register(
 function ActionButton(props: {
   icon: Icon;
   text: string;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   return (
     <Flex
-      onPress={props.onPress}
+      onClick={props.onClick}
       sx={{
         flexDirection: "row",
         alignItems: "center",
@@ -198,7 +198,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
           <ScrollContainer sx={{ flex: 1, minWidth: 0 }}>
             <Text
               selectable
-              testID={recoveryKey ? "recovery-key" : undefined}
+              data-test-id={recoveryKey ? "recovery-key" : undefined}
               sx={{
                 lineHeight: 1,
                 color: "paragraph",
@@ -210,7 +210,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
             </Text>
           </ScrollContainer>
           <Flex
-            onPress={handleCopy}
+            onClick={handleCopy}
             sx={{
               alignItems: "center",
               flexDirection: "row",
@@ -273,7 +273,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 ? strings.copied()
                 : strings.copyToClipboard()
             }
-            onPress={handleCopyQRCode}
+            onClick={handleCopyQRCode}
           />
           <ActionButton
             icon={FloppyDisk}
@@ -282,7 +282,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 ? strings.saved()
                 : strings.saveQRImage()
             }
-            onPress={handleDownloadQRCode}
+            onClick={handleDownloadQRCode}
           />
           <ActionButton
             icon={Download}
@@ -291,7 +291,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 ? strings.downloaded()
                 : strings.downloadTextFile()
             }
-            onPress={handleSaveToFile}
+            onClick={handleSaveToFile}
           />
         </Flex>
       </Flex>

@@ -131,12 +131,12 @@ export function SubscriptionStatus() {
               gap: 1
             }}
           >
-            <Button variant="accent" onPress={() => BuyDialog.show({})}>
+            <Button variant="accent" onClick={() => BuyDialog.show({})}>
               <Text>{strings.upgradeToPro()}</Text>
             </Button>
             <Button
               variant="secondary"
-              onPress={async () => {
+              onClick={async () => {
                 const giftCode = await PromptDialog.show({
                   title: strings.redeemGiftCode(),
                   description: strings.redeemGiftCodeDesc(),

@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState } from "react";
 import { Checkbox, Flex, Text } from "@notesnook/ui-kit";
-import { Dialog } from "@notesnook/ui-kit";
+
 import { Field, type FieldProps } from "./components/field";
 import { Warning } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { MarkdownText } from "./components/markdown-text";
+import Dialog from "../components/dialog";
 
 type Check = { text: string; default?: boolean };
 export type PasswordDialogProps<
@@ -86,7 +87,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
 
   return (
     <Dialog
-      testID="password-dialog"
+      testId="password-dialog"
       isOpen={true}
       title={props.title}
       description={props.subtitle}
@@ -99,7 +100,14 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
       }}
       negativeButton={{ text: strings.cancel(), onClick: () => onClose(false) }}
     >
-      <Flex sx={{ mb: "spacing7", flexDirection: "column" }}>
+      <Flex
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit();
+        }}
+        sx={{ mb: "spacing7", flexDirection: "column" }}
+      >
         {message ? <MarkdownText text={message} /> : null}
         {Object.entries<FieldProps>(inputs).map(([id, input], index) => (
           <Field
@@ -108,16 +116,15 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
             {...input}
             key={id}
             id={id}
-            testID={id}
+            data-test-id={id}
             required
             type="password"
             placeholder={strings.enterYourPassword()}
             variant={error ? "error" : input.variant}
-            onChangeText={(text) => {
-              values.current[id] = text;
-              input.onChangeText?.(text);
+            onChange={(e) => {
+              values.current[id] = e.target.value;
+              input.onChange?.(e);
             }}
-            onSubmitEditing={() => onSubmit()}
           />
         ))}
 
@@ -133,10 +140,12 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
                 }}
               >
                 <Checkbox
-                  testID={id}
+                  data-test-id={id}
                   defaultChecked={check.default}
                   sx={{ width: 18, height: 18 }}
-                  onCheckedChange={(value) => (checked.current[id] = value)}
+                  onChange={({ target: { checked: value } }) =>
+                    (checked.current[id] = value)
+                  }
                 />
                 <Text variant="body" sx={{ color: "paragraph" }}>
                   {check.text}

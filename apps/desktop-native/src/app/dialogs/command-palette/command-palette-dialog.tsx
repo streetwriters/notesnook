@@ -26,12 +26,11 @@ import {
 import { EVENTS, fuzzy, Note, Notebook, Reminder, Tag } from "@notesnook/core";
 import {
   Button,
-  Dialog,
   Flex,
   Text,
   useWindowSize,
-  VirtualList,
-  type VirtualListHandle
+  Virtuoso,
+  type VirtuosoHandle
 } from "@notesnook/ui-kit";
 import { environment } from "@platform";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -54,6 +53,7 @@ import {
 } from "./commands";
 import { truncateString } from "../../common";
 import { Field } from "../components/field";
+import Dialog from "../../components/dialog";
 
 type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
@@ -72,8 +72,11 @@ function HighlightedText(props: {
   return (
     <Text
       variant="body"
-      numberOfLines={props.numberOfLines ?? 1}
-      sx={{ color: "paragraph", fontSize: "xs" }}
+      sx={{
+        lineClamp: props.numberOfLines ?? 1,
+        color: "paragraph",
+        fontSize: "xs"
+      }}
     >
       {parts.map((part, index) =>
         part.startsWith("<b>") ? (
@@ -100,7 +103,11 @@ export const CommandPaletteDialog = DialogManager.register(
     const [selected, setSelected] = useState<number>(0);
     const [query, setQuery] = useState<string>("");
     const { height: windowHeight } = useWindowSize();
-    const listRef = useRef<VirtualListHandle>(null);
+    const listRef = useRef<VirtuosoHandle>(null);
+    const onSearch = useMemo(
+      () => debounce((text: string) => setQuery(text), 100),
+      []
+    );
     const { search: dbSearch } = useDatabaseFuzzySearch();
     const defaultCommands = useRef<Command[] | undefined>(undefined);
 
@@ -217,7 +224,7 @@ export const CommandPaletteDialog = DialogManager.register(
           }}
         >
           <Field
-            testID="command-palette-input"
+            data-test-id="command-palette-input"
             autoFocus
             variant="clean"
             placeholder={
@@ -232,9 +239,7 @@ export const CommandPaletteDialog = DialogManager.register(
               borderBottomColor: "separator"
             }}
             styles={{ input: { pl: "spacing10", pr: "spacing4" } }}
-            onChangeText={debounce((text: string) => {
-              setQuery(text);
-            }, 100)}
+            onChange={(e) => onSearch(e.target.value)}
             leftIcon={SearchIcon}
           />
           {rows.length === 0 && commands.status === "fulfilled" ? (
@@ -248,14 +253,13 @@ export const CommandPaletteDialog = DialogManager.register(
               </Text>
             </Flex>
           ) : (
-            <VirtualList
+            <Virtuoso
               ref={listRef}
-              count={rows.length}
-              estimatedItemSize={32}
-              itemKey={(index) => rows[index].key}
-              extraData={[selected, rows]}
-              sx={{ flex: 1 }}
-              renderItem={(rowIndex) => {
+              totalCount={rows.length}
+              defaultItemHeight={32}
+              computeItemKey={(index) => rows[index].key}
+              style={{ flex: 1 }}
+              itemContent={(rowIndex) => {
                 const row = rows[rowIndex];
                 if (!row) return null;
                 if (row.kind === "group")
@@ -283,7 +287,7 @@ export const CommandPaletteDialog = DialogManager.register(
                 const { command, index } = row;
                 return (
                   <Flex
-                    onPress={(e) => execute(command, e.ctrlKey || e.metaKey)}
+                    onClick={(e) => execute(command, e.ctrlKey || e.metaKey)}
                     sx={{
                       cursor: "pointer",
                       flexDirection: "row",
@@ -342,7 +346,7 @@ export const CommandPaletteDialog = DialogManager.register(
                     {command.group === "recent" && (
                       <Button
                         title={strings.removeFromRecents()}
-                        onPress={async () => {
+                        onClick={async () => {
                           removeRecentCommand(command.id);
                           defaultCommands.current = await getDefaultCommands();
                           if (commands.status !== "pending") commands.refresh();

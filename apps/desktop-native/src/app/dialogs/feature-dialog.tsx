@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { environment, shell } from "@platform";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
@@ -26,6 +26,7 @@ import { ArrowRight, Checkmark, Icon, Warn } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import type { ReactNode } from "react";
+import Dialog from "../components/dialog";
 
 type CallToAction = {
   title: string;
@@ -183,7 +184,7 @@ type CodeProps = { text: string; href?: string };
 export function Code(props: CodeProps) {
   return (
     <Text
-      onPress={() => {
+      onClick={() => {
         if (props.href) shell.openUrl(props.href);
       }}
       sx={{

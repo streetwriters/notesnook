@@ -18,10 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Button, Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text, Box } from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { Field } from "./components/field";
+import Dialog from "../components/dialog";
 
 export type BackupPasswordDialogProps = BaseDialogProps<boolean> & {
   validate: (outputs: {
@@ -62,7 +63,7 @@ export const BackupPasswordDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        testID="password-dialog"
+        testId="password-dialog"
         title={strings.encryptedBackup()}
         description={strings.encryptedBackupDesc()}
         onClose={() => onClose(false)}
@@ -78,22 +79,29 @@ export const BackupPasswordDialog = DialogManager.register(
         }}
       >
         <Flex sx={{ flexDirection: "column" }}>
-          <Field
-            key={isEncryptionKey ? "key" : "password"}
-            required
-            autoFocus
-            testID={isEncryptionKey ? "encryption-key" : "password"}
-            label={
-              isEncryptionKey ? strings.encryptionKey() : strings.password()
-            }
-            type="password"
-            id={isEncryptionKey ? "key" : "password"}
-            onChangeText={(text) => (value.current = text)}
-            onSubmitEditing={() => onSubmit()}
-          />
+          <Box
+            as="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
+            <Field
+              key={isEncryptionKey ? "key" : "password"}
+              required
+              autoFocus
+              data-test-id={isEncryptionKey ? "encryption-key" : "password"}
+              label={
+                isEncryptionKey ? strings.encryptionKey() : strings.password()
+              }
+              type="password"
+              id={isEncryptionKey ? "key" : "password"}
+              onChange={({ target: { value: text } }) => (value.current = text)}
+            />
+          </Box>
           <Button
             variant="anchor"
-            onPress={() => {
+            onClick={() => {
               value.current = "";
               setIsEncryptionKey((s) => !s);
             }}

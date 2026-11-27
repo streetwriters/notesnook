@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useCallback } from "react";
-import { Dialog, Flex } from "@notesnook/ui-kit";
+import { Flex, Box } from "@notesnook/ui-kit";
 import { Notebook } from "@notesnook/core";
 import { showToast } from "../utils/toast";
 import { store as noteStore } from "../stores/note-store";
@@ -29,6 +29,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature, truncateString } from "../common";
 import { Field } from "./components/field";
+import Dialog from "../components/dialog";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -74,7 +75,7 @@ export const AddNotebookDialog = DialogManager.register(
     }, [props.notebook?.id, props.edit, onClose, parentId]);
     return (
       <Dialog
-        testID="add-notebook-dialog"
+        testId="add-notebook-dialog"
         isOpen={true}
         title={props.edit ? strings.editNotebook() : strings.newNotebook()}
         description={
@@ -100,23 +101,32 @@ export const AddNotebookDialog = DialogManager.register(
             gap: "spacing4"
           }}
         >
+          <Box
+            as="form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+          >
+            <Field
+              defaultValue={title.current}
+              data-test-id="title-input"
+              autoFocus
+              required
+              label={strings.title()}
+              placeholder={strings.enterNotebookTitle()}
+              id="title"
+              onChange={({ target: { value: text } }) => (title.current = text)}
+            />
+          </Box>
           <Field
-            defaultValue={title.current}
-            testID="title-input"
-            autoFocus
-            required
-            label={strings.title()}
-            placeholder={strings.enterNotebookTitle()}
-            id="title"
-            onChangeText={(text) => (title.current = text)}
-            onSubmitEditing={() => onSubmit()}
-          />
-          <Field
-            testID="description-input"
+            data-test-id="description-input"
             label={`${strings.description()} (${strings.optional()})`}
             placeholder={strings.enterNotebookDescription()}
             id="description"
-            onChangeText={(text) => (description.current = text)}
+            onChange={({ target: { value: text } }) =>
+              (description.current = text)
+            }
             defaultValue={description.current}
           />
         </Flex>

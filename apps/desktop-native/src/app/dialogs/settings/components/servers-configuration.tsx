@@ -107,7 +107,7 @@ export function ServersConfiguration() {
             placeholder={`e.g. ${server.example}`}
             validate={(text) => /^[a-z][a-z0-9+.-]*:\/\/[^\s/]+/i.test(text)}
             defaultValue={urls[server.host]}
-            onChangeText={(text) =>
+            onChange={({ target: { value: text } }) =>
               setUrls((s) => {
                 s[server.host] = text;
                 return s;
@@ -144,7 +144,7 @@ export function ServersConfiguration() {
           <Button
             variant="accent"
             disabled={!success}
-            onPress={async () => {
+            onClick={async () => {
               if (!success || isLoggedIn) return;
               useStore.getState().setServerUrls(urls);
               await TaskManager.startTask({
@@ -167,7 +167,7 @@ export function ServersConfiguration() {
           <Button
             disabled={isLoggedIn}
             variant="secondary"
-            onPress={async () => {
+            onClick={async () => {
               setError(undefined);
               try {
                 for (const host of HostIds) {
@@ -200,7 +200,7 @@ export function ServersConfiguration() {
           <Button
             disabled={isLoggedIn}
             variant="errorSecondary"
-            onPress={async () => {
+            onClick={async () => {
               if (isLoggedIn) return;
               useStore.getState().setServerUrls();
               await TaskManager.startTask({

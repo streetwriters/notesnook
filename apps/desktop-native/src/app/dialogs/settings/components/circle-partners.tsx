@@ -116,7 +116,7 @@ export function CirclePartners() {
                     </Text>
                     <Button
                       variant="icon"
-                      onPress={() =>
+                      onClick={() =>
                         writeToClipboard({ "text/plain": redeemedCode.code })
                       }
                     >
@@ -141,7 +141,7 @@ export function CirclePartners() {
                 <Button
                   variant="accent"
                   sx={{ mt: 1 }}
-                  onPress={async () => {
+                  onClick={async () => {
                     if (isFree) return BuyDialog.show({});
                     if (isTrial) {
                       return showToast(

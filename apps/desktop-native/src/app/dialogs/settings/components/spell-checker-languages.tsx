@@ -60,7 +60,9 @@ export function SpellCheckerLanguages() {
       <Input
         placeholder={strings.filterLanguages()}
         sx={{ mx: "2px", my: 2 }}
-        onChangeText={(text) => filter(text.toLowerCase().trim())}
+        onChange={({ target: { value: text } }) =>
+          filter(text.toLowerCase().trim())
+        }
       />
       <ScrollContainer sx={{ maxHeight: 400 }}>
         <Flex sx={{ flexDirection: "column" }}>
@@ -72,7 +74,7 @@ export function SpellCheckerLanguages() {
               <Checkbox
                 sx={{ width: 14, height: 14 }}
                 checked={enabledLanguages.includes(lang.code)}
-                onCheckedChange={async (checked) => {
+                onChange={async ({ target: { checked: checked } }) => {
                   const copiedLanguages = enabledLanguages.slice();
 
                   if (checked) copiedLanguages.push(lang.code);

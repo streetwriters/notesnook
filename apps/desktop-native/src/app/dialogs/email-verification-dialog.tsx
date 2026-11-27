@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect } from "react";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { useStore as useUserStore } from "../stores/user-store";
 import { db } from "../common/db";
 import { useState } from "react";
@@ -27,6 +27,7 @@ import Accordion from "../components/accordion";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { showToast } from "../utils/toast";
+import Dialog from "../components/dialog";
 
 let interval = 0;
 type EmailVerificationDialogProps = BaseDialogProps<boolean>;

@@ -21,14 +21,13 @@ import { useEffect, useRef, useState, startTransition } from "react";
 import {
   Button,
   Checkbox,
-  Dialog,
   Flex,
   Input,
   Progress,
   Text,
   ThemeScope,
   useWindowSize,
-  VirtualList
+  Virtuoso
 } from "@notesnook/ui-kit";
 import { store, useStore } from "../stores/attachment-store";
 import { formatBytes, usePromise, useResolvedItem } from "@notesnook/common";
@@ -61,6 +60,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { ConfirmDialog } from "./confirm";
 import { showToast } from "../utils/toast";
 import { strings } from "@notesnook/intl";
+import Dialog from "../components/dialog";
 
 type ToolbarAction = {
   title: string;
@@ -201,7 +201,7 @@ export const AttachmentsDialog = DialogManager.register(
                   variant="secondary"
                   key={tool.title}
                   title={tool.title}
-                  onPress={() => {
+                  onClick={() => {
                     try {
                       tool.onClick({ selected });
                     } catch (e) {
@@ -231,7 +231,7 @@ export const AttachmentsDialog = DialogManager.register(
                     <Checkbox
                       sx={{ width: 18, height: 18 }}
                       checked={selected.length === attachments.length}
-                      onCheckedChange={async (checked) => {
+                      onChange={async ({ target: { checked: checked } }) => {
                         setSelected(
                           checked
                             ? await filterAttachments(
@@ -245,7 +245,7 @@ export const AttachmentsDialog = DialogManager.register(
                   {COLUMNS.map((column) => (
                     <Flex
                       key={column.id}
-                      onPress={() =>
+                      onClick={() =>
                         setSortBy((sortBy) => ({
                           direction:
                             sortBy.id === column.id &&
@@ -278,13 +278,12 @@ export const AttachmentsDialog = DialogManager.register(
                     </Flex>
                   ))}
                 </Flex>
-                <VirtualList
-                  count={attachments.placeholders.length}
-                  estimatedItemSize={30}
-                  itemKey={(index) => attachments.key(index)}
-                  extraData={[selected, attachments]}
-                  sx={{ flex: 1 }}
-                  renderItem={(index) => (
+                <Virtuoso
+                  totalCount={attachments.placeholders.length}
+                  defaultItemHeight={30}
+                  computeItemKey={(index) => attachments.key(index)}
+                  style={{ flex: 1 }}
+                  itemContent={(index) => (
                     <AttachmentRow
                       index={index}
                       attachments={attachments}
@@ -380,10 +379,10 @@ function Sidebar(props: SidebarProps) {
       >
         <Flex sx={{ flexDirection: "column", gap: "small", mx: 2, mt: 2 }}>
           <Input
-            testID="search"
+            data-test-id="search"
             placeholder={strings.search()}
             sx={{ mb: 2, bg: "background", py: "7px" }}
-            onChangeText={(text) => {
+            onChange={({ target: { value: text } }) => {
               setRoute(text ? "none" : "all");
               if (text) filter(text);
             }}
@@ -429,7 +428,7 @@ function Sidebar(props: SidebarProps) {
               }}
               disabled={!!downloadStatus}
               title={strings.clearCache()}
-              onPress={async () => {
+              onClick={async () => {
                 if (
                   await ConfirmDialog.show({
                     title: strings.clearCacheConfirm(),
@@ -454,7 +453,7 @@ function Sidebar(props: SidebarProps) {
                 height: 38
               }}
               title={strings.downloadAllAttachments()}
-              onPress={async () => {
+              onClick={async () => {
                 if (downloadStatus) {
                   await cancelDownload();
                 } else {

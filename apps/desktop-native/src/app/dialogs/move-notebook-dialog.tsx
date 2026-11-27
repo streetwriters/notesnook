@@ -22,10 +22,11 @@ import { strings } from "@notesnook/intl";
 import { useCallback } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { Dialog } from "@notesnook/ui-kit";
+
 import { store as notebookStore } from "../stores/notebook-store";
 import { useRelationChangesStore } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";
+import Dialog from "../components/dialog";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
   notebook: Notebook;
@@ -44,7 +45,7 @@ export const MoveNotebookDialog = DialogManager.register(
 
     return (
       <Dialog
-        testID="move-notebook-dialog"
+        testId="move-notebook-dialog"
         isOpen={true}
         title={`${strings.move()} ${notebook.title}`}
         description={strings.moveNotebookDesc()}

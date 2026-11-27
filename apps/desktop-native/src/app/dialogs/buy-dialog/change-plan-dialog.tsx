@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DialogManager } from "../../common/dialog-manager";
-import { Dialog, Flex, Text } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { PLAN_METADATA } from "./plans";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
@@ -27,6 +27,7 @@ import { ComparePlans, Footer, PlansList } from "./plan-list";
 import { ConfirmDialog } from "../confirm";
 import { TaskManager } from "../../common/task-manager";
 import { strings } from "@notesnook/intl";
+import Dialog from "../../components/dialog";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;
