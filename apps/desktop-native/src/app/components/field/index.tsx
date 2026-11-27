@@ -18,14 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { forwardRef, useId, useState } from "react";
-import {
-  Button,
-  Flex,
-  Text,
-  InputProps,
-  Input,
-  Label
-} from "@notesnook/ui-kit";
+import { Button, Flex, Text, InputProps, Input, Label } from "@notesnook/ui-kit";
 import { ThemeUIStyleObject } from "@notesnook/ui-kit";
 import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";

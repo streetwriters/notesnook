@@ -98,10 +98,10 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
           options.groupOptions.sortBy === "title"
             ? strings.aToZ()
             : options.groupOptions.sortBy === "dueDate"
-            ? strings.earliestFirst()
-            : options.groupOptions.sortBy === "relevance"
-            ? strings.leastRelevantFirst()
-            : strings.oldestToNewest()
+              ? strings.earliestFirst()
+              : options.groupOptions.sortBy === "relevance"
+                ? strings.leastRelevantFirst()
+                : strings.oldestToNewest()
       },
       {
         key: "desc",
@@ -109,10 +109,10 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
           options.groupOptions.sortBy === "title"
             ? strings.zToA()
             : options.groupOptions.sortBy === "dueDate"
-            ? strings.latestFirst()
-            : options.groupOptions.sortBy === "relevance"
-            ? strings.mostRelevantFirst()
-            : strings.newestToOldest()
+              ? strings.latestFirst()
+              : options.groupOptions.sortBy === "relevance"
+                ? strings.mostRelevantFirst()
+                : strings.newestToOldest()
       }
     ])
   }
@@ -227,8 +227,8 @@ function getGroupOptions(
     : context?.type === "notebook" ||
       context?.type === "tag" ||
       context?.type === "color"
-    ? db.settings.getGroupOptionsById(context.id, context.type)
-    : db.settings.getGroupOptions(groupingKey);
+      ? db.settings.getGroupOptionsById(context.id, context.type)
+      : db.settings.getGroupOptions(groupingKey);
 }
 
 async function setGroupOptions(
