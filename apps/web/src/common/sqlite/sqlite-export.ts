@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import * as VFS from "./VFS";
+import * as VFS from "wa-sqlite/src/VFS.js";
+import type { FacadeVFS } from "wa-sqlite/src/FacadeVFS.js";
 
 export class DatabaseSource {
   isDone;
@@ -32,7 +33,7 @@ export class DatabaseSource {
   #resolve!: (value: unknown) => void;
   #reject!: (reason?: unknown) => void;
 
-  constructor(vfs: VFS.Base, path: string) {
+  constructor(vfs: FacadeVFS, path: string) {
     this.#vfs = vfs;
     this.#path = path;
     this.isDone = new Promise((resolve, reject) => {
@@ -50,19 +51,19 @@ export class DatabaseSource {
       // Open the file for reading.
       const flags = VFS.SQLITE_OPEN_MAIN_DB | VFS.SQLITE_OPEN_READONLY;
       await check(
-        this.#vfs.xOpen(this.#path, this.#fileId, flags, {
+        this.#vfs.jOpen(this.#path, this.#fileId, flags, {
           setInt32() {}
         } as unknown as DataView)
       );
-      this.#onDone.push(() => this.#vfs.xClose(this.#fileId));
-      await check(this.#vfs.xLock(this.#fileId, VFS.SQLITE_LOCK_SHARED));
+      this.#onDone.push(() => this.#vfs.jClose(this.#fileId));
+      await check(this.#vfs.jLock(this.#fileId, VFS.SQLITE_LOCK_SHARED));
       this.#onDone.push(() =>
-        this.#vfs.xUnlock(this.#fileId, VFS.SQLITE_LOCK_NONE)
+        this.#vfs.jUnlock(this.#fileId, VFS.SQLITE_LOCK_NONE)
       );
 
       // Get the file size.
       const fileSize = new DataView(new ArrayBuffer(8));
-      await check(this.#vfs.xFileSize(this.#fileId, fileSize));
+      await check(this.#vfs.jFileSize(this.#fileId, fileSize));
       this.#bytesRemaining = Number(fileSize.getBigUint64(0, true));
     } catch (e) {
       controller.error(e);
@@ -73,7 +74,7 @@ export class DatabaseSource {
   async pull(controller: ReadableStreamDefaultController) {
     try {
       const buffer = new Uint8Array(Math.min(this.#bytesRemaining, 65536));
-      await check(this.#vfs.xRead(this.#fileId, buffer, this.#iOffset));
+      await check(this.#vfs.jRead(this.#fileId, buffer, this.#iOffset));
       console.log("reading", buffer);
       controller.enqueue(buffer);
 

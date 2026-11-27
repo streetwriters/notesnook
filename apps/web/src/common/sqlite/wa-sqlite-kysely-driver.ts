@@ -25,8 +25,8 @@ import type {
 import { CompiledQuery } from "@streetwriters/kysely";
 import Worker from "./sqlite.worker.ts?worker";
 import type { SQLiteWorker } from "./sqlite.worker";
-import SQLiteSyncURI from "./wa-sqlite.wasm?url";
-import SQLiteAsyncURI from "./wa-sqlite-async.wasm?url";
+import SQLiteSyncURI from "wa-sqlite/dist/wa-sqlite.wasm?url";
+import SQLiteAsyncURI from "wa-sqlite/dist/wa-sqlite-async.wasm?url";
 import { Mutex } from "async-mutex";
 import { SharedService } from "./shared-service";
 import { Remote, wrap } from "comlink";
@@ -234,9 +234,7 @@ export class WaSqliteWorkerSingleTabDriver implements Driver {
 
   constructor(private readonly config: Config) {
     console.log("single tab driver", config.dbName);
-    this.worker = wrap<SQLiteWorker>(
-      new Worker({ name: config.dbName })
-    ) 
+    this.worker = wrap<SQLiteWorker>(new Worker({ name: config.dbName }));
   }
 
   async init(): Promise<void> {

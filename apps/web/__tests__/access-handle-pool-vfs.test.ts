@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { readFileSync } from "fs";
 import path from "path";
 import { expect, test, vi } from "vitest";
-import SQLiteSyncESMFactory from "../src/common/sqlite/wa-sqlite";
-import { Factory, SQLITE_FULL } from "../src/common/sqlite/sqlite-api";
-import { AccessHandlePoolVFS } from "../src/common/sqlite/AccessHandlePoolVFS";
+import SQLiteSyncESMFactory from "wa-sqlite/dist/wa-sqlite.mjs";
+import { Factory, SQLITE_FULL } from "wa-sqlite";
+import { AccessHandlePoolVFS } from "wa-sqlite/src/examples/AccessHandlePoolVFS.js";
 
 function createQuotaLimitedOPFS(quota: number) {
   const files = new Map<string, Uint8Array>();
@@ -93,6 +93,12 @@ function createQuotaLimitedOPFS(quota: number) {
     async *entries() {
       for (const name of files.keys())
         yield [name, await directory.getFileHandle(name)];
+    },
+    async *keys() {
+      yield* files.keys();
+    },
+    [Symbol.asyncIterator]() {
+      return directory.entries();
     }
   };
   return directory;
@@ -104,11 +110,11 @@ test("sqlite reports SQLITE_FULL and stays usable when OPFS quota is exceeded", 
   });
 
   const wasmBinary = readFileSync(
-    path.join(__dirname, "../src/common/sqlite/wa-sqlite.wasm")
+    path.join(__dirname, "../node_modules/wa-sqlite/dist/wa-sqlite.wasm")
   );
-  const sqlite = Factory(await SQLiteSyncESMFactory({ wasmBinary }));
-  const vfs = new AccessHandlePoolVFS("test");
-  await vfs.isReady;
+  const module = await SQLiteSyncESMFactory({ wasmBinary });
+  const sqlite = Factory(module);
+  const vfs = await AccessHandlePoolVFS.create("test", module);
   sqlite.vfs_register(vfs, false);
   const db = await sqlite.open_v2("test.db", undefined, vfs.name);
 
@@ -124,13 +130,19 @@ test("sqlite reports SQLITE_FULL and stays usable when OPFS quota is exceeded", 
 
   for (let i = 0; i < 3; ++i) {
     await expect(
-      sqlite.exec(db, `INSERT INTO content VALUES (${i}, randomblob(64 * 1024))`)
+      sqlite.exec(
+        db,
+        `INSERT INTO content VALUES (${i}, randomblob(64 * 1024))`
+      )
     ).rejects.toMatchObject({ code: SQLITE_FULL });
   }
 
   await sqlite.exec(db, "BEGIN");
   expect(sqlite.get_autocommit(db)).toBe(0);
-  await sqlite.exec(db, "INSERT INTO content VALUES (0, randomblob(64 * 1024))");
+  await sqlite.exec(
+    db,
+    "INSERT INTO content VALUES (0, randomblob(64 * 1024))"
+  );
   await expect(sqlite.exec(db, "COMMIT")).rejects.toMatchObject({
     code: SQLITE_FULL
   });

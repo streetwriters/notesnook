@@ -17,20 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { SQLiteAPI, SQLiteCompatibleType } from "./sqlite-types";
-import { Factory, SQLITE_ROW, SQLITE_UTF8, SQLiteError } from "./sqlite-api";
+import { Factory, SQLITE_ROW, SQLITE_UTF8, SQLiteError } from "wa-sqlite";
 import { expose, transfer } from "comlink";
 import type { RunMode } from "./type";
 import { QueryResult } from "@streetwriters/kysely";
 import { DatabaseSource } from "./sqlite-export";
 import { createSharedServicePort } from "./shared-service";
-import type { IDBBatchAtomicVFS } from "./IDBBatchAtomicVFS";
-import type { AccessHandlePoolVFS } from "./AccessHandlePoolVFS";
+import type { FacadeVFS } from "wa-sqlite/src/FacadeVFS.js";
 import { rewriteError } from "../../utils/error";
 
 type PreparedStatement = {
   stmt: number;
   columns: string[];
+};
+
+type DatabaseVFS = FacadeVFS & {
+  close(): void | Promise<void>;
+  delete(): Promise<void>;
 };
 
 type SQLiteOptions = {
@@ -41,8 +44,9 @@ type SQLiteOptions = {
 
 class _SQLiteWorker {
   sqlite!: SQLiteAPI;
+  module: unknown;
   db: number | undefined = undefined;
-  vfs: IDBBatchAtomicVFS | AccessHandlePoolVFS | null = null;
+  vfs: DatabaseVFS | null = null;
   initialized = false;
   preparedStatements: Map<string, PreparedStatement> = new Map();
   retryCounter: Record<string, number> = {};
@@ -60,16 +64,9 @@ class _SQLiteWorker {
     this.name = name;
     this.async = options.async;
 
-    const option = options.url ? { locateFile: () => options.url } : {};
-    const sqliteModule = options.async
-      ? await import("./wa-sqlite-async").then(
-          ({ default: SQLiteAsyncESMFactory }) => SQLiteAsyncESMFactory(option)
-        )
-      : await import("./wa-sqlite").then(({ default: SQLiteSyncESMFactory }) =>
-          SQLiteSyncESMFactory(option)
-        );
-    this.sqlite = Factory(sqliteModule);
-    this.vfs = await this.getVFS(name, options.async);
+    this.module = await this.loadModule(options);
+    this.sqlite = Factory(this.module);
+    this.vfs = await this.getVFS(name, options);
 
     this.sqlite.vfs_register(this.vfs, false);
     this.db = await this.sqlite.open_v2(
@@ -106,20 +103,21 @@ class _SQLiteWorker {
       const cached = this.preparedStatements.get(sql);
       if (cached !== undefined) return cached;
 
-      const str = this.sqlite.str_new(this.db, sql);
-      const prepared = await this.sqlite.prepare_v2(
-        this.db,
-        this.sqlite.str_value(str)
-      );
-      if (!prepared) return;
+      let stmt: number | undefined;
+      // unscoped keeps the statement alive after the loop so it can be cached
+      for await (const prepared of this.sqlite.statements(this.db, sql, {
+        unscoped: true
+      })) {
+        stmt = prepared;
+        break;
+      }
+      if (!stmt) return;
 
       const statement: PreparedStatement = {
-        stmt: prepared.stmt,
-        columns: this.sqlite.column_names(prepared.stmt)
+        stmt,
+        columns: this.sqlite.column_names(stmt)
       };
       this.preparedStatements.set(sql, statement);
-
-      this.sqlite.str_finish(str);
 
       // reset retry count on success
       this.retryCounter[sql] = 0;
@@ -225,7 +223,7 @@ class _SQLiteWorker {
   }
 
   async export(name: string, options: SQLiteOptions) {
-    const vfs = await this.getVFS(name, options.async);
+    const vfs = this.vfs ?? (await this.getVFS(name, options));
     const stream = new ReadableStream(new DatabaseSource(vfs, name));
     return transfer(stream, [stream]);
   }
@@ -233,20 +231,36 @@ class _SQLiteWorker {
   async delete(name: string, options: SQLiteOptions) {
     await this.close();
     if (this.vfs) await this.vfs.delete();
-    else await (await this.getVFS(name, options.async)).delete();
+    else {
+      const vfs = await this.getVFS(name, options);
+      await vfs.close();
+      await vfs.delete();
+    }
   }
 
-  async getVFS(dbName: string, async: boolean) {
-    const vfs = async
-      ? await import("./IDBBatchAtomicVFS").then(
-          ({ IDBBatchAtomicVFS }) =>
-            new IDBBatchAtomicVFS(dbName, { durability: "strict" })
+  async loadModule(options: SQLiteOptions) {
+    const option = options.url ? { locateFile: () => options.url } : {};
+    return options.async
+      ? await import("wa-sqlite/dist/wa-sqlite-async.mjs").then(
+          ({ default: SQLiteAsyncESMFactory }) => SQLiteAsyncESMFactory(option)
         )
-      : await import("./AccessHandlePoolVFS").then(
-          ({ AccessHandlePoolVFS }) => new AccessHandlePoolVFS(dbName)
+      : await import("wa-sqlite/dist/wa-sqlite.mjs").then(
+          ({ default: SQLiteSyncESMFactory }) => SQLiteSyncESMFactory(option)
         );
-    if ("isReady" in vfs) await vfs.isReady;
-    return vfs;
+  }
+
+  async getVFS(dbName: string, options: SQLiteOptions): Promise<DatabaseVFS> {
+    // a VFS is bound to the wasm module it is registered with
+    const module = this.module ?? (await this.loadModule(options));
+    return options.async
+      ? await import("wa-sqlite/src/examples/IDBBatchAtomicVFS.js").then(
+          ({ IDBBatchAtomicVFS }) =>
+            IDBBatchAtomicVFS.create(dbName, module, { lockPolicy: "shared" })
+        )
+      : await import("wa-sqlite/src/examples/AccessHandlePoolVFS.js").then(
+          ({ AccessHandlePoolVFS }) =>
+            AccessHandlePoolVFS.create(dbName, module)
+        );
   }
 
   async initialize() {
