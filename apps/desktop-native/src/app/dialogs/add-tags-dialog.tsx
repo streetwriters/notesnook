@@ -20,22 +20,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { Flex, Text } from "@notesnook/ui-kit";
 import { db } from "../common/db";
+import Dialog from "../components/dialog";
 import { useStore, store } from "../stores/tag-store";
 import { store as notestore } from "../stores/note-store";
-import { ItemReference, Tag, VirtualizedGrouping } from "@notesnook/core";
+import { FilteredList } from "../components/filtered-list";
+import { ItemReference, Tag } from "@notesnook/core";
+import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { SelectedCheck } from "../components/selected-check";
 import {
   RelationChange,
   selectMultiple,
   useRelationChangesStore
 } from "../stores/relation-changes-store";
 import { checkFeature } from "../common";
+import { Box } from "@notesnook/ui-kit";
 import { Tag as TagIcon } from "../components/icons";
-import { FilteredList } from "../components/filtered-list";
-import { SelectedCheck } from "../components/selected-check";
-import Dialog from "../components/dialog";
 
 const TAG_ITEM_HEIGHT = 35;
 
@@ -101,10 +103,11 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         onClick: () => onClose(false)
       }}
     >
-      <Flex sx={{ my: "spacing7", flexDirection: "column" }}>
+      <Box sx={{ my: "spacing7" }}>
         {tags && (
           <FilteredList
             getItemKey={(index) => tags.key(index)}
+            mode="fixed"
             estimatedSize={TAG_ITEM_HEIGHT}
             items={tags.placeholders}
             placeholders={{
@@ -139,7 +142,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
             }}
           />
         )}
-      </Flex>
+      </Box>
     </Dialog>
   );
 });
@@ -157,35 +160,36 @@ function TagItem(props: { tag: Tag }) {
 
   return (
     <Flex
+      as="li"
       data-test-id="tag"
-      onClick={toggleSelection}
       sx={{
         cursor: "pointer",
         alignItems: "center",
-        height: TAG_ITEM_HEIGHT,
+        height: `${TAG_ITEM_HEIGHT}px`,
         bg: isHighlighted ? "background-selected" : "background",
         borderRadius: "radius1",
         p: "spacing4",
-        ":hover": { bg: "hover" }
+        ":hover": {
+          bg: "hover"
+        }
       }}
+      title={tag.title}
+      onClick={toggleSelection}
     >
-      <Flex
-        sx={{
-          alignItems: "center",
-          flexDirection: "row",
-          gap: "spacing4",
-          width: "100%"
-        }}
-      >
+      <Flex sx={{ alignItems: "center", gap: "spacing4", width: "100%" }}>
         <TagIcon size={15} color={isHighlighted ? "icon-selected" : "icon"} />
         <Text
+          className="title"
           data-test-id="tag-title"
+          title={tag.title}
           sx={{
-            lineClamp: 1,
             flex: 1,
             minWidth: 0,
             color: isHighlighted ? "paragraph-selected" : "paragraph",
-            fontSize: "sm"
+            fontSize: "sm",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden"
           }}
         >
           {tag.title}

@@ -33,13 +33,17 @@ import { Close, Loading } from "../icons";
 
 Modal.setAppElement("#root");
 
-export type DialogButtonProps = Omit<ButtonProps, "onClick" | "role"> & {
+export type DialogButtonProps = Omit<
+  ButtonProps,
+  "onClick" | "role" | "variant"
+> & {
   onClick?: () => void;
   disabled?: boolean;
   text: React.ReactElement | string;
   loading?: boolean;
   role?: string;
-  variant?: ButtonProps["variant"];
+  /** A theme button variant; a string, as on web. */
+  variant?: string;
 };
 
 export type DialogProps = {
@@ -260,7 +264,7 @@ export function DialogButton({
   return (
     <Button
       {...props}
-      variant={props.variant || "dialog"}
+      variant={(props.variant || "dialog") as ButtonProps["variant"]}
       disabled={disabled}
       onClick={disabled ? undefined : () => onClick?.()}
       data-role={role}

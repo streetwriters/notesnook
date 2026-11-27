@@ -34,10 +34,8 @@ import { ThemePreview } from "../../../components/theme-preview";
 import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
 import { VirtualizedGrid } from "../../../components/virtualized-grid";
-import {
-  ThemeDetailsDialog,
-  type ThemeMetadata
-} from "../../theme-details-dialog";
+import { ThemeDetailsDialog } from "../../theme-details-dialog";
+import type { ThemeMetadata } from "../../theme-metadata";
 import { strings } from "@notesnook/intl";
 
 const COLOR_SCHEMES = [

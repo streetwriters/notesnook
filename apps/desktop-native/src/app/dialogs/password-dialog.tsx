@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
-import { Checkbox, Flex, Text } from "@notesnook/ui-kit";
-
-import { Field, type FieldProps } from "./components/field";
+import { useState } from "react";
+import { Box, Flex, Text, FormData } from "@notesnook/ui-kit";
+import Dialog from "../components/dialog";
+import Field, { FieldProps } from "../components/field";
 import { Warning } from "../components/icons";
+import { Checkbox, Label } from "@notesnook/ui-kit";
+import { mdToHtml } from "../utils/md";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { MarkdownText } from "./components/markdown-text";
-import Dialog from "../components/dialog";
 
 type Check = { text: string; default?: boolean };
 export type PasswordDialogProps<
@@ -46,44 +46,6 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
   const { checks, inputs, message, validate, onClose } = props;
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const values = useRef<Record<string, string>>({});
-  const checked = useRef<Record<string, boolean>>(
-    Object.fromEntries(
-      Object.entries<Check>((checks || {}) as Record<string, Check>).map(
-        ([id, check]) => [id, !!check.default]
-      )
-    )
-  );
-
-  const onSubmit = async () => {
-    setIsLoading(true);
-    setError(undefined);
-    try {
-      const passwords = Object.fromEntries(
-        Object.keys(inputs).map((id) => {
-          const inputData = values.current[id];
-          if (!inputData) throw new Error(`${id} is required.`);
-          return [id, inputData];
-        })
-      ) as Record<TInputId, string>;
-
-      if (await validate(passwords)) {
-        onClose(
-          checks
-            ? (Object.fromEntries(
-                Object.keys(checks).map((id) => [id, !!checked.current[id]])
-              ) as Record<TCheckId, boolean>)
-            : true
-        );
-      } else {
-        setError(strings.passwordIncorrect());
-        setIsLoading(false);
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : JSON.stringify(e));
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Dialog
@@ -93,64 +55,103 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
       description={props.subtitle}
       onClose={() => onClose(false)}
       positiveButton={{
+        form: "passwordForm",
+        type: "submit",
         text: strings.submit(),
-        onClick: onSubmit,
         loading: isLoading,
         disabled: isLoading
       }}
       negativeButton={{ text: strings.cancel(), onClick: () => onClose(false) }}
     >
-      <Flex
+      <Box
+        id="passwordForm"
         as="form"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          onSubmit();
+
+          setIsLoading(true);
+          setError(undefined);
+          try {
+            const formData = new FormData(e.target as HTMLFormElement);
+            const passwords = Object.fromEntries(
+              Object.keys(inputs).map((id) => {
+                const inputData = formData.get(id);
+                if (!inputData) throw new Error(`${id} is required.`);
+                return [id, inputData.toString()];
+              })
+            ) as Record<TInputId, string>;
+
+            if (await validate(passwords)) {
+              onClose(
+                checks
+                  ? (Object.fromEntries(
+                      Object.keys(checks).map((id) => {
+                        return [id, formData.has(id)];
+                      })
+                    ) as Record<TCheckId, boolean>)
+                  : true
+              );
+            } else {
+              setError(strings.passwordIncorrect());
+              setIsLoading(false);
+            }
+          } catch (e) {
+            setError(e instanceof Error ? e.message : JSON.stringify(e));
+            setIsLoading(false);
+          }
         }}
-        sx={{ mb: "spacing7", flexDirection: "column" }}
+        sx={{ mb: "spacing7" }}
       >
-        {message ? <MarkdownText text={message} /> : null}
+        {message ? (
+          <Text
+            as="span"
+            variant="body"
+            dangerouslySetInnerHTML={{ __html: mdToHtml(message) }}
+          />
+        ) : null}
         {Object.entries<FieldProps>(inputs).map(([id, input], index) => (
           <Field
             autoFocus={index === 0}
-            sx={{ mt: "spacing6" }}
+            sx={{
+              mt: "spacing6",
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
             {...input}
             key={id}
             id={id}
+            name={id}
             data-test-id={id}
             required
             type="password"
             placeholder={strings.enterYourPassword()}
             variant={error ? "error" : input.variant}
-            onChange={(e) => {
-              values.current[id] = e.target.value;
-              input.onChange?.(e);
-            }}
           />
         ))}
 
         {checks
           ? Object.entries<Check>(checks).map(([id, check]) => (
-              <Flex
+              <Label
                 key={id}
+                mt={2}
                 sx={{
-                  mt: 2,
-                  flexDirection: "row",
+                  fontSize: "body",
+                  fontFamily: "body",
                   alignItems: "center",
-                  gap: "small"
+                  color: "paragraph"
                 }}
               >
                 <Checkbox
-                  data-test-id={id}
+                  id={id}
+                  name={id}
                   defaultChecked={check.default}
-                  sx={{ width: 18, height: 18 }}
-                  onChange={({ target: { checked: value } }) =>
-                    (checked.current[id] = value)
-                  }
+                  sx={{ mr: "small", width: 18, height: 18 }}
                 />
-                <Text variant="body" sx={{ color: "paragraph" }}>
-                  {check.text}
-                </Text>
-              </Flex>
+                {check.text}
+              </Label>
             ))
           : null}
 
@@ -158,7 +159,6 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
           <Flex
             sx={{
               alignItems: "center",
-              flexDirection: "row",
               gap: "spacing3",
               mt: "spacing4"
             }}
@@ -175,34 +175,16 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
             </Text>
           </Flex>
         )}
-      </Flex>
+      </Box>
     </Dialog>
   );
 });
 
-type ShowPasswordDialogProps<TInputId extends string> = {
-  title: string;
-  subtitle?: string;
-  message?: string;
-  inputs: Record<TInputId, FieldProps>;
-  validate: (passwords: Record<TInputId, string>) => Promise<boolean>;
-};
-
-export function showPasswordDialog<TInputId extends string>(
-  props: ShowPasswordDialogProps<TInputId> & { checks?: undefined }
-): Promise<boolean>;
 export function showPasswordDialog<
   TInputId extends string,
   TCheckId extends string
->(
-  props: ShowPasswordDialogProps<TInputId> & {
-    checks: Record<TCheckId, Check>;
-  }
-): Promise<false | Record<TCheckId, boolean>>;
-export function showPasswordDialog(
-  props: ShowPasswordDialogProps<string> & { checks?: Record<string, Check> }
-) {
-  return PasswordDialog.show(
-    props as Omit<PasswordDialogProps<string, string>, "onClose">
-  );
+>(props: Omit<PasswordDialogProps<TInputId, TCheckId>, "onClose">) {
+  return PasswordDialog.show(props) as Promise<
+    string extends TCheckId ? boolean : false | Record<TCheckId, boolean>
+  >;
 }

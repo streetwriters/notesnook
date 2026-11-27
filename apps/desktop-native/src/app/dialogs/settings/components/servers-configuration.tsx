@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { window } from "../../desktop-bridge";
 import { Button, Flex, Text } from "@notesnook/ui-kit";
-import { Field } from "../../components/field";
-import { reloadApp } from "../platform-gaps";
+import Field from "../../../components/field";
 import { useState } from "react";
 import { HostId, HostIds, useStore } from "../../../stores/setting-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
@@ -90,7 +90,7 @@ export function ServersConfiguration() {
   );
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   return (
-    <Flex sx={{ flexDirection: "column" }}>
+    <>
       {isLoggedIn ? (
         <ErrorText
           error={strings.logoutToChangeServerUrls()}
@@ -105,11 +105,11 @@ export function ServersConfiguration() {
             label={`${server.title} URL`}
             helpText={server.description}
             placeholder={`e.g. ${server.example}`}
-            validate={(text) => /^[a-z][a-z0-9+.-]*:\/\/[^\s/]+/i.test(text)}
+            validate={(text) => URL.canParse(text)}
             defaultValue={urls[server.host]}
-            onChange={({ target: { value: text } }) =>
+            onChange={(e) =>
               setUrls((s) => {
-                s[server.host] = text;
+                s[server.host] = e.target.value;
                 return s;
               })
             }
@@ -118,10 +118,10 @@ export function ServersConfiguration() {
         <ErrorText error={error} />
         {success === true ? (
           <Text
-            selectable
-            variant="error"
+            className="selectable"
+            variant={"error"}
+            ml={1}
             sx={{
-              ml: 1,
               whiteSpace: "pre-wrap",
               bg: "shade",
               color: "accent",
@@ -133,14 +133,7 @@ export function ServersConfiguration() {
             {strings.connectedToServer()}
           </Text>
         ) : null}
-        <Flex
-          sx={{
-            mt: 1,
-            justifyContent: "flex-end",
-            flexDirection: "row",
-            gap: 1
-          }}
-        >
+        <Flex sx={{ mt: 1, justifyContent: "end", gap: 1 }}>
           <Button
             variant="accent"
             disabled={!success}
@@ -154,7 +147,7 @@ export function ServersConfiguration() {
                 action() {
                   return new Promise((resolve) => {
                     setTimeout(() => {
-                      reloadApp();
+                      window.location.reload();
                       resolve(undefined);
                     }, 5000);
                   });
@@ -210,7 +203,7 @@ export function ServersConfiguration() {
                 action() {
                   return new Promise((resolve) => {
                     setTimeout(() => {
-                      reloadApp();
+                      window.location.reload();
                       resolve(undefined);
                     }, 5000);
                   });
@@ -222,6 +215,6 @@ export function ServersConfiguration() {
           </Button>
         </Flex>
       </Flex>
-    </Flex>
+    </>
   );
 }

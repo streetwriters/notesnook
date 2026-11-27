@@ -17,18 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Checkbox, Flex, Label, Text, Box } from "@notesnook/ui-kit";
 import { useRef } from "react";
-import { Box, Checkbox, Flex, Text } from "@notesnook/ui-kit";
-
+import { mdToHtml } from "../utils/md";
+import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
 import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
-import { strings } from "@notesnook/intl";
 import { ErrorText } from "../components/error-text";
-import { Field } from "./components/field";
-import { MarkdownText } from "./components/markdown-text";
-import Dialog from "../components/dialog";
+import { strings } from "@notesnook/intl";
+import Field from "../components/field";
 
 type Check = { text: string; default?: boolean };
 type Input = {
@@ -73,8 +72,8 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
     checks,
     inputs
   } = props;
-  const checkedItems = useRef<Record<string, boolean>>({});
-  const inputItems = useRef<Record<string, string>>({});
+  const checkedItems = useRef<Record<string, boolean>>({} as any);
+  const inputItems = useRef<Record<string, string>>({} as any);
 
   return (
     <Dialog
@@ -102,7 +101,8 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                   checks: checkedItems.current,
                   inputs: inputItems.current
                 }),
-              variant: positiveButtonVariant as never
+              autoFocus: !!positiveButtonText,
+              variant: positiveButtonVariant
             }
           : undefined
       }
@@ -118,11 +118,19 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
       <Flex
         sx={{
           flexDirection: "column",
+          // gap: 1,
           pb: !negativeButtonText && !positiveButtonText ? "spacing7" : 0,
           mb: "spacing7"
         }}
       >
-        {message ? <MarkdownText text={message} /> : null}
+        {message ? (
+          <Text
+            as="div"
+            variant="body"
+            sx={{ overflowWrap: "break-word" }}
+            dangerouslySetInnerHTML={{ __html: mdToHtml(message) }}
+          />
+        ) : null}
         {warnings?.map((text) => (
           <ErrorText key={text} error={text} sx={{ mt: 0 }} />
         ))}
@@ -135,38 +143,43 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                 helpText={input.helpText}
                 defaultValue={input.defaultValue}
                 required={input.required}
-                onChange={({ target: { value: text } }) => {
-                  inputItems.current[id] = text;
+                onChange={(e) => {
+                  inputItems.current[id] = e.target.value;
                 }}
               />
             ))
           : null}
         {checks ? (
-          <Box sx={{ mt: "spacing4" }}>
+          <Box sx={{ marginTop: "spacing4" }}>
             {Object.entries<Check>(checks).map(([id, check]) => (
-              <Flex
+              <Label
                 key={id}
+                id={id}
                 sx={{
-                  flexDirection: "row",
+                  fontFamily: "body",
+                  fontSize: "md",
+                  color: "paragraph",
+                  lineHeight: 1.4,
+                  display: "flex",
                   alignItems: "center",
                   gap: "spacing3"
                 }}
               >
                 <Checkbox
-                  data-test-id={id}
+                  name={id}
                   defaultChecked={check.default}
-                  sx={{ width: 18, height: 18 }}
-                  onChange={({ target: { checked: checked } }) =>
-                    (checkedItems.current[id] = checked)
+                  sx={{
+                    width: 18,
+                    height: 18,
+                    color: "accent",
+                    marginRight: 0
+                  }}
+                  onChange={(e) =>
+                    (checkedItems.current[id] = e.currentTarget.checked)
                   }
                 />
-                <Text
-                  variant="body"
-                  sx={{ fontSize: "md", color: "paragraph", lineHeight: 1.4 }}
-                >
-                  {check.text}
-                </Text>
-              </Flex>
+                {check.text}
+              </Label>
             ))}
           </Box>
         ) : null}

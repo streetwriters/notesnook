@@ -17,17 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@notesnook/ui-kit";
-
 import { useState } from "react";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
+import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
-import { Field } from "./components/field";
+import Field from "../components/field";
 import { showToast } from "../utils/toast";
 import { SerializedKeyPair } from "@notesnook/crypto";
 import { ConfirmDialog } from "./confirm";
 import { strings } from "@notesnook/intl";
-import Dialog from "../components/dialog";
 
 type InboxPGPKeysDialogProps = BaseDialogProps<boolean> & {
   keys?: SerializedKeyPair | null;
@@ -126,11 +125,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
                 disabled={isLoading}
                 sx={{ width: "100%" }}
               >
-                <Text>
-                  {isLoading
-                    ? strings.generating()
-                    : strings.autoGenerateKeys()}
-                </Text>
+                {isLoading ? strings.generating() : strings.autoGenerateKeys()}
               </Button>
               <Text
                 sx={{
@@ -179,12 +174,11 @@ export const InboxPGPKeysDialog = DialogManager.register(
             required
             value={publicKey}
             onChange={(e) => setPublicKey(e.target.value)}
-            styles={{
-              input: {
-                fontFamily: "monospace",
-                fontSize: "body",
-                minHeight: 150
-              }
+            sx={{
+              fontFamily: "monospace",
+              fontSize: "body",
+              minHeight: 150,
+              resize: "vertical"
             }}
             placeholder={strings.enterPgpPublicKey()}
             disabled={isLoading}
@@ -197,12 +191,11 @@ export const InboxPGPKeysDialog = DialogManager.register(
             required
             value={privateKey}
             onChange={(e) => setPrivateKey(e.target.value)}
-            styles={{
-              input: {
-                fontFamily: "monospace",
-                fontSize: "body",
-                minHeight: 150
-              }
+            sx={{
+              fontFamily: "monospace",
+              fontSize: "body",
+              minHeight: 150,
+              resize: "vertical"
             }}
             placeholder={strings.enterPgpPrivateKey()}
             disabled={isLoading}

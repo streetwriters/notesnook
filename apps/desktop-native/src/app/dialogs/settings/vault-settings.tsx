@@ -54,18 +54,9 @@ export const VaultSettings: SettingsGroup[] = [
         description: strings.lockVaultAfterDesc(),
         isHidden: () => !useAppStore.getState().isVaultCreated,
         onStateChange: (listener) => {
-          const unsub1 = useAppStore.subscribe(
-            (s) => s.vaultLockAfter,
-            listener
-          );
-          const unsub2 = useAppStore.subscribe(
-            (s) => s.isVaultCreated,
-            listener
-          );
-          return () => {
-            unsub1();
-            unsub2();
-          };
+          const unsub1 = useAppStore.subscribe((s) => s.vaultLockAfter, listener);
+          const unsub2 = useAppStore.subscribe((s) => s.isVaultCreated, listener);
+          return () => { unsub1(); unsub2(); };
         },
         components: [
           {

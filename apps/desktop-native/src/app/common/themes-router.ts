@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ThemeMetadata } from "../dialogs/theme-details-dialog";
+import type { ThemeMetadata } from "../dialogs/theme-metadata";
 
 export const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 

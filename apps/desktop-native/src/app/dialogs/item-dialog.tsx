@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
-import { Flex, Box } from "@notesnook/ui-kit";
+import { Box, FormData } from "@notesnook/ui-kit";
+import Dialog from "../components/dialog";
+import Field from "../components/field";
+import { useState } from "react";
 import { ErrorText } from "../components/error-text";
-import { Field } from "./components/field";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
@@ -30,7 +31,6 @@ import { useStore as useAppStore } from "../stores/app-store";
 import { Color, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { checkFeature, truncateString } from "../common";
-import Dialog from "../components/dialog";
 
 type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -42,20 +42,6 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
   props: ItemDialogProps
 ) {
   const [error, setError] = useState<Error>();
-  const value = useRef(props.defaultValue || "");
-
-  const onSubmit = () => {
-    setError(undefined);
-    const title = value.current;
-    if (!title) return;
-    try {
-      props.onClose(title);
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(e);
-      }
-    }
-  };
 
   return (
     <Dialog
@@ -64,8 +50,9 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
       title={props.title}
       description={props.subtitle}
       positiveButton={{
-        text: props.title,
-        onClick: onSubmit
+        form: "itemForm",
+        type: "submit",
+        text: props.title
       }}
       onClose={() => props.onClose(false)}
       negativeButton={{
@@ -73,28 +60,45 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
         onClick: () => props.onClose(false)
       }}
     >
-      <Flex sx={{ flexDirection: "column" }}>
-        <Box
-          as="form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit();
+      <Box
+        as="form"
+        id="itemForm"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setError(undefined);
+          const formData = new FormData(e.target as HTMLFormElement);
+          const title = formData.get("title");
+          if (!title) return;
+          try {
+            props.onClose(title as string);
+          } catch (e) {
+            if (e instanceof Error) {
+              setError(e);
+            }
+          }
+        }}
+      >
+        <Field
+          required
+          label={strings.title()}
+          placeholder={props.placeholder}
+          id="title"
+          name="title"
+          autoFocus
+          data-test-id="title-input"
+          defaultValue={props.defaultValue}
+          sx={{
+            mt: "spacing6",
+            mb: "spacing7",
+            input: {
+              fontSize: "sm",
+              px: "spacing4",
+              py: "spacing6"
+            }
           }}
-        >
-          <Field
-            required
-            label={strings.title()}
-            placeholder={props.placeholder}
-            id="title"
-            autoFocus
-            data-test-id="title-input"
-            defaultValue={props.defaultValue}
-            onChange={({ target: { value: text } }) => (value.current = text)}
-            sx={{ mt: "spacing6", mb: "spacing7" }}
-          />
-        </Box>
+        />
         <ErrorText error={error?.message} />
-      </Flex>
+      </Box>
     </Dialog>
   );
 });

@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
-import { Button, Flex, Text, Box } from "@notesnook/ui-kit";
+import { useState } from "react";
+import Field from "../components/field";
+import Dialog from "../components/dialog";
+import { Box, Button, Text, FormData } from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { Field } from "./components/field";
-import Dialog from "../components/dialog";
 
 export type BackupPasswordDialogProps = BaseDialogProps<boolean> & {
   validate: (outputs: {
@@ -34,31 +34,10 @@ export type BackupPasswordDialogProps = BaseDialogProps<boolean> & {
 export const BackupPasswordDialog = DialogManager.register(
   function BackupPasswordDialog(props: BackupPasswordDialogProps) {
     const { onClose, validate } = props;
+
     const [error, setError] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
     const [isEncryptionKey, setIsEncryptionKey] = useState(false);
-    const value = useRef("");
-
-    const onSubmit = async () => {
-      try {
-        setIsLoading(true);
-        setError(undefined);
-        const input = value.current;
-        if (!input) return;
-        const outputs = isEncryptionKey
-          ? { key: input, password: undefined }
-          : { key: undefined, password: input };
-        if (await validate(outputs)) {
-          onClose(true);
-        } else {
-          setError(strings.passwordIncorrect());
-        }
-      } catch (e) {
-        setError((e as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     return (
       <Dialog
@@ -68,52 +47,76 @@ export const BackupPasswordDialog = DialogManager.register(
         description={strings.encryptedBackupDesc()}
         onClose={() => onClose(false)}
         positiveButton={{
+          form: "backupPasswordForm",
+          type: "submit",
           loading: isLoading,
           disabled: isLoading,
-          text: strings.restore(),
-          onClick: onSubmit
+          text: strings.restore()
         }}
         negativeButton={{
           text: strings.cancel(),
           onClick: () => onClose(false)
         }}
       >
-        <Flex sx={{ flexDirection: "column" }}>
-          <Box
-            as="form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit();
-            }}
-          >
+        <Box
+          id="backupPasswordForm"
+          as="form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target as HTMLFormElement);
+
+            try {
+              setIsLoading(true);
+              setError(undefined);
+
+              const key = formData.get("key") as string;
+              const password = formData.get("password") as string;
+              if (!key && !password) return;
+
+              if (await validate({ key, password })) {
+                onClose(true);
+              } else {
+                setError(strings.passwordIncorrect());
+              }
+            } catch (e) {
+              setError((e as Error).message);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+        >
+          {isEncryptionKey ? (
             <Field
-              key={isEncryptionKey ? "key" : "password"}
               required
               autoFocus
-              data-test-id={isEncryptionKey ? "encryption-key" : "password"}
-              label={
-                isEncryptionKey ? strings.encryptionKey() : strings.password()
-              }
+              data-test-id="encryption-key"
+              label={strings.encryptionKey()}
               type="password"
-              id={isEncryptionKey ? "key" : "password"}
-              onChange={({ target: { value: text } }) => (value.current = text)}
+              id="key"
+              name="key"
             />
-          </Box>
-          <Button
-            variant="anchor"
-            onClick={() => {
-              value.current = "";
-              setIsEncryptionKey((s) => !s);
-            }}
-          >
-            <Text>{strings.useEncryptionKey()}</Text>
-          </Button>
-          {error && (
-            <Text variant="error" sx={{ mt: 1 }}>
-              {error}
-            </Text>
+          ) : (
+            <Field
+              required
+              autoFocus
+              data-test-id="password"
+              label={strings.password()}
+              type="password"
+              autoComplete="current-password"
+              id="password"
+              name="password"
+            />
           )}
-        </Flex>
+        </Box>
+        <Button variant="anchor" onClick={() => setIsEncryptionKey((s) => !s)}>
+          {strings.useEncryptionKey()}
+        </Button>
+
+        {error && (
+          <Text as="div" mt={1} variant={"error"}>
+            {error}
+          </Text>
+        )}
       </Dialog>
     );
   }

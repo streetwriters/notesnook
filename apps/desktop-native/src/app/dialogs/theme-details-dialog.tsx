@@ -18,27 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import type { getPreviewColors } from "@notesnook/theme";
-import { Flex, Text } from "@notesnook/ui-kit";
+import { ThemeMetadata } from "./theme-metadata";
+import { Flex, Link, Text } from "@notesnook/ui-kit";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { useStore as useThemeStore } from "../stores/theme-store";
-import { LinkText } from "./components/link-text";
-import { ThemePreview } from "../components/theme-preview";
 import Dialog from "../components/dialog";
-
-export type ThemeMetadata = {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  authors: { name: string }[];
-  totalInstalls?: number;
-  license: string;
-  homepage?: string;
-  sourceURL?: string;
-  colorScheme?: "dark" | "light";
-  previewColors: ReturnType<typeof getPreviewColors>;
-};
+import { ThemePreview } from "../components/theme-preview";
+import { useStore as useThemeStore } from "../stores/theme-store";
 
 export type ThemeDetailsDialogProps = BaseDialogProps<boolean> & {
   theme: ThemeMetadata;
@@ -67,12 +52,12 @@ export const ThemeDetailsDialog = DialogManager.register(
       >
         <ThemePreview theme={theme} />
         <Flex sx={{ flexDirection: "column", mt: 2 }}>
-          <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
-            <Text variant="heading">{theme.name}</Text>
+          <Text variant="heading">
+            {theme.name}{" "}
             <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
               v{theme.version}
             </Text>
-          </Flex>
+          </Text>
           <Text variant="body" sx={{ fontSize: "title" }}>
             {theme.description}
           </Text>
@@ -87,16 +72,26 @@ export const ThemeDetailsDialog = DialogManager.register(
           <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
             {strings.licenseUnder(theme.license)}
           </Text>
-          <Flex sx={{ gap: 1, mt: 1, flexDirection: "row" }}>
+          <Flex sx={{ gap: 1, mt: 1 }}>
             {theme.homepage && (
-              <LinkText href={theme.homepage} sx={{ fontSize: "subtitle" }}>
+              <Link
+                href={theme.homepage}
+                target="_blank"
+                variant="text.subBody"
+                sx={{ fontSize: "subtitle", color: "accent" }}
+              >
                 {strings.website()}
-              </LinkText>
+              </Link>
             )}
             {theme.sourceURL && (
-              <LinkText href={theme.sourceURL} sx={{ fontSize: "subtitle" }}>
+              <Link
+                href={theme.sourceURL}
+                target="_blank"
+                variant="text.subBody"
+                sx={{ fontSize: "subtitle", color: "accent" }}
+              >
                 {strings.source()}
-              </LinkText>
+              </Link>
             )}
           </Flex>
         </Flex>

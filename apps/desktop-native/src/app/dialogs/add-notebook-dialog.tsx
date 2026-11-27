@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useCallback } from "react";
-import { Flex, Box } from "@notesnook/ui-kit";
-import { Notebook } from "@notesnook/core";
+import Dialog from "../components/dialog";
+import Field from "../components/field";
 import { showToast } from "../utils/toast";
+import { Notebook } from "@notesnook/core";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as appStore } from "../stores/app-store";
@@ -28,8 +29,7 @@ import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature, truncateString } from "../common";
-import { Field } from "./components/field";
-import Dialog from "../components/dialog";
+import { Flex } from "@notesnook/ui-kit";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -101,33 +101,44 @@ export const AddNotebookDialog = DialogManager.register(
             gap: "spacing4"
           }}
         >
-          <Box
-            as="form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit();
+          <Field
+            defaultValue={title.current}
+            data-test-id="title-input"
+            autoFocus
+            required
+            label={strings.title()}
+            placeholder={strings.enterNotebookTitle()}
+            name="title"
+            id="title"
+            onChange={(e) => (title.current = e.target.value)}
+            onKeyUp={async (e) => {
+              if (e.key === "Enter") {
+                await onSubmit();
+              }
             }}
-          >
-            <Field
-              defaultValue={title.current}
-              data-test-id="title-input"
-              autoFocus
-              required
-              label={strings.title()}
-              placeholder={strings.enterNotebookTitle()}
-              id="title"
-              onChange={({ target: { value: text } }) => (title.current = text)}
-            />
-          </Box>
+            sx={{
+              input: {
+                px: "spacing4",
+                py: "spacing6",
+                fontSize: "sm"
+              }
+            }}
+          />
           <Field
             data-test-id="description-input"
             label={`${strings.description()} (${strings.optional()})`}
             placeholder={strings.enterNotebookDescription()}
+            name="description"
             id="description"
-            onChange={({ target: { value: text } }) =>
-              (description.current = text)
-            }
+            onChange={(e) => (description.current = e.target.value)}
             defaultValue={description.current}
+            sx={{
+              input: {
+                px: "spacing4",
+                py: "spacing6",
+                fontSize: "sm"
+              }
+            }}
           />
         </Flex>
       </Dialog>

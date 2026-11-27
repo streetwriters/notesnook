@@ -18,14 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Flex, Grid, Image, Text } from "@notesnook/ui-kit";
 import { Copy, Loading } from "../../../components/icons";
+import { Button, Link, Flex, Text, Grid } from "@notesnook/ui-kit";
 import { usePromise } from "@notesnook/common";
 import { db } from "../../../common/db";
 import { writeToClipboard } from "../../../utils/clipboard";
 import { showToast } from "../../../utils/toast";
 import { ErrorText } from "../../../components/error-text";
-import { LinkText } from "../../components/link-text";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import { BuyDialog } from "../../buy-dialog";
@@ -38,6 +37,7 @@ export function CirclePartners() {
     code: string;
   }>();
   const subscription = useUserStore((store) => store.user?.subscription);
+
   const isFree =
     !subscription ||
     subscription?.plan === SubscriptionPlan.FREE ||
@@ -46,11 +46,11 @@ export function CirclePartners() {
   const canRedeem = !isFree && !isTrial;
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
+    <>
       {partners.status === "pending" ? (
         <Loading sx={{ mt: 2 }} />
       ) : partners.status === "rejected" ? (
-        <ErrorText error={partners.reason as Error} />
+        <ErrorText error={partners.reason} />
       ) : (
         <Grid columns={2} sx={{ mt: 2 }}>
           {partners.value?.map((partner) => (
@@ -58,25 +58,20 @@ export function CirclePartners() {
               key={partner.id}
               sx={{
                 flexDirection: "column",
-                border: "1px solid",
-                borderColor: "border",
+                border: "1px solid var(--border)",
                 borderRadius: "dialog",
                 padding: 2,
                 gap: 1
               }}
             >
               <Flex
-                sx={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center"
-                }}
+                sx={{ justifyContent: "space-between", alignItems: "center" }}
               >
                 <Text variant="title">{partner.name}</Text>
-                <Image
+                <img
                   src={partner.logoBase64}
                   alt={partner.name}
-                  sx={{ width: 30, height: 30, borderRadius: 8 }}
+                  style={{ width: 30, height: "auto", borderRadius: 8 }}
                 />
               </Flex>
               <Text variant="body" sx={{ whiteSpace: "pre-wrap" }}>
@@ -93,24 +88,25 @@ export function CirclePartners() {
                 {partner.offerDescription}
               </Text>
               {redeemedCode?.partnerId === partner.id ? (
-                <Flex sx={{ flexDirection: "column", gap: 1 }}>
+                <>
                   <Flex
                     sx={{
                       bg: "background-secondary",
-                      border: "1px solid",
-                      borderColor: "border",
+                      border: "1px solid var(--border)",
                       borderRadius: "default",
                       alignSelf: "center",
                       alignItems: "center",
-                      flexDirection: "row",
                       gap: 1,
                       p: "small"
                     }}
                   >
                     <Text
                       variant="body"
-                      selectable
-                      sx={{ fontFamily: "monospace", fontSize: 14 }}
+                      className="selectable"
+                      sx={{
+                        fontFamily: "monospace",
+                        fontSize: 14
+                      }}
                     >
                       {redeemedCode.code}
                     </Text>
@@ -125,18 +121,19 @@ export function CirclePartners() {
                   </Flex>
                   {partner.codeRedeemUrl ? (
                     <Text variant="subBody" sx={{ textAlign: "center" }}>
-                      <LinkText
+                      <Link
+                        target="_blank"
                         href={partner.codeRedeemUrl.replace(
                           "{{code}}",
                           redeemedCode.code
                         )}
                       >
                         {strings.claimPromotion[0]()}
-                      </LinkText>{" "}
+                      </Link>{" "}
                       {strings.claimPromotion[1]()}
                     </Text>
                   ) : null}
-                </Flex>
+                </>
               ) : (
                 <Button
                   variant="accent"
@@ -160,19 +157,20 @@ export function CirclePartners() {
                         partnerId: partner.id,
                         code: result.code
                       });
-                      showToast("success", strings.codeRedeemedSuccessfully());
+                      showToast(
+                        "success",
+                        strings.codeRedeemedSuccessfully()
+                      );
                     }
                   }}
                 >
-                  <Text>
-                    {isFree ? strings.upgradeToRedeem() : strings.redeemCode()}
-                  </Text>
+                  {isFree ? strings.upgradeToRedeem() : strings.redeemCode()}
                 </Button>
               )}
             </Flex>
           ))}
         </Grid>
       )}
-    </Flex>
+    </>
   );
 }

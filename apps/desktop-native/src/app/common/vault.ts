@@ -26,7 +26,7 @@ import { useStore as useAppStore } from "../stores/app-store";
 import { useStore as useUserStore } from "../stores/user-store";
 
 class Vault {
-  static async createVault(): Promise<boolean> {
+  static async createVault() {
     if (await db.vault.exists()) return false;
     return showPasswordDialog({
       title: strings.createVault(),
@@ -108,7 +108,7 @@ class Vault {
     return false;
   }
 
-  static unlockVault(): Promise<boolean> {
+  static unlockVault() {
     return showPasswordDialog({
       title: strings.unlockVault(),
       subtitle: strings.unlockVaultDesc(),
@@ -146,7 +146,7 @@ class Vault {
     });
   }
 
-  static unlockNote(id: string): Promise<boolean> {
+  static unlockNote(id: string) {
     return showPasswordDialog({
       title: strings.unlockNote(),
       subtitle: strings.unlockNoteDesc(),
