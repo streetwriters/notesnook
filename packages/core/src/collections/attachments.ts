@@ -214,7 +214,7 @@ export class Attachments implements ICollection {
     if (!localOnly && !(await this.canDetach(attachment)))
       throw new Error("This attachment is inside a locked note.");
 
-    await this.db.fs().cancelFile(attachment.hash);
+    await this.db.fs().cancelTransfers(attachment.hash);
 
     if (
       await this.db
@@ -252,7 +252,7 @@ export class Attachments implements ICollection {
       .map((a) => a.hash);
 
     for (const attachment of detachable) {
-      await this.db.fs().cancelFile(attachment.hash);
+      await this.db.fs().cancelTransfers(attachment.hash);
     }
 
     if (localOnlyHashes.length > 0) {
