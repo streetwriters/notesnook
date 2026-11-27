@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DesktopElement,
+  controlElement,
   elementFor,
   getElementById,
   measureInWindow,
@@ -37,6 +38,15 @@ function node(
 }
 
 afterEach(() => setScrollCommand(undefined));
+
+describe("a change before the native host's ref is set", () => {
+  it("names the field's control, so the typed text is the target's value", () => {
+    const control: ElementControl = { value: "" };
+    const element = controlElement(control);
+    control.value = "Surroundings note";
+    expect(element.value).toBe("Surroundings note");
+  });
+});
 
 describe("a ref to a desktop primitive", () => {
   it("has the HTMLElement subset the kit's presenters and web's code use, measureInWindow included", () => {

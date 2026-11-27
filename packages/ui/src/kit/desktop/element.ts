@@ -351,6 +351,17 @@ export function elementFor(
   return element;
 }
 
+/**
+ * An element that reads and writes `control`, for a change whose host element
+ * is not known yet: a native input attaches its ref on its next render, so the
+ * first change can arrive before the ref is set.
+ */
+export function controlElement(control: ElementControl): DesktopElement {
+  const element = new DesktopElement({});
+  element.control = control;
+  return element;
+}
+
 const ids = new Map<string, DesktopElement>();
 
 export function registerElementId(id: string, element: DesktopElement) {

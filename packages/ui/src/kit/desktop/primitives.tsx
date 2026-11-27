@@ -51,6 +51,7 @@ import type {
 } from "../contracts/elements";
 import type { UIMouseEvent } from "../contracts/events";
 import {
+  controlElement,
   elementFor,
   getElementById,
   registerElementId,
@@ -626,7 +627,11 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
       onChange={(event: NativeEvent) => {
         const text = String(event?.nativeEvent?.text ?? "");
         control.value = text;
-        onChange?.(changeEvent(element.current, event));
+        // The native host's ref can still be empty on the first change, so
+        // the change names the field's control: `target.value` is the text.
+        onChange?.(
+          changeEvent(element.current ?? controlElement(control), event)
+        );
       }}
       onSelectionChange={(event: NativeEvent) => {
         const selection = event?.nativeEvent?.selection;
