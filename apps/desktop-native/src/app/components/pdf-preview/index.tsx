@@ -92,6 +92,7 @@ export function PdfPreview(props: PdfPreviewProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [pageText, setPageText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [fullscreen, setFullscreen] = useState(windowControls.isFullscreen());
   useEffect(
     () => windowControls.onStateChanged((s) => setFullscreen(s.fullscreen)),
@@ -170,6 +171,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             title={strings.search()}
             onClick={() => {
               setSearchOpen((open) => !open);
+              setSearchText("");
               controller.current?.clearSearch();
             }}
           />
@@ -260,9 +262,10 @@ export function PdfPreview(props: PdfPreviewProps) {
             data-test-id="pdf-search-input"
             autoFocus
             placeholder={strings.search()}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter")
-                controller.current?.search(e.currentTarget.value);
+              if (e.key === "Enter") controller.current?.search(searchText);
             }}
             sx={{ width: 240 }}
           />
