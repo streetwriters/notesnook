@@ -275,6 +275,11 @@
       "path": "components/navigation-menu/navigation-item.tsx",
       "category": "platform",
       "reason": "apps/web's SortableNavigationItem is built on @dnd-kit/sortable (DOM); desktop has no such item, the kit's SortableList moves the rows."
+    },
+    {
+      "path": "components/navigation-menu/logo.tsx",
+      "category": "platform",
+      "reason": "apps/web draws the logo from an SVG sprite in index.html (<svg><use href=\"#full-logo\"/>); desktop has no page to hold the sprite, so the mark is an svgIcon here."
     }
   ]
 }
