@@ -22,7 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * elements, and drives the native callbacks they hand down, to check that
  * the deprecated names and the new web-shaped ones both still fire.
  */
-import { createElement as h, forwardRef, useImperativeHandle } from "react";
+import {
+  createElement as h,
+  forwardRef,
+  Fragment,
+  useImperativeHandle
+} from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -71,7 +76,7 @@ vi.mock("../shared/icons", () => ({ CaretDown: () => null }));
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
-const { Checkbox, Input, Slider, Switch, Box, Button, Icon } = await import(
+const { Checkbox, Input, Slider, Switch, Box, Button, Text } = await import(
   "./primitives"
 );
 const { Select } = await import("./select");
@@ -190,6 +195,16 @@ describe("Button", () => {
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(typeof onClick.mock.calls[0][0].stopPropagation).toBe("function");
+  });
+});
+
+describe("Text", () => {
+  it("draws <br /> as a line break, in fragments too", () => {
+    const tree = render(
+      h(Text, {}, "a", h("br", { key: "1" }), h(Fragment, { key: "f" }, "b", h("br"), "c"))
+    );
+    const text = tree.root.findAll((node) => (node.type as any) === "Text")[0];
+    expect(text.props.children).toEqual(["a", "\n", "b", "\n", "c"]);
   });
 });
 

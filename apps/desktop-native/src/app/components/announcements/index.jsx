@@ -17,11 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
-import { Flex } from "@notesnook/ui-kit";
+import { Flex, Text } from "@notesnook/ui-kit";
 import { Cross } from "../icons";
-import AnnouncementBody, { ANNOUNCEMENT_DISMISS_COLORS } from "./body";
+import AnnouncementBody from "./body";
 import { useStore as useAnnouncementStore } from "../../stores/announcement-store";
+import Notice from "../notice";
+
+import { alpha } from "@notesnook/ui-kit";
+import { strings } from "@notesnook/intl";
 
 function Announcements() {
   const announcements = useAnnouncementStore(
@@ -33,32 +36,34 @@ function Announcements() {
   if (!announcement) return null;
   return (
     <Flex
+      mx={1}
+      mb={2}
+      py={2}
+      bg="var(--background-secondary)"
       sx={{
-        mx: 1,
-        mb: 2,
-        py: 2,
-        bg: "background-secondary",
         borderRadius: "default",
         position: "relative",
         flexDirection: "column"
       }}
     >
-      <Flex
-        title={strings.dismissAnnouncement()}
-        onClick={() => dismiss(announcement.id)}
+      <Text
+        p="2px"
         sx={{
-          p: "2px",
-          bg: ANNOUNCEMENT_DISMISS_COLORS.background,
+          bg: alpha("red", 0.2),
           position: "absolute",
           right: 2,
           top: 2,
           borderRadius: 50,
           cursor: "pointer",
-          alignSelf: "flex-end"
+          alignSelf: "end"
+        }}
+        title={strings.dismissAnnouncement()}
+        onClick={() => {
+          dismiss(announcement.id);
         }}
       >
-        <Cross size={16} color={ANNOUNCEMENT_DISMISS_COLORS.icon} />
-      </Flex>
+        <Cross size={16} color="red" />
+      </Text>
       <AnnouncementBody components={announcement.body} type="inline" />
     </Flex>
   );

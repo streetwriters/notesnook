@@ -79,6 +79,7 @@ describe("alpha", () => {
     expect(resolveColor("accent", colors)).toBe("#008837");
     expect(resolveColor("#abcdef", colors)).toBe("#abcdef");
     expect(resolveColor(alphaToken("#ffffff", 0.2), colors)).toBe("#ffffff33");
+    expect(resolveColor(alphaToken("red", 0.2), colors)).toBe("#ff000033");
   });
 
   test("alpha values are replaced anywhere in an sx object, states included", () => {

@@ -33,12 +33,12 @@ export function Loader(props: LoaderProps) {
         justifyContent: "center"
       }}
     >
-      <Loading color="icon" />
-      <Text variant="subtitle" sx={{ mt: 4 }}>
+      <Loading rotate />
+      <Text variant="subtitle" mt={4}>
         {title}
       </Text>
       {text && (
-        <Text variant="body" sx={{ mt: 2 }}>
+        <Text variant="body" mt={2}>
           {text}
         </Text>
       )}

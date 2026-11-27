@@ -17,27 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, type ColorValue, type SxProp } from "@notesnook/ui-kit";
+// The few browser globals the app code shared with apps/web calls, backed by
+// the platform services. Imported after the platform is set up.
 
-type TextWithTipProps = {
-  text: string;
-  tip?: string;
-  sx?: SxProp;
-  color?: ColorValue;
-};
+import { shell } from "@platform";
 
-function TextWithTip({ text, tip, sx, color }: TextWithTipProps) {
-  return (
-    <Text sx={{ ...sx, fontSize: "body", color: color || "paragraph" }}>
-      {text}
-      {"\n"}
-      <Text
-        variant="subBody"
-        sx={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
-      >
-        {tip}
-      </Text>
-    </Text>
-  );
+type WebWindow = { open?: (url?: string | URL, target?: string) => null };
+
+export function installWebGlobals(target: object = globalThis) {
+  const scope = target as { window?: WebWindow };
+  const window = (scope.window ??= scope as WebWindow);
+  // `window.open(url, "_blank")` opens the link in the user's browser.
+  window.open ??= (url) => {
+    if (url) shell.openUrl(String(url));
+    return null;
+  };
 }
-export default TextWithTip;
+
+installWebGlobals();

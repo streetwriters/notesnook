@@ -143,6 +143,16 @@ export function resolveSx(
 const EMPTY: SxProp = {};
 
 const ALPHA = /^alpha\((.+),\s*(-?\d*\.?\d+)\)$/;
+// CSS colour names apps/web passes to alpha(), so their opacity can be set.
+const NAMED_COLORS: Record<string, string> = {
+  black: "#000000",
+  white: "#ffffff",
+  red: "#ff0000",
+  green: "#008000",
+  blue: "#0000ff",
+  gray: "#808080",
+  grey: "#808080"
+};
 const CSS_VAR = /var\(--([A-Za-z0-9-]+)\)/g;
 
 /** `var(--token)` (as apps/web writes colours) replaced by the token's colour. */
@@ -177,7 +187,10 @@ export function resolveColor(value: string, colors: Record<string, string>) {
   const match = value.startsWith("alpha(") ? ALPHA.exec(value) : null;
   if (!match) return colors[value] ?? value;
   const color = match[1].trim();
-  return withAlpha(colors[color] ?? color, parseFloat(match[2]));
+  return withAlpha(
+    colors[color] ?? NAMED_COLORS[color] ?? color,
+    parseFloat(match[2])
+  );
 }
 
 /**

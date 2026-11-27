@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Flex, Button, Text, FlexProps } from "@notesnook/ui-kit";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text, type SxProp } from "@notesnook/ui-kit";
 
-type ContentToggleProps = {
+type ContentToggle = {
   isSelected: boolean;
   isOtherSelected: boolean;
   onToggle: () => void;
@@ -29,9 +29,9 @@ type ContentToggleProps = {
   dateEdited: number;
   resolveConflict: (saveCopy: boolean) => void;
   readonly: boolean;
-  sx: SxProp;
+  sx: FlexProps["sx"];
 };
-function ContentToggle(props: ContentToggleProps) {
+function ContentToggle(props: ContentToggle) {
   const {
     isSelected,
     isOtherSelected,
@@ -46,12 +46,14 @@ function ContentToggle(props: ContentToggleProps) {
   return (
     <Flex sx={{ ...sx, flexDirection: "column" }}>
       {!readonly && (
-        <Flex sx={{ flexDirection: "row" }}>
+        <Flex>
           {isOtherSelected && (
             <Button
               variant="accent"
+              mr={2}
               onClick={() => resolveConflict(true)}
-              sx={{ mr: 2, p: 1, px: 2 }}
+              p={1}
+              px={2}
             >
               {strings.saveACopy()}
             </Button>
@@ -65,7 +67,8 @@ function ContentToggle(props: ContentToggleProps) {
                 onToggle();
               }
             }}
-            sx={{ p: 1, px: 2 }}
+            p={1}
+            px={2}
           >
             {isSelected
               ? strings.undo()
@@ -75,7 +78,7 @@ function ContentToggle(props: ContentToggleProps) {
           </Button>
         </Flex>
       )}
-      <Text variant="subBody" sx={{ mt: 1 }}>
+      <Text variant="subBody" mt={1}>
         {label} | {getFormattedDate(dateEdited)}
       </Text>
     </Flex>

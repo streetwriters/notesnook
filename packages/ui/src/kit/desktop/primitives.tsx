@@ -21,6 +21,8 @@ import {
   Children,
   createContext,
   forwardRef,
+  Fragment,
+  isValidElement,
   useCallback,
   useContext,
   useEffect,
@@ -155,6 +157,32 @@ const LabelContext = createContext<LabelRegistry | undefined>(undefined);
 function useLabelControl(control: ElementControl) {
   const label = useContext(LabelContext);
   useEffect(() => label?.register(control), [label, control]);
+}
+
+/** Whether `children` holds a `<br />`, directly or in a fragment. */
+function hasLineBreak(children: ReactNode): boolean {
+  let found = false;
+  Children.forEach(children, (child) => {
+    if (found || !isValidElement(child)) return;
+    if (child.type === "br") found = true;
+    else if (child.type === Fragment)
+      found = hasLineBreak((child.props as { children?: ReactNode }).children);
+  });
+  return found;
+}
+
+/** Text children with each `<br />` drawn as a line break, as in HTML. */
+function withLineBreaks(children: ReactNode): ReactNode[] {
+  const result: ReactNode[] = [];
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === "br") result.push("\n");
+    else if (isValidElement(child) && child.type === Fragment)
+      result.push(
+        ...withLineBreaks((child.props as { children?: ReactNode }).children)
+      );
+    else result.push(child);
+  });
+  return result;
 }
 
 function hasText(children: ReactNode): boolean {
@@ -320,7 +348,9 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
     >
       {dangerouslySetInnerHTML
         ? htmlToText(dangerouslySetInnerHTML.__html)
-        : props.children}
+        : hasLineBreak(props.children)
+          ? withLineBreaks(props.children)
+          : props.children}
     </TextComponent>
   );
 });

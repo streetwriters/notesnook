@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@notesnook/ui-kit";
-import { shell } from "@platform";
 import Accordion from "../../accordion";
 import { strings } from "@notesnook/intl";
 
@@ -32,28 +31,30 @@ export function ImportErrors(props: ImportErrorsProps) {
       isClosed={false}
       title={strings.errorsOccured(props.errors.length)}
       sx={{ bg: "background-error", borderRadius: "default", mt: 2 }}
+      color="paragraph-error"
     >
-      <Flex sx={{ flexDirection: "column", px: 2, pb: 2 }}>
+      <Flex sx={{ flexDirection: "column", px: 2, pb: 2, overflowX: "auto" }}>
         {props.errors.map((error, index) => (
           <Text
             key={index}
             variant="body"
-            selectable
             sx={{ color: "paragraph-error", my: 1, fontFamily: "monospace" }}
           >
             {index + 1}. {error.message}
+            <br />
           </Text>
         ))}
         <Button
           variant="error"
-          sx={{ alignSelf: "flex-start", mt: 2 }}
+          sx={{ alignSelf: "start", mt: 2 }}
           onClick={() =>
-            shell.openUrl(
-              "https://github.com/streetwriters/notesnook-importer/issues/new"
+            window.open(
+              "https://github.com/streetwriters/notesnook-importer/issues/new",
+              "_blank"
             )
           }
         >
-          <Text>{strings.sendUsABugReport()}</Text>
+          {strings.sendUsABugReport()}
         </Button>
       </Flex>
     </Accordion>

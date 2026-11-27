@@ -48,7 +48,7 @@ export function Importer() {
           }}
         />
         {selectedProvider ? (
-          <Flex sx={{ flexDirection: "column" }}>
+          <>
             {selectedProvider.type === "file" ? (
               <FileProviderHandler
                 key={instanceKey}
@@ -62,10 +62,10 @@ export function Importer() {
                 onTransformFinished={setTransformResult}
               />
             ) : null}
-          </Flex>
+          </>
         ) : null}
         {transformResult && selectedProvider ? (
-          <Flex sx={{ flexDirection: "column" }}>
+          <>
             <ImportResult
               result={transformResult}
               provider={selectedProvider}
@@ -74,7 +74,7 @@ export function Importer() {
                 setInstanceKey(`${Math.random()}`);
               }}
             />
-          </Flex>
+          </>
         ) : null}
       </Flex>
     </Flex>

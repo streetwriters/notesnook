@@ -17,19 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo } from "react";
+import React, { useRef } from "react";
+import { Text, TextProps } from "@notesnook/ui-kit";
+import { type TDate } from "timeago.js";
 import { useTimeAgo } from "@notesnook/common";
-import { Text, type TextProps } from "@notesnook/ui-kit";
-
-type TDate = Parameters<typeof useTimeAgo>[0];
 
 type TimeAgoProps = {
   datetime: TDate;
   locale?: "short" | "en_short";
   live?: boolean;
   interval?: number;
-} & Omit<TextProps, "children">;
-
+};
 function TimeAgo({
   datetime,
   live,
@@ -37,14 +35,26 @@ function TimeAgo({
   interval,
   sx,
   ...restProps
-}: TimeAgoProps) {
+}: TimeAgoProps & TextProps) {
+  const timeRef = useRef<HTMLDivElement>(null);
+
   const time = useTimeAgo(datetime, { live, locale, interval });
 
   return (
-    <Text {...restProps} data-test-id="time" sx={{ fontFamily: "body", ...sx }}>
+    <Text
+      {...restProps}
+      ref={timeRef}
+      sx={{
+        fontFamily: "body",
+        ...sx,
+        color: (sx && (sx as any)["color"]) || "inherit"
+      }}
+      as="time"
+      data-test-id="time"
+    >
       {time}
     </Text>
   );
 }
 
-export default memo(TimeAgo);
+export default React.memo(TimeAgo);

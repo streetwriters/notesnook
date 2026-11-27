@@ -21,6 +21,12 @@ import { describe, expect, test } from "vitest";
 import { convertDeclarations, convertOutline, expandFlex } from "./convert";
 
 describe("sx keys taken from apps/web", () => {
+  test("inherit leaves the property to the parent", () => {
+    expect(convertDeclarations({ color: "inherit" }).style.color).toBe(
+      undefined
+    );
+  });
+
   test("start and end alignment are flex-start and flex-end", () => {
     expect(
       convertDeclarations({

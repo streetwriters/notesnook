@@ -46,16 +46,16 @@ export function ImportResult(props: ImportResultProps) {
           onClick={onReset}
           sx={{ alignSelf: "center", mt: 2, px: 4 }}
         >
-          <Text>{strings.startOver()}</Text>
+          {strings.startOver()}
         </Button>
       </Flex>
     );
   }
 
   return (
-    <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
+    <>
       <CheckCircleOutline color="accent" />
-      <Text variant="body" sx={{ my: 2, textAlign: "center" }}>
+      <Text variant="body" my={2} sx={{ textAlign: "center" }}>
         {strings.importCompleted()}.{" "}
         {strings.notesSuccessfullyImported(props.result.totalNotes)}{" "}
         {strings.errorsOccured(result.errors.length)}
@@ -63,25 +63,32 @@ export function ImportResult(props: ImportResultProps) {
       <Button
         variant="secondary"
         sx={{ alignSelf: "center" }}
-        onClick={onReset}
+        onClick={async () => {
+          onReset();
+        }}
       >
-        <Text>{strings.startOver()}</Text>
+        {strings.startOver()}
       </Button>
       {result.errors.length > 0 && (
         <Flex
-          sx={{ my: 1, bg: "background-error", p: 1, flexDirection: "column" }}
+          my={1}
+          bg="var(--background-error)"
+          p={1}
+          sx={{ flexDirection: "column" }}
         >
           {result.errors.map((error) => (
             <Text
               key={error.message}
               variant="body"
-              sx={{ color: "paragraph-error" }}
+              sx={{
+                color: "var(--paragraph-error)"
+              }}
             >
               {error.message}
             </Text>
           ))}
         </Flex>
       )}
-    </Flex>
+    </>
   );
 }

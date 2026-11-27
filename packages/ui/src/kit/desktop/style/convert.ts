@@ -245,7 +245,8 @@ export function convertDeclarations(
 
   for (const key in declarations) {
     let value = declarations[key];
-    if (value === undefined || value === null) continue;
+    // `inherit` is what desktop text does already when nothing is set.
+    if (value === undefined || value === null || value === "inherit") continue;
     switch (key) {
       case "alignItems":
       case "alignSelf":
