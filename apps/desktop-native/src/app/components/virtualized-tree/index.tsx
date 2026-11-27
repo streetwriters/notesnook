@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   useEffect,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -29,13 +28,11 @@ import {
 import {
   Virtuoso,
   type UIMouseEvent,
-  type VirtuosoHandle
+  type VirtuosoHandle,
+  ListSelectionContext,
+  useListCursor
 } from "@notesnook/ui-kit";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
-import {
-  ListSelectionContext,
-  type ListSelection
-} from "../list-container/selection";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 
 export type VirtualizedTreeHandle<T> = {
@@ -95,8 +92,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     isSelected
   } = props;
   const list = useRef<VirtuosoHandle>(null);
-  const openers = useRef(new Map<number, () => void>());
-  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const cursor = useListCursor();
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setPersistedIds] = usePersistentState<ExpandedIds>(
     saveKey,
@@ -200,41 +196,23 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       bulkSelect?.(ids);
     },
     focusItemAt: (index) => {
-      setFocusedIndex(index);
+      cursor.setFocusedIndex(index);
       list.current?.scrollToIndex({ index });
     },
     skip: () => false,
-    open: (index) => openers.current.get(index)?.()
+    open: cursor.openAt
   });
-
-  const selection = useMemo<ListSelection>(
-    () => ({
-      focusedIndex,
-      register: (index, open) => {
-        openers.current.set(index, open);
-        return () => {
-          if (openers.current.get(index) === open)
-            openers.current.delete(index);
-        };
-      },
-      onItemPress: (index, _id, event, open) => {
-        onMouseUp(event, index);
-        setFocusedIndex(index);
-        if (!event.metaKey && !event.shiftKey && !event.ctrlKey) open();
-      }
-    }),
-    [focusedIndex, onMouseUp]
-  );
+  cursor.bindPress(onMouseUp);
 
   return (
-    <ListSelectionContext.Provider value={selection}>
+    <ListSelectionContext.Provider value={cursor.selection}>
       <Virtuoso
         data-test-id={props["data-test-id"]}
         ref={list}
         style={{ flex: 1 }}
         tabIndex={0}
         onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-        onBlur={() => setFocusedIndex(-1)}
+        onBlur={() => cursor.setFocusedIndex(-1)}
         totalCount={nodes.length}
         computeItemKey={(index) => nodes[index]?.id ?? `${index}`}
         defaultItemHeight={itemHeight + itemGap}

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type {
+  Context,
   ComponentType,
   ForwardRefExoticComponent,
   Key,
@@ -27,7 +28,7 @@ import type {
   RefAttributes
 } from "react";
 import type { UIElement } from "./elements";
-import type { UIFocusEvent, UIKeyboardEvent } from "./events";
+import type { UIFocusEvent, UIKeyboardEvent, UIMouseEvent } from "./events";
 import type { DataAttributes } from "./primitives";
 import type { StyleProp, SxProp } from "./style";
 
@@ -281,3 +282,34 @@ export interface SortableListProps<T extends SortableItem> {
 export declare function SortableList<T extends SortableItem>(
   props: SortableListProps<T>
 ): JSX.Element;
+
+/**
+ * A list's keyboard cursor and click registry, for native lists: they have no
+ * DOM to focus or click, so each item registers its open action with its index.
+ * Web's list reads the DOM instead, so web never provides it.
+ */
+export type ListSelection = {
+  focusedIndex: number;
+  register: (index: number, open: () => void) => () => void;
+  onItemPress: (
+    index: number,
+    id: string,
+    event: UIMouseEvent,
+    open: () => void
+  ) => void;
+};
+export declare const ListSelectionContext: Context<ListSelection | undefined>;
+export declare function useListSelection(): ListSelection | undefined;
+
+/**
+ * The state behind a `ListSelection` on a native list: the keyboard cursor, the
+ * open action of each item by index, and the press handler that the list's
+ * keyboard selection gets. Web's list has none of it; it reads the DOM instead.
+ */
+export type ListCursor = {
+  selection: ListSelection;
+  setFocusedIndex: (index: number) => void;
+  openAt: (index: number) => void;
+  bindPress: (handler: (event: UIMouseEvent, index: number) => void) => void;
+};
+export declare function useListCursor(): ListCursor;

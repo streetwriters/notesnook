@@ -32,15 +32,15 @@ import {
   Button,
   Flex,
   Virtuoso,
-  type UIMouseEvent,
   type UIDragEvent,
   type SxProp,
-  type VirtuosoHandle
+  type VirtuosoHandle,
+  ListSelectionContext,
+  useListCursor
 } from "@notesnook/ui-kit";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { store as selectionStore } from "../../stores/selection-store";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
-import { ListSelectionContext, type ListSelection } from "./selection";
 import GroupHeader from "../group-header";
 import Announcements from "../announcements";
 import { ListLoader } from "../loaders/list-loader";
@@ -83,8 +83,7 @@ const LIST_COMPONENTS = { Header: ListHeader };
 export default function ListContainer(props: ListContainerProps) {
   const { type, group, items, context, header, compact, isSearching } = props;
   const list = useRef<VirtuosoHandle>(null);
-  const openers = useRef(new Map<number, () => void>());
-  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const cursor = useListCursor();
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
   useEffect(() => {
@@ -136,36 +135,13 @@ export default function ListContainer(props: ListContainerProps) {
       selectionStore.setSelectedItems(ids);
     },
     focusItemAt: (index) => {
-      setFocusedIndex(index);
+      cursor.setFocusedIndex(index);
       list.current?.scrollToIndex({ index });
     },
     skip: () => false,
-    open: (index) => openers.current.get(index)?.()
+    open: cursor.openAt
   });
-
-  const selection = useMemo<ListSelection>(
-    () => ({
-      focusedIndex,
-      register: (index, open) => {
-        openers.current.set(index, open);
-        return () => {
-          if (openers.current.get(index) === open)
-            openers.current.delete(index);
-        };
-      },
-      onItemPress: (
-        index: number,
-        _id: string,
-        event: UIMouseEvent,
-        open: () => void
-      ) => {
-        onMouseUp(event, index);
-        setFocusedIndex(index);
-        if (!event.metaKey && !event.shiftKey && !event.ctrlKey) open();
-      }
-    }),
-    [onMouseUp, focusedIndex]
-  );
+  cursor.bindPress(onMouseUp);
 
   const renderItem = useCallback(
     (index: number) => (
@@ -230,7 +206,7 @@ export default function ListContainer(props: ListContainerProps) {
     );
 
   return (
-    <ListSelectionContext.Provider value={selection}>
+    <ListSelectionContext.Provider value={cursor.selection}>
       <Flex
         data-test-id={`${type}-list`}
         onDrop={props.onDrop}
@@ -250,7 +226,7 @@ export default function ListContainer(props: ListContainerProps) {
           onKeyDown={(e) => onKeyDown(e.nativeEvent)}
           onBlur={() => {
             setFocusedGroupIndex(-1);
-            setFocusedIndex(-1);
+            cursor.setFocusedIndex(-1);
           }}
           totalCount={items.length}
           computeItemKey={itemKey}

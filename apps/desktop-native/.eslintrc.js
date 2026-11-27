@@ -62,7 +62,8 @@ module.exports = {
           { name: "sessionStorage", message: "Use @platform." },
           { name: "location", message: "Use @platform." },
           { name: "self", message: "Use @platform." },
-          { name: "globalThis", message: "Use @platform." }
+          { name: "globalThis", message: "Use @platform." },
+          { name: "parent", message: "Use @platform." }
         ]
         // `className` is allowed: the kit's contract accepts it (ignored on
         // desktop), so files shared with apps/web keep their class names.

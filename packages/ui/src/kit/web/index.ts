@@ -23,12 +23,7 @@ export { default as Modal } from "react-modal";
 export * from "./hooks";
 export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./layout";
-export {
-  GroupedVirtuoso,
-  TableVirtuoso,
-  VirtualList,
-  Virtuoso
-} from "./lists";
+export { GroupedVirtuoso, TableVirtuoso, VirtualList, Virtuoso } from "./lists";
 export { SortableList } from "./sortable-list";
 export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
 // The menu and popup hosts are the ones apps/web already uses.
@@ -40,3 +35,8 @@ export * from "./primitives";
 export { WebThemeProvider, ThemeScope } from "./theme";
 export { ThemeBridge, syncThemeEngine } from "./theme-bridge";
 export { dataColor } from "../shared/style/data-color";
+export {
+  ListSelectionContext,
+  useListCursor,
+  useListSelection
+} from "../shared/list-selection";

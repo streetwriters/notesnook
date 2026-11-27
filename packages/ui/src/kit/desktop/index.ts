@@ -40,4 +40,9 @@ export { WebView } from "./webview";
 export { PdfViewer } from "./pdf";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "../shared/style/data-color";
+export {
+  ListSelectionContext,
+  useListCursor,
+  useListSelection
+} from "../shared/list-selection";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./title-bar";

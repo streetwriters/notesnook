@@ -30,9 +30,9 @@ import {
   type UIDragEvent,
   type UIKeyboardEvent,
   type MenuItem,
-  type SxProp
+  type SxProp,
+  useListSelection
 } from "@notesnook/ui-kit";
-import { useListSelection } from "../list-container/selection";
 import {
   store as selectionStore,
   useStore as useSelectionStore

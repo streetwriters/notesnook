@@ -254,8 +254,6 @@ async function changeGroupOptions(
   options: GroupingMenuOptions,
   item: Omit<MenuButtonItem, "type">
 ) {
-  if (!parent) return false;
-
   const groupOptions: GroupOptions = { ...options.groupOptions };
   (groupOptions as any)[options.parentKey] = item.key;
 

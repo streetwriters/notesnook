@@ -254,17 +254,32 @@
     {
       "path": "components/virtualized-tree/index.tsx",
       "category": "platform",
-      "reason": "apps/web renders each row in a raw <div> with onMouseUp and finds rows with document.getElementById to focus or click them (waitForElement); desktop has no DOM, so rows register an opener and the focused index with the list instead."
+      "reason": "apps/web renders each row in a raw <div> with onMouseUp and finds rows with document.getElementById to focus or click them (waitForElement); desktop has no DOM, so rows register their open action with the kit's list cursor (useListCursor) instead."
     },
     {
       "path": "components/list-container/index.tsx",
       "category": "platform",
-      "reason": "apps/web renders raw <div> items and skeletons, finds items with document.querySelector/getElementById (reveal flash with classList, waitForElement focus and click); desktop has no DOM, so items register with a selection context (list-container/selection.ts) instead."
+      "reason": "apps/web renders raw <div> items and skeletons, finds items with document.querySelector/getElementById (reveal flash with classList, waitForElement focus and click); desktop has no DOM, so items register their open action with the kit's list cursor (useListCursor, kit shared/list-selection.ts) instead."
     },
     {
-      "path": "components/list-container/selection.ts",
+      "path": "components/list-container/list-profiles.tsx",
       "category": "platform",
-      "reason": "Desktop-only stand-in for the DOM focus and click that apps/web's list uses (document.getElementById(...).focus()/click()): items register their open action and read the focused index."
+      "reason": "apps/web measures a paragraph with document.getElementById('p') for the line height and renders items without an index; desktop has no document, so it uses a fixed 16px line and passes each item its list index, which the item registers with the list selection."
+    },
+    {
+      "path": "components/list-item/index.tsx",
+      "category": "platform",
+      "reason": "apps/web's item takes focus and clicks through the DOM (tabIndex, :focus styles, the focused element); desktop has no DOM, so the item registers its open action and reads the keyboard cursor from the kit's list selection, and carries the e2e markers web reads from the DOM. Native text has no CSS white-space or -webkit-line-clamp, so the title and description use nowrap, lineClamp and px line heights."
+    },
+    {
+      "path": "components/group-header/index.tsx",
+      "category": "platform",
+      "reason": "apps/web's changeGroupOptions returns early on `!parent` (window.parent, which a browser always sets, so the guard never fires there); desktop has no window, so reading parent would throw, and the guard is left out."
+    },
+    {
+      "path": "common/key-handler.ts",
+      "category": "platform",
+      "reason": "apps/web reads navigator.platform to pick the Mac modifier keys; desktop asks the platform's environment.os, and its key event type also accepts the kit's keyboard event."
     },
     {
       "path": "components/navigation-menu/index.tsx",
