@@ -23,6 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  checkFailures,
   buildReport,
   comparePair,
   diffLines,
@@ -177,11 +178,17 @@ describe("allowlist", () => {
     );
   });
 
-  it("the committed allowlist is valid", () => {
+  it("the committed allowlist is valid and the current tree passes the check", () => {
     const json = JSON.parse(
       fs.readFileSync(path.join(here, "allowlist.json"), "utf8")
     );
-    expect(parseAllowlist(json).length).toBeGreaterThan(0);
+    const allowlist = parseAllowlist(json);
+    expect(allowlist.length).toBeGreaterThan(0);
+    const appSrc = path.resolve(here, "../../src/app");
+    const webSrc = path.resolve(here, "../../../web/src");
+    expect(checkFailures(buildReport({ appSrc, webSrc, allowlist }))).toEqual(
+      []
+    );
   });
 });
 
@@ -262,5 +269,11 @@ describe("buildReport", () => {
       webOnly: 1,
       staleAllowlistEntries: 1
     });
+    // The check fails on the unexplained files only: not on same.tsx (imports
+    // differ) or the allowlisted editor.ts and smoke.tsx.
+    expect(checkFailures(report)).toEqual([
+      "drift.ts: +1 -1 lines vs web",
+      "extra.ts: no web counterpart"
+    ]);
   });
 });

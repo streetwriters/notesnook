@@ -185,6 +185,14 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=desktop-native
 
+      # Every file in src/app must match its apps/web/src counterpart apart from
+      # imports, or be on tools/divergence/allowlist.json with a category and
+      # reason; anything else fails the run.
+      - name: Divergence from apps/web
+        if: runner.os == 'Linux'
+        working-directory: apps/desktop-native
+        run: npm run check:divergence
+
       # Also builds the shared @notesnook/* packages (their dist/) that the JS
       # bundle imports, so it runs on both systems.
       - name: Type check

@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // Reports how far apps/desktop-native/src/app has drifted from apps/web/src.
-// A report, not a gate: it exits 0 whatever it finds (1 only for a broken
-// allowlist or bad arguments).
+// A report by default: it exits 0 whatever it finds (1 only for a broken
+// allowlist or bad arguments). With --check (npm run check:divergence, run in
+// CI) it is a gate: it exits 1 when a file diverges or has no web counterpart
+// and is not on the allowlist.
 //
 //   npm run report:divergence                   text report
 //   npm run report:divergence -- --json         the same as JSON
@@ -32,6 +34,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   buildReport,
+  checkFailures,
   comparePair,
   listCodeFiles,
   pairFiles,
@@ -94,6 +97,26 @@ if (show) {
 }
 
 const report = buildReport({ appSrc, webSrc, allowlist });
+
+if (args.includes("--check")) {
+  const failures = checkFailures(report);
+  if (failures.length === 0) {
+    console.log(
+      `divergence: ok (${report.summary.identical} identical, ${
+        report.summary.divergentAllowed + report.summary.desktopOnlyAllowed
+      } allowlisted)`
+    );
+    process.exit(0);
+  }
+  console.error(
+    `divergence: ${failures.length} file(s) in src/app differ from apps/web/src beyond imports and are not allowlisted:`
+  );
+  for (const failure of failures) console.error(`  ${failure}`);
+  console.error(
+    "Align each with web (npm run report:divergence -- --show <path> shows the diff) or add it to tools/divergence/allowlist.json with a category and reason."
+  );
+  process.exit(1);
+}
 
 if (args.includes("--json")) {
   console.log(JSON.stringify(report, null, 2));

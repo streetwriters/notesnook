@@ -1,5 +1,5 @@
 {
-  "$comment": "Files in src/app allowed to differ from apps/web/src (or to have no web counterpart). One entry per file or glob, relative to src/app. category: platform (a platform service is the reason), native-editor (the native editor is), desktop-only (a screen or tool web has no counterpart for). reason: why, in a sentence. Kit-API drift (onPress, testID, lists, dialogs) is never a reason: phase 4 removes it.",
+  "$comment": "Files in src/app allowed to differ from apps/web/src (or to have no web counterpart). One entry per file or glob, relative to src/app. category: platform (a platform service is the reason), native-editor (the native editor is), desktop-only (a screen or tool web has no counterpart for), pending (still drifts from web for no lasting reason: align it and remove the entry). reason: why, in a sentence. Kit-API drift (onPress, testID, lists, dialogs) is never a reason: phase 4 removes it.",
   "entries": [
     {
       "path": "**/*.generated.ts",
@@ -970,6 +970,136 @@
       "path": "components/editor/attachment-temp.ts",
       "category": "native-editor",
       "reason": "Decrypts an attachment to a temp file for the native editor's PDF and preview host actions; web's Tiptap editor reads attachments in the page."
+    },
+    {
+      "path": "root.tsx",
+      "category": "platform",
+      "reason": "Mounts the app on the GPUI host's root view; web renders into a DOM element, lazy-imports a title bar and asks the Electron bridge about it."
+    },
+    {
+      "path": "bootstrap.tsx",
+      "category": "platform",
+      "reason": "Routes hold their components directly because the Hermes bundle cannot lazy-load modules with import(); web's routes are async imports."
+    },
+    {
+      "path": "common/dialog-manager.tsx",
+      "category": "platform",
+      "reason": "Dialogs render into a store-driven host inside the app tree; the GPUI host has no document to createRoot a new container in, as web does."
+    },
+    {
+      "path": "navigation/index.ts",
+      "category": "platform",
+      "reason": "Navigation goes through the history platform service and wraps its state; web reads window.history and location directly."
+    },
+    {
+      "path": "navigation/hash-routes.tsx",
+      "category": "platform",
+      "reason": "Reads history state through the navigation wrapper over the history platform service instead of window.history."
+    },
+    {
+      "path": "components/hash-router/index.tsx",
+      "category": "platform",
+      "reason": "Waits for the database host to be ready before resolving hash routes; web's database is ready at startup."
+    },
+    {
+      "path": "components/cached-router/index.tsx",
+      "category": "platform",
+      "reason": "Waits for the database host and keeps route components with their props because routes are not lazy imports on Hermes."
+    },
+    {
+      "path": "app-effects.tsx",
+      "category": "platform",
+      "reason": "Link opening and launch requests (nn:// and jump list) come from the integration platform service; web attaches Electron bridge listeners."
+    },
+    {
+      "path": "boot.ts",
+      "category": "desktop-only",
+      "reason": "Native start-up sequence (database host, key store, locale) that runs before the app mounts on the GPUI host; web boots in root.tsx and index.ts."
+    },
+    {
+      "path": "views/wrapped.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/route-container/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "views/plans.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "views/notebooks.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/reminder/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/note/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/notebook/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/search-result/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/trash-item/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "views/tags.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/notebook-header.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/session-item/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/tag/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/navigation-menu/filter-field.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/reminder/repeat-text.ts",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "components/user-profile/index.tsx",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+    },
+    {
+      "path": "hooks/use-resolved-item.ts",
+      "category": "pending",
+      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
     }
   ]
 }

@@ -26,7 +26,14 @@ import path from "node:path";
 import ts from "typescript";
 
 export const CODE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mjs"];
-export const CATEGORIES = ["platform", "native-editor", "desktop-only"];
+// pending: a file that still drifts from web for no lasting reason, allowed
+// for now so the check can gate new drift; its entry goes once it is aligned.
+export const CATEGORIES = [
+  "platform",
+  "native-editor",
+  "desktop-only",
+  "pending"
+];
 // Tests are not app code: web keeps its own under __tests__/__e2e__.
 const SKIPPED = /\.(test|spec)\.[cm]?[jt]sx?$|\.d\.ts$/;
 const MODULE = '"<module>"';
@@ -286,6 +293,21 @@ export function parseAllowlist(json) {
 }
 
 const read = (file) => fs.readFileSync(file, "utf8");
+
+/**
+ * What makes the CI check fail: every divergent or desktop-only file with no
+ * allowlist entry. Empty when the tree is clean.
+ */
+export function checkFailures(report) {
+  return [
+    ...report.divergent
+      .filter((d) => !d.allowed)
+      .map((d) => `${d.desktop}: +${d.added} -${d.removed} lines vs web`),
+    ...report.desktopOnly
+      .filter((o) => !o.allowed)
+      .map((o) => `${o.desktop}: no web counterpart`)
+  ];
+}
 
 /** Builds the whole report. Paths in it are relative to the desktop app root. */
 export function buildReport({ appSrc, webSrc, allowlist }) {
