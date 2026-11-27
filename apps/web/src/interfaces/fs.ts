@@ -188,6 +188,15 @@ export async function hashStream(
   return { type: "xxh64", hash: hasher.digest("hex") };
 }
 
+export async function hashFile(file: File) {
+  const reader = file.stream().getReader();
+  try {
+    return (await hashStream(reader)).hash;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 async function readEncrypted<TOutputFormat extends DataFormat>(
   filename: string,
   key: SerializedKey,

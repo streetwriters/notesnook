@@ -24,6 +24,7 @@ import { showFilePicker } from "../../utils/file-picker";
 import { Attachment } from "@notesnook/editor";
 import {
   getUploadedFileSize,
+  hashFile,
   hashStream,
   writeEncryptedFile
 } from "../../interfaces/fs";
@@ -90,15 +91,6 @@ export async function reuploadAttachment(
   } else {
     const file = await pickFile(selectedFile, options);
     if (!file) return;
-  }
-}
-
-async function hashFile(file: File) {
-  const reader = file.stream().getReader();
-  try {
-    return (await hashStream(reader)).hash;
-  } finally {
-    reader.releaseLock();
   }
 }
 
