@@ -392,7 +392,7 @@ function Sidebar(props: SidebarProps) {
               key={item.id}
               icon={item.icon}
               title={item.title}
-              onPress={() => {
+              onClick={() => {
                 onRouteChange(item.id);
                 setRoute(item.id);
               }}

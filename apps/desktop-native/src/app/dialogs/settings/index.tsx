@@ -356,7 +356,7 @@ function SettingsSideBar(props: {
                       icon={section.icon}
                       title={section.title}
                       selected={section.key === props.route}
-                      onPress={() => props.onNavigate(section.key)}
+                      onClick={() => props.onNavigate(section.key)}
                     />
                   ) : null
                 )}
