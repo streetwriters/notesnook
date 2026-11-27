@@ -569,7 +569,7 @@
     {
       "path": "views/email-confirmed.tsx",
       "category": "platform",
-      "reason": "Redirects through hardNavigate (no window.location) and lays out with the native Flex/ScrollContainer instead of overflowY on a div."
+      "reason": "Redirects through hardNavigate (no window.location), since the native host has no browser location."
     },
     {
       "path": "views/app-lock.tsx",
@@ -579,7 +579,7 @@
     {
       "path": "views/checkout.tsx",
       "category": "platform",
-      "reason": "Checkout page of the native host: validates the plan without zod, draws the logo with <Logo>, and uses kit colour tokens/borders; web's ReactNativeWebView bridge and CSS-only sizes have no native counterpart."
+      "reason": "Checkout page of the native host: validates the plan without zod and draws the logo with <Logo>; web's ReactNativeWebView bridge has no native counterpart."
     },
     {
       "path": "views/payments.tsx",
@@ -589,7 +589,7 @@
     {
       "path": "views/recovery.tsx",
       "category": "platform",
-      "reason": "Native has no history.replaceState/window.open (uses hardNavigate), no <input type=radio> (drawn with Flex/Box) and lays out with kit tokens instead of CSS strings."
+      "reason": "Native has no history.replaceState/window.open (uses hardNavigate) and no <input type=radio> (the radio group is drawn as controls)."
     },
     {
       "path": "views/notes.tsx",
@@ -664,7 +664,7 @@
     {
       "path": "hooks/use-menu.ts",
       "category": "platform",
-      "reason": "Menus are presented by the kit's menu presenter with a native anchor; the Electron native-menu bridge and PositionOptions do not exist."
+      "reason": "Menus are presented from a native anchor; the Electron native-menu bridge and PositionOptions do not exist."
     },
     {
       "path": "hooks/use-escape.ts",
@@ -819,7 +819,7 @@
     {
       "path": "utils/toast.ts",
       "category": "platform",
-      "reason": "Toasts are rendered by the kit's native toast host; web uses react-hot-toast components (JSX)."
+      "reason": "Toasts are rendered by the native host, since react-hot-toast is a DOM component library."
     },
     {
       "path": "utils/updater.ts",
