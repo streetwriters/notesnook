@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { initTRPC } from "@trpc/server";
-import { createWriteStream, mkdirSync } from "node:fs";
+import { createWriteStream, mkdirSync, type WriteStream } from "node:fs";
+import { rm } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { config } from "../utils/config";
@@ -27,20 +28,32 @@ import { app } from "electron";
 
 const t = initTRPC.create();
 
-const activeStreams = new Map<string, NodeJS.WritableStream>();
+const activeStreams = new Map<string, { stream: WriteStream; path: string }>();
 
 function generateId() {
   return Math.random().toString(36).slice(2);
 }
 
 function getStreamOrThrow(id: string, operation: "write" | "close") {
-  const stream = activeStreams.get(id);
-  if (!stream) {
+  const entry = activeStreams.get(id);
+  if (!entry) {
     throw new Error(
       `Backup stream not found during ${operation}. The stream may have already been closed or was never opened. Stream id: ${id}`
     );
   }
-  return stream;
+  return entry.stream;
+}
+
+async function discard(id: string) {
+  const entry = activeStreams.get(id);
+  if (!entry) return;
+  activeStreams.delete(id);
+  await new Promise<void>((resolve) => {
+    if (entry.stream.closed) return resolve();
+    entry.stream.once("close", () => resolve());
+    entry.stream.destroy();
+  });
+  await rm(entry.path, { force: true });
 }
 
 export const backupsRouter = t.router({
@@ -68,20 +81,28 @@ export const backupsRouter = t.router({
 
       mkdirSync(resolvedBackupDir, { recursive: true });
       const stream = createWriteStream(backupPath, { encoding: "utf-8" });
+      // A failed write also emits "error"; without a listener that would be
+      // an uncaught exception. The write mutation handles cleanup.
+      stream.on("error", (e) => console.error("Backup stream error", e));
       const id = generateId();
-      activeStreams.set(id, stream);
+      activeStreams.set(id, { stream, path: backupPath });
       return id;
     }),
 
   write: t.procedure
     .input(z.object({ id: z.string(), chunk: z.string() }))
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       const stream = getStreamOrThrow(input.id, "write");
-      return new Promise<void>((resolve, reject) => {
-        stream.write(Buffer.from(input.chunk, "base64"), (err) =>
-          err ? reject(err) : resolve()
-        );
-      });
+      try {
+        await new Promise<void>((resolve, reject) => {
+          stream.write(Buffer.from(input.chunk, "base64"), (err) =>
+            err ? reject(err) : resolve()
+          );
+        });
+      } catch (e) {
+        await discard(input.id);
+        throw e;
+      }
     }),
 
   close: t.procedure
@@ -94,12 +115,16 @@ export const backupsRouter = t.router({
           resolve();
         });
       });
-    })
+    }),
+
+  abort: t.procedure
+    .input(z.object({ id: z.string() }))
+    .mutation(({ input }) => discard(input.id))
 });
 
 app.on("before-quit", () => {
   try {
-    for (const stream of activeStreams.values()) {
+    for (const { stream } of activeStreams.values()) {
       stream.end();
     }
   } catch {
