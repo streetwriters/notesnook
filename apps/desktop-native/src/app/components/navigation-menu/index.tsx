@@ -108,7 +108,7 @@ import {
   type Icon
 } from "../icons";
 import { showSortMenu } from "../group-header";
-import { UserProfileMinimal } from "../user-profile";
+import { UserProfile } from "../../dialogs/settings/components/user-profile";
 import { Logo } from "./logo";
 import { NavigationItem } from "./navigation-item";
 import { TabItem } from "./tab-item";
@@ -495,7 +495,7 @@ function ProfileButton() {
             {
               type: "popup",
               key: "profile",
-              component: UserProfileMinimal
+              component: () => <UserProfile minimal />
             },
             { type: "separator", key: "sep" },
             {

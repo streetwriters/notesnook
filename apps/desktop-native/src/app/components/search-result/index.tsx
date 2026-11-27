@@ -33,6 +33,7 @@ type SearchResultProps = {
 
 function SearchResult(props: SearchResultProps) {
   const { item } = props;
+
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const isExpandable = item.content.length > 0;
   const [isExpanded, setIsExpanded] = useState(isExpandable);
@@ -45,35 +46,33 @@ function SearchResult(props: SearchResultProps) {
         isFocused={isOpened}
         item={item}
         menuItems={menuItems}
-        onMiddleClick={() => {
-          useEditorStore.getState().openSession(item.id, {
-            openInNewTab: true,
-            rawContent: item.rawContent
-          });
-        }}
         onClick={() => {
           useEditorStore.getState().openSession(item.id, {
             rawContent: item.rawContent,
             force: true
           });
         }}
+        onMiddleClick={() => {
+          useEditorStore.getState().openSession(item.id, {
+            openInNewTab: true,
+            rawContent: item.rawContent
+          });
+        }}
         title={
-          <Flex
-            sx={{ flexDirection: "row", alignItems: "center", gap: "small" }}
-          >
+          <Flex sx={{ alignItems: "center", gap: "small" }}>
             {isExpandable && !isCompact ? (
               <Button
-                data-test-id="search-result-expand"
                 variant="secondary"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setIsExpanded((expanded) => !expanded);
-                }}
+                data-test-id="search-result-expand"
                 sx={{
                   bg: "transparent",
                   p: 0,
                   borderRadius: 100,
                   flexShrink: 0
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded((s) => !s);
                 }}
               >
                 {isExpanded ? (
@@ -91,18 +90,19 @@ function SearchResult(props: SearchResultProps) {
             ) : null}
             <Flex
               sx={{
-                flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
                 flex: 1
               }}
             >
               <Text
-                data-test-id="title"
-                variant="body"
+                data-test-id={`title`}
+                variant={"body"}
+                color={isOpened ? "paragraph-selected" : "paragraph"}
                 sx={{
-                  lineClamp: 1,
-                  color: isOpened ? "paragraph-selected" : "paragraph",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                   fontWeight: isCompact ? "bold" : 700
                 }}
               >
@@ -110,6 +110,7 @@ function SearchResult(props: SearchResultProps) {
                   <Match key={match.id} match={match} />
                 ))}
               </Text>
+
               <Text variant="subBody">
                 {item.content?.reduce(
                   (count, next) => next.length + count,
@@ -119,7 +120,11 @@ function SearchResult(props: SearchResultProps) {
             </Flex>
           </Flex>
         }
-        sx={{ my: "small", borderRadius: "default", mx: 1 }}
+        sx={{
+          my: "small",
+          borderRadius: "default",
+          mx: 1
+        }}
       />
       {isExpanded && !isCompact
         ? item.content.map((match, index) => (
@@ -128,13 +133,6 @@ function SearchResult(props: SearchResultProps) {
               isFocused={false}
               item={item}
               menuItems={menuItems}
-              onMiddleClick={() => {
-                useEditorStore.getState().openSession(item.id, {
-                  openInNewTab: true,
-                  rawContent: item.rawContent,
-                  activeSearchResultId: match[0].id
-                });
-              }}
               onClick={() => {
                 useEditorStore.getState().openSession(item.id, {
                   rawContent: item.rawContent,
@@ -142,24 +140,30 @@ function SearchResult(props: SearchResultProps) {
                   activeSearchResultId: match[0].id
                 });
               }}
+              onMiddleClick={() => {
+                useEditorStore.getState().openSession(item.id, {
+                  openInNewTab: true,
+                  rawContent: item.rawContent,
+                  activeSearchResultId: match[0].id
+                });
+              }}
               title={
                 <Text
-                  data-test-id="title"
-                  variant="body"
+                  data-test-id={`title`}
+                  variant={"body"}
+                  color={isOpened ? "paragraph-selected" : "paragraph"}
                   sx={{
-                    color: isOpened ? "paragraph-selected" : "paragraph",
                     whiteSpace: "pre-wrap"
                   }}
                 >
-                  {match.map((part) => (
-                    <Match key={part.id} match={part} />
+                  {match.map((match) => (
+                    <Match key={match.id} match={match} />
                   ))}
                 </Text>
               }
               sx={{
                 px: 1,
-                borderBottom: "1px solid",
-                borderBottomColor: "border",
+                borderBottom: "1px solid var(--border)",
                 mx: 1
               }}
             />
@@ -176,10 +180,7 @@ function Match({ match }: { match: TMatch }) {
     <>
       <Text>{match.prefix}</Text>
       <Text
-        sx={{
-          bg: "accent-secondary",
-          color: "accentForeground-secondary"
-        }}
+        sx={{ bg: "accent-secondary", color: "accentForeground-secondary" }}
       >
         {match.match}
       </Text>

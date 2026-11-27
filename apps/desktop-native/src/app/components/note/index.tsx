@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo, type ReactNode } from "react";
+import React from "react";
 import {
   areFeaturesAvailable,
   exportContent,
@@ -123,15 +123,16 @@ type NoteProps = NoteResolvedData & {
   item: NoteType;
   context?: Context;
   date: number;
-  index?: number;
   compact?: boolean;
   sx?: SxProp;
+  index?: number;
 };
 
-const FALLBACK_PRIMARY = "accent-selected";
-
+// The kit has no alpha() from @theme-ui/color: a note's colour is drawn as a
+// data colour, with the alpha written into the hex code.
 function toDataColor(colorCode: string | undefined, alpha = ""): ColorValue {
-  if (!colorCode || !/^#[0-9a-f]{6}$/i.test(colorCode)) return FALLBACK_PRIMARY;
+  if (!colorCode || !/^#[0-9a-f]{6}$/i.test(colorCode))
+    return "accent-selected";
   return dataColor(colorCode + alpha);
 }
 
@@ -173,27 +174,31 @@ function Note(props: NoteProps) {
 
   return (
     <ListItem
-      draggable
       index={props.index}
+      draggable={true}
       isFocused={isOpened}
       isCompact={compact}
       item={note}
       title={
         <Flex
           sx={{
-            flexDirection: "row",
             alignItems: "center",
             gap: "spacing3",
             minWidth: 0
           }}
         >
-          {color ? <Circle size={10} color={primary} /> : null}
+          {color && (
+            <Circle size={10} color={primary} sx={{ width: 10, height: 10 }} />
+          )}
           <Text
-            data-test-id="title"
+            dir="auto"
+            data-test-id={`title`}
             sx={{
-              lineClamp: 1,
               color: "heading",
               minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               fontWeight: 600,
               fontSize: compact ? "xs" : "sm"
             }}
@@ -222,11 +227,12 @@ function Note(props: NoteProps) {
         py: "spacing4",
         px: "spacing6",
         pl: 13,
-        gap: "spacing4",
+        height: compact ? "auto" : undefined,
         borderBottom: "1px solid",
-        borderBottomColor: "border",
         borderLeft: "2px solid",
         borderLeftColor: isOpened ? primary : "transparent",
+        borderBottomColor: "border",
+        gap: "spacing4",
         ...sx
       }}
       context={{ color, locked }}
@@ -239,7 +245,6 @@ function Note(props: NoteProps) {
         compact || !hasMetadata ? undefined : (
           <Flex
             sx={{
-              flexDirection: "row",
               alignItems: "center",
               flexWrap: "wrap",
               gap: "spacing2",
@@ -253,11 +258,11 @@ function Note(props: NoteProps) {
       footer={
         <Flex
           sx={{
-            flexDirection: "row",
             alignItems: "center",
+            color: "paragraph-secondary",
             flexShrink: 0,
             gap: "spacing2",
-            justifyContent: compact ? "flex-end" : "flex-start"
+            justifyContent: compact ? "flex-end" : undefined
           }}
         >
           {compact ? (
@@ -289,13 +294,7 @@ function Note(props: NoteProps) {
             </>
           ) : (
             <>
-              <Flex
-                sx={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "spacing3"
-                }}
-              >
+              <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
                 <NoteCalendar size={12} color="icon-secondary" />
                 <Text
                   sx={{
@@ -330,7 +329,7 @@ function Note(props: NoteProps) {
   );
 }
 
-export default memo(Note, function (prevProps, nextProps) {
+export default React.memo(Note, function (prevProps, nextProps) {
   const prevItem = prevProps.item;
   const nextItem = nextProps.item;
   return (
@@ -348,12 +347,10 @@ export default memo(Note, function (prevProps, nextProps) {
   );
 });
 
-function createColorIcon(colorCode: string): Icon {
-  const color = toDataColor(colorCode);
-  return function ColorIcon(props) {
-    return <Circle {...props} color={color} />;
-  };
-}
+// const pin = (note: Note) => {
+//   return store
+//     .pin(note.id);
+// };
 
 const getFormats = () => [
   ...(environment.features.print
@@ -392,6 +389,7 @@ export const noteMenuItems: (
   ids?: string[],
   context?: { color?: Color; locked?: boolean }
 ) => Promise<MenuItem[]> = async (note, ids = [], context) => {
+  // const isSynced = db.notes.note(note.id)?.synced();
   const features = await areFeaturesAvailable(["expiringNotes"]);
   return [
     {
@@ -432,6 +430,7 @@ export const noteMenuItems: (
     {
       type: "button",
       key: "lock",
+      //isDisabled: !isSynced,
       title: strings.lock(),
       isChecked: context?.locked,
       iconComponent: Lock,
@@ -494,6 +493,7 @@ export const noteMenuItems: (
       key: "print",
       isHidden: !environment.features.print,
       title: strings.print(),
+      //isDisabled: !isSynced,
       iconComponent: Printer,
       onClick: async () => {
         await exportNote(note, {
@@ -569,6 +569,7 @@ export const noteMenuItems: (
       key: "export",
       title: strings.exportAs(),
       iconComponent: Upload,
+      //isDisabled: !isSynced,
       menu: {
         items: getFormats().map((format) => ({
           type: "button",
@@ -642,6 +643,7 @@ export const noteMenuItems: (
       type: "button",
       key: "local-only",
       isHidden: !userstore.get().isLoggedIn,
+      //isDisabled: !isSynced,
       title: strings.syncOff(),
       isChecked: note.localOnly,
       iconComponent: note.localOnly ? CloudSlash : Cloud,
@@ -711,6 +713,7 @@ export const noteMenuItems: (
       key: "movetotrash",
       title: strings.moveToTrash(),
       variant: "dangerous",
+      icon: Trash.path,
       iconComponent: Trash,
       isDisabled: ids.length === 1 && db.monographs.isPublished(note.id),
       onClick: () => Multiselect.moveNotesToTrash(ids, ids.length > 1),
@@ -960,7 +963,7 @@ function getMetadataItems(props: {
   reminder?: NoteResolvedData["reminder"];
   primary: ColorValue;
   isSelected: boolean;
-}): ReactNode[] {
+}): React.ReactNode[] {
   const {
     note,
     context,
@@ -974,7 +977,7 @@ function getMetadataItems(props: {
   } = props;
   return [
     note.conflicted && <Alert key="conflicted" size={15} color="icon-error" />,
-    note.localOnly && <SyncOff key="local-only" size={15} color="icon" />,
+    note.localOnly && <SyncOff key="local-only" size={15} />,
     note.pinned && <NotePin key="pinned" size={15} color="icon" />,
     locked && (
       <Lock key="locked" size={15} color="icon" data-test-id="locked" />
@@ -991,7 +994,7 @@ function getMetadataItems(props: {
     attachments?.total ? (
       <Flex
         key="attachments-total"
-        sx={{ flexDirection: "row", alignItems: "center", gap: "spacing1" }}
+        sx={{ alignItems: "center", gap: "spacing1" }}
       >
         <NoteLink size={14} color="icon" />
         <Text sx={{ color: "heading", fontSize: "xs" }}>
@@ -1003,7 +1006,7 @@ function getMetadataItems(props: {
       <Flex
         key="attachments-failed"
         title={strings.errorsInAttachments(attachments.failed)}
-        sx={{ flexDirection: "row", alignItems: "center", gap: "spacing1" }}
+        sx={{ alignItems: "center", gap: "spacing1" }}
       >
         <AttachmentError size={13} color="icon-error" />
         <Text sx={{ color: "paragraph", fontSize: "xs" }}>
@@ -1034,7 +1037,8 @@ function getMetadataItems(props: {
         icon={TagIcon}
         text={tag.title}
         title={strings.goToTag(tag.title)}
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           if (!tag.id) return showToast("error", strings.tagNotFound());
 
           appStore.get().setNavigationTab("tags");
@@ -1058,4 +1062,13 @@ function getMetadataItems(props: {
       />
     )
   ].filter(Boolean);
+}
+
+// Desktop menus draw an icon component in its own colour; they do not read
+// styles.icon.color.
+function createColorIcon(colorCode: string): Icon {
+  const color = toDataColor(colorCode);
+  return function ColorIcon(props) {
+    return <Circle {...props} color={color} />;
+  };
 }

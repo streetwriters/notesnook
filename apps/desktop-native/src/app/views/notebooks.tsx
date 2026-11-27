@@ -24,7 +24,7 @@ import type {
 } from "@notesnook/core";
 import { debounce } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Box, Flex } from "@notesnook/ui-kit";
+import { Box, Flex, Input } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
 import { store as selectionStore } from "../stores/selection-store";
@@ -36,7 +36,7 @@ import {
 } from "../components/virtualized-tree";
 import { ListLoader } from "../components/loaders/list-loader";
 import { SidebarPlaceholder } from "../components/placeholders";
-import { FilterField } from "../components/navigation-menu/filter-field";
+import { Funnel } from "../components/icons";
 
 type NotebookNodeData = { notebook: NotebookType; totalNotes: number };
 
@@ -183,10 +183,28 @@ export function Notebooks() {
           </Flex>
         )}
       </Box>
-      <FilterField
-        placeholder={strings.filterNotebooks()}
-        onChangeText={onFilter}
-      />
+      <Flex
+        sx={{
+          alignItems: "center",
+          borderTop: "1px solid var(--separator)",
+          mx: "spacing4",
+          pt: "spacing4"
+        }}
+      >
+        <Input
+          variant="clean"
+          placeholder={strings.filterNotebooks()}
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 0,
+            fontSize: "xs",
+            color: "paragraph"
+          }}
+          onChange={(e) => onFilter(e.target.value)}
+        />
+        <Funnel size={13} color="icon-secondary" />
+      </Flex>
     </>
   );
 }

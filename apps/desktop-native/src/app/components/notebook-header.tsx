@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatDate } from "@notesnook/common";
 import type { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text, type UIElement } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate, navigate } from "../navigation";
 import {
@@ -88,9 +88,7 @@ export function NotebookHeader(props: {
       <Flex sx={{ flexDirection: "column", gap: "spacing6" }}>
         <NotebookCrumbs notebook={notebook} />
         <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
-          <Flex
-            sx={{ flexDirection: "row", alignItems: "center", gap: "spacing3" }}
-          >
+          <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
             <NotebookIcon size={17} color="icon" />
             <Text
               data-test-id="notebook-title"
@@ -106,18 +104,12 @@ export function NotebookHeader(props: {
           )}
         </Flex>
       </Flex>
-      <Flex
-        sx={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between"
-        }}
-      >
-        <Flex
-          sx={{ flexDirection: "row", alignItems: "center", gap: "spacing2" }}
-        >
+      <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Flex sx={{ alignItems: "center", gap: "spacing2" }}>
           <NoteCalendar size={13} color="icon-secondary" />
-          <Text sx={{ fontSize: "3xs", color: "paragraph", lineHeight: 1.25 }}>
+          <Text
+            sx={{ fontSize: "3xs", color: "paragraph", lineHeight: "125%" }}
+          >
             {formatDate(notebook.dateEdited, { type: "date", dateFormat })}
           </Text>
           <Text sx={{ fontSize: "3xs", color: "icon-disabled" }}>•</Text>
@@ -125,9 +117,7 @@ export function NotebookHeader(props: {
             {strings.notes(totalNotes || 0)}
           </Text>
         </Flex>
-        <Flex
-          sx={{ flexDirection: "row", alignItems: "center", gap: "spacing4" }}
-        >
+        <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
           <Button
             variant="icon"
             sx={{ p: 0 }}
@@ -153,7 +143,7 @@ export function NotebookHeader(props: {
 }
 
 function NotebookCrumbs(props: { notebook: Notebook }) {
-  const moreCrumbsRef = useRef<UIElement>(null);
+  const moreCrumbsRef = useRef<HTMLButtonElement>(null);
   const [crumbs, setCrumbs] = useState<{ id: string; title: string }[]>([]);
 
   useEffect(() => {
@@ -167,34 +157,40 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
   }
 
   return (
-    <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
+    <Flex sx={{ alignItems: "center" }}>
       <CrumbText
         onClick={() => navigateCrumb(crumbs[0]?.id)}
         text={crumbs[0]?.title}
       />
-      <CaretRight color="icon-secondary" sx={{ mx: "spacing2" }} size={11} />
+      <CaretRight sx={{ color: "icon-secondary", mx: "spacing2" }} size={11} />
       {crumbs.length > 3 && (
-        <Fragment>
+        <>
           <Button
             ref={moreCrumbsRef}
             variant="icon"
             sx={{ p: 0, flexShrink: 0 }}
             onClick={() => {
-              const rect = moreCrumbsRef.current?.getBoundingClientRect();
-              if (!rect) return;
-              const { x, y, width, height } = rect;
+              if (!moreCrumbsRef.current) return;
               Menu.openMenu(
                 crumbs
                   .slice(1, -2)
                   .reverse()
                   .map((c) => ({
-                    type: "button" as const,
+                    type: "button",
                     title: c.title,
                     key: c.id,
                     iconComponent: NotebookIcon,
                     onClick: () => navigateCrumb(c.id)
                   })),
-                { position: { x, y, width, height } }
+                {
+                  position: {
+                    target: moreCrumbsRef.current,
+                    location: "below",
+                    isTargetAbsolute: true,
+                    align: "start",
+                    yOffset: 10
+                  }
+                }
               );
             }}
           >
@@ -202,23 +198,25 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
           </Button>
           <CaretRight
             sx={{ color: "icon-secondary", mx: "spacing2" }}
+            as="span"
             size={11}
           />
-        </Fragment>
+        </>
       )}
       {crumbs.slice(crumbs.length > 2 ? -2 : -1).map((crumb, index, array) => (
-        <Fragment key={crumb.id}>
+        <>
           <CrumbText
             onClick={() => navigateCrumb(crumb.id)}
             text={crumb.title}
           />
           {index === array.length - 1 ? null : (
             <CaretRight
+              as="span"
               sx={{ color: "icon-secondary", mx: "spacing2" }}
               size={11}
             />
           )}
-        </Fragment>
+        </>
       ))}
     </Flex>
   );
@@ -229,6 +227,7 @@ function CrumbText(props: { text: string; onClick: () => void }) {
     <Text
       sx={{
         fontSize: "3xs",
+        textDecoration: "none",
         color: "paragraph-secondary",
         whiteSpace: "nowrap",
         textOverflow: "ellipsis",

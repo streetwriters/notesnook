@@ -23,7 +23,14 @@ import { Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
 import IconTag from "../icon-tag";
 import TimeAgo from "../time-ago";
-import { ClockCounterClockwise, Note, Notebook, Trash } from "../icons";
+import {
+  ClockCounterClockwise,
+  DeleteForver,
+  Note,
+  Notebook,
+  Restore,
+  Trash
+} from "../icons";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { Multiselect } from "../../common/multi-select";
@@ -38,16 +45,19 @@ function TrashItem(props: TrashItemProps) {
 
   return (
     <ListItem
-      index={props.index}
       isFocused={isOpened}
       item={item}
+      index={props.index}
       title={
         <Text
-          data-test-id="title"
+          dir="auto"
+          data-test-id={`title`}
           sx={{
-            lineClamp: 1,
             color: "heading",
             minWidth: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
             fontWeight: 600,
             fontSize: "sm"
           }}
@@ -71,16 +81,33 @@ function TrashItem(props: TrashItemProps) {
         gap: "spacing4"
       }}
       header={
-        item.itemType === "note" || item.itemType === "notebook" ? (
-          <Flex sx={{ flexDirection: "row", minWidth: 0 }}>
+        item.itemType === "note" ? (
+          <Flex
+            sx={{
+              minWidth: 0
+            }}
+          >
             <IconTag
-              icon={item.itemType === "note" ? Note : Notebook}
+              icon={Note}
               selected={isSelected || isOpened}
-              text={
-                item.itemType === "note"
-                  ? strings.note()
-                  : strings.dataTypesCamelCase.notebook()
-              }
+              text={strings.note()}
+              iconSize={12}
+              styles={{
+                icon: { color: "icon-secondary" },
+                text: { color: "paragraph" }
+              }}
+            />
+          </Flex>
+        ) : item.itemType === "notebook" ? (
+          <Flex
+            sx={{
+              minWidth: 0
+            }}
+          >
+            <IconTag
+              icon={Notebook}
+              selected={isSelected || isOpened}
+              text={strings.dataTypesCamelCase.notebook()}
               iconSize={12}
               styles={{
                 icon: { color: "icon-secondary" },
@@ -95,15 +122,13 @@ function TrashItem(props: TrashItemProps) {
           sx={{
             gap: "spacing3",
             flexDirection: "row",
+            fontSize: "3xs",
+            color: "paragraph-disabled",
             alignItems: "center"
           }}
         >
           <Trash color="icon-disabled" size={12} />
-          <TimeAgo
-            live={true}
-            datetime={date}
-            sx={{ fontSize: "3xs", color: "paragraph-disabled" }}
-          />
+          <TimeAgo live={true} datetime={date} />
         </Flex>
       }
       menuItems={trashMenuItems}
@@ -119,12 +144,13 @@ export default TrashItem;
 export const trashMenuItems: (
   item: TrashItemType,
   ids?: string[]
-) => MenuItem[] = (_item, ids = []) => {
+) => MenuItem[] = (item, ids = []) => {
   return [
     {
       type: "button",
       key: "restore",
       title: strings.restore(),
+      icon: Restore.path,
       iconComponent: ClockCounterClockwise,
       onClick: () => Multiselect.restoreItemsFromTrash(ids),
       multiSelect: true
@@ -133,6 +159,7 @@ export const trashMenuItems: (
       type: "button",
       key: "delete",
       title: strings.delete(),
+      icon: DeleteForver.path,
       iconComponent: Trash,
       variant: "dangerous",
       onClick: () => Multiselect.deleteItemsFromTrash(ids),

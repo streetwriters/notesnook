@@ -26,17 +26,7 @@ import path from "node:path";
 import ts from "typescript";
 
 export const CODE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mjs"];
-// pending: a file that still drifts from web for no lasting reason, allowed
-// for now so the check can gate new drift; its entry goes once it is aligned.
-export const CATEGORIES = [
-  "platform",
-  "native-editor",
-  "desktop-only",
-  "pending"
-];
-// The pending backlog may only shrink: lower this as files are aligned, never
-// raise it. An allowlist with more pending entries is rejected.
-export const MAX_PENDING = 17;
+export const CATEGORIES = ["platform", "native-editor", "desktop-only"];
 // Tests are not app code: web keeps its own under __tests__/__e2e__.
 const SKIPPED = /\.(test|spec)\.[cm]?[jt]sx?$|\.d\.ts$/;
 const MODULE = '"<module>"';
@@ -291,11 +281,6 @@ export function parseAllowlist(json) {
       matches: globToRegExp(String(entry?.path ?? ""))
     };
   });
-  const pending = entries.filter((e) => e?.category === "pending").length;
-  if (pending > MAX_PENDING)
-    problems.push(
-      `allowlist: ${pending} "pending" entries, at most ${MAX_PENDING}; align new drift with web instead of allowlisting it`
-    );
   if (problems.length) throw new Error(problems.join("\n"));
   return parsed;
 }

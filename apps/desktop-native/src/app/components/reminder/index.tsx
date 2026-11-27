@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo } from "react";
+import React from "react";
 import dayjs from "dayjs";
 import {
   formatDate,
@@ -48,9 +48,12 @@ import { db } from "../../common/db";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { ConfirmDialog } from "../../dialogs/confirm";
-import { EditReminderDialog } from "../../dialogs/add-reminder-dialog";
+import {
+  EditReminderDialog,
+  getReminderRepeatText,
+  getWeekDays
+} from "../../dialogs/add-reminder-dialog";
 import { showToast } from "../../utils/toast";
-import { getReminderRepeatText, getWeekDays } from "./repeat-text";
 
 const PRIORITY_ICON_MAP = {
   silent: BellSimpleSlash,
@@ -64,30 +67,9 @@ type ReminderProps = {
   index?: number;
 };
 
-function ElevatedIcon(props: { children: React.ReactNode }) {
-  return (
-    <Flex
-      sx={{
-        alignItems: "center",
-        bg: "background-secondary",
-        borderRadius: "radius1",
-        height: 20,
-        justifyContent: "center",
-        width: 20,
-        ":group-hover": {
-          group: "list-item",
-          style: { bg: "background-tertiary" }
-        }
-      }}
-    >
-      {props.children}
-    </Flex>
-  );
-}
-
 function Reminder(props: ReminderProps) {
   const { item, compact } = props;
-  const reminder = item;
+  const reminder = item as unknown as ReminderType;
   const PriorityIcon = PRIORITY_ICON_MAP[reminder.priority];
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const timeFormat = useSettingStore((store) => store.timeFormat);
@@ -133,20 +115,12 @@ function Reminder(props: ReminderProps) {
         >
           <Flex
             sx={{
-              flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%"
             }}
           >
-            <Flex
-              sx={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "spacing4",
-                minWidth: 0
-              }}
-            >
+            <Flex sx={{ alignItems: "center", gap: "spacing4", minWidth: 0 }}>
               <Checkbox
                 checked={completed}
                 onToggle={toggleCompleted}
@@ -162,26 +136,35 @@ function Reminder(props: ReminderProps) {
               />
               <Text
                 data-test-id="title"
+                dir="auto"
                 sx={{
-                  lineClamp: 1,
                   color: "heading",
                   fontSize: compact ? "xs" : "sm",
                   fontWeight: compact ? 400 : 600,
-                  textDecorationLine: completed ? "line-through" : "none"
+                  overflow: "hidden",
+                  textDecoration: completed ? "line-through" : "none",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap"
                 }}
               >
                 {reminder.title}
               </Text>
             </Flex>
-            <Flex
-              sx={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "spacing3",
-                flexShrink: 0
-              }}
-            >
-              <ElevatedIcon>
+            <Flex sx={{ alignItems: "center", gap: "spacing3", flexShrink: 0 }}>
+              <Flex
+                sx={{
+                  ":group-hover": {
+                    group: "list-item",
+                    style: { backgroundColor: "background-tertiary" }
+                  },
+                  alignItems: "center",
+                  backgroundColor: "background-secondary",
+                  borderRadius: "radius1",
+                  height: 20,
+                  justifyContent: "center",
+                  width: 20
+                }}
+              >
                 {reminder.disabled ? (
                   <ReminderOff
                     data-test-id="disabled"
@@ -189,13 +172,26 @@ function Reminder(props: ReminderProps) {
                     color="icon-secondary"
                   />
                 ) : (
-                  <PriorityIcon size={11} color="icon" />
+                  <PriorityIcon size={11} />
                 )}
-              </ElevatedIcon>
+              </Flex>
               {reminder.mode === "repeat" && (
-                <ElevatedIcon>
-                  <ArrowCounterClockwise size={11} color="icon" />
-                </ElevatedIcon>
+                <Flex
+                  sx={{
+                    ":group-hover": {
+                      group: "list-item",
+                      style: { backgroundColor: "background-tertiary" }
+                    },
+                    alignItems: "center",
+                    backgroundColor: "background-secondary",
+                    borderRadius: "radius1",
+                    height: 20,
+                    justifyContent: "center",
+                    width: 20
+                  }}
+                >
+                  <ArrowCounterClockwise size={11} />
+                </Flex>
               )}
             </Flex>
           </Flex>
@@ -204,12 +200,16 @@ function Reminder(props: ReminderProps) {
       body={
         !compact && reminder.description ? (
           <Text
+            as="p"
             data-test-id="description"
+            dir="auto"
             sx={{
-              lineClamp: 1,
               ml: "spacing8",
               color: "paragraph",
-              fontSize: "xs"
+              fontSize: "xs",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
             }}
           >
             {reminder.description}
@@ -227,15 +227,17 @@ function Reminder(props: ReminderProps) {
         }
       }}
       sx={{
-        borderBottom: compact ? "none" : "1px solid",
+        borderBottom: "1px solid",
         borderBottomColor: "separator",
-        gap: compact ? "spacing1" : "spacing4",
+        gap: "spacing4",
         px: "spacing6",
         py: "spacing4",
         opacity: completed ? 0.5 : 1,
         ...(compact && {
           borderRadius: "radius1",
-          p: "spacing2"
+          p: "spacing2",
+          border: "none",
+          gap: "spacing1"
         })
       }}
       footer={
@@ -252,7 +254,7 @@ function Reminder(props: ReminderProps) {
               color:
                 group === "Past" ? "paragraph-error" : "paragraph-secondary",
               fontSize: "3xs",
-              textDecorationLine: completed ? "line-through" : "none"
+              textDecoration: completed ? "line-through" : "none"
             }}
           >
             {reminderDate}
@@ -260,12 +262,7 @@ function Reminder(props: ReminderProps) {
           {!compact && reminder.mode === "repeat" && reminder.recurringMode && (
             <Flex
               data-test-id="recurring-mode"
-              sx={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: "spacing3",
-                width: "100%"
-              }}
+              sx={{ alignItems: "center", gap: "spacing3", width: "100%" }}
             >
               <ArrowsClockwise size={11} color="icon-secondary" />
               <Text sx={{ color: "paragraph-secondary", fontSize: "3xs" }}>
@@ -295,7 +292,7 @@ function Reminder(props: ReminderProps) {
   );
 }
 
-export default memo(Reminder, (prev, next) => {
+export default React.memo(Reminder, (prev, next) => {
   return (
     prev.item.dateModified === next.item.dateModified &&
     prev.item.completedAt === next.item.completedAt

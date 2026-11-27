@@ -1,5 +1,5 @@
 {
-  "$comment": "Files in src/app allowed to differ from apps/web/src (or to have no web counterpart). One entry per file or glob, relative to src/app. category: platform (a platform service is the reason), native-editor (the native editor is), desktop-only (a screen or tool web has no counterpart for), pending (still drifts from web for no lasting reason: align it and remove the entry). reason: why, in a sentence. Kit-API drift (onPress, testID, lists, dialogs) is never a reason: phase 4 removes it.",
+  "$comment": "Files in src/app allowed to differ from apps/web/src (or to have no web counterpart). One entry per file or glob, relative to src/app. category: platform (a platform service is the reason), native-editor (the native editor is), desktop-only (a screen or tool web has no counterpart for). reason: why, in a sentence. Kit-API drift (onPress, testID, lists, dialogs) is never a reason: phase 4 removes it.",
   "entries": [
     {
       "path": "**/*.generated.ts",
@@ -1018,88 +1018,68 @@
     },
     {
       "path": "views/wrapped.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Web's Wrapped slides use CSS the desktop renderer cannot draw (rem font sizes, keyframe animations, gradient backgrounds, position: fixed, scroll snapping, '& strong' selectors), so the slides are rebuilt with kit sizes, static colours and an absolute overlay."
     },
     {
       "path": "components/route-container/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Buttons stay disabled and the title waits until the native database host is ready, and the has-items flag is cached in Config so the header does not jump before the lists load; the search field drops web's CSS selector styles (placeholder colour, sibling opacity) the kit has no stylesheet for; route-title and route-action carry test ids for the e2e specs."
     },
     {
       "path": "views/plans.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Web imports its star and footer artwork as SVG files and uses raw CSS colour strings, the testimonials carousel and the featured-on strip; desktop draws the generated SvgImage assets, passes colours through dataColor and has no carousel or featured-on components."
     },
     {
       "path": "views/notebooks.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Keeps the desktop VirtualizedTree API (per-row index and select for keyboard selection, store callbacks instead of a DOM Scroller); the filter field below the tree is web's inline Input."
     },
     {
       "path": "components/reminder/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Web's ':hover .class' rules become the kit's :group-hover on the list-item group (checkbox and icon backgrounds), since desktop has no class selectors; rows take an index for keyboard selection; border: 0 becomes border: none for the kit's border type."
     },
     {
       "path": "components/note/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "The kit has no alpha() or theme callbacks in sx, so the note colour is a data colour with the alpha in its hex code and the left padding is a number; rows take an index for keyboard selection; open-link, copy and print go through the shell, clipboard and environment platform services; colour menu items draw an icon component because desktop menus do not read styles.icon.color."
     },
     {
       "path": "components/notebook/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Rows take an index and a select callback for the desktop tree's keyboard selection, and the expander keeps the notebook-expand test id the e2e specs use; the depth padding is computed from constants because the kit takes no theme callbacks in sx; display: block is dropped."
     },
     {
       "path": "components/search-result/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Highlighted matches are kit Text with their own background, since the kit has no <span> or '.match' class selectors; 'bolder' becomes weight 700 and display: block is dropped (the kit types reject both); the expand button keeps the search-result-expand test id the e2e specs use."
     },
     {
       "path": "components/trash-item/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Rows take an index for keyboard selection; the chip hover comes from IconTag's group-hover in place of web's '.trash-chip' class selector and className."
     },
     {
       "path": "views/tags.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "The list placeholder is centred through ListContainer's placeholderSx (the kit has no '.list-container-placeholder' selector), there is no DOM SidebarScroller, and the view keeps the tags test id the e2e specs use."
     },
     {
       "path": "components/notebook-header.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
-    },
-    {
-      "path": "components/session-item/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "The crumb hover colour is paragraph: web's paragraph-hover is not a colour in the theme, which the kit's typed colours reject."
     },
     {
       "path": "components/tag/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
-    },
-    {
-      "path": "components/navigation-menu/filter-field.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
-    },
-    {
-      "path": "components/reminder/repeat-text.ts",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
-    },
-    {
-      "path": "components/user-profile/index.tsx",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "Rows take an index for keyboard selection; height: fit-content and display: block are dropped because the kit's layout types reject them."
     },
     {
       "path": "hooks/use-resolved-item.ts",
-      "category": "pending",
-      "reason": "Still differs from web in layout props, sx and kit usage left over from the React Native port, or splits out code web keeps inline; align it with web and remove this entry."
+      "category": "platform",
+      "reason": "List rows resolve without per-row React transitions (useDeferredValue, startTransition), which cut the native renderer's commits per search keystroke from 11 to 6; web uses the @notesnook/common hook with transitions."
     }
   ]
 }

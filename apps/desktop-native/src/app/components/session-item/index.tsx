@@ -36,46 +36,49 @@ export function SessionItem(props: SessionItemProps) {
   return (
     <Flex
       key={session.id}
-      data-test-id="session-item"
-      title={strings.clickToPreview()}
-      onClick={() =>
-        useEditorStore.getState().openDiffSession(noteId, session.id)
-      }
+      data-test-id={`session-item`}
       sx={{
-        flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         p: "spacing2",
         borderRadius: "radius1",
         cursor: "pointer",
         bg: "transparent",
-        ":hover": { bg: "hover" }
+        ":hover": {
+          bg: "hover"
+        }
       }}
+      title={strings.clickToPreview()}
+      onClick={() =>
+        useEditorStore.getState().openDiffSession(noteId, session.id)
+      }
     >
       <Text
         data-test-id="title"
-        sx={{ lineClamp: 1, color: "paragraph", fontSize: "xs", lineHeight: 1 }}
+        sx={{
+          color: "paragraph",
+          fontSize: "xs",
+          lineHeight: 1,
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+          overflow: "hidden"
+        }}
       >
         {label}
       </Text>
       <Flex
         sx={{
-          flexDirection: "row",
           ml: "spacing2",
           alignItems: "center",
           gap: "spacing2",
+          color: "paragraph",
+          fontSize: "3xs",
+          lineHeight: 1,
           flexShrink: 0
         }}
       >
-        {session.locked && (
-          <Lock size={11} color="icon" data-test-id="locked" />
-        )}
-        <TimeAgo
-          live
-          datetime={session.dateModified}
-          locale="en_short"
-          sx={{ color: "paragraph", fontSize: "3xs", lineHeight: 1 }}
-        />
+        {session.locked && <Lock size={11} data-test-id="locked" />}
+        <TimeAgo live datetime={session.dateModified} locale={"en_short"} />
       </Flex>
     </Flex>
   );

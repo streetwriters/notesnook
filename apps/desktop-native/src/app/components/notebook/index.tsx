@@ -66,23 +66,24 @@ import { useDragHandler } from "../../hooks/use-drag-handler";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 
+// The kit takes no theme callbacks in sx: these are spacing2, spacing3 and the
+// caret size that web's callback reads from the theme.
 const ICON_SIZE = 11;
 const SPACING2 = 5;
 const SPACING3 = 7;
 
 type NotebookProps = {
   item: NotebookType;
-  index?: number;
   totalNotes?: number;
   isExpandable?: boolean;
   isExpanded?: boolean;
   expand?: () => void;
   collapse?: () => void;
   refresh?: () => void;
-  select?: (event?: UIMouseEvent) => void;
   depth?: number;
+  index?: number;
+  select?: (event?: UIMouseEvent) => void;
 };
-
 export function Notebook(props: NotebookProps) {
   const {
     item,
@@ -96,87 +97,78 @@ export function Notebook(props: NotebookProps) {
     select = () => {}
   } = props;
   const context = useNotesStore((store) => store.context);
-  const dragTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  );
-  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
   const isOpened = context?.type === "notebook" && context.id === item.id;
   const contextNotes = useNotesStore((store) => store.contextNotes);
   const currentContext = isOpened ? contextNotes : null;
+  const dragTimeout = useRef(0);
+  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
   return (
     <ListItem
-      index={props.index}
+      draggable
       isFocused={isOpened}
       isCompact
       item={item}
-      draggable
-      onDragEnter={(event) => {
-        if (!isDragEntering(event)) return;
-        dragTimeout.current = setTimeout(() => expand(), 700);
+      index={props.index}
+      onClick={(e) => {
+        select(e);
+        navigate(`/notebooks/${item.id}`);
       }}
-      onDragLeave={(event) => {
-        if (!isDragLeaving(event)) return;
+      onDragEnter={(e) => {
+        if (!isDragEntering(e)) return;
+        e.currentTarget.focus();
+
+        dragTimeout.current = setTimeout(() => {
+          expand();
+        }, 700) as unknown as number;
+      }}
+      onDragLeave={(e) => {
+        if (!isDragLeaving(e)) return;
         clearTimeout(dragTimeout.current);
       }}
-      onDrop={(event) => {
+      onDrop={async (e) => {
         clearTimeout(dragTimeout.current);
-        handleDrop(event.dataTransfer, item);
+        handleDrop(e.dataTransfer, item);
       }}
-      menuItems={notebookMenuItems}
-      context={{ refresh, isRoot: depth === 0 }}
       onKeyPress={async (e) => {
-        if (e.key === " ") {
+        if (e.code === "Space") {
           e.stopPropagation();
           if (isExpandable) isExpanded ? collapse() : expand();
           else navigate(`/notebooks/${item.id}`);
-        } else if (e.key === "Delete") {
+        } else if (e.code === "Delete") {
           e.stopPropagation();
           await Multiselect.moveNotebooksToTrash(
             useSelectionStore.getState().selectedItems
           );
         }
       }}
-      onClick={(event) => {
-        select(event);
-        navigate(`/notebooks/${item.id}`, { notify: true });
-      }}
       title={
-        <Flex
-          sx={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "spacing3",
-            minWidth: 0
-          }}
-        >
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
           {isExpandable ? (
             <Button
-              data-test-id="notebook-expand"
               variant="secondary"
-              onClick={(event) => {
-                select(event);
-                if (isExpanded) collapse();
-                else expand();
-              }}
+              data-test-id="notebook-expand"
               sx={{
                 bg: "transparent",
                 p: 0,
                 borderRadius: "radius1",
-                width: ICON_SIZE,
-                height: ICON_SIZE,
-                alignItems: "center",
-                justifyContent: "center"
+                width: 11,
+                height: 11
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                select(e);
+                isExpanded ? collapse() : expand();
               }}
             >
               <CaretDown
-                size={ICON_SIZE}
+                size={11}
                 color={isOpened ? "icon-selected" : "icon"}
-                rotate={isExpanded ? undefined : -90}
+                sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
               />
             </Button>
           ) : (
-            <Box sx={{ width: ICON_SIZE, height: ICON_SIZE }} />
+            <Box sx={{ width: 11, height: 11 }} />
           )}
           {depth === 0 ? (
             <NotebookIcon
@@ -185,11 +177,13 @@ export function Notebook(props: NotebookProps) {
             />
           ) : null}
           <Text
-            data-test-id="title"
-            variant="body"
+            data-test-id={`title`}
+            variant={"body"}
+            color={isOpened ? "paragraph-selected" : "paragraph"}
             sx={{
-              lineClamp: 1,
-              color: isOpened ? "paragraph-selected" : "paragraph",
+              whiteSpace: "pre",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
               fontWeight: "normal",
               fontSize: "xs",
               minWidth: 0
@@ -202,23 +196,21 @@ export function Notebook(props: NotebookProps) {
       footer={
         <Text
           variant="subBody"
-          sx={{
-            fontSize: "3xs",
-            lineHeight: 1,
-            color: isOpened ? "paragraph" : "paragraph-secondary"
-          }}
+          color={isOpened ? "paragraph" : "paragraph-secondary"}
+          sx={{ fontSize: "3xs", lineHeight: 1 }}
         >
-          {currentContext ? currentContext.length : totalNotes}
+          {currentContext ? currentContext?.length : totalNotes}
         </Text>
       }
+      menuItems={notebookMenuItems}
+      context={{ refresh, isRoot: depth === 0 }}
       sx={{
         pr: "spacing2",
         py: "spacing4",
         borderRadius: "radius1",
+        height: "100%",
         mb: "spacing1",
-        pl: `${
-          depth === 0 ? SPACING2 : SPACING2 + (depth * ICON_SIZE + SPACING3)
-        }px`
+        pl: depth === 0 ? SPACING2 : SPACING2 + (depth * ICON_SIZE + SPACING3)
       }}
     />
   );

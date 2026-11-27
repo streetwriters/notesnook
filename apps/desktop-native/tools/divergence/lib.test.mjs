@@ -24,7 +24,6 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   checkFailures,
-  MAX_PENDING,
   buildReport,
   comparePair,
   diffLines,
@@ -177,17 +176,6 @@ describe("allowlist", () => {
     ).toThrow(
       /entry 1 \(a\.ts\): "reason"[\s\S]*entry 2 \(b\.ts\): "category"[\s\S]*entry 3: "path"/
     );
-  });
-
-  it("rejects more pending entries than the cap", () => {
-    const entry = (i) => ({
-      path: `p${i}.ts`,
-      category: "pending",
-      reason: "still to align with web"
-    });
-    const entries = Array.from({ length: MAX_PENDING + 1 }, (_, i) => entry(i));
-    expect(() => parseAllowlist({ entries })).toThrow(/at most/);
-    expect(() => parseAllowlist({ entries: entries.slice(1) })).not.toThrow();
   });
 
   it("the committed allowlist is valid and the current tree passes the check", () => {

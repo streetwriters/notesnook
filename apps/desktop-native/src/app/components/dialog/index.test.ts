@@ -82,7 +82,10 @@ test("renders through the kit's Modal, in the dialog theme scope", async () => {
   const onOpen = vi.fn();
   const onClose = vi.fn();
   const view = await render(
-    dialog({ testId: "confirm-dialog", title: "Delete?", onOpen, onClose }, "Body")
+    dialog(
+      { testId: "confirm-dialog", title: "Delete?", onOpen, onClose },
+      "Body"
+    )
   );
 
   expect(modal.appElement).toBe("#root");
@@ -107,7 +110,9 @@ test("isOpen false renders nothing; a missing isOpen means open", async () => {
 });
 
 test("keeps the test ids the e2e specs use", async () => {
-  const view = await render(dialog({ testId: "add-notebook-dialog", title: "T" }));
+  const view = await render(
+    dialog({ testId: "add-notebook-dialog", title: "T" })
+  );
   expect(view.byTestId("add-notebook-dialog-backdrop")).toBeDefined();
   expect(view.byTestId("add-notebook-dialog")).toBeDefined();
   expect(view.byTestId("dialog-title")).toBeDefined();
@@ -154,7 +159,12 @@ test("a disabled or loading button does not fire and shows a spinner", async () 
   const yes = vi.fn();
   const view = await render(
     dialog({
-      positiveButton: { text: "Save", onClick: yes, disabled: true, loading: true }
+      positiveButton: {
+        text: "Save",
+        onClick: yes,
+        disabled: true,
+        loading: true
+      }
     })
   );
   const button = view.byTestId("dialog-yes");

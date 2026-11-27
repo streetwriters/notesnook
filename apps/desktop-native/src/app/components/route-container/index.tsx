@@ -17,52 +17,58 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { strings } from "@notesnook/intl";
-import type { GroupingKey } from "@notesnook/core";
-import { usePromise } from "@notesnook/common";
-import { Box, Button, Flex, Input, Text } from "@notesnook/ui-kit";
-import { showGroupOptionsMenu } from "../group-header";
+import { PropsWithChildren, useEffect, useRef } from "react";
 import Config from "../../utils/config";
 import { useDatabaseReady } from "../../stores/boot-store";
-import { useStore as useNoteStore } from "../../stores/note-store";
-import { useStore as useReminderStore } from "../../stores/reminder-store";
-import { useStore as useSearchStore } from "../../stores/search-store";
-import { useStore as useTrashStore } from "../../stores/trash-store";
+import { Box, Button, Text, Flex } from "@notesnook/ui-kit";
 import {
   Close,
-  List,
+  Menu,
   SearchIcon,
   Sliders,
   ViewList,
-  type Icon
+  List,
+  Icon
 } from "../icons";
-import type { Context } from "../list-container/types";
+import { useStore as useSearchStore } from "../../stores/search-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useReminderStore } from "../../stores/reminder-store";
+import { useStore as useTrashStore } from "../../stores/trash-store";
+import useMobile from "../../hooks/use-mobile";
+import { showGroupOptionsMenu } from "../group-header";
+import { GroupingKey } from "@notesnook/core";
+import { debounce, usePromise } from "@notesnook/common";
+import Field from "../field";
+import { strings } from "@notesnook/intl";
+import { RouteResult } from "../../navigation/types";
+import { AppEventManager, AppEvents } from "../../common/app-events";
+import { Context } from "../list-container/types";
 
 export type RouteContainerButton = {
   title: string;
   onClick: () => void;
-  icon?: Icon;
+  icon: Icon;
 };
 
-type RouteContainerProps = {
-  title?: string | (() => Promise<string | undefined>);
-  type?: string;
-  routeKey: string;
-  buttons?: RouteContainerButton;
-  children?: ReactNode;
+export type RouteContainerProps = RouteResult & {
+  routeKey?: string;
 };
-
-export default function RouteContainer(props: RouteContainerProps) {
+function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
+  const { children } = props;
   return (
     <>
       <Header {...props} />
-      {props.children}
+      {children}
     </>
   );
 }
 
-function useHasItems(type?: string, routeKey?: string) {
+export default RouteContainer;
+
+function useHasItems(
+  type: RouteContainerProps["type"],
+  routeKey?: RouteContainerProps["routeKey"]
+) {
   const hasNoteItems = useNoteStore((store) => {
     const items = routeKey === "home" ? store.notes : store.contextNotes;
     return items ? items.length > 0 : undefined;
@@ -73,25 +79,26 @@ function useHasItems(type?: string, routeKey?: string) {
   const hasTrashItems = useTrashStore((store) =>
     store.trash ? store.trash.length > 0 : undefined
   );
+
   const actual =
     type === "reminders"
       ? hasReminderItems
       : type === "trash"
       ? hasTrashItems
       : hasNoteItems;
+  // The native host opens the database after the first frame: until the
+  // lists load, use what the route had last time so the header does not jump.
   const cacheKey = `hasItems:${routeKey}:${type}`;
   const cached = Config.get<boolean>(cacheKey, false);
-
   useEffect(() => {
     if (actual !== undefined && actual !== cached) Config.set(cacheKey, actual);
   }, [actual, cached, cacheKey]);
-
   return actual ?? cached;
 }
 
 function useGroupingState(
-  type: string | undefined,
-  routeKey: string,
+  type: RouteContainerProps["type"],
+  routeKey: RouteContainerProps["routeKey"],
   noteContext: Context | undefined
 ) {
   const groupingKey: GroupingKey =
@@ -121,10 +128,11 @@ function useGroupingState(
     groupingKey === "notes" ||
     groupingKey === "favorites" ||
     groupingKey === "archive";
+
   return { groupingKey, refresh, context, canToggleView };
 }
 
-function HeaderActions(props: {
+type HeaderActionsProps = {
   groupingKey: GroupingKey;
   refresh: () => void;
   isSearching: boolean;
@@ -134,62 +142,77 @@ function HeaderActions(props: {
   setViewMode: (viewMode: "compact" | "detailed") => void;
   routeButton?: RouteContainerButton;
   hasItems: boolean;
-}) {
-  const { groupingKey, viewMode, routeButton, hasItems } = props;
+};
+
+function HeaderActions({
+  groupingKey,
+  refresh,
+  isSearching,
+  context,
+  canToggleView,
+  viewMode,
+  setViewMode,
+  routeButton,
+  hasItems
+}: HeaderActionsProps) {
   const isDatabaseReady = useDatabaseReady();
-  const RouteIcon = routeButton?.icon;
   return (
-    <Flex
+    <Box
       sx={{
         flexShrink: 0,
         alignItems: "center",
-        flexDirection: "row",
+        display: "flex",
         gap: "spacing4"
       }}
     >
-      {routeButton && RouteIcon ? (
+      {routeButton && (
         <Button
           data-test-id="route-action"
-          title={routeButton.title}
           variant="tertiary"
           disabled={!isDatabaseReady}
+          title={routeButton.title}
           onClick={routeButton.onClick}
           sx={{ p: 0 }}
         >
-          <RouteIcon size={15} />
+          <routeButton.icon size={15} />
         </Button>
-      ) : null}
-      {hasItems ? (
+      )}
+      {hasItems && (
         <Button
-          data-test-id={`${groupingKey}-sort-button`}
           variant="tertiary"
           disabled={!isDatabaseReady}
           title={strings.groupAndSort()}
+          data-test-id={`${groupingKey}-sort-button`}
           onClick={() =>
-            showGroupOptionsMenu(groupingKey, props.refresh, {
-              isSearching: props.isSearching,
-              context: props.context
+            showGroupOptionsMenu(groupingKey, refresh, {
+              isSearching,
+              context
             })
           }
           sx={{ p: 0 }}
         >
           <Sliders size={15} />
         </Button>
-      ) : null}
-      {hasItems && props.canToggleView && viewMode ? (
+      )}
+      {hasItems && canToggleView && viewMode && (
         <Button
-          data-test-id={`${groupingKey}-view-mode-button`}
           variant="tertiary"
           disabled={!isDatabaseReady}
+          title={
+            viewMode === "compact"
+              ? strings.switchToDetailedView()
+              : strings.switchToCompactView()
+          }
+          data-test-id={`${groupingKey}-view-mode-button`}
           onClick={() =>
-            props.setViewMode(viewMode === "compact" ? "detailed" : "compact")
+            setViewMode(viewMode === "compact" ? "detailed" : "compact")
           }
           sx={{ p: 0 }}
         >
           {viewMode === "compact" ? <List size={15} /> : <ViewList size={15} />}
         </Button>
-      ) : null}
-    </Flex>
+      )}
+    </Box>
   );
 }
 
@@ -205,29 +228,48 @@ function Header(props: RouteContainerProps) {
         : undefined,
     [props.title, isDatabaseReady]
   );
-  const title =
-    titlePromise.status === "fulfilled" ? titlePromise.value : undefined;
+  const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
-  const [inputKey, setInputKey] = useState(0);
   const noteContext = useNoteStore((store) => store.context);
   const viewMode = useNoteStore((store) => store.viewMode);
   const setViewMode = useNoteStore((store) => store.setViewMode);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const hasItems = useHasItems(type, routeKey);
   const { groupingKey, refresh, context, canToggleView } = useGroupingState(
     type,
     routeKey,
     noteContext
   );
-  const debounce = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const headerTitle = title || type || "";
+
+  useEffect(() => {
+    if (inputRef.current && inputRef.current.value !== query) {
+      inputRef.current.value = query || "";
+    }
+  }, [query]);
+
+  useEffect(() => {
+    if (isSearching) inputRef.current?.focus();
+  }, [isSearching]);
+
+  const headerTitle =
+    titlePromise.status === "fulfilled" ? titlePromise.value || type : type;
 
   if (type === "notebook" && !hasItems) return null;
 
   return (
-    <Box data-test-id="routeHeader" sx={{ zIndex: 2 }}>
-      <Flex
+    <Box
+      sx={{
+        zIndex: 2
+      }}
+      className="route-container-header search-container"
+      data-test-id="routeHeader"
+      data-header={headerTitle}
+    >
+      <Box
         sx={{
+          display: "flex",
           gap: hasItems ? "spacing6" : "spacing4",
           flexDirection: "column",
           width: "100%",
@@ -237,29 +279,31 @@ function Header(props: RouteContainerProps) {
           bg: "background"
         }}
       >
-        {type !== "notebook" ? (
-          <Flex
+        {type !== "notebook" && (
+          <Box
             sx={{
               alignItems: "center",
-              flexDirection: "row",
+              display: "flex",
               justifyContent: "space-between",
               gap: "spacing2",
-              height: hasItems ? 20 : 32
+              height: hasItems ? "20px" : "32px"
             }}
           >
             <Text
               data-test-id="route-title"
               sx={{
-                lineClamp: 1,
                 color: "heading",
                 fontSize: "lg",
                 fontWeight: "bold",
-                minWidth: 0
+                minWidth: 0,
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden"
               }}
             >
               {headerTitle}
             </Text>
-            {type !== "notFound" ? (
+            {type !== "notFound" && (
               <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
@@ -271,96 +315,86 @@ function Header(props: RouteContainerProps) {
                 routeButton={props.buttons}
                 hasItems={hasItems}
               />
-            ) : null}
-          </Flex>
-        ) : null}
-        {!hasItems ? (
-          <Box sx={{ height: 1, bg: "separator", width: "100%" }} />
-        ) : (
-          <Flex sx={{ flexDirection: "row", gap: "spacing6" }}>
-            <Flex sx={{ flex: 1, flexDirection: "row", height: 40 }}>
-              <Input
-                key={inputKey}
+            )}
+          </Box>
+        )}
+        {!hasItems && (
+          <Box sx={{ height: "1px", background: "separator", width: "100%" }} />
+        )}
+        {hasItems && (
+          <Flex sx={{ gap: "spacing6" }}>
+            <Box
+              sx={{
+                position: "relative",
+                flex: 1
+              }}
+            >
+              <Field
+                inputRef={inputRef}
                 data-test-id="search-input"
+                id="search"
+                name="search"
+                type="text"
                 variant="clean"
+                leftIcon={!isMobile ? SearchIcon : undefined}
+                sx={{
+                  gap: 0,
+                  m: 0,
+                  width: "100%",
+                  height: "40px"
+                }}
+                styles={{
+                  input: {
+                    m: 0,
+                    p: "spacing4",
+                    pl: "spacing10",
+                    fontSize: "xs",
+                    color: "paragraph",
+                    bg: "background-secondary",
+                    borderRadius: "dialog"
+                  }
+                }}
                 defaultValue={query}
                 placeholder={strings.searchInRoute(headerTitle)}
-                onKeyUp={(event) => {
-                  if (event.key === "Escape") {
+                onChange={debounce(
+                  (e) => useSearchStore.setState({ query: e.target.value }),
+                  250
+                )}
+                onKeyUp={(e) => {
+                  if (e.key === "Escape")
                     useSearchStore.getState().resetSearch();
-                    setInputKey((key) => key + 1);
-                  } else
+                  else
                     useSearchStore.setState({
                       isSearching: true,
                       searchType: type
                     });
                 }}
-                onChange={({ target: { value: text } }) => {
-                  clearTimeout(debounce.current);
-                  debounce.current = setTimeout(
-                    () => useSearchStore.setState({ query: text }),
-                    250
-                  );
-                }}
-                sx={{
-                  flex: 1,
-                  m: 0,
-                  p: "spacing4",
-                  pl: "spacing10",
-                  height: 40,
-                  fontSize: "xs",
-                  color: "paragraph",
-                  bg: "background-secondary",
-                  borderRadius: "dialog"
-                }}
-              />
-              {query ? (
-                <Flex
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    height: "100%",
-                    borderTopRightRadius: "radius2",
-                    borderBottomRightRadius: "radius2",
-                    overflow: "hidden"
-                  }}
-                >
-                  <Button
-                    data-test-id="search-button"
-                    variant="secondary"
-                    onClick={() => {
+                leftActions={[
+                  {
+                    icon: Menu,
+                    hidden: !isMobile,
+                    id: "hamburger-menu",
+                    onClick: () => {
+                      AppEventManager.publish(AppEvents.toggleSideMenu, true);
+                    }
+                  }
+                ]}
+                rightActions={[
+                  {
+                    icon: Close,
+                    id: "search-action-button",
+                    testId: "search-button",
+                    onClick: () => {
+                      if (inputRef.current) inputRef.current.value = "";
                       useSearchStore.getState().resetSearch();
-                      setInputKey((key) => key + 1);
-                    }}
-                    sx={{
-                      p: 0,
-                      px: "6px",
-                      height: "100%",
-                      borderRadius: 0,
-                      m: 0,
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                  >
-                    <Close size={15} />
-                  </Button>
-                </Flex>
-              ) : null}
-              <SearchIcon
-                size={15}
-                color="icon"
-                sx={{
-                  position: "absolute",
-                  left: 10,
-                  top: 20,
-                  transform: [{ translateY: -7.5 }],
-                  pointerEvents: "none",
-                  zIndex: 1
-                }}
+                    },
+                    hidden: !query
+                  }
+                ]}
               />
-            </Flex>
-            {type === "notebook" ? (
+            </Box>
+
+            {type === "notebook" && hasItems && (
               <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
@@ -372,13 +406,24 @@ function Header(props: RouteContainerProps) {
                 routeButton={props.buttons}
                 hasItems={hasItems}
               />
-            ) : null}
+            )}
           </Flex>
         )}
-      </Flex>
-      {hasItems ? (
-        <Box sx={{ mt: "1px", height: 1, bg: "separator", width: "100%" }} />
-      ) : null}
+      </Box>
+
+      {hasItems && (
+        <Box
+          sx={{
+            /**
+             * 1px margin top aligns this separator with the separator in the sidebar
+             */
+            mt: "1px",
+            height: "1px",
+            background: "separator",
+            width: "100%"
+          }}
+        />
+      )}
     </Box>
   );
 }

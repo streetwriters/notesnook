@@ -21,11 +21,11 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import type { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Flex } from "@notesnook/ui-kit";
+import { Flex, Input } from "@notesnook/ui-kit";
 import ListContainer from "../components/list-container";
 import { SidebarPlaceholder } from "../components/placeholders";
 import { ListLoader } from "../components/loaders/list-loader";
-import { FilterField } from "../components/navigation-menu/filter-field";
+import { Funnel } from "../components/icons";
 import { db } from "../common/db";
 import { useStore, store } from "../stores/tag-store";
 
@@ -33,7 +33,7 @@ function Tags() {
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
   const [filteredTags, setFilteredTags] = useState<VirtualizedGrouping<Tag>>();
-  const query = useRef("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const items = filteredTags || tags;
 
   useEffect(() => {
@@ -41,27 +41,24 @@ function Tags() {
   }, []);
 
   useEffect(() => {
-    if (!query.current) return;
+    const query = inputRef.current?.value.trim();
+    if (!query) return;
+
     (async () => {
-      setFilteredTags(await db.lookup.tags(query.current).sorted());
+      setFilteredTags(await db.lookup.tags(query).sorted());
     })();
   }, [tags]);
-
-  const onFilter = useRef(
-    debounce(async (text: string) => {
-      query.current = text.trim();
-      setFilteredTags(
-        query.current ? await db.lookup.tags(query.current).sorted() : undefined
-      );
-    }, 300)
-  ).current;
 
   if (!items) return <ListLoader />;
   return (
     <Flex
+      variant="columnFill"
       id="tags"
       data-test-id="tags"
-      sx={{ flexDirection: "column", flex: 1, mt: "spacing4" }}
+      sx={{
+        flex: 1,
+        mt: "spacing4"
+      }}
     >
       <ListContainer
         type="tags"
@@ -75,8 +72,36 @@ function Tags() {
         }}
         header={<></>}
       />
-      <FilterField placeholder={strings.filterTags()} onChangeText={onFilter} />
+      <Flex
+        sx={{
+          alignItems: "center",
+          borderTop: "1px solid var(--separator)",
+          mx: "spacing4",
+          pt: "spacing4"
+        }}
+      >
+        <Input
+          ref={inputRef}
+          variant="clean"
+          placeholder={strings.filterTags()}
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 0,
+            fontSize: "xs",
+            color: "paragraph"
+          }}
+          onChange={debounce(async (e) => {
+            const query = e.target.value.trim();
+            setFilteredTags(
+              query ? await db.lookup.tags(query).sorted() : undefined
+            );
+          }, 300)}
+        />
+        <Funnel size={13} color="icon-secondary" />
+      </Flex>
     </Flex>
   );
 }
+
 export default Tags;

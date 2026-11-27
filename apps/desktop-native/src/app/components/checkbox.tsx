@@ -31,12 +31,7 @@ type CheckboxProps = {
 };
 
 export function Checkbox(props: CheckboxProps) {
-  const {
-    checked,
-    onToggle,
-    size = 18,
-    checkboxUncheckedIconColor
-  } = props;
+  const { checked, onToggle, size = 18, checkboxUncheckedIconColor } = props;
 
   const Icon = checked ? CheckboxIcon : CheckboxUnchecked;
 

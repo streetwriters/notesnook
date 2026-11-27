@@ -75,7 +75,6 @@ function Tag(props: TagProps) {
       title={
         <Flex
           sx={{
-            flexDirection: "row",
             alignItems: "center",
             justifyContent: "flex-start",
             gap: "spacing3",
@@ -89,12 +88,14 @@ function Tag(props: TagProps) {
             sx={{ flexShrink: 0 }}
           />
           <Text
-            data-test-id="title"
-            variant="body"
+            data-test-id={`title`}
+            variant={"body"}
+            color={isSelected ? "paragraph-selected" : "paragraph"}
             sx={{
-              lineClamp: 1,
-              color: isSelected ? "paragraph-selected" : "paragraph",
               fontSize: "xs",
+              whiteSpace: "pre",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
               fontWeight: "normal",
               minWidth: 0
             }}
@@ -124,10 +125,13 @@ function Tag(props: TagProps) {
         }
       }}
       menuItems={tagMenuItems}
-      onDrop={(event) => handleDrop(event.dataTransfer, item)}
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
+      onDragEnter={(e) => {
+        e?.currentTarget.focus();
+      }}
+      onDrop={(e) => handleDrop(e.dataTransfer, item)}
     />
   );
 }

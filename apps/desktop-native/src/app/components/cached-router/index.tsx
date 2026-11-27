@@ -65,12 +65,7 @@ function CachedRouter() {
   else cached.current[routeResult.key].props = routeResult.props;
 
   return (
-    <RouteContainer
-      title={routeResult.title}
-      buttons={routeResult.buttons}
-      routeKey={routeResult.key}
-      type={routeResult.type}
-    >
+    <RouteContainer {...routeResult} routeKey={routeResult.key}>
       {Object.entries(isDatabaseReady ? cached.current : {}).map(
         ([key, { Component, props }]) => (
           <Activity
