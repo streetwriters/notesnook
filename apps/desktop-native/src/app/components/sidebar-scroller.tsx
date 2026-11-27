@@ -17,8 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ScrollContainer, { type ScrollContainerProps } from "./scroll-container";
+import { forwardRef } from "react";
+import { ScrollerProps } from "@notesnook/ui-kit";
+import ScrollContainer from "./scroll-container";
 
-export function SidebarScroller(props: ScrollContainerProps) {
-  return <ScrollContainer {...props} />;
-}
+export const SidebarScroller = forwardRef<HTMLDivElement, ScrollerProps>(
+  function CustomScroller(props, ref) {
+    return (
+      <ScrollContainer
+        {...props}
+        trackStyle={() => ({
+          width: 3
+        })}
+        thumbStyle={() => ({ width: 3 })}
+        suppressScrollX={true}
+        forwardedRef={(sRef) => {
+          if (typeof ref === "function") ref(sRef);
+          else if (ref) ref.current = sRef;
+        }}
+      />
+    );
+  }
+);

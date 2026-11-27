@@ -35,6 +35,16 @@
       "path": "components/importer/components/import-errors.tsx",
       "category": "platform",
       "reason": "The bug report link opens with the shell service (shell.openUrl); web calls window.open, which the desktop host does not have. Otherwise identical to web."
+    },
+    {
+      "path": "components/unlock/index.tsx",
+      "category": "platform",
+      "reason": "The password field's widest width is 400 where web writes max(30%, 400px): the desktop layout has no CSS min()/max(). Otherwise identical to web."
+    },
+    {
+      "path": "components/filtered-list/index.tsx",
+      "category": "platform",
+      "reason": "The filter input is styled through Field's styles.input where web reaches it with an `input` selector in sx: desktop has no stylesheet selectors. Otherwise identical to web."
     }
   ]
 }

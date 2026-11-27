@@ -177,7 +177,12 @@ export interface BaseProps<T = UIElement>
 }
 
 export interface BoxProps extends BaseProps {
-  variant?: keyof Theme["variants"];
+  /**
+   * One of the theme's layout variants. Other names are accepted, as theme-ui
+   * accepts them, so a component can narrow `variant` to its own names; a
+   * name the theme does not define draws no variant.
+   */
+  variant?: keyof Theme["variants"] | (string & {});
   children?: ReactNode;
 }
 

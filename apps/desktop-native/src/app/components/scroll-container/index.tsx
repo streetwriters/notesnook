@@ -17,36 +17,69 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import React, { PropsWithChildren } from "react";
 import {
-  ScrollContainer as UIScrollContainer,
-  type SxProp
+  ScrollContainer as MacScrollbar,
+  type ScrollContainerProps as MacScrollbarProps
 } from "@notesnook/ui-kit";
-import type { ReactNode } from "react";
+import "mac-scrollbar/dist/mac-scrollbar.css";
 
 export type ScrollContainerProps = {
-  sx?: SxProp;
-  "data-test-id"?: string;
-  children?: ReactNode;
-};
+  style?: React.CSSProperties;
+  forwardedRef?: (ref: HTMLDivElement | null) => void;
+} & MacScrollbarProps;
 
-const ScrollContainer = (props: ScrollContainerProps) => {
-  const { children, sx } = props;
+const ScrollContainer = ({
+  children,
+  forwardedRef,
+  style,
+  ...props
+}: PropsWithChildren<ScrollContainerProps>) => {
   return (
-    <UIScrollContainer
-      data-test-id={props["data-test-id"]}
-      sx={{ height: "100%", ...sx }}
+    <MacScrollbar
+      suppressScrollX
+      minThumbSize={40}
+      {...props}
+      ref={(div) => {
+        forwardedRef && forwardedRef(div as HTMLDivElement);
+      }}
+      style={{
+        position: "relative",
+        height: "100%",
+        ...style
+      }}
     >
       {children}
-    </UIScrollContainer>
+    </MacScrollbar>
   );
 };
 export default ScrollContainer;
 
-export function FlexScrollContainer(props: ScrollContainerProps) {
-  const { children, sx } = props;
+type FlexScrollContainerProps = {
+  id?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  scrollRef?: React.Ref<HTMLElement>;
+} & MacScrollbarProps;
+
+export function FlexScrollContainer({
+  id,
+  children,
+  style,
+  className,
+  scrollRef,
+  ...restProps
+}: PropsWithChildren<FlexScrollContainerProps>) {
   return (
-    <UIScrollContainer data-test-id={props["data-test-id"]} sx={sx}>
+    <MacScrollbar
+      {...restProps}
+      ref={scrollRef}
+      id={id}
+      className={className}
+      style={style}
+      minThumbSize={40}
+    >
       {children}
-    </UIScrollContainer>
+    </MacScrollbar>
   );
 }

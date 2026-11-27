@@ -17,18 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text, type FlexProps } from "@notesnook/ui-kit";
+import { Flex, FlexProps, Text } from "@notesnook/ui-kit";
+
 import { Error as ErrorIcon, Warning } from "../icons";
 
-type ErrorTextProps = {
-  error?: string | Error | null | false;
-} & Omit<FlexProps, "children">;
-
-function errorMessage(error: string | Error) {
-  return error instanceof Error
-    ? `${error.name}: ${error.message}\n${error.stack}`
-    : error;
-}
+type ErrorTextProps = { error?: string | Error | null | false } & FlexProps;
 
 export function ErrorText(props: ErrorTextProps) {
   const { error, sx, ...restProps } = props;
@@ -36,20 +29,33 @@ export function ErrorText(props: ErrorTextProps) {
   if (!error) return null;
   return (
     <Flex
-      bg="background-error"
-      {...restProps}
+      bg="var(--background-error)"
+      p={1}
       sx={{
-        flexDirection: "row",
-        p: 1,
         borderRadius: "default",
         alignItems: "flex-start",
         maxHeight: 300,
+        overflowY: "auto",
         ...sx
       }}
+      {...restProps}
     >
-      <ErrorIcon size={15} color="icon-error" />
-      <Text selectable variant="error" sx={{ ml: 1, whiteSpace: "pre-wrap" }}>
-        {errorMessage(error)}
+      <ErrorIcon size={15} color="var(--icon-error)" />
+      <Text
+        className="selectable"
+        variant={"error"}
+        ml={1}
+        sx={{ whiteSpace: "pre-wrap" }}
+      >
+        {error instanceof Error ? (
+          <>
+            {error.name}: {error.message}
+            <br />
+            {error.stack}
+          </>
+        ) : (
+          error
+        )}
       </Text>
     </Flex>
   );
@@ -61,21 +67,33 @@ export function AuthErrorText(props: ErrorTextProps) {
   if (!error) return null;
   return (
     <Flex
+      sx={{
+        alignItems: "center",
+        overflowY: "auto",
+        ...sx
+      }}
       {...restProps}
-      sx={{ flexDirection: "row", alignItems: "center", ...sx }}
     >
       <Warning size={13} color="icon-error" />
       <Text
-        selectable
+        className="selectable"
+        ml="spacing3"
         sx={{
-          ml: "spacing3",
           whiteSpace: "pre-wrap",
           fontWeight: 400,
           fontSize: "xs",
           color: "paragraph-error"
         }}
       >
-        {errorMessage(error)}
+        {error instanceof Error ? (
+          <>
+            {error.name}: {error.message}
+            <br />
+            {error.stack}
+          </>
+        ) : (
+          error
+        )}
       </Text>
     </Flex>
   );

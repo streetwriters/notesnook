@@ -168,7 +168,8 @@ type LayoutProps = {
   bottom?: Length | SpaceToken;
   left?: Length | SpaceToken;
   zIndex?: number;
-  flex?: number;
+  /** A number, or one written as a string (`"1"`) as CSS allows. */
+  flex?: number | `${number}`;
   flexGrow?: number;
   flexShrink?: number;
   flexBasis?: Length;

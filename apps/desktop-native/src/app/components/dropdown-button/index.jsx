@@ -17,69 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  Button,
-  Flex,
-  Text,
-  type MenuItem,
-  type SxProp
-} from "@notesnook/ui-kit";
-import { Menu } from "../../hooks/use-menu";
+import { Button, Flex } from "@notesnook/ui-kit";
+import { useMenuTrigger } from "../../hooks/use-menu";
 import { ChevronDown } from "../icons";
 
-type DropdownOption = Omit<Extract<MenuItem, { type: "button" }>, "title"> & {
-  title: string | (() => string);
-};
-
-type DropdownButtonProps = {
-  options?: DropdownOption[];
-  title?: string;
-  sx?: SxProp;
-  buttonStyle?: SxProp;
-  chevronStyle?: SxProp;
-};
-
-export default function DropdownButton(props: DropdownButtonProps) {
+export default function DropdownButton(props) {
+  const { openMenu } = useMenuTrigger();
   const { options, title, sx, buttonStyle, chevronStyle } = props;
 
   if (!options || !options.length) return null;
-  const first = options[0];
   return (
-    <Flex sx={{ flexDirection: "row", ...sx }}>
+    <Flex sx={sx}>
       <Button
-        onClick={first.onClick}
         sx={{
           borderTopRightRadius: 0,
           borderBottomRightRadius: 0,
           ...buttonStyle
         }}
+        onClick={options[0].onClick}
       >
-        <Text>
-          {typeof first.title === "function" ? first.title() : first.title}
-        </Text>
+        {options[0].title()}
       </Button>
       {options.length > 1 && (
         <Button
-          onClick={(event) =>
-            Menu.openMenu(
-              options.slice(1).map((option) => ({
-                ...option,
-                title:
-                  typeof option.title === "function"
-                    ? option.title()
-                    : option.title
-              })),
-              { title, position: { x: event.pageX, y: event.pageY } }
-            )
-          }
+          px={1}
           sx={{
-            px: 1,
             borderBottomLeftRadius: 0,
             borderTopLeftRadius: 0,
             ...chevronStyle
           }}
+          onClick={() => openMenu(options.slice(1), { title })}
         >
-          <ChevronDown color="accentForeground" size={18} />
+          <ChevronDown color="white" size={18} />
         </Button>
       )}
     </Flex>

@@ -84,6 +84,8 @@ export interface ScrollContainerProps extends DataAttributes {
   sx?: SxProp;
   suppressScrollX?: boolean;
   suppressScrollY?: boolean;
+  /** Accepted and unused on desktop: the scrollbar is the platform's. */
+  minThumbSize?: number;
   trackStyle?: (horizontal?: boolean) => StyleProp;
   thumbStyle?: (horizontal?: boolean) => StyleProp;
   onScroll?: (event: UISyntheticEvent) => void;

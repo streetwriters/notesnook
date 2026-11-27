@@ -17,26 +17,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState, type ReactNode } from "react";
-import { Flex, Text, type ColorValue, type SxProp } from "@notesnook/ui-kit";
+import { SchemeColors } from "@notesnook/theme";
+import { Flex, FlexProps, Text } from "@notesnook/ui-kit";
+import { PropsWithChildren, useState } from "react";
 import { CaretDown, ChevronDown, ChevronUp } from "../icons";
 
 export type AccordionProps = {
   title: string;
   isClosed: boolean;
-  color?: ColorValue;
+  color?: SchemeColors;
   testId?: string;
-  buttonSx?: SxProp;
-  titleSx?: SxProp;
-  containerSx?: SxProp;
+  buttonSx?: FlexProps["sx"];
+  titleSx?: FlexProps["sx"];
+  containerSx?: FlexProps["sx"];
   variant?: "default" | "faq";
-  sx?: SxProp;
-  children?: ReactNode;
 };
 
-export default function Accordion(props: AccordionProps) {
-  const { isClosed, title, color, children, testId, sx, containerSx, variant } =
-    props;
+export default function Accordion(
+  props: PropsWithChildren<AccordionProps> & FlexProps
+) {
+  const {
+    isClosed,
+    title,
+    color,
+    children,
+    testId,
+    sx,
+    containerSx,
+    variant,
+    ...restProps
+  } = props;
   const [isContentHidden, setIsContentHidden] = useState(isClosed);
   const isFaqVariant = variant === "faq";
 
@@ -48,27 +58,28 @@ export default function Accordion(props: AccordionProps) {
           gap: "spacing4",
           p: "spacing6",
           borderRadius: "radius2",
-          border: "1px solid",
-          borderColor: isContentHidden ? "border" : "background-selected",
+          border: isContentHidden
+            ? "1px solid var(--border)"
+            : "1px solid var(--background-selected)",
           bg: isContentHidden ? undefined : "background-selected",
           ...sx
         }}
+        {...restProps}
       >
         <Flex
-          data-test-id={testId}
-          onClick={() => setIsContentHidden((s) => !s)}
           sx={{
-            flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             cursor: "pointer",
             ...props.buttonSx
           }}
+          onClick={() => setIsContentHidden((s) => !s)}
+          data-test-id={testId}
         >
           <Text variant="subtitle" sx={{ color, ...props.titleSx }}>
             {title}
           </Text>
-          <CaretDown size={20} color="icon" />
+          <CaretDown size={20} />
         </Flex>
         {!isContentHidden && (
           <Flex sx={{ flexDirection: "column", ...containerSx }}>
@@ -80,33 +91,40 @@ export default function Accordion(props: AccordionProps) {
   }
 
   return (
-    <Flex sx={{ flexDirection: "column", ...sx }}>
+    <Flex sx={{ flexDirection: "column", ...sx }} {...restProps}>
       <Flex
-        data-test-id={testId}
-        onClick={() => setIsContentHidden((state) => !state)}
         sx={{
-          flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
           cursor: "pointer",
-          bg: "background-secondary",
+          bg: "var(--background-secondary)",
           p: 1,
           borderRadius: "default",
           ...props.buttonSx
         }}
+        onClick={() => {
+          setIsContentHidden((state) => !state);
+        }}
+        data-test-id={testId}
       >
         <Text variant="subtitle" sx={{ color, ...props.titleSx }}>
           {title}
         </Text>
         {isContentHidden ? (
-          <ChevronDown size={16} color={color || "icon"} />
+          <ChevronDown size={16} color={color} />
         ) : (
-          <ChevronUp size={16} color={color || "icon"} />
+          <ChevronUp size={16} color={color} />
         )}
       </Flex>
-      {isContentHidden ? null : (
-        <Flex sx={{ flexDirection: "column", ...containerSx }}>{children}</Flex>
-      )}
+      <Flex
+        sx={{
+          flexDirection: "column",
+          ...containerSx,
+          display: isContentHidden ? "none" : "flex"
+        }}
+      >
+        {children}
+      </Flex>
     </Flex>
   );
 }

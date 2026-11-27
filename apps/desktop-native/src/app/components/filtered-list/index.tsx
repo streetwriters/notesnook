@@ -17,15 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useState } from "react";
-import { strings } from "@notesnook/intl";
-import { Button, Text } from "@notesnook/ui-kit";
+import { useCallback, useRef, useState } from "react";
 import Field from "../field";
 import { Close, Plus, SearchIcon } from "../icons";
-import {
-  VirtualizedList,
-  type VirtualizedListProps
-} from "../virtualized-list";
+import { Button, Text } from "@notesnook/ui-kit";
+import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
+import { strings } from "@notesnook/intl";
+import { Box, useThemeUI } from "@notesnook/ui-kit";
 
 type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string; emptyList: string };
@@ -35,14 +33,14 @@ type FilteredListProps<T> = {
 
 export function FilteredList<T>(props: FilteredListProps<T>) {
   const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
-  const itemGap = listProps.itemGap ?? 7;
+  const { theme } = useThemeUI();
+  const itemGap = listProps.itemGap || (theme as any).space?.spacing3;
   const [query, setQuery] = useState<string>();
-  const [text, setText] = useState("");
   const noItemsFound = items.length <= 0 && query && query.length > 0;
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const _filter = useCallback(
     async (query = "") => {
-      setText(query);
       await filter(query);
       setQuery(query);
     },
@@ -53,17 +51,17 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
     async (title: string) => {
       await onCreateNewItem(title);
       setQuery(undefined);
-      setText("");
+      if (inputRef.current) inputRef.current.value = "";
     },
-    [onCreateNewItem]
+    [inputRef, onCreateNewItem]
   );
 
   return (
     <>
       <Field
-        data-test-id="filter-input"
+        inputRef={inputRef}
+        data-test-id={"filter-input"}
         autoFocus
-        value={text}
         sx={{ mb: "spacing7" }}
         styles={{
           input: {
@@ -76,9 +74,9 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         placeholder={
           items.length <= 0 ? placeholders.empty : placeholders.filter
         }
-        onChange={(e) => _filter(e.target.value)}
+        onChange={(e) => _filter((e.target as HTMLInputElement).value)}
         onKeyUp={async (e) => {
-          if (e.key === "Enter" && noItemsFound && query) {
+          if (e.key === "Enter" && noItemsFound) {
             await _createNewItem(query);
           }
         }}
@@ -86,7 +84,10 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         rightActions={[
           {
             icon: Close,
-            onClick: () => _filter(""),
+            onClick: () => {
+              if (inputRef.current) inputRef.current.value = "";
+              _filter("");
+            },
             hidden: !query
           }
         ]}
@@ -95,8 +96,10 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
       {items.length <= 0 && !query && (
         <Text
           sx={{
-            height: 180,
-            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "180px",
             color: "paragraph-secondary",
             fontSize: "sm"
           }}
@@ -105,30 +108,32 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         </Text>
       )}
 
-      {noItemsFound && query ? (
+      {noItemsFound ? (
         <Button
-          variant="secondary"
-          onClick={async () => {
-            await _createNewItem(query);
-          }}
+          variant={"secondary"}
           sx={{
-            flexDirection: "row",
+            display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             width: "100%",
             p: "spacing4",
             minWidth: 0
           }}
+          onClick={async () => {
+            await _createNewItem(query);
+          }}
         >
           <Text
             sx={{
-              lineClamp: 1,
               color: "paragraph",
               fontSize: "sm",
-              minWidth: 0
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
             }}
           >{`${strings.add()} "${query}"`}</Text>
-          <Plus size={15} color="icon" />
+          <Plus size={15} color="icon" sx={{ flexShrink: 0 }} />
         </Button>
       ) : (
         <VirtualizedList {...listProps} items={items} itemGap={itemGap} />

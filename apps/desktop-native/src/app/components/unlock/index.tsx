@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useState } from "react";
-import { strings } from "@notesnook/intl";
-import { Button, Flex, Text } from "@notesnook/ui-kit";
+import { useRef, useState, useCallback } from "react";
+import { Flex, Text, Button } from "@notesnook/ui-kit";
 import { Lock } from "../icons";
 import Field from "../field";
-import { ErrorText } from "../error-text";
 import { showToast } from "../../utils/toast";
+import { ErrorText } from "../error-text";
+import { strings } from "@notesnook/intl";
 
 type UnlockViewProps = {
   title: string;
@@ -37,9 +37,11 @@ export function UnlockView(props: UnlockViewProps) {
     undefined
   );
   const [isUnlocking, setIsUnlocking] = useState(false);
-  const [password, setPassword] = useState("");
+
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const submit = useCallback(async () => {
+    const password = passwordRef?.current?.value;
     if (!password) {
       setErrorMessage(strings.passwordRequired());
       return;
@@ -61,62 +63,74 @@ export function UnlockView(props: UnlockViewProps) {
     } finally {
       setIsUnlocking(false);
     }
-  }, [password, unlock]);
+  }, [setErrorMessage, unlock]);
 
   return (
     <Flex
+      mx={2}
       sx={{
-        mx: 2,
-        flex: 1,
+        flex: "1",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center"
       }}
     >
-      <Flex sx={{ flexDirection: "column", alignItems: "center" }}>
-        <Lock size={100} color="icon" sx={{ opacity: 0.2 }} />
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Lock size={100} sx={{ opacity: 0.2 }} />
         <Text
           data-test-id="unlock-note-title"
           variant="heading"
-          sx={{ mx: 100, mt: 25, fontSize: 36, textAlign: "center" }}
+          mx={100}
+          mt={25}
+          sx={{ fontSize: 36, textAlign: "center" }}
         >
           {title}
         </Text>
       </Flex>
       <Text
         variant="body"
+        mt={1}
+        mb={4}
         sx={{
-          mt: 1,
-          mb: 4,
           textAlign: "center",
           fontSize: "title",
-          color: "paragraph-secondary"
+          color: "var(--paragraph-secondary)"
         }}
       >
         {subtitle}
       </Text>
       <Field
+        id="vaultPassword"
         data-test-id="unlock-note-password"
+        inputRef={passwordRef}
         autoFocus
-        value={password}
         sx={{ width: ["95%", "95%", 400] }}
         placeholder={strings.enterPassword()}
         type="password"
-        onChange={(e) => {
-          setPassword(e.target.value);
-          if (errorMessage) setErrorMessage(undefined);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") submit();
+        onKeyUp={async (e) => {
+          if (e.key === "Enter") {
+            await submit();
+          } else if (errorMessage) {
+            setErrorMessage(undefined);
+          }
         }}
       />
       {errorMessage && <ErrorText sx={{ mt: 1 }} error={errorMessage} />}
       <Button
+        mt={3}
         variant="accent"
         data-test-id="unlock-note-submit"
         disabled={isUnlocking}
-        onClick={submit}
-        sx={{ mt: 3, borderRadius: 100, px: 30 }}
+        sx={{ borderRadius: 100, px: 30 }}
+        onClick={async () => {
+          await submit();
+        }}
       >
         {isUnlocking ? strings.unlocking() + "..." : buttonTitle}
       </Button>
