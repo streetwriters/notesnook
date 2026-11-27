@@ -45,7 +45,8 @@ import { strings } from "@notesnook/intl";
 import { EDITOR_ZOOM } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
 import { enterFullscreen, exitFullscreen } from "../../utils/fullscreen";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { getNoteStatistics } from "../../utils/note-statistics";
 import {
   Box,
   PopupPresenter,
@@ -74,7 +75,24 @@ function EditorFooterSeparator() {
 
 function EditorFooter() {
   const { isFullscreen } = useWindowControls();
-  const statistics = useNoteStatistics();
+  const reported = useNoteStatistics();
+  // Until the native editor reports (it queries on load), count the stored
+  // note, so a reopened long note shows its words and auto-save notice at once.
+  const stored = useEditorStore((store) => {
+    const session = store.getActiveSession();
+    const data =
+      session && "content" in session ? session.content?.data : undefined;
+    return typeof data === "string" ? data : undefined;
+  });
+  const hasReported = useEditorManager((store) =>
+    store.activeEditorId
+      ? !!store.editors[store.activeEditorId]?.statistics
+      : false
+  );
+  const statistics = useMemo(
+    () => (hasReported ? reported : getNoteStatistics(stored)),
+    [hasReported, reported, stored]
+  );
   const session = useEditorStore((store) => store.getActiveSession());
   const { editorConfig, setEditorConfig } = useEditorConfig();
   const editorMargins = useEditorStore((store) => store.editorMargins);

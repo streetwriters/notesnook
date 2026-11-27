@@ -477,6 +477,10 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
     defaultVariant: props.field,
     defaults: { p: 2 }
   });
+  // A DOM input has an intrinsic width; a native text field with `width:
+  // "auto"` and no text would size to nothing and could not be clicked.
+  if (viewStyle.width === "auto" && viewStyle.minWidth === undefined)
+    (viewStyle as Record<string, unknown>).minWidth = 136;
   const control = useControl();
   if (props.value !== undefined) control.value = String(props.value);
   else if (control.value === undefined)
