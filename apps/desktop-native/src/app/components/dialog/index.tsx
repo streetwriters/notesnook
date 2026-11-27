@@ -94,6 +94,11 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           left: 0,
           right: 0,
           bottom: 0,
+          // As apps/web: the content is the flex column the backdrop and the
+          // dialog's percentage max-height resolve against.
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "hidden",
           padding: 0,
           borderWidth: 0,
           borderRadius: 0,

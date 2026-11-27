@@ -73,6 +73,7 @@ function CachedRouter() {
             mode={key === routeResult.key ? "visible" : "hidden"}
           >
             <Flex
+              id={key}
               data-test-id={`route-${key}`}
               sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
             >

@@ -24,6 +24,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState
 } from "react";
@@ -305,12 +306,23 @@ function EditorView({ session }: { session: EditableSession }) {
     return typeof data === "string" ? data : undefined;
   }, [session.content?.data]);
 
+  // apps/web marks the editor of the visible tab `.active`; its e2e specs (and
+  // styles) find the title and tag inputs through it. Native has no DOM classes.
+  const root = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = root.current;
+    element?.classList?.add("active");
+    return () => element?.classList?.remove("active");
+  }, [session.needsHydration]);
+
   if (session.needsHydration) return null;
 
   const readonly = session.type === "readonly" || session.type === "deleted";
 
   return (
     <Flex
+      ref={root}
+      id="editorContainer"
       data-test-id="editor-container"
       sx={{
         position: "relative",
@@ -481,8 +493,17 @@ function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
 type UnlockNoteViewProps = { session: LockedEditorSession };
 function UnlockNoteView(props: UnlockNoteViewProps) {
   const { session } = props;
+  // `.active`, as apps/web's UnlockNoteView: its e2e specs find the password
+  // field through it.
+  const root = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = root.current;
+    element?.classList?.add("active");
+    return () => element?.classList?.remove("active");
+  }, []);
   return (
     <Flex
+      ref={root}
       data-test-id="unlock-note-view"
       sx={{ overflow: "hidden", alignItems: "center", flex: 1 }}
     >

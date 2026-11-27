@@ -164,6 +164,7 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     <Flex
       data-test-id="list-item"
       id={`id_${item.id}`}
+      className={isSelected ? "selected" : ""}
       draggable={props.draggable}
       onDragStart={
         props.draggable

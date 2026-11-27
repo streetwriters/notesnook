@@ -36,6 +36,12 @@ export type VirtualizedListProps<T, C> = {
   mode?: "fixed" | "dynamic";
   overscan?: number;
   header?: ReactNode;
+  /**
+   * apps/web's list is as tall as its rows, inside whatever scrolls. Virtuoso
+   * needs a height: with this the list is `items.length` estimated rows tall
+   * instead of filling its parent. For short, fixed-row lists in a scroller.
+   */
+  autoHeight?: boolean;
   "data-test-id"?: string;
   sx?: SxProp;
 };
@@ -61,6 +67,7 @@ function VirtualizedListInner<T, C>(
     itemGap = 0,
     overscan = 400,
     header,
+    autoHeight,
     sx
   } = props;
 
@@ -85,11 +92,20 @@ function VirtualizedListInner<T, C>(
   return (
     <Flex
       data-test-id={props["data-test-id"] || "virtualized-list"}
-      sx={{ flex: 1, flexDirection: "column", overflow: "hidden", ...sx }}
+      sx={{
+        flex: autoHeight ? undefined : 1,
+        flexDirection: "column",
+        overflow: "hidden",
+        ...sx
+      }}
     >
       <Virtuoso
         ref={ref}
-        style={{ flex: 1 }}
+        style={
+          autoHeight
+            ? { height: items.length * (estimatedSize + itemGap) }
+            : { flex: 1 }
+        }
         totalCount={items.length}
         computeItemKey={computeItemKey}
         itemContent={itemContent}

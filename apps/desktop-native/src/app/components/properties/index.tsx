@@ -1307,6 +1307,7 @@ function SessionHistory({ noteId }: { noteId: string }) {
         </Text>
       ) : (
         <VirtualizedList
+          autoHeight
           mode="dynamic"
           estimatedSize={28}
           itemGap={itemGap}
