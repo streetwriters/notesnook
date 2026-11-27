@@ -208,6 +208,16 @@ export default defineConfig({
         replacement: path.join(webApp, "../node_modules/$1$2")
       },
       {
+        // one copy of the editor's ProseMirror and tiptap packages (as apps/web):
+        // editor-ui installs its own, and two copies of prosemirror-view crash it
+        find: /^(prosemirror-(?:view|model|state|transform)|@tiptap\/(?:core|pm|extension-text-style))(\/.*)?$/,
+        replacement: path.join(root, "../../packages/editor/node_modules") + "/$1$2"
+      },
+      {
+        find: /^mac-scrollbar\/(.*)$/,
+        replacement: path.join(webApp, "../node_modules/mac-scrollbar/$1")
+      },
+      {
         find: /^web-app-sqlite$/,
         replacement: path.join(webApp, "common/sqlite/index.ts")
       },

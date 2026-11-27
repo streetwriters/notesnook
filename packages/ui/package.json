@@ -33,6 +33,7 @@
     "@react-native-gpui/fs": "0.0.1-alpha.1",
     "@react-native-gpui/image-manipulator": "0.0.1",
     "@react-native-gpui/pdf": "0.0.2",
+    "@theme-ui/color": "^0.16.1",
     "@theme-ui/components": "0.16.1",
     "@theme-ui/core": "0.16.1",
     "@theme-ui/css": "0.16.2",
@@ -59,6 +60,7 @@
   "peerDependencies": {
     "@emotion/react": ">=11",
     "@mdi/js": ">=7",
+    "@theme-ui/color": ">=0.16",
     "@theme-ui/components": ">=0.16",
     "@theme-ui/core": ">=0.16",
     "mac-scrollbar": ">=0.10",
