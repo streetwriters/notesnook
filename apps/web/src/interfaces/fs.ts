@@ -281,6 +281,7 @@ async function uploadFile(
   } catch (e) {
     console.error(e);
     reportProgress(undefined, { type: "upload", hash: filename });
+    if (requestOptions.signal?.aborted) return false;
     const error = toS3Error(e);
     if (
       [
@@ -594,6 +595,10 @@ async function downloadFile(
     logger.debug("Attachment downloaded", { filename });
     return true;
   } catch (e) {
+    if (requestOptions.signal?.aborted) {
+      reportProgress(undefined, { type: "download", hash: filename });
+      return false;
+    }
     logger.error(e, "Could not download file", { filename });
     showError(toS3Error(e), "Could not download file");
     reportProgress(undefined, { type: "download", hash: filename });

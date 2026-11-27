@@ -26,6 +26,7 @@ import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
 import { createCacheDir } from "./io";
 import {
+  CancelToken,
   cacheDir,
   checkUpload,
   FileSizeResult,
@@ -86,7 +87,7 @@ async function multipartUploadFile(
   filePath: string,
   fileSize: number,
   requestOptions: RequestOptions,
-  cancelToken: { cancel: (reason?: string) => Promise<void> }
+  cancelToken: CancelToken
 ): Promise<Response> {
   const { headers } = requestOptions;
 
@@ -157,7 +158,8 @@ async function multipartUploadFile(
 
     return response;
   } catch (error) {
-    DatabaseLogger.error(error, "Multipart upload failed", { filename });
+    if (!cancelToken.canceled)
+      DatabaseLogger.error(error, "Multipart upload failed", { filename });
     CloudUploader.removeListener("upload-progress");
     useAttachmentStore.getState().remove(filename);
     throw error;
@@ -167,9 +169,7 @@ async function multipartUploadFile(
 export async function uploadFile(
   filename: string,
   requestOptions: RequestOptions,
-  cancelToken: {
-    cancel: (reason?: string) => Promise<void>;
-  }
+  cancelToken: CancelToken
 ) {
   if (!requestOptions) return false;
   const { url, headers } = requestOptions;
@@ -356,6 +356,10 @@ export async function uploadFile(
     return uploaded;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
+    if (cancelToken.canceled) {
+      DatabaseLogger.info("Upload canceled", { filename });
+      return false;
+    }
     ToastManager.error(e as Error, "File upload failed");
     DatabaseLogger.error(e, "File upload failed", {
       filename

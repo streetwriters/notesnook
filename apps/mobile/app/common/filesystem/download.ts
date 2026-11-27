@@ -25,14 +25,18 @@ import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { DatabaseLogger, db } from "../database";
 import { createCacheDir, exists } from "./io";
-import { ABYTES, cacheDir, getUploadedFileSize, parseS3Error } from "./utils";
+import {
+  ABYTES,
+  CancelToken,
+  cacheDir,
+  getUploadedFileSize,
+  parseS3Error
+} from "./utils";
 
 export async function downloadFile(
   filename: string,
   requestOptions: RequestOptions,
-  cancelToken: {
-    cancel: (reason?: string) => Promise<void>;
-  }
+  cancelToken: CancelToken
 ) {
   if (!requestOptions) {
     DatabaseLogger.log(
@@ -165,10 +169,9 @@ export async function downloadFile(
 
     return status >= 200 && status < 300;
   } catch (e) {
-    if (
-      (e as Error).message !== "canceled" &&
-      !(e as Error).message.includes("NoSuchKey")
-    ) {
+    const canceled =
+      cancelToken.canceled || (e as Error).message === "canceled";
+    if (!canceled && !(e as Error).message.includes("NoSuchKey")) {
       const toast = {
         heading: strings.downloadError((e as Error).message),
         message: (e as Error).message,
@@ -187,9 +190,13 @@ export async function downloadFile(
     RNFetchBlob.fs.unlink(originalFilePath).catch(() => {
       /* empty */
     });
-    DatabaseLogger.error(e, "Download failed: ", {
-      url
-    });
+    if (canceled) {
+      DatabaseLogger.info("Download canceled", { filename });
+    } else {
+      DatabaseLogger.error(e, "Download failed: ", {
+        url
+      });
+    }
     return false;
   }
 }

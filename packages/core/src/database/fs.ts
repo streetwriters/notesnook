@@ -33,18 +33,30 @@ export type DownloadableFile = {
   filename: string;
   chunkSize: number;
 };
-export type QueueItem = DownloadableFile & {
+type TransferKind = "upload" | "download";
+type TransferStatus = "success" | "failed" | "canceled";
+type TransferResult = { status: TransferStatus; error?: unknown };
+type Transfer = DownloadableFile & {
+  groups: Set<string>;
+  canceled: boolean;
   cancel?: (reason?: string) => Promise<void>;
-  operation?: Promise<boolean>;
+  done?: Promise<TransferResult>;
+};
+
+const CANCELED_EVENT = {
+  download: EVENTS.downloadCanceled,
+  upload: EVENTS.uploadCanceled
 };
 
 export class FileStorage {
   id = Date.now();
-  downloads = new Map<string, QueueItem>();
-  uploads = new Map<string, QueueItem>();
-  groups = {
-    downloads: new Map<string, Set<string>>(),
-    uploads: new Map<string, Set<string>>()
+  private transfers = {
+    upload: new Map<string, Transfer>(),
+    download: new Map<string, Transfer>()
+  };
+  private queues = {
+    upload: new Map<string, object>(),
+    download: new Map<string, object>()
   };
 
   constructor(
@@ -58,60 +70,41 @@ export class FileStorage {
     groupId: string,
     eventData?: Record<string, unknown>
   ) {
-    try {
-      const newFiles = await this.fs.bulkExists(files.map((f) => f.filename));
-      files = files.filter((f) => newFiles.includes(f.filename));
-      if (files.length <= 0) return;
+    await this.withQueue("download", groupId, files, async (transfers) => {
+      const missing = new Set(
+        await this.fs.bulkExists(transfers.map((t) => t.filename))
+      );
+      transfers = transfers.filter((t) => {
+        if (missing.has(t.filename)) return true;
+        this.release("download", groupId, t);
+        return false;
+      });
+      if (transfers.length <= 0) return;
 
-      let current = 0;
       const token = await this.tokenManager.getAccessToken();
-      const total = files.length;
+      const total = transfers.length;
+      let current = 0;
 
-      if (this.groups.downloads.has(groupId)) {
-        logger.debug("[queueDownloads] group already exists", {
-          groupId
-        });
-        return this.groups.downloads.get(groupId);
-      }
-
-      const group = new Set<string>();
-
-      files.forEach((f) => group.add(f.filename));
-      this.groups.downloads.set(groupId, group);
-
-      for (const file of files as QueueItem[]) {
+      for (const transfer of transfers) {
+        const { filename } = transfer;
         current++;
-        if (!group.has(file.filename)) {
+        const event = { groupId, filename, eventData, current, total };
+        const exists = await this.exists(filename);
+
+        if (this.isCanceledFor(groupId, transfer)) {
           this.eventManager.publish(EVENTS.fileDownloaded, {
+            ...event,
             success: false,
-            groupId,
-            filename: file.filename,
-            eventData,
-            current,
-            total
+            canceled: true
           });
           continue;
         }
 
-        const download = this.downloads.get(file.filename);
-        if (download && download.operation) {
-          logger.debug("[queueDownloads] duplicate download", {
-            filename: file.filename,
-            groupId
-          });
-          await download.operation;
-          continue;
-        }
-
-        const { filename, chunkSize } = file;
-        if (await this.exists(filename)) {
+        if (exists) {
+          this.release("download", groupId, transfer);
           this.eventManager.publish(EVENTS.fileDownloaded, {
-            success: true,
-            groupId,
-            filename,
-            eventData,
-            current,
-            total
+            ...event,
+            success: true
           });
           continue;
         }
@@ -123,178 +116,195 @@ export class FileStorage {
           filename
         });
 
-        const url = `${hosts.API_HOST}/s3?name=${filename}`;
-        const { execute, cancel } = this.fs.downloadFile(filename, {
-          url,
-          chunkSize,
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        file.cancel = cancel;
-        file.operation = execute()
-          .catch(() => false)
-          .finally(() => {
-            this.downloads.delete(filename);
-            group.delete(filename);
-          });
-
-        this.downloads.set(filename, file);
-        const result = await file.operation;
+        const { status } = await this.start("download", transfer, token);
         if (eventData)
           this.eventManager.publish(EVENTS.fileDownloaded, {
-            success: result,
-            total,
-            current,
-            groupId,
-            filename,
-            eventData
+            ...event,
+            success: status === "success",
+            canceled: status === "canceled"
           });
       }
-    } finally {
-      this.groups.downloads.delete(groupId);
-    }
+    });
   }
 
   async queueUploads(files: DownloadableFile[], groupId: string) {
-    try {
-      let current = 0;
+    await this.withQueue("upload", groupId, files, async (transfers) => {
       const token = await this.tokenManager.getAccessToken();
-      const total = files.length;
+      const total = transfers.length;
+      let current = 0;
 
-      if (this.groups.uploads.has(groupId)) {
-        logger.debug("[queueUploads] group already exists", {
-          groupId
-        });
-        return this.groups.uploads.get(groupId);
-      }
-
-      const group = new Set<string>();
-
-      files.forEach((f) => group.add(f.filename));
-      this.groups.uploads.set(groupId, group);
-
-      for (const file of files as QueueItem[]) {
-        if (!group.has(file.filename)) continue;
-
-        const upload = this.uploads.get(file.filename);
-        if (upload && upload.operation) {
-          logger.debug("[queueUploads] duplicate upload", {
-            filename: file.filename,
-            groupId
-          });
-          await file.operation;
-          continue;
-        }
-
-        const { filename, chunkSize } = file;
-        let error = null;
-        const url = `${hosts.API_HOST}/s3?name=${filename}`;
-        const { execute, cancel } = this.fs.uploadFile(filename, {
-          chunkSize,
-          url,
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        file.cancel = cancel;
-        file.operation = execute()
-          .catch((e) => {
-            logger.error(e, "failed to upload attachment", { hash: filename });
-            error = e;
-            return false;
-          })
-          .finally(() => {
-            this.uploads.delete(filename);
-            group.delete(filename);
+      for (const transfer of transfers) {
+        const { filename } = transfer;
+        const canceled = this.isCanceledFor(groupId, transfer);
+        if (!canceled)
+          this.eventManager.publish(EVENTS.fileUpload, {
+            total,
+            current,
+            groupId,
+            filename
           });
 
-        this.eventManager.publish(EVENTS.fileUpload, {
-          total,
-          current,
-          groupId,
-          filename
-        });
-
-        this.uploads.set(filename, file);
-        const result = await file.operation;
+        const { status, error }: TransferResult = canceled
+          ? { status: "canceled" }
+          : await this.start("upload", transfer, token);
         this.eventManager.publish(EVENTS.fileUploaded, {
-          error,
-          success: result,
+          error: error ?? null,
+          success: status === "success",
+          canceled: status === "canceled",
           total,
           current: ++current,
           groupId,
           filename
         });
       }
-    } finally {
-      this.groups.uploads.delete(groupId);
-    }
+    });
   }
 
   async downloadFile(groupId: string, filename: string, chunkSize: number) {
-    if (await this.exists(filename)) return true;
+    const transfer = this.acquire("download", groupId, { filename, chunkSize });
+    try {
+      if (await this.exists(filename)) return true;
 
-    const download = this.downloads.get(filename);
-    if (download && download.operation) {
-      logger.debug("[downloadFile] duplicate download", { filename, groupId });
-      return await download.operation;
+      logger.debug("[downloadFile] downloading", { filename, groupId });
+
+      const token = await this.tokenManager.getAccessToken();
+      if (this.isCanceledFor(groupId, transfer)) return false;
+
+      const { status, error } = await this.start("download", transfer, token);
+      if (status === "failed" && error) throw error;
+      return status === "success";
+    } finally {
+      this.release("download", groupId, transfer);
     }
-
-    logger.debug("[downloadFile] downloading", { filename, groupId });
-
-    const url = `${hosts.API_HOST}/s3?name=${filename}`;
-    const file: QueueItem = { filename, chunkSize };
-    const token = await this.tokenManager.getAccessToken();
-    const group = this.groups.downloads.get(groupId) || new Set();
-    const { execute, cancel } = this.fs.downloadFile(filename, {
-      url,
-      chunkSize,
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    file.cancel = cancel;
-    file.operation = execute().finally(() => {
-      this.downloads.delete(filename);
-      group.delete(filename);
-    });
-
-    this.downloads.set(filename, file);
-    this.groups.downloads.set(groupId, group.add(filename));
-    return await file.operation;
   }
 
   async cancel(groupId: string) {
-    const queues = [
-      {
-        type: "download",
-        ids: this.groups.downloads.get(groupId),
-        files: this.downloads
-      },
-      {
-        type: "upload",
-        ids: this.groups.uploads.get(groupId),
-        files: this.uploads
+    for (const kind of ["download", "upload"] as const) {
+      let found = this.queues[kind].delete(groupId);
+      for (const transfer of this.transfers[kind].values()) {
+        if (!transfer.groups.delete(groupId)) continue;
+        found = true;
+        if (transfer.groups.size === 0) await this.abort(kind, transfer);
       }
-    ].filter((a) => !!a.ids);
+      if (!found) continue;
 
-    for (const queue of queues) {
-      if (!queue.ids) continue;
+      this.eventManager.publish(CANCELED_EVENT[kind], {
+        groupId,
+        canceled: true
+      });
+    }
+  }
 
-      for (const filename of queue.ids) {
-        const file = queue.files.get(filename);
-        if (file?.cancel) await file.cancel("Operation canceled.");
-        queue.ids.delete(filename);
-      }
+  async cancelTransfers(filename: string) {
+    for (const kind of ["upload", "download"] as const) {
+      const transfer = this.transfers[kind].get(filename);
+      if (!transfer) continue;
+      await this.abort(kind, transfer);
+      await transfer.done;
+    }
+  }
 
-      if (queue.type === "download") {
-        this.groups.downloads.delete(groupId);
-        this.eventManager.publish(EVENTS.downloadCanceled, {
-          groupId,
-          canceled: true
-        });
-      } else if (queue.type === "upload") {
-        this.groups.uploads.delete(groupId);
-        this.eventManager.publish(EVENTS.uploadCanceled, {
-          groupId,
-          canceled: true
-        });
-      }
+  private async withQueue(
+    kind: TransferKind,
+    groupId: string,
+    files: DownloadableFile[],
+    body: (transfers: Transfer[]) => Promise<void>
+  ) {
+    if (this.queues[kind].has(groupId)) {
+      logger.debug(`[${kind} queue] group already exists`, { groupId });
+      return;
+    }
+
+    const queue = {};
+    this.queues[kind].set(groupId, queue);
+    const transfers = unique(files).map((f) => this.acquire(kind, groupId, f));
+    try {
+      await body(transfers);
+    } finally {
+      for (const transfer of transfers) this.release(kind, groupId, transfer);
+      if (this.queues[kind].get(groupId) === queue)
+        this.queues[kind].delete(groupId);
+    }
+  }
+
+  private acquire(kind: TransferKind, groupId: string, file: DownloadableFile) {
+    let transfer = this.transfers[kind].get(file.filename);
+    if (!transfer) {
+      transfer = { ...file, groups: new Set(), canceled: false };
+      this.transfers[kind].set(file.filename, transfer);
+    }
+    transfer.groups.add(groupId);
+    return transfer;
+  }
+
+  private release(kind: TransferKind, groupId: string, transfer: Transfer) {
+    transfer.groups.delete(groupId);
+    if (!transfer.done && transfer.groups.size === 0)
+      this.deleteTransfer(kind, transfer);
+  }
+
+  private deleteTransfer(kind: TransferKind, transfer: Transfer) {
+    if (this.transfers[kind].get(transfer.filename) === transfer)
+      this.transfers[kind].delete(transfer.filename);
+  }
+
+  private isCanceledFor(groupId: string, transfer: Transfer) {
+    return transfer.canceled || !transfer.groups.has(groupId);
+  }
+
+  private async abort(kind: TransferKind, transfer: Transfer) {
+    transfer.canceled = true;
+    if (!transfer.done) this.deleteTransfer(kind, transfer);
+    await transfer.cancel?.("Operation canceled.");
+  }
+
+  private start(
+    kind: TransferKind,
+    transfer: Transfer,
+    token?: string
+  ): Promise<TransferResult> {
+    if (transfer.canceled) return Promise.resolve({ status: "canceled" });
+    if (transfer.done) {
+      logger.debug(`[${kind}] duplicate transfer`, {
+        filename: transfer.filename
+      });
+      return transfer.done;
+    }
+    return (transfer.done = this.transferFile(kind, transfer, token));
+  }
+
+  private async transferFile(
+    kind: TransferKind,
+    transfer: Transfer,
+    token?: string
+  ): Promise<TransferResult> {
+    const { filename, chunkSize } = transfer;
+    try {
+      if (kind === "download" && (await this.exists(filename)))
+        return { status: "success" };
+      if (transfer.canceled) return { status: "canceled" };
+
+      const options = {
+        url: `${hosts.API_HOST}/s3?name=${filename}`,
+        chunkSize,
+        headers: { Authorization: `Bearer ${token}` }
+      };
+      const { execute, cancel } =
+        kind === "upload"
+          ? this.fs.uploadFile(filename, options)
+          : this.fs.downloadFile(filename, options);
+      transfer.cancel = cancel;
+
+      const result = await execute();
+      if (transfer.canceled) return { status: "canceled" };
+      return { status: result ? "success" : "failed" };
+    } catch (error) {
+      if (transfer.canceled) return { status: "canceled" };
+      if (kind === "upload")
+        logger.error(error, "failed to upload attachment", { hash: filename });
+      return { status: "failed", error };
+    } finally {
+      this.deleteTransfer(kind, transfer);
     }
   }
 
@@ -355,4 +365,15 @@ export class FileStorage {
   getUploadedFileSize(filename: string) {
     return this.fs.getUploadedFileSize(filename);
   }
+}
+
+function unique(files: DownloadableFile[]) {
+  const seen = new Set<string>();
+  const result: DownloadableFile[] = [];
+  for (const file of files) {
+    if (seen.has(file.filename)) continue;
+    seen.add(file.filename);
+    result.push(file);
+  }
+  return result;
 }
