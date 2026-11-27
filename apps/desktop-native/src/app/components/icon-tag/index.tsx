@@ -35,6 +35,7 @@ type IconTagProps = {
   iconSize?: number;
   onClick?: (event: UIMouseEvent) => void;
   styles?: {
+    container?: SxProp;
     icon?: { color?: ColorValue };
     text?: { color?: ColorValue; fontSize?: SxProp["fontSize"] };
   };
@@ -95,6 +96,7 @@ function IconTag(props: IconTagProps) {
               }
             }
           : {}),
+        ...styles?.container,
         ...containerSx
       }}
     >

@@ -29,7 +29,7 @@ import {
   PopoverHost,
   ToastHost
 } from "@notesnook/ui-kit";
-import { ActionBar } from "./components/action-bar";
+import { ActionBar } from "./components/editor/action-bar";
 import { MenuHost } from "./components/menu";
 import { DialogHost } from "./common/dialog-manager";
 import { useEditorStore } from "./stores/editor-store";

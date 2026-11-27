@@ -19,16 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createElement, type ComponentType } from "react";
 import { Icon as UIIcon, type IconProps } from "@notesnook/ui-kit";
 
-export type Icon = ComponentType<Omit<IconProps, "path" | "svg">>;
+/**
+ * An icon component. Like apps/web's icons it carries its drawing as `path`,
+ * for APIs that take an icon as a string (a menu item's `icon`): an SVG path
+ * for `mdiIcon`, the whole SVG document for `svgIcon`; `Icon`'s `path` prop
+ * draws either.
+ */
+export type Icon = ComponentType<Omit<IconProps, "path" | "svg">> & {
+  /** Unset for an icon component written by hand. */
+  readonly path?: string;
+};
 
 export function mdiIcon(path: string, rotate = false): Icon {
-  const Component: Icon = (props) =>
+  const Component = (props: Omit<IconProps, "path" | "svg">) =>
     createElement(UIIcon, { rotate: rotate ? 1 : undefined, ...props, path });
-  return Component;
+  return Object.assign(Component, { path });
 }
 
 export function svgIcon(svg: string, rotate = false): Icon {
-  const Component: Icon = (props) =>
+  const Component = (props: Omit<IconProps, "path" | "svg">) =>
     createElement(UIIcon, { rotate: rotate ? 1 : undefined, ...props, svg });
-  return Component;
+  return Object.assign(Component, { path: svg });
 }

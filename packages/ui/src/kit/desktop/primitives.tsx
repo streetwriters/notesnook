@@ -909,6 +909,7 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   const { nativeProps, viewStyle } = useStyled(props);
   const [setRef] = useElementRef(ref, { id: props.id });
   const size = props.size ?? 24;
+  const svg = props.svg ?? (isSvgDocument(props.path) ? props.path : undefined);
   const pixels =
     typeof size === "number"
       ? size
@@ -933,8 +934,8 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
         ...(transform ? { transform } : null)
       }}
     >
-      {props.svg ? (
-        <SvgXml xml={props.svg} width={pixels} height={pixels} color={color} />
+      {svg ? (
+        <SvgXml xml={svg} width={pixels} height={pixels} color={color} />
       ) : (
         <Svg width={pixels} height={pixels} viewBox="0 0 24 24">
           <Path d={props.path} fill={color} />
@@ -943,5 +944,10 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
     </AnyView>
   );
 });
+
+/** Whether an icon `path` holds a whole SVG document rather than a `d`. */
+function isSvgDocument(path: string | undefined): path is string {
+  return !!path && path.trimStart().startsWith("<");
+}
 
 export type { ReactNode };

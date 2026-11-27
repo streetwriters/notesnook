@@ -27,9 +27,9 @@ import { checkFeature } from "../common";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import {
   attachFiles,
-  type Attachment,
   type AttachmentProgress
 } from "../components/editor/picker";
+import type { EditorAttachment as Attachment } from "@notesnook/ui-kit";
 import Config from "../utils/config";
 import { ImageCompressionOptions } from "../stores/setting-store";
 import {

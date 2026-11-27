@@ -29,5 +29,3 @@ export const EDITOR_LINE_HEIGHT = {
   MAX: 10,
   MIN: 1
 };
-
-export const MAX_AUTO_SAVEABLE_WORDS = 100_000;

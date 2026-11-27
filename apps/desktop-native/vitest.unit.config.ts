@@ -23,6 +23,8 @@ export default defineConfig({
   // jsdom tests transform as web modules, which only reads files the dev server
   // may serve: the kit lives in packages/ui, outside this package.
   server: { fs: { allow: ["../.."] } },
+  // The build-time globals of src/platform/globals.d.ts.
+  define: { IS_TESTING: "false" },
   test: {
     include: [
       "src/**/*.test.ts",

@@ -33,8 +33,8 @@ import {
 import { getDragData } from "../../utils/data-transfer";
 import { Menu } from "../../hooks/use-menu";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useEditorManager } from "../editor/manager";
-import { saveContent } from "../editor/save-content";
+import { useEditorManager } from "./manager";
+import { saveContent } from "./index";
 import { CommandPaletteDialog } from "../../dialogs/command-palette";
 import {
   ArrowLeft,

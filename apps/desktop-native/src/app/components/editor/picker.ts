@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { crypto, type PickedFile } from "@platform";
+import { crypto, type PickedFile as File } from "@platform";
+import type { EditorAttachment as Attachment } from "@notesnook/ui-kit";
 import type { SerializedKey } from "@notesnook/crypto";
 import { strings } from "@notesnook/intl";
 import { db } from "../../common/db";
@@ -27,11 +28,14 @@ import { showToast } from "../../utils/toast";
 import { showFilePicker } from "../../utils/file-picker";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 
-class TaskQueue {
+class Queue {
   private running = 0;
   private pending: (() => Promise<void>)[] = [];
   private idle: (() => void)[] = [];
-  constructor(private readonly concurrency: number) {}
+  private readonly concurrency: number;
+  constructor(options: { concurrency: number }) {
+    this.concurrency = options.concurrency;
+  }
 
   add(task: () => Promise<void>) {
     this.pending.push(task);
@@ -60,16 +64,6 @@ class TaskQueue {
     return new Promise<void>((resolve) => this.idle.push(resolve));
   }
 }
-
-export type Attachment = {
-  type: "image" | "file" | "web-clip";
-  filename: string;
-  hash: string;
-  mime: string;
-  size: number;
-  width?: number;
-  height?: number;
-};
 
 export async function insertAttachments(
   type: string,
@@ -129,11 +123,11 @@ type AttachFilesMessage =
   | { type: "error"; index: number; error: string };
 
 export async function attachFiles(
-  files: PickedFile[],
+  files: File[],
   report: (progress: AttachFilesMessage) => void,
   skipSpecialImageHandling = false
 ) {
-  const queue = new TaskQueue(8);
+  const queue = new Queue({ concurrency: 8 });
   for (let i = 0; i < files.length; i++) {
     queue.add(async () => {
       const file = files[i];
@@ -163,8 +157,12 @@ export async function attachFiles(
   await queue.onIdle();
 }
 
+/**
+ * @param {File} file
+ * @returns
+ */
 async function pickFile(
-  file: PickedFile,
+  file: File,
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
@@ -182,8 +180,12 @@ async function pickFile(
   }
 }
 
+/**
+ * @param {File} file
+ * @returns
+ */
 async function pickImage(
-  file: PickedFile,
+  file: File,
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
@@ -214,7 +216,7 @@ export type AttachmentProgress = {
   type: "encrypt" | "download" | "upload";
   total: number;
   loaded: number;
-  file?: PickedFile;
+  file?: File;
 };
 
 type AddAttachmentOptions = {
@@ -223,7 +225,7 @@ type AddAttachmentOptions = {
 };
 
 async function addAttachment(
-  file: PickedFile,
+  file: File,
   options: AddAttachmentOptions = {}
 ): Promise<string> {
   const { expectedFileHash } = options;
@@ -267,7 +269,7 @@ async function addAttachment(
   return hash;
 }
 
-function getImageDimensions(_file: PickedFile) {
+function getImageDimensions(_file: File) {
   return Promise.resolve<{ width: number; height: number } | undefined>(
     undefined
   );

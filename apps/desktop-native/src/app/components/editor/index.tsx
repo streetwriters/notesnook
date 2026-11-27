@@ -46,6 +46,7 @@ import {
   useEditorStore,
   type DefaultEditorSession,
   type DeletedEditorSession,
+  type LockedEditorSession,
   type NewEditorSession,
   type ReadonlyEditorSession
 } from "../../stores/editor-store";
@@ -62,16 +63,53 @@ import Properties from "../properties";
 import Header from "./header";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import TitleBox from "./title-box";
-import { saveContent } from "./save-content";
 import { useEditorManager } from "./manager";
 import { useEditorHostActions } from "./use-host-actions";
 import { useDeniedPermissions } from "./use-denied-permissions";
 import useMobile from "../../hooks/use-mobile";
+import { logger } from "../../utils/logger";
+import type { IEditor } from "./types";
+import type { AttachmentProgress } from "./picker";
 
-export { saveContent };
+const PDFPreview = lazy(() => import("../pdf-preview"));
 
 const autoSaveToast = { show: true, hide: () => {} };
-const PdfPreview = lazy(() => import("../pdf-preview"));
+
+export async function saveContent(
+  noteId: string,
+  ignoreEdit: boolean,
+  content: string
+) {
+  logger.debug("saving content", {
+    noteId,
+    ignoreEdit,
+    length: content.length
+  });
+  await Promise.race([
+    useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
+      type: "tiptap",
+      data: content
+    }),
+    new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error(strings.savingNoteTakingTooLong())),
+        30 * 1000
+      )
+    )
+  ]).catch((e) => {
+    const { hide } = showToast(
+      "error",
+      (e as Error).message,
+      [
+        {
+          text: strings.dismiss(),
+          onClick: () => hide()
+        }
+      ],
+      0
+    );
+  });
+}
 const deferredSave = debounceWithId(saveContent, 100);
 
 export default function TabsView() {
@@ -135,7 +173,7 @@ export default function TabsView() {
                 >
                   {documentPreview.url ? (
                     <Suspense fallback={<Loading />}>
-                      <PdfPreview
+                      <PDFPreview
                         fileUrl={documentPreview.url}
                         hash={documentPreview.hash}
                         onClose={() =>
@@ -222,7 +260,7 @@ function EditorView({ session }: { session: EditableSession }) {
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
   const focusKey = "note" in session ? session.note?.id : session.id;
   const lastFocus = useRef<{
-    editor?: EditorHandle;
+    editor?: IEditor;
     type: string;
     data: unknown;
   }>(undefined);
@@ -390,18 +428,23 @@ function EditorView({ session }: { session: EditableSession }) {
   );
 }
 
-function DownloadAttachmentProgress(props: { hash: string }) {
+type DownloadAttachmentProgressProps = {
+  hash: string;
+};
+function DownloadAttachmentProgress(props: DownloadAttachmentProgressProps) {
   const { hash } = props;
-  const [progress, setProgress] = useState(0);
 
+  const [progress, setProgress] = useState(0);
   useEffect(() => {
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      (update: { hash: string; loaded: number; total: number }) => {
-        if (update.hash === hash)
-          setProgress(Math.round((update.loaded / update.total) * 100));
+      (progress: AttachmentProgress) => {
+        if (progress.hash === hash) {
+          setProgress(Math.round((progress.loaded / progress.total) * 100));
+        }
       }
     );
+
     return () => {
       event.unsubscribe();
     };
@@ -435,12 +478,8 @@ function DownloadAttachmentProgress(props: { hash: string }) {
   );
 }
 
-function UnlockNoteView(props: {
-  session: Extract<
-    ReturnType<typeof useEditorStore.getState>["sessions"][number],
-    { type: "locked" }
-  >;
-}) {
+type UnlockNoteViewProps = { session: LockedEditorSession };
+function UnlockNoteView(props: UnlockNoteViewProps) {
   const { session } = props;
   return (
     <Flex

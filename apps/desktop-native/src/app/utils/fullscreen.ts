@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { windowControls } from "@platform";
 
+/** Web's `element.requestFullscreen()`: the whole window goes fullscreen. */
+export function enterFullscreen() {
+  if (windowControls.isFullscreen()) return;
+  windowControls.enterFullscreen();
+}
+
 export function exitFullscreen() {
   if (!windowControls.isFullscreen()) return;
   windowControls.exitFullscreen();

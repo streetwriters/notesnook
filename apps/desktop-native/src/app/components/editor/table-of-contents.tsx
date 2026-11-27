@@ -19,7 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo, useRef } from "react";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text } from "@notesnook/ui-kit";
+import {
+  Button,
+  Flex,
+  Text,
+  type EditorHandle,
+  type EditorHeading as TOCItem
+} from "@notesnook/ui-kit";
 import { CaretDown, Circle } from "../icons";
 import { Section } from "../properties";
 import {
@@ -27,7 +33,7 @@ import {
   type TreeNode,
   type VirtualizedTreeHandle
 } from "../virtualized-tree";
-import { useEditorManager, type TOCItem } from "./manager";
+import { useEditorManager } from "./manager";
 
 type TableOfContentsProps = {
   sessionId: string;
@@ -95,10 +101,13 @@ function TableOfContents(props: TableOfContentsProps) {
                 key={item.id}
                 data-test-id="toc-item"
                 onClick={() =>
-                  useEditorManager
-                    .getState()
-                    .getEditor(sessionId)
-                    ?.editor?.scrollToHeading(item.id)
+                  // The native editor scrolls to the heading itself; web
+                  // scrolls the DOM node with `scrollIntoViewById`.
+                  (
+                    useEditorManager.getState().getEditor(sessionId)?.editor as
+                      | EditorHandle
+                      | undefined
+                  )?.scrollToHeading(item.id)
                 }
                 sx={{
                   flexDirection: "row",

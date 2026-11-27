@@ -17,17 +17,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getPointerPosition, type MenuItem } from "@notesnook/ui-kit";
+import {
+  getPointerPosition,
+  type MenuItem,
+  type PositionOptions
+} from "@notesnook/ui-kit";
 import { useMenuStore, type MenuAnchor } from "../components/menu/store";
 
 export type MenuPosition = { x: number; y: number };
 
 export type MenuOptions = {
   title?: string;
-  position?: MenuPosition | MenuAnchor;
+  /**
+   * A point, a rectangle, or apps/web's `PositionOptions`: the menu opens
+   * below `target` (an element), or at the pointer for `"mouse"` or none.
+   */
+  position?: MenuPosition | MenuAnchor | PositionOptions;
+  /** apps/web's option; the desktop menu is always blocking. */
+  blocking?: boolean;
+  /** apps/web's option; the desktop menu is always the app's own. */
+  forceCustom?: boolean;
 };
 
-function toAnchor(position?: MenuPosition | MenuAnchor): MenuAnchor {
+function toAnchor(
+  position?: MenuPosition | MenuAnchor | PositionOptions
+): MenuAnchor {
+  if (position && !("x" in position)) {
+    const { target } = position;
+    if (target && target !== "mouse") {
+      const { x, y, width, height } = target.getBoundingClientRect();
+      return { x, y, width, height };
+    }
+    position = undefined;
+  }
   if (!position) {
     const pointer = getPointerPosition();
     return { x: pointer.x, y: pointer.y, width: 0, height: -5 };

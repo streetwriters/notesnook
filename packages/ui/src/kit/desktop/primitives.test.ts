@@ -71,7 +71,7 @@ vi.mock("../shared/icons", () => ({ CaretDown: () => null }));
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
-const { Checkbox, Input, Slider, Switch, Box, Button } = await import(
+const { Checkbox, Input, Slider, Switch, Box, Button, Icon } = await import(
   "./primitives"
 );
 const { Select } = await import("./select");
@@ -242,3 +242,17 @@ describe("Select", () => {
   });
 });
 
+describe("Icon", () => {
+  it("draws a path as an SVG path", () => {
+    render(h(Icon, { path: "M0 0h24v24H0z" }));
+    expect(root.root.findByType("Path" as any).props.d).toBe("M0 0h24v24H0z");
+    expect(root.root.findAllByType("SvgXml" as any)).toHaveLength(0);
+  });
+
+  it("draws a path holding a whole SVG document like svg, as an icon's .path does", () => {
+    const svg = '<svg viewBox="0 0 24 24"><circle r="4"/></svg>';
+    render(h(Icon, { path: `  ${svg}` }));
+    expect(root.root.findByType("SvgXml" as any).props.xml).toBe(`  ${svg}`);
+    expect(root.root.findAllByType("Path" as any)).toHaveLength(0);
+  });
+});

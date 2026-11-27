@@ -17,12 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  type Ref
-} from "react";
+import { forwardRef, useImperativeHandle, useMemo, type Ref } from "react";
 import * as ThemeUI from "@theme-ui/components";
 import { useTheme } from "@emotion/react";
 import qrcode from "qrcode-generator";
@@ -80,8 +75,20 @@ type Any = Record<string, any>;
 
 export const Icon = forwardRef<Contract.UIElement, Contract.IconProps>(
   function Icon(props, ref) {
-    const { path, svg, size: sizeToken = "medium", color, rotate, sx, ...rest } =
-      props;
+    const {
+      path: pathOrDocument,
+      svg: svgDocument,
+      size: sizeToken = "medium",
+      color,
+      rotate,
+      sx,
+      ...rest
+    } = props;
+    // An icon's `.path` is a whole SVG document for icons drawn from SVG files.
+    const isDocument =
+      !!pathOrDocument && pathOrDocument.trimStart().startsWith("<");
+    const path = isDocument ? undefined : pathOrDocument;
+    const svg = svgDocument ?? (isDocument ? pathOrDocument : undefined);
     const theme = useTheme() as Any;
     const size =
       typeof sizeToken === "number"
@@ -145,42 +152,41 @@ export const ColorPicker = forwardRef<
   );
 });
 
-export const QRCode = forwardRef<
-  Contract.QRCodeHandle,
-  Contract.QRCodeProps
->(function QRCode(props, ref: Ref<Contract.QRCodeHandle>) {
-  const { value, size, ecLevel, logo: _logo, sx, ...rest } = props;
-  const svg = useMemo(() => {
-    const code = qrcode(0, ecLevel ?? "M");
-    code.addData(value);
-    code.make();
-    return code.createSvgTag({ cellSize: 1, margin: 0, scalable: true });
-  }, [value, ecLevel]);
-  useImperativeHandle(
-    ref,
-    () => ({
-      toSVG: () => svg,
-      toPNG: async () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = size;
-        const context = canvas.getContext("2d")!;
-        const image = new window.Image();
-        image.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-        await image.decode();
-        context.drawImage(image, 0, 0, size, size);
-        const blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(resolve)
-        );
-        return new Uint8Array(await blob!.arrayBuffer());
-      }
-    }),
-    [svg, size]
-  );
-  return (
-    <Box
-      {...(rest as Any)}
-      {...({ dangerouslySetInnerHTML: { __html: svg } } as Any)}
-      sx={{ width: size, height: size, bg: "background", ...sx }}
-    />
-  );
-});
+export const QRCode = forwardRef<Contract.QRCodeHandle, Contract.QRCodeProps>(
+  function QRCode(props, ref: Ref<Contract.QRCodeHandle>) {
+    const { value, size, ecLevel, logo: _logo, sx, ...rest } = props;
+    const svg = useMemo(() => {
+      const code = qrcode(0, ecLevel ?? "M");
+      code.addData(value);
+      code.make();
+      return code.createSvgTag({ cellSize: 1, margin: 0, scalable: true });
+    }, [value, ecLevel]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        toSVG: () => svg,
+        toPNG: async () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = size;
+          const context = canvas.getContext("2d")!;
+          const image = new window.Image();
+          image.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+          await image.decode();
+          context.drawImage(image, 0, 0, size, size);
+          const blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve)
+          );
+          return new Uint8Array(await blob!.arrayBuffer());
+        }
+      }),
+      [svg, size]
+    );
+    return (
+      <Box
+        {...(rest as Any)}
+        {...({ dangerouslySetInnerHTML: { __html: svg } } as Any)}
+        sx={{ width: size, height: size, bg: "background", ...sx }}
+      />
+    );
+  }
+);

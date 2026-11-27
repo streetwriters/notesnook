@@ -352,6 +352,11 @@ export interface DonutProps extends BaseProps {
 }
 
 export interface IconProps extends BaseProps {
+  /**
+   * An SVG path (`d`) on a 24×24 grid, or a whole SVG document (anything
+   * starting with `<`), drawn like `svg`: an icon's `.path` holds one of the
+   * two, so apps/web's `icon: Plus.path` works for icons drawn from SVG files.
+   */
   path?: string;
   svg?: string;
   size?: IconSizeToken;

@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ReactNode } from "react";
+import { forwardRef, type ForwardedRef, type ReactNode } from "react";
 import {
   Button,
   Text,
   type ButtonProps,
   type ColorValue,
-  type SxProp
+  type SxProp,
+  type UIElement
 } from "@notesnook/ui-kit";
 import type { Icon } from "../icons";
 
@@ -33,7 +34,7 @@ type StatusBarIconProps = {
   color?: ColorValue;
 };
 
-type CommonProps = { sx?: SxProp };
+type CommonProps = { sx?: SxProp; className?: string };
 
 type StatusBarTextItemProps = CommonProps & {
   variant: "text";
@@ -73,11 +74,19 @@ function spin(direction: "clockwise" | "counterclockwise"): SxProp {
   };
 }
 
-export function StatusBarItem(props: StatusBarItemProps) {
+function _StatusBarItem(
+  props: StatusBarItemProps,
+  ref: ForwardedRef<UIElement>
+) {
   if (props.variant === "text") {
-    const { text, sx, title } = props;
+    const { text, sx, className, title } = props;
     return (
-      <Text title={title} data-test-id={props["data-test-id"]} sx={{ ...TEXT_STYLE, ...sx }}>
+      <Text
+        className={className}
+        title={title}
+        data-test-id={props["data-test-id"]}
+        sx={{ ...TEXT_STYLE, ...sx }}
+      >
         {text}
       </Text>
     );
@@ -89,6 +98,7 @@ export function StatusBarItem(props: StatusBarItemProps) {
   return (
     <Button
       {...buttonProps}
+      ref={ref}
       variant="statusitem"
       sx={{
         flexDirection: "row",
@@ -124,3 +134,5 @@ export function StatusBarItem(props: StatusBarItemProps) {
     </Button>
   );
 }
+
+export const StatusBarItem = forwardRef(_StatusBarItem);

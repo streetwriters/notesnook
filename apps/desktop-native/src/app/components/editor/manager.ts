@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type {
-  EditorHandle,
-  EditorHeading,
-  EditorStatistics
-} from "@notesnook/ui-kit";
+import { useCallback, useEffect } from "react";
+import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
+import type { EditorHeading as TOCItem } from "@notesnook/ui-kit";
+import type { ToolbarDefinition } from "../../common/toolbar-types";
 import Config from "../../utils/config";
+import { getCurrentPreset } from "../../common/toolbar-config";
+import { EDITOR_LINE_HEIGHT, EDITOR_ZOOM } from "./common";
 
 type EditorConfig = {
   fontFamily: string;
@@ -32,10 +33,6 @@ type EditorConfig = {
   zoom: number;
   lineHeight: number;
 };
-
-export type NoteStatistics = EditorStatistics;
-export type IEditor = EditorHandle;
-export type TOCItem = EditorHeading;
 
 type EditorContext = {
   editor?: IEditor;
@@ -45,16 +42,14 @@ type EditorContext = {
   tableOfContents?: TOCItem[];
 };
 
-const EDITOR_ZOOM_DEFAULT = 100;
-const EDITOR_LINE_HEIGHT_DEFAULT = 1.2;
-
 class EditorManager extends BaseStore<EditorManager> {
   activeEditorId?: string;
+  toolbarConfig?: ToolbarDefinition;
   editorConfig: EditorConfig = Config.get("editorConfig", {
     fontFamily: "sans-serif",
     fontSize: 14,
-    zoom: EDITOR_ZOOM_DEFAULT,
-    lineHeight: EDITOR_LINE_HEIGHT_DEFAULT
+    zoom: EDITOR_ZOOM.DEFAULT,
+    lineHeight: EDITOR_LINE_HEIGHT.DEFAULT
   });
   editors: Record<string, EditorContext | undefined> = {};
 
@@ -111,6 +106,22 @@ export function useEditor(id: string) {
   return useEditorManager((store) => store.editors[id]);
 }
 
+export function useToolbarConfig() {
+  const toolbarConfig = useEditorManager((store) => store.toolbarConfig);
+  const setToolbarConfig = useCallback(
+    (config: ToolbarDefinition) =>
+      useEditorManager.setState({ toolbarConfig: config }),
+    []
+  );
+  useEffect(() => {
+    getCurrentPreset().then((preset) =>
+      useEditorManager.setState({ toolbarConfig: preset.tools })
+    );
+  }, []);
+
+  return { toolbarConfig, setToolbarConfig };
+}
+
 export function useNoteStatistics(): NoteStatistics {
   return useEditorManager(
     (store) =>
@@ -132,7 +143,10 @@ export function useEditorConfig() {
 
 export const editorConfig = () => useEditorManager.getState().editorConfig;
 
-export const onEditorConfigChange = <T>(
-  selector: (editorConfig: EditorConfig) => T,
-  listener: (selectedState: T, previousSelectedState: T) => void
+export const onEditorConfigChange = (
+  selector: (editorConfig: EditorConfig) => any,
+  listener: (
+    selectedState: EditorConfig,
+    previousSelectedState: EditorConfig
+  ) => void
 ) => useEditorManager.subscribe((s) => selector(s.editorConfig), listener);

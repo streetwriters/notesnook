@@ -36,7 +36,8 @@ import { ConfirmDialog } from "../../dialogs/confirm";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { showToast } from "../../utils/toast";
 import { writeToClipboard } from "../../utils/clipboard";
-import { insertAttachments, type Attachment } from "./picker";
+import { insertAttachments } from "./picker";
+import type { EditorAttachment as Attachment } from "@notesnook/ui-kit";
 import { useEditorManager } from "./manager";
 import {
   createEditorHostActions,
