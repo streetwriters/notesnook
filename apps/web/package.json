@@ -79,6 +79,7 @@
     "snarkdown": "^2.0.0",
     "timeago.js": "4.0.2",
     "w3c-keyname": "^2.2.6",
+    "wa-sqlite": "github:streetwriters/wa-sqlite#b3a8401ce62cd60c55a8025e4c31c7feb3a987ad",
     "wouter": "2.12.1",
     "zustand": "4.5.5",
     "zustand-mutative": "^1.2.0"

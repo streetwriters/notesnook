@@ -132,6 +132,52 @@ describe("Schema migration recovery", () => {
     }
   });
 
+  test("search index is rebuilt for sqlite3-fts5-html 0.0.7", async () => {
+    const db = createSchemaTestDatabase();
+
+    try {
+      const { provider } = await createMigrationProviderBefore("a-2026-11-25");
+      await initializeDatabase(db, provider, "notesnook-test");
+
+      await db
+        .insertInto("content" as any)
+        .values({
+          id: "content-1",
+          noteId: "note-1",
+          type: "tiptap",
+          data: "<p><s>Read books</s> and clean desk.</p>",
+          locked: false,
+          deleted: false
+        })
+        .execute();
+
+      // simulate an index built by an older tokenizer that skipped the text
+      // inside <s> tags
+      await sql`INSERT INTO content_fts(content_fts) VALUES('delete-all')`.execute(
+        db
+      );
+      await sql`INSERT INTO content_fts(rowid, id, noteId, data)
+        SELECT rowid, id, noteId, replace(data, '<s>Read books</s>', '') FROM content`.execute(
+        db
+      );
+      const search = (term: string) =>
+        sql<{ noteId: string }>`
+          SELECT noteId FROM content_fts WHERE content_fts MATCH ${`"${term}"`}
+        `
+          .execute(db)
+          .then((r) => r.rows.length);
+      expect(await search("clean")).toBe(1);
+      expect(await search("Read")).toBe(0);
+
+      await initializeDatabase(db, new NNMigrationProvider(), "notesnook-test");
+
+      expect(await search("Read")).toBe(1);
+      expect(await search("clean")).toBe(1);
+    } finally {
+      await db.destroy();
+    }
+  });
+
   test("unsynced queries use the partial synced index", async () => {
     const db = createSchemaTestDatabase();
 

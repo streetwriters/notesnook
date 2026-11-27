@@ -77,13 +77,18 @@ async function initializeDatabase(persistence: DatabasePersistence) {
           multiTab
         }),
       ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
-        ? { journalMode: "WAL", lockingMode: "exclusive" }
+        ? {
+            journalMode: "WAL",
+            lockingMode: "exclusive",
+            synchronous: "normal"
+          }
         : {
             journalMode: "MEMORY",
-            lockingMode: "normal"
+            lockingMode: "normal",
+            // the IndexedDB VFS takes its transaction durability from this
+            synchronous: "full"
           }),
       tempStore: "memory",
-      synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
       password:

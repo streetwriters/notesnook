@@ -1614,7 +1614,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-quick-sqlite (8.2.7):
+  - react-native-quick-sqlite (8.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1626,7 +1626,7 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-quick-sqlite/lexbor (= 8.2.7)
+    - react-native-quick-sqlite/lexbor (= 8.3.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1637,7 +1637,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-quick-sqlite/lexbor (8.2.7):
+  - react-native-quick-sqlite/lexbor (8.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2753,7 +2753,7 @@ DEPENDENCIES:
   - react-native-notification-sounds (from `../node_modules/react-native-notification-sounds`)
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
-  - react-native-quick-sqlite (from `.prebuilt-xcframeworks/.cache/react-native-quick-sqlite`)
+  - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-screenguard (from `../node_modules/react-native-screenguard`)
@@ -2961,7 +2961,7 @@ EXTERNAL SOURCES:
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-quick-sqlite:
-    :path: ".prebuilt-xcframeworks/.cache/react-native-quick-sqlite"
+    :path: "../node_modules/react-native-quick-sqlite"
   react-native-restart:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
@@ -3173,7 +3173,7 @@ SPEC CHECKSUMS:
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pdf: 70836b3b48595c7f85a3aa2b5d122b175c455733
-  react-native-quick-sqlite: c8abd0e68fe045620fcc626041950d6b2fa2c88a
+  react-native-quick-sqlite: 15185b3686360eb422afd193391be7f8877329e7
   react-native-restart: f2a57ccec2e6481deb1f19958ac60c0813313784
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-screenguard: 4daf8cb9c41b1c5a37c1db285832c481459ed4de

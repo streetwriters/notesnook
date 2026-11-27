@@ -543,6 +543,13 @@ export class NNMigrationProvider implements MigrationProvider {
             .column("type")
             .execute();
         }
+      },
+      "a-2026-11-25": {
+        async up(db) {
+          // sqlite3-fts5-html 0.0.7 indexes text inside <s> tags so notes
+          // indexed by older versions must be re-indexed.
+          await rebuildSearchIndex(db);
+        }
       }
     };
   }
