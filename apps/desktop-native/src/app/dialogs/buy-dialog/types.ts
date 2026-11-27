@@ -18,11 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Discount, Period, PlanPrice, SubscriptionPlan } from "@notesnook/core";
-type CheckoutEventNames = string;
-type CheckoutEventsCustomer = Record<string, unknown>;
-type CheckoutEventsDiscount = Record<string, unknown>;
-type CheckoutEventsItem = Record<string, unknown>;
-type PaddleEventData = Record<string, unknown>;
+import {
+  CheckoutEventNames,
+  CheckoutEventsCustomer,
+  CheckoutEventsDiscount,
+  CheckoutEventsItem,
+  PaddleEventData
+} from "./paddle-types";
 
 // export interface CallbackData {
 //   checkout?: Checkout;

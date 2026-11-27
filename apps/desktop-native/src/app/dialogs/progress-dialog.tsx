@@ -19,10 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import { Box, Flex, Text } from "@notesnook/ui-kit";
-
+import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import Dialog from "../components/dialog";
 
 type Progress = {
   total?: number;
@@ -84,11 +83,11 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
             >
               <Box
                 sx={{
-                  borderRadius: 150,
-                  alignSelf: "flex-start",
+                  borderRadius: "150px",
+                  alignSelf: "start",
                   bg: "accent",
                   height: "7px",
-                  width: `${(current / total) * 100}%` as `${number}%`
+                  width: `${(current / total) * 100}%`
                 }}
               />
             </Box>

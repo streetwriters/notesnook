@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DialogManager } from "../../common/dialog-manager";
+import BaseDialog from "../../components/dialog";
 import { Flex, Text } from "@notesnook/ui-kit";
 import { PLAN_METADATA } from "./plans";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -27,7 +28,6 @@ import { ComparePlans, Footer, PlansList } from "./plan-list";
 import { ConfirmDialog } from "../confirm";
 import { TaskManager } from "../../common/task-manager";
 import { strings } from "@notesnook/intl";
-import Dialog from "../../components/dialog";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;
@@ -39,7 +39,14 @@ export const ChangePlanDialog = DialogManager.register(
     const subscription = useUserStore((store) => store.user?.subscription);
 
     return (
-      <Dialog isOpen={true} onClose={onClose} width="60%">
+      <BaseDialog
+        isOpen={true}
+        onClose={onClose}
+        sx={{
+          width: ["95%", "80%", "60%"],
+          height: ["auto", "auto", "80vw"]
+        }}
+      >
         <Flex
           sx={{
             flexDirection: "column",
@@ -49,13 +56,17 @@ export const ChangePlanDialog = DialogManager.register(
           }}
         >
           <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
-            <Text variant="heading" sx={{ fontSize: 32, textAlign: "center" }}>
+            <Text
+              id="select-plan"
+              variant="heading"
+              sx={{ fontSize: 32, textAlign: "center" }}
+            >
               {strings.changePlan()}
             </Text>
             <Text
               variant="title"
+              mt={1}
               sx={{
-                mt: 1,
                 fontSize: "title",
                 color: "heading-secondary",
                 textAlign: "center"
@@ -103,14 +114,14 @@ export const ChangePlanDialog = DialogManager.register(
           sx={{
             flexDirection: "column",
             flex: 1,
-            px: 30,
+            px: "5%",
             mt: 50
           }}
         >
           <ComparePlans />
           <Footer />
         </Flex>
-      </Dialog>
+      </BaseDialog>
     );
   }
 );

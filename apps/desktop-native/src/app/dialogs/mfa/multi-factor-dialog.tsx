@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-
+import Dialog from "../../components/dialog";
 import {
   AuthenticatorOnNext,
   AuthenticatorTypeOnNext,
@@ -27,13 +27,11 @@ import {
   Step,
   steps
 } from "./steps";
-import { submitStep } from "./submit";
 import { Authenticator, OnNextFunction } from "./types";
-import { ErrorText } from "../components/error-text";
+import { ErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import Dialog from "../../components/dialog";
 
 type MultifactorDialogProps = BaseDialogProps<boolean> & {
   primaryMethod?: AuthenticatorType;
@@ -50,19 +48,17 @@ export const MultifactorDialog = DialogManager.register(
     const [error, setError] = useState<string>();
 
     if (!step) return null;
-
     return (
       <Dialog
         isOpen={true}
         title={step.title}
         description={step.description}
         width={500}
-        onClose={() => props.onClose(false)}
         positiveButton={
           step.next
             ? {
                 text: strings.continue(),
-                onClick: submitStep
+                form: "2faForm"
               }
             : null
         }
@@ -79,6 +75,7 @@ export const MultifactorDialog = DialogManager.register(
           <step.component
             onNext={(arg: AuthenticatorType | Authenticator) => {
               if (!step.next) return onClose(true);
+
               const nextStep =
                 step.next !== "recoveryCodes" && primaryMethod
                   ? fallbackSteps[step.next](
@@ -86,6 +83,7 @@ export const MultifactorDialog = DialogManager.register(
                       primaryMethod
                     )
                   : steps[step.next](arg as AuthenticatorType & Authenticator);
+
               setStep(nextStep);
             }}
             onError={setError}

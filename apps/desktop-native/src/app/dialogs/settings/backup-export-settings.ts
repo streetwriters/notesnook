@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment, integration } from "@platform";
-import { selectBackupDirectory } from "./platform-gaps";
 import { createBackup, verifyAccount, importBackup } from "../../common";
 import { db } from "../../common/db";
 import { exportNotes } from "../../common/export";
 import { SettingsGroup } from "./types";
+import { IS_DESKTOP_APP } from "../desktop-bridge";
 import { strings } from "@notesnook/intl";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { desktop } from "../desktop-bridge";
 import { formatDate } from "@notesnook/core";
 import {
   BACKUP_CRON_EXPRESSIONS,
@@ -258,7 +258,7 @@ export const BackupExportSettings: SettingsGroup[] = [
           strings
             .selectBackupDirDesc(getDesktopBackupsDirectoryPath())
             .join("\n\n"),
-        isHidden: () => !environment.isDesktopApp,
+        isHidden: () => !IS_DESKTOP_APP,
         components: [
           {
             type: "button",
@@ -269,10 +269,11 @@ export const BackupExportSettings: SettingsGroup[] = [
                 (await verifyAccount());
               if (!verified) return;
 
-              await selectBackupDirectory();
+              await desktop?.integration.selectBackupDirectory.query();
 
               useSettingStore.setState({
-                backupStorageLocation: await integration.getBackupDirectory()
+                backupStorageLocation:
+                  await desktop?.integration.backupDirectory.query()
               });
             },
             variant: "secondary"

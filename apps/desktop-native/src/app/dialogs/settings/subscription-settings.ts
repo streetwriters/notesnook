@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { shell } from "@platform";
+import { window } from "../desktop-bridge";
 import { SettingsGroup } from "./types";
 import { SubscriptionStatus } from "./components/subscription-status";
 import { showToast } from "../../utils/toast";
@@ -144,7 +144,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
                   throw new Error(
                     "Failed to get subscription update url. Please contact us at support@streetwriters.co so we can help you update your payment method."
                   );
-                shell.openUrl(url);
+                window.open(url, "_blank");
               } catch (e) {
                 if (e instanceof Error) showToast("error", e.message);
               }
@@ -193,7 +193,9 @@ export const SubscriptionSettings: SettingsGroup[] = [
                   action: () => db.subscriptions.cancel()
                 })
                   .catch((e) => showToast("error", e.message))
-                  .then(() => showToast("success", strings.trialCanceled()));
+                  .then(() =>
+                    showToast("success", strings.trialCanceled())
+                  );
               }
             }
           }
@@ -248,7 +250,10 @@ export const SubscriptionSettings: SettingsGroup[] = [
                   showToast("error", result.message);
                   return;
                 }
-                showToast("success", strings.refundIssued());
+                showToast(
+                  "success",
+                  strings.refundIssued()
+                );
               }
             },
             variant: "error"

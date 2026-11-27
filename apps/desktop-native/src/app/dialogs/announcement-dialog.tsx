@@ -17,20 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback } from "react";
 import { Flex } from "@notesnook/ui-kit";
 import AnnouncementBody from "../components/announcements/body";
 import { store as announcementStore } from "../stores/announcement-store";
+import { useCallback } from "react";
+import BaseDialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import Dialog from "../components/dialog";
 
 type AnnouncementDialogProps = BaseDialogProps<boolean> & {
-  announcement: {
-    id: string;
-    body: Parameters<typeof AnnouncementBody>[0]["components"];
-  };
+  announcement: any;
 };
-
 export const AnnouncementDialog = DialogManager.register(
   function AnnouncementDialog(props: AnnouncementDialogProps) {
     const { announcement, onClose } = props;
@@ -41,15 +37,21 @@ export const AnnouncementDialog = DialogManager.register(
     }, [announcement, onClose]);
 
     return (
-      <Dialog isOpen onClose={() => onClose(false)} width="30%">
-        <Flex sx={{ bg: "background", flexDirection: "column" }}>
+      <BaseDialog isOpen onClose={() => onClose(false)} width={"30%"}>
+        <Flex
+          bg="background"
+          sx={{
+            position: "relative",
+            flexDirection: "column"
+          }}
+        >
           <AnnouncementBody
             dismiss={dismiss}
             components={announcement.body}
             type="dialog"
           />
         </Flex>
-      </Dialog>
+      </BaseDialog>
     );
   }
 );

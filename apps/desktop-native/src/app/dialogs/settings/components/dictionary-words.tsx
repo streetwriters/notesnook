@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, ScrollContainer, Text } from "@notesnook/ui-kit";
+import { Button, Flex, Text } from "@notesnook/ui-kit";
+import { FlexScrollContainer } from "../../../components/scroll-container";
 import { useSpellChecker } from "../../../hooks/use-spell-checker";
 import { strings } from "@notesnook/intl";
 
@@ -26,23 +27,24 @@ export function DictionaryWords() {
   const deleteWord = useSpellChecker((store) => store.deleteWord);
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
+    <>
       <Text variant="body" sx={{ my: 1 }}>
         {strings.customDictWords(words.length)}
       </Text>
-      <ScrollContainer sx={{ maxHeight: 400 }}>
+      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
         <Flex sx={{ flexDirection: "column" }}>
           {words.map((word) => (
-            <Flex
+            <Button
               key={word}
+              variant="menuitem"
+              sx={{ textAlign: "left", p: 1 }}
               onClick={() => deleteWord(word)}
-              sx={{ p: 1, borderRadius: "default", ":hover": { bg: "hover" } }}
             >
-              <Text variant="body">{word}</Text>
-            </Flex>
+              {word}
+            </Button>
           ))}
         </Flex>
-      </ScrollContainer>
-    </Flex>
+      </FlexScrollContainer>
+    </>
   );
 }

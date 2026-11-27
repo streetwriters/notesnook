@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment } from "@platform";
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { getPlatform, IS_DESKTOP_APP } from "../desktop-bridge";
 import { db } from "../../common/db";
 import Config from "../../utils/config";
 import { showToast } from "../../utils/toast";
@@ -73,7 +73,7 @@ export const PrivacySettings: SettingsGroup[] = [
         description: strings.privacyModeDesc(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.privacyMode, listener),
-        isHidden: () => !environment.isDesktopApp || environment.os === "Linux",
+        isHidden: () => !IS_DESKTOP_APP || getPlatform() === "linux",
         components: [
           {
             type: "toggle",
@@ -95,7 +95,7 @@ export const PrivacySettings: SettingsGroup[] = [
         description: strings.customDnsDescription(),
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.customDns, listener),
-        isHidden: () => !environment.isDesktopApp,
+        isHidden: () => !IS_DESKTOP_APP,
         components: [
           {
             type: "toggle",

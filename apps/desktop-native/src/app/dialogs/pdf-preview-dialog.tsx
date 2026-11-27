@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Suspense, lazy } from "react";
+import React, { Suspense } from "react";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { Loading } from "../components/icons";
 import Dialog from "../components/dialog";
+import { Loading } from "../components/icons";
 
-const PdfPreview = lazy(() => import("../components/pdf-preview"));
+const PdfPreview = React.lazy(() => import("../components/pdf-preview"));
 
 type PdfPreviewDialogProps = BaseDialogProps<boolean> & {
   url: string;
@@ -37,7 +37,9 @@ export const PdfPreviewDialog = DialogManager.register(
         width="100%"
         height="100%"
         noScroll
-        sx={{ py: 1 }}
+        sx={{
+          py: 1
+        }}
         onClose={() => onClose(false)}
       >
         <Suspense fallback={<Loading />}>

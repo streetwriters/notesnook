@@ -22,11 +22,10 @@ import { strings } from "@notesnook/intl";
 import { useCallback } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-
+import Dialog from "../components/dialog";
 import { store as notebookStore } from "../stores/notebook-store";
 import { useRelationChangesStore } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";
-import Dialog from "../components/dialog";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
   notebook: Notebook;
@@ -52,7 +51,7 @@ export const MoveNotebookDialog = DialogManager.register(
         onClose={() => onClose(false)}
         width={700}
         noScroll
-        sx={{ minHeight: 553 }}
+        sx={{ minHeight: "553px" }}
         positiveButton={{
           text: strings.done(),
           onClick: async () => {

@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import Dialog from "../components/dialog";
 import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { Reminder } from "@notesnook/core";
+import IconTag from "../components/icon-tag";
 import { Clock, Refresh } from "../components/icons";
+import Note from "../components/note";
 import { getFormattedReminderTime, usePromise } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import IconTag from "../components/icon-tag";
-import { NoteReference } from "./components/note-reference";
-import Dialog from "../components/dialog";
 
 export type ReminderPreviewDialogProps = BaseDialogProps<false> & {
   reminder: Reminder;
@@ -69,7 +69,12 @@ export const ReminderPreviewDialog = DialogManager.register(
           onClick: () => props.onClose(false)
         }}
       >
-        <Flex sx={{ alignItems: "center", flexDirection: "row", mb: 2 }}>
+        <Flex
+          sx={{
+            alignItems: "center",
+            mb: 2
+          }}
+        >
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
               icon={Refresh}
@@ -78,11 +83,11 @@ export const ReminderPreviewDialog = DialogManager.register(
           )}
           <IconTag icon={Clock} text={getFormattedReminderTime(reminder)} />
         </Flex>
+
         <Text variant="body">{strings.remindMeIn()}:</Text>
         <Flex
           sx={{
             alignItems: "center",
-            flexDirection: "row",
             my: 1,
             gap: 1,
             flexWrap: "wrap"
@@ -99,25 +104,31 @@ export const ReminderPreviewDialog = DialogManager.register(
                 });
                 props.onClose(false);
               }}
-              sx={{ borderRadius: 100, py: 1, px: 2, flexShrink: 0 }}
+              sx={{
+                borderRadius: 100,
+                py: 1,
+                px: 2,
+                flexShrink: 0
+              }}
             >
-              <Text>{time.title}</Text>
+              {time.title}
             </Button>
           ))}
         </Flex>
         {referencedNotes &&
           referencedNotes.status === "fulfilled" &&
           referencedNotes.value.length > 0 && (
-            <Flex sx={{ flexDirection: "column" }}>
+            <>
               <Text variant="body">{strings.references()}:</Text>
-              {referencedNotes.value.map((item) => (
-                <NoteReference
+              {referencedNotes.value.map((item, index) => (
+                <Note
                   key={item.id}
                   item={item}
                   date={item.dateCreated}
+                  compact
                 />
               ))}
-            </Flex>
+            </>
           )}
       </Dialog>
     );

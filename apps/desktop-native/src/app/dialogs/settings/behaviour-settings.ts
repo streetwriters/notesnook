@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment } from "@platform";
-import { reloadApp, setAppLanguage } from "./platform-gaps";
 import { DATE_FORMATS, WeekFormat } from "@notesnook/core";
 import { SettingsGroup } from "./types";
+import { window, IS_DESKTOP_APP } from "../desktop-bridge";
 import {
   ImageCompressionOptions,
   useStore as useSettingStore
@@ -28,7 +27,11 @@ import {
 import dayjs from "dayjs";
 import { TimeFormat, DayFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
-import { strings, AVAILABLE_LANGUAGES } from "@notesnook/intl";
+import {
+  strings,
+  AVAILABLE_LANGUAGES
+} from "@notesnook/intl";
+import { desktop } from "../desktop-bridge";
 import { ConfirmDialog } from "../confirm";
 import { checkFeature } from "../../common";
 
@@ -62,10 +65,10 @@ export const BehaviourSettings: SettingsGroup[] = [
 
               if (ok) {
                 useSettingStore.getState().setAppLanguage(newLang);
-                if (environment.isDesktopApp) {
-                  await setAppLanguage(newLang);
+                if (IS_DESKTOP_APP && desktop) {
+                  await desktop.integration.setAppLanguage.mutate(newLang);
                 }
-                reloadApp();
+                window.location.reload();
               }
             },
             selectedOption: () => {
@@ -302,7 +305,7 @@ export const BehaviourSettings: SettingsGroup[] = [
     key: "desktop-app",
     section: "behaviour",
     header: strings.desktopApp(),
-    isHidden: () => !environment.isDesktopApp,
+    isHidden: () => !IS_DESKTOP_APP,
     settings: [
       {
         key: "auto-updates",

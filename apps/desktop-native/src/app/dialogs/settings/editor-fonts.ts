@@ -17,55 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// The fonts the editor offers; web takes this list from @notesnook/editor
+// (Tiptap), which the native editor does not ship.
+
 import { strings } from "@notesnook/intl";
 import { getFontConfig } from "@notesnook/theme";
-import Config from "../../utils/config";
-
-export const EDITOR_LINE_HEIGHT = {
-  DEFAULT: 1.2,
-  MAX: 10,
-  MIN: 1
-};
-
-const EDITOR_ZOOM_DEFAULT = 100;
-
-export type EditorConfig = {
-  fontFamily: string;
-  fontSize: number;
-  zoom: number;
-  lineHeight: number;
-};
-
-type Listener = (config: EditorConfig, previous: EditorConfig) => void;
-
-let current: EditorConfig = Config.get("editorConfig", {
-  fontFamily: "sans-serif",
-  fontSize: 14,
-  zoom: EDITOR_ZOOM_DEFAULT,
-  lineHeight: EDITOR_LINE_HEIGHT.DEFAULT
-});
-const listeners = new Set<Listener>();
-
-export const editorConfig = () => current;
-
-export function setEditorConfig(config: Partial<EditorConfig>) {
-  const previous = current;
-  current = Config.set("editorConfig", { ...current, ...config });
-  listeners.forEach((listener) => listener(current, previous));
-}
-
-export function onEditorConfigChange(
-  selector: (editorConfig: EditorConfig) => unknown,
-  listener: (config: EditorConfig, previous: EditorConfig) => void
-) {
-  const wrapped: Listener = (next, previous) => {
-    if (selector(next) !== selector(previous)) listener(next, previous);
-  };
-  listeners.add(wrapped);
-  return () => {
-    listeners.delete(wrapped);
-  };
-}
 
 export function getFonts() {
   return [

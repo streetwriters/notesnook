@@ -17,25 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
-import { environment } from "@platform";
+import { SettingsGroup } from "./types";
+import { IS_DESKTOP_APP } from "../desktop-bridge";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import type { SettingsGroup } from "./types";
 import { ThemesSelector } from "./components/themes-selector";
+import { strings } from "@notesnook/intl";
 
 export const AppearanceSettings: SettingsGroup[] = [
   {
     key: "theme",
     section: "appearance",
     header: strings.general(),
-    isHidden: () => !environment.isDesktopApp,
+    isHidden: () => !IS_DESKTOP_APP,
     settings: [
       {
         key: "zoom-factor",
         title: strings.zoomFactor(),
         description: strings.zoomFactorDescription(),
-        isHidden: () => !environment.isDesktopApp,
+        isHidden: () => !IS_DESKTOP_APP,
         onStateChange: (listener) =>
           useThemeStore.subscribe(
             (s) => [s.colorScheme, s.followSystemTheme],

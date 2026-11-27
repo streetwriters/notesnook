@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { restartApp } from "./platform-gaps";
 import { strings } from "@notesnook/intl";
+import { desktop } from "../desktop-bridge";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { showToast } from "../../utils/toast";
 import { SettingsGroup } from "./types";
@@ -152,7 +152,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
               showToast("success", strings.restartAppToTakeEffect(), [
                 {
                   text: strings.restartNow(),
-                  onClick: () => restartApp()
+                  onClick: () => desktop?.integration.restart.query()
                 }
               ]);
             }

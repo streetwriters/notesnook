@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { window } from "../desktop-bridge";
 import { strings } from "@notesnook/intl";
 import { escapeUTF8 } from "entities";
 import { db } from "../../common/db";
@@ -46,8 +47,7 @@ import {
   ArrowBendUpLeft,
   ArrowBendUpRight
 } from "../../components/icons";
-import { mdiIcon } from "../../components/icon-factory";
-import { shell } from "@platform";
+import { mdiIcon as createIcon } from "../../components/icon-factory";
 import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
@@ -57,7 +57,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
 import { noteMenuItems } from "../../components/note";
-import type { MenuItem } from "@notesnook/ui-kit";
+import { MenuItem } from "@notesnook/ui-kit";
 import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";
@@ -190,7 +190,7 @@ const staticCommands: Command[] = [
     id: "help",
     title: strings.helpAndSupport(),
     icon: Question,
-    action: () => shell.openUrl("https://notesnook.com/help"),
+    action: () => (window.location.href = "https://notesnook.com/help"),
     group: strings.navigate(),
     type: "command"
   },
@@ -540,7 +540,7 @@ function menuItemToCommands(
 
   if (!menuItem.onClick) return commands;
   const _Icon = menuItem.icon
-    ? mdiIcon(menuItem.icon)
+    ? createIcon(menuItem.icon)
     : menuItem.iconComponent
     ? (menuItem.iconComponent as Icon)
     : undefined;

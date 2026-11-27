@@ -17,22 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment } from "@platform";
 import { SettingsGroup } from "./types";
+import { IS_DESKTOP_APP } from "../desktop-bridge";
 import {
-  EDITOR_LINE_HEIGHT,
   editorConfig,
-  getFonts,
   onEditorConfigChange,
-  setEditorConfig
-} from "./editor-config";
+  useEditorManager
+} from "../../components/editor/manager";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import { getFonts } from "./editor-fonts";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { SpellCheckerLanguages } from "./components/spell-checker-languages";
 import { CustomizeToolbar } from "./components/customize-toolbar";
 import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
+import { EDITOR_LINE_HEIGHT } from "../../components/editor/common";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -70,7 +70,9 @@ export const EditorSettings: SettingsGroup[] = [
             })),
             selectedOption: () => editorConfig().fontFamily,
             onSelectionChanged: (value) => {
-              setEditorConfig({ fontFamily: value });
+              useEditorManager
+                .getState()
+                .setEditorConfig({ fontFamily: value });
             }
           }
         ]
@@ -88,7 +90,8 @@ export const EditorSettings: SettingsGroup[] = [
             max: 120,
             min: 8,
             defaultValue: () => editorConfig().fontSize,
-            onChange: (value) => setEditorConfig({ fontSize: value })
+            onChange: (value) =>
+              useEditorManager.getState().setEditorConfig({ fontSize: value })
           }
         ]
       },
@@ -105,7 +108,8 @@ export const EditorSettings: SettingsGroup[] = [
             max: EDITOR_LINE_HEIGHT.MAX,
             min: EDITOR_LINE_HEIGHT.MIN,
             defaultValue: () => editorConfig().lineHeight,
-            onChange: (value) => setEditorConfig({ lineHeight: value })
+            onChange: (value) =>
+              useEditorManager.getState().setEditorConfig({ lineHeight: value })
           }
         ]
       },
@@ -160,7 +164,7 @@ export const EditorSettings: SettingsGroup[] = [
     key: "spell-check",
     section: "editor",
     header: strings.spellCheck(),
-    isHidden: () => !environment.isDesktopApp,
+    isHidden: () => !IS_DESKTOP_APP,
     onRender: () => {
       useSpellChecker.getState().refresh();
     },
