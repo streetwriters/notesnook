@@ -22,13 +22,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // through `onKeyDown`.
 
 import { afterEach, describe, expect, test } from "vitest";
-import { act, createElement } from "react";
+import { act, createElement, type ReactElement } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { EmotionThemeProvider } from "@notesnook/theme";
-import { Editor } from "@tiptap/core";
+import { Editor, type JSONContent } from "@tiptap/core";
 import { createEditor } from "../../test-utils/index.js";
-import { Toolbar, type ToolbarDefinition } from "@notesnook/editor-ui";
+import {
+  Toolbar,
+  useToolbarStore,
+  type ToolbarDefinition
+} from "@notesnook/editor-ui";
+import { strings } from "@notesnook/intl";
 import { Link } from "../extensions/link/index.js";
+import { TablePopup } from "@notesnook/editor-ui/toolbar/popups/table-popup.js";
+import { Table } from "../extensions/table/index.js";
+import TableCell from "../extensions/table-cell/index.js";
+import TableHeader from "../extensions/table-header/index.js";
+import TableRow from "@tiptap/extension-table-row";
+import { EmbedNode } from "../extensions/embed/index.js";
+import Color from "@tiptap/extension-color";
+import TextStyle from "@tiptap/extension-text-style";
 
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -41,12 +54,39 @@ afterEach(() => {
   root = undefined;
   for (const editor of editors.splice(0))
     if (!editor.isDestroyed) editor.destroy();
+  useToolbarStore.getState().setIsMobile(false);
   document.body.innerHTML = "";
 });
 
+type TableSize = { columns: number; rows: number };
+
+function renderInline(element: ReactElement) {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  root = createRoot(container);
+  act(() =>
+    root?.render(
+      createElement(
+        EmotionThemeProvider,
+        { scope: "editorToolbar" },
+        element
+      )
+    )
+  );
+}
+
 function renderToolbar(tools: ToolbarDefinition) {
   const { editor } = createEditor({
-    extensions: { link: Link },
+    extensions: {
+      link: Link,
+      table: Table,
+      tableRow: TableRow,
+      tableCell: TableCell,
+      tableHeader: TableHeader,
+      embed: EmbedNode,
+      textStyle: TextStyle,
+      color: Color.configure({ types: ["textStyle"] })
+    },
     initialContent: "<p>hello world</p>"
   });
   editors.push(editor);
@@ -96,11 +136,29 @@ function press(input: HTMLElement, key: string) {
 }
 
 function input(placeholder: string) {
-  const element = document.querySelector<HTMLInputElement>(
-    `input[placeholder="${placeholder}"]`
+  const element = Array.from(document.querySelectorAll("input")).find(
+    (item) => item.placeholder === placeholder
   );
   if (!element) throw new Error(`no input with placeholder ${placeholder}`);
   return element;
+}
+
+function countMatches(text: string, pattern: RegExp) {
+  return (text.match(pattern) ?? []).length;
+}
+
+function findNode(node: JSONContent, type: string): JSONContent | undefined {
+  if (node.type === type) return node;
+  for (const child of node.content ?? []) {
+    const found = findNode(child, type);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+function openInsertTable() {
+  click('[data-test-id="tool-insertBlock"]');
+  click('[data-test-id="menu-button-table"]');
 }
 
 describe("toolbar popups on the web kit", () => {
@@ -139,5 +197,98 @@ describe("toolbar popups on the web kit", () => {
     click('[data-test-id="popup-action"]');
 
     expect(editor.isActive("link")).toBe(true);
+  });
+});
+
+describe("table popup on the web kit", () => {
+  test("a cell of the size grid inserts a table of that size", () => {
+    const editor = renderToolbar([["insertBlock"]]);
+    openInsertTable();
+
+    const grid = document.querySelector<HTMLElement>(
+      '[data-test-id="table-size-grid"]'
+    );
+    // the third cell of the second row: a table of 2 rows and 3 columns
+    const cell = grid?.children[1]?.children[2];
+    if (!(cell instanceof HTMLElement))
+      throw new Error("no grid cell at row 2, column 3");
+    act(() => cell.click());
+
+    const html = editor.getHTML();
+    expect(countMatches(html, /<tr[\s>]/g)).toBe(2);
+    expect(countMatches(html, /<(td|th)[\s>]/g)).toBe(6);
+  });
+});
+
+describe("table popup's size inputs on the web kit", () => {
+  // On mobile the insert-block sheet renders no items (a separate issue), so
+  // the popup is rendered on its own here.
+  test("on mobile, the column and row inputs set the size that is inserted", () => {
+    useToolbarStore.getState().setIsMobile(true);
+    const sizes: TableSize[] = [];
+    renderInline(
+      createElement(TablePopup, {
+        onInsertTable: (size: TableSize) => {
+          sizes.push(size);
+        }
+      })
+    );
+
+    const [columns, rows] = document.querySelectorAll<HTMLInputElement>(
+      'input[type="number"]'
+    );
+    if (!columns || !rows)
+      throw new Error("the column and row inputs are not rendered");
+    type(columns, "3");
+    type(rows, "2");
+    click('[data-test-id="popup-action"]');
+
+    expect(sizes).toEqual([{ columns: 3, rows: 2 }]);
+  });
+});
+
+describe("embed popup on the web kit", () => {
+  test("the URL and width fields insert an embed of that width", () => {
+    const editor = renderToolbar([["insertBlock"]]);
+    click('[data-test-id="tool-insertBlock"]');
+    click('[data-test-id="menu-button-embed"]');
+
+    type(
+      input(strings.enterEmbedSourceURL()),
+      "https://example.com/embed/video"
+    );
+    type(input(strings.width()), "640");
+    click('[data-test-id="popup-action"]');
+
+    const embed = findNode(editor.getJSON(), "embed");
+    expect(embed?.attrs).toMatchObject({
+      src: "https://example.com/embed/video",
+      width: 640
+    });
+  });
+});
+
+describe("colour picker on the web kit", () => {
+  test("the hex field applies a typed colour to the selection", () => {
+    const editor = renderToolbar([["textColor"]]);
+    click('[data-test-id="tool-chevronDown"]');
+    click('[data-test-id="color-picker-palette"]');
+
+    const hex = document.querySelector<HTMLInputElement>(
+      'input[data-test-id="color-picker-hex"]'
+    );
+    if (!hex) throw new Error("the hex colour field is not rendered");
+    type(hex, "#ff0000");
+
+    expect(editor.getHTML()).toContain("#ff0000");
+  });
+});
+
+describe("list tool on the web kit", () => {
+  test("the bullet list button toggles a bullet list on the selection", () => {
+    const editor = renderToolbar([["bulletList"]]);
+    click('[data-test-id="tool-bulletList"]');
+
+    expect(editor.isActive("bulletList")).toBe(true);
   });
 });
