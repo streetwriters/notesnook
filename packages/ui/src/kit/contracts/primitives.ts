@@ -267,6 +267,11 @@ export interface InputProps extends BaseProps<UIInputElement> {
     | "numeric"
     | "decimal"
     | "search";
+  /**
+   * A paste into the field, with the pasted text in `clipboardData`. Desktop
+   * raises it when the native text field reports pastes (see
+   * docs/ui-kit-web-api.md).
+   */
   onPaste?: (event: UIClipboardEvent<UIInputElement>) => void;
   onChange?: (event: UIChangeEvent<UIInputElement>) => void;
 }
@@ -284,6 +289,7 @@ export interface TextareaProps extends BaseProps<UITextAreaElement> {
   spellCheck?: boolean;
   wrap?: "soft" | "hard" | "off";
   selectTextOnFocus?: boolean;
+  onPaste?: (event: UIClipboardEvent<UITextAreaElement>) => void;
   onChange?: (event: UIChangeEvent<UITextAreaElement>) => void;
 }
 

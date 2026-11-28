@@ -88,6 +88,7 @@ const {
   Button,
   Flex,
   Text,
+  Textarea,
   FormData,
   resolvePercentTranslate
 } = await import("./primitives");
@@ -125,6 +126,43 @@ describe("Input", () => {
     expect(onChangeText).not.toHaveBeenCalled();
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0].target.value).toBe("hello");
+  });
+
+  it("raises onPaste with the pasted text as clipboard data", () => {
+    const onPaste = vi.fn();
+    const preventDefault = vi.fn();
+    render(h(Input, { onPaste } as never));
+    fire(() =>
+      root.root
+        .findByType("TextInput" as any)
+        .props.onPaste({ nativeEvent: { text: "123456" }, preventDefault })
+    );
+    expect(onPaste).toHaveBeenCalledTimes(1);
+    const event = onPaste.mock.calls[0][0];
+    expect(event.clipboardData.getData("text")).toBe("123456");
+    expect(event.clipboardData.getData("text/plain")).toBe("123456");
+    expect(event.clipboardData.types).toEqual(["text/plain"]);
+    expect(event.clipboardData.files).toHaveLength(0);
+    expect(typeof event.currentTarget.focus).toBe("function");
+    event.preventDefault();
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it("raises a Textarea's onPaste too, and an empty clipboard has no text", () => {
+    const onPaste = vi.fn();
+    render(h(Textarea, { onPaste } as never));
+    fire(() =>
+      root.root.findByType("TextInput" as any).props.onPaste({ nativeEvent: {} })
+    );
+    expect(onPaste.mock.calls[0][0].clipboardData.getData("text")).toBe("");
+    expect(onPaste.mock.calls[0][0].clipboardData.types).toEqual([]);
+  });
+
+  it("leaves the native paste handler unset without onPaste", () => {
+    render(h(Input, {} as never));
+    expect(
+      root.root.findByType("TextInput" as any).props.onPaste
+    ).toBeUndefined();
   });
 
   it("submits the enclosing form on Enter", () => {

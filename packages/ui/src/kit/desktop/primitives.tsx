@@ -65,6 +65,7 @@ import { useThemeContext } from "./theme";
 import { mergeSx, sxObject } from "../shared/style/shorthand";
 import {
   changeEvent,
+  clipboardEvent,
   syntheticEvent,
   type EventState,
   type NativeEvent
@@ -615,7 +616,7 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
   useLabelControl(control);
   useFormField(props.name, control, false);
   const form = useContext(FormContext);
-  const { onChange } = props;
+  const { onChange, onPaste } = props;
 
   const fields: Record<string, unknown> = { ...nativeProps };
   delete fields.focusable;
@@ -651,6 +652,14 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
           changeEvent(element.current ?? controlElement(control), event)
         );
       }}
+      onPaste={
+        onPaste
+          ? (event: NativeEvent) =>
+              onPaste(
+                clipboardEvent(element.current ?? controlElement(control), event)
+              )
+          : undefined
+      }
       onSelectionChange={(event: NativeEvent) => {
         const selection = event?.nativeEvent?.selection;
         if (!selection) return;

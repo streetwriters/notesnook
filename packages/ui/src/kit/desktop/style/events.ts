@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { UIElement } from "../../contracts/elements";
 import type {
+  UIClipboardEvent,
   UIChangeEvent,
   UIDataTransfer,
   UIDragEvent,
@@ -314,6 +315,26 @@ export function dragEvent<T = UIElement>(
   const native = payloadOf(event);
   return withMembers(mouseEvent<T>(type, event, {}, element), {
     dataTransfer
+  });
+}
+
+/**
+ * A paste into a text field. The native field reports the pasted text
+ * (`nativeEvent.text`) and, when the clipboard holds files, those
+ * (`nativeEvent.files`); `clipboardData.getData("text")` returns the text.
+ * `preventDefault()` reaches the native event, which is how the field is told
+ * not to insert the text itself.
+ */
+export function clipboardEvent<T = UIElement>(
+  element: DesktopElement | null,
+  event?: NativeEvent
+): UIClipboardEvent<T> & EventState {
+  const native = payloadOf(event) as { text?: unknown; files?: NativeFile[] };
+  const store = new Map<string, string>();
+  if (typeof native.text === "string") store.set("text/plain", native.text);
+  const files = Array.isArray(native.files) ? native.files.map(toUIFile) : [];
+  return withMembers(syntheticEvent<T>("paste", event, element ?? detached), {
+    clipboardData: new DesktopDataTransfer(store, files)
   });
 }
 
