@@ -27,6 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // and imports `Dom` from the desktop kit (packages/ui/src/kit/desktop/dom.tsx),
 // so a file shared with apps/web keeps its raw tags.
 //
+// `document` is rewritten the same way, to the kit's `document` (the same
+// module): `document.getElementById("select-plan")` finds the kit element
+// with that id. Only a free `document` is: a local of that name, a property
+// (`x.document`) and the operand of `typeof` (code asking whether there is a
+// DOM is told there is none) stay as written.
+//
 // Left alone: `br`, `option` and `optgroup` (the kit's Text and Select read
 // them from their children and never draw them), tags the kit has no element
 // for, and tags inside an `<svg>` (`use`, `path`), which the svg element reads.
@@ -42,24 +48,44 @@ const TAGS = new Set(
   ).split(" ")
 );
 
-module.exports = function domElements({ types: t }) {
+module.exports = Object.assign(function domElementsPlugin(api) {
+  return domElements(api);
+}, { TAGS });
+
+function domElements({ types: t }) {
   return {
     name: "dom-elements",
     visitor: {
       Program: {
         enter(_path, state) {
           state.domLocal = undefined;
+          state.documentLocal = undefined;
         },
         exit(path, state) {
-          if (!state.domLocal) return;
+          const specifiers = [];
+          if (state.domLocal)
+            specifiers.push(
+              t.importSpecifier(state.domLocal, t.identifier("Dom"))
+            );
+          if (state.documentLocal)
+            specifiers.push(
+              t.importSpecifier(state.documentLocal, t.identifier("document"))
+            );
+          if (!specifiers.length) return;
           path.unshiftContainer(
             "body",
-            t.importDeclaration(
-              [t.importSpecifier(state.domLocal, t.identifier("Dom"))],
-              t.stringLiteral(SOURCE)
-            )
+            t.importDeclaration(specifiers, t.stringLiteral(SOURCE))
           );
         }
+      },
+      ReferencedIdentifier(path, state) {
+        if (!path.isIdentifier({ name: "document" })) return;
+        if (path.scope.hasBinding("document")) return;
+        if (path.parentPath.isUnaryExpression({ operator: "typeof" })) return;
+        state.documentLocal ??= path.scope
+          .getProgramParent()
+          .generateUidIdentifier("document");
+        path.replaceWith(t.identifier(state.documentLocal.name));
       },
       JSXElement(path, state) {
         const opening = path.node.openingElement;

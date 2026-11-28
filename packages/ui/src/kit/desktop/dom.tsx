@@ -41,6 +41,7 @@ import {
 import { SvgXml } from "react-native-svg";
 import type { SxProp } from "../contracts/style";
 import { registerStylesheet } from "../shared/style/css-motion";
+import { getElementById } from "./element";
 import { mergeSx } from "../shared/style/shorthand";
 import {
   Box,
@@ -86,6 +87,22 @@ const HEADING_SIZES: Record<string, number> = {
   h4: 16,
   h5: 13,
   h6: 11
+};
+
+/**
+ * The part of the DOM's `document` that files shared with apps/web reach for:
+ * elements by id. There is nothing to query by selector and no document-wide
+ * events, so those find nothing and listen to nothing.
+ */
+export const document = {
+  getElementById,
+  querySelector: (selector: string) =>
+    /^#[\w-]+$/.test(selector) ? getElementById(selector.slice(1)) : null,
+  querySelectorAll: (_selector: string): never[] => [],
+  addEventListener: (_type: string, _listener: unknown) => undefined,
+  removeEventListener: (_type: string, _listener: unknown) => undefined,
+  activeElement: null,
+  hidden: false
 };
 
 const svgSymbols = new Map<string, string>();

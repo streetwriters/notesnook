@@ -299,7 +299,7 @@
     {
       "path": "dialogs/buy-dialog/plan-list.tsx",
       "category": "platform",
-      "reason": "Web measures the plan cards through HTMLDivElement refs and styles them with CSS the desktop renderer cannot draw; desktop lays the plan list out with the kit's flexbox props."
+      "reason": "The featured-on strip and the testimonials carousel are web's code. The plan cards, pricing and comparison table are still laid out with the kit's flexbox props: web sizes the plan cards from HTMLDivElement measurements and CSS grid, which the desktop layout has no equivalent for."
     },
     {
       "path": "dialogs/add-reminder-dialog.tsx",
@@ -1020,11 +1020,6 @@
       "path": "components/route-container/index.tsx",
       "category": "platform",
       "reason": "Buttons stay disabled and the title waits until the native database host is ready, and the has-items flag is cached in Config so the header does not jump before the lists load; the search field drops web's CSS selector styles (placeholder colour, sibling opacity) the kit has no stylesheet for; route-title and route-action carry test ids for the e2e specs."
-    },
-    {
-      "path": "views/plans.tsx",
-      "category": "platform",
-      "reason": "Web imports its star and footer artwork as SVG files and uses raw CSS colour strings, the testimonials carousel and the featured-on strip; desktop draws the generated SvgImage assets, passes colours through dataColor and has no carousel or featured-on components."
     },
     {
       "path": "views/notebooks.tsx",

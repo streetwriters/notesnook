@@ -132,8 +132,70 @@ export class DesktopIntersectionObserver {
   }
 }
 
-/** Defines `IntersectionObserver` globally when the platform has none. */
+/**
+ * The DOM's ResizeObserver for kit elements, measured on the same timer: the
+ * callback runs when an observed element's size changes, and once for each
+ * new target.
+ */
+export class DesktopResizeObserver {
+  private targets = new Map<UIElement, string | undefined>();
+  private timer: ReturnType<typeof setInterval> | undefined;
+
+  constructor(
+    private callback: (
+      entries: { target: UIElement; contentRect: UIRect }[],
+      observer: DesktopResizeObserver
+    ) => void
+  ) {}
+
+  observe(target: UIElement) {
+    if (!target || this.targets.has(target)) return;
+    this.targets.set(target, undefined);
+    this.timer ??= setInterval(() => this.check(), POLL_MS);
+    setTimeout(() => this.check(), 0);
+  }
+
+  unobserve(target: UIElement) {
+    this.targets.delete(target);
+    if (this.targets.size === 0) this.disconnect();
+  }
+
+  disconnect() {
+    this.targets.clear();
+    if (this.timer !== undefined) clearInterval(this.timer);
+    this.timer = undefined;
+  }
+
+  check() {
+    const entries: { target: UIElement; contentRect: UIRect }[] = [];
+    for (const [target, before] of this.targets) {
+      let rect: UIRect;
+      let scroll = "";
+      try {
+        rect = target.getBoundingClientRect();
+        // A box whose content grew has resized for what observes it.
+        scroll = `${target.scrollWidth}x${target.scrollHeight}`;
+      } catch {
+        continue;
+      }
+      const size = `${rect.width}x${rect.height}/${scroll}`;
+      if (size === before) continue;
+      this.targets.set(target, size);
+      entries.push({ target, contentRect: rect });
+    }
+    if (entries.length) this.callback(entries, this);
+  }
+}
+
+/**
+ * Defines `IntersectionObserver` and `ResizeObserver` globally when the
+ * platform has none.
+ */
 export function installIntersectionObserver() {
-  const scope = globalThis as { IntersectionObserver?: unknown };
+  const scope = globalThis as {
+    IntersectionObserver?: unknown;
+    ResizeObserver?: unknown;
+  };
   scope.IntersectionObserver ??= DesktopIntersectionObserver;
+  scope.ResizeObserver ??= DesktopResizeObserver;
 }

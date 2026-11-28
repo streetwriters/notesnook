@@ -108,9 +108,11 @@ test("the plans route renders the plan list", async () => {
   await open("/plans");
   await vi.waitFor(
     async () =>
-      expect(await app!.getByTestId("plans").count()).toBeGreaterThan(0),
+      expect(await app!.getByTestId("close-plans").count()).toBeGreaterThan(0),
     { timeout: 90000, interval: 500 }
   );
+  // The extras web's plans page has: featured-on strip and testimonials.
+  expect(await app!.getByText("Cameron Flint").count()).toBeGreaterThan(0);
 });
 
 test("the email confirmed route without a user id returns to the app", async () => {

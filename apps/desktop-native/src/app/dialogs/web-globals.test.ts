@@ -23,8 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * HTML element in them type-checks and then fails on the native host. This
  * test finds them: a dialog may use `window`, `FormData`, `IS_DESKTOP_APP`
  * and the like only when it imports that name (from ./desktop-bridge or the
- * kit), and may draw no lowercase (HTML) JSX element.
+ * kit), and may draw only the lowercase (HTML) JSX elements the desktop build
+ * rewrites to the kit's (tools/babel-plugin-dom-elements.js). `document` is
+ * rewritten by that plugin too, to the kit's.
  */
+import { createRequire } from "node:module";
 import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";
@@ -34,15 +37,25 @@ const here = path.dirname(new URL(import.meta.url).pathname);
 
 const GLOBALS = new Set([
   "window",
-  "document",
   "navigator",
   "localStorage",
   "FormData",
   "IS_DESKTOP_APP",
   "IS_TESTING"
 ]);
-// `option` is allowed: the kit's Select reads its <option> children.
-const ALLOWED_INTRINSICS = new Set(["option"]);
+const { TAGS } = createRequire(import.meta.url)(
+  "../../../tools/babel-plugin-dom-elements.js"
+) as { TAGS: Set<string> };
+// `option` and `br` are read by the kit's Select and Text from their
+// children; `use` and `path` by the svg element.
+const ALLOWED_INTRINSICS = new Set([
+  ...TAGS,
+  "option",
+  "optgroup",
+  "br",
+  "use",
+  "path"
+]);
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -107,12 +120,12 @@ describe("dialogs use no browser globals or HTML elements", () => {
       'import { Box } from "@notesnook/ui-kit";',
       "export const A = (p: { icon: () => null }) => {",
       "  window.open('x');",
-      "  return <Box><b>hi</b><p.icon /></Box>;",
+      "  return <Box><b>hi</b><canvas /><p.icon /></Box>;",
       "};"
     ].join("\n");
     expect(findProblems(source, "probe.tsx")).toEqual({
       globals: ["window"],
-      elements: ["b"]
+      elements: ["canvas"]
     });
   });
 

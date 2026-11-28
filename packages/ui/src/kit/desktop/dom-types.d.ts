@@ -29,6 +29,13 @@ import type {
 } from "../contracts/elements";
 
 declare global {
+  /** The kit's polyfill (intersection-observer.ts): sizes are polled. */
+  class ResizeObserver {
+    constructor(callback: (entries: { target: UIElement }[]) => void);
+    observe(target: UIElement): void;
+    unobserve(target: UIElement): void;
+    disconnect(): void;
+  }
   /** The kit's polyfill (intersection-observer.ts), measured against the window. */
   class IntersectionObserver {
     constructor(

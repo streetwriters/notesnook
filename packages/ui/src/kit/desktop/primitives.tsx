@@ -72,7 +72,7 @@ import {
   type NativeEvent
 } from "./style/events";
 import { pressHandler, testIdOf } from "./style/native-props";
-import { resolveColor } from "./style/resolve";
+import { resolveColor, resolveCssVars } from "./style/resolve";
 import {
   InheritedTextStyle,
   SelectorScope,
@@ -586,13 +586,71 @@ export const Link = forwardRef<UIElement, Contract.LinkProps>(function Link(
 
 const RESIZE_MODES = { cover: "cover", contain: "contain", fill: "stretch" };
 
+const SVG_DATA_URI = /^data:image\/svg\+xml(;charset=[\w-]+)?(;base64)?,/i;
+
+/** The SVG document `src` holds (as text or a data URI), or undefined. */
+export function svgSource(src: string | undefined): string | undefined {
+  if (!src) return undefined;
+  const text = src.trimStart();
+  if (text.startsWith("<svg") || text.startsWith("<?xml")) return text;
+  const match = SVG_DATA_URI.exec(text);
+  if (!match) return undefined;
+  const data = text.slice(match[0].length);
+  try {
+    return match[2] ? globalThis.atob(data) : decodeURIComponent(data);
+  } catch {
+    return undefined;
+  }
+}
+
+/** The size an SVG document declares: width and height, else its viewBox. */
+export function svgIntrinsicSize(svg: string) {
+  const root = /<svg\b[^>]*>/i.exec(svg)?.[0] ?? "";
+  const attribute = (name: string) =>
+    parseFloat(new RegExp(`\\s${name}="([\\d.]+)(?:px)?"`).exec(root)?.[1] ?? "");
+  const box = /\sviewBox="([^"]+)"/.exec(root)?.[1].trim().split(/[\s,]+/);
+  const width = attribute("width") || parseFloat(box?.[2] ?? "") || 24;
+  const height = attribute("height") || parseFloat(box?.[3] ?? "") || width;
+  return { width, height };
+}
+
+function pixelsOf(value: unknown): number | undefined {
+  return typeof value === "number" && value > 0 ? value : undefined;
+}
+
 export const Image = forwardRef<UIElement, Contract.ImageProps>(function Image(
   props,
   ref
 ) {
-  const { resolved, viewStyle, nativeProps } = useStyled(props);
+  const { resolved, viewStyle, nativeProps } = useStyled(props, { tag: "img" });
   const [setRef, element] = useElementRef(ref, { id: props.id });
+  const { colors } = useThemeContext();
   const { onLoad } = props;
+  const svg = svgSource(props.src);
+  if (svg) {
+    // An SVG document is drawn as vectors, at the size the style gives or,
+    // as an <img> does, at the size the document declares.
+    const intrinsic = svgIntrinsicSize(svg);
+    const width = pixelsOf(viewStyle.width);
+    const height = pixelsOf(viewStyle.height);
+    const ratio = intrinsic.width / intrinsic.height || 1;
+    const drawWidth = width ?? (height ? height * ratio : intrinsic.width);
+    const drawHeight = height ?? drawWidth / ratio;
+    return (
+      <AnyView
+        ref={setRef}
+        {...nativeProps}
+        accessibilityLabel={props.alt}
+        style={{ ...viewStyle, width: drawWidth, height: drawHeight }}
+      >
+        <SvgXml
+          xml={resolveCssVars(svg, colors)}
+          width={drawWidth}
+          height={drawHeight}
+        />
+      </AnyView>
+    );
+  }
   return (
     <NativeImage
       ref={setRef as never}

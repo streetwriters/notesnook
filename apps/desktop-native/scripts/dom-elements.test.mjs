@@ -89,4 +89,33 @@ describe("babel-plugin-dom-elements", () => {
     expect(out).toContain(`import { Dom as _Dom2 }`);
     expect(out).toContain(`<_Dom2.div>{_Dom}</_Dom2.div>`);
   });
+
+  test("a free document is the kit's; a local, a property and typeof are not", () => {
+    const out = transform(
+      [
+        `export const a = () => document.getElementById("select-plan")?.scrollIntoView();`,
+        `export const b = typeof document !== "undefined";`,
+        `export const c = (document) => document.title;`,
+        `export const d = (x) => x.document;`,
+        `export const e = { document: 1 };`
+      ].join("\n")
+    );
+    expect(out).toContain(
+      `import { document as _document } from "@notesnook/ui-kit/desktop/dom";`
+    );
+    expect(out).toContain(`_document.getElementById("select-plan")`);
+    expect(out).toContain(`typeof document !== "undefined"`);
+    expect(out).toContain(`document => document.title`);
+    expect(out).toContain(`x.document`);
+    expect(out).toContain(`document: 1`);
+  });
+
+  test("elements and document share one import", () => {
+    const out = transform(
+      `export const a = <div onClick={() => document.getElementById("x")} />;`
+    );
+    expect(out).toContain(
+      `import { Dom as _Dom, document as _document } from "@notesnook/ui-kit/desktop/dom";`
+    );
+  });
 });

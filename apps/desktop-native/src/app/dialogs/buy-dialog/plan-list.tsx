@@ -17,13 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@notesnook/ui-kit";
+import { Text, Flex, Button, Image, Link, Box } from "@notesnook/ui-kit";
 import {
   CheckCircleOutline,
   Loading,
   Cloud,
   FileDoc,
   Picture,
+  ArrowRight,
   ShieldCheck,
   CaretDown,
   CalendarBlank,
@@ -39,7 +40,7 @@ import {
 } from "@notesnook/common";
 import { Plan } from "./types";
 import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { strings } from "@notesnook/intl";
 import { Period, SubscriptionPlan } from "@notesnook/core";
 import { FeatureCaption } from "./feature-caption";
@@ -49,6 +50,21 @@ import { DialogManager } from "../../common/dialog-manager";
 import Accordion from "../../components/accordion";
 import { SvgImage } from "../../components/svg-image";
 import Dialog from "../../components/dialog";
+import {
+  Cameron,
+  AndroidPolice,
+  AndroidPoliceTitle,
+  Appleinsider as AppleInsider,
+  NessLabs,
+  PrivacyGuides,
+  PrivacyGuidesTitle,
+  Techlore,
+  TechloreTitle,
+  Theverge as TheVerge,
+  FreedomPress,
+  Xda as XDA,
+  Star
+} from "../../assets/files.generated";
 
 type PlansListProps = {
   selectedPlan?: string | null;
@@ -66,6 +82,67 @@ const PLAN_CARD_FEATURES = [
   getFeature("storage"),
   getFeature("fileSize"),
   getFeature("fullQualityImages")
+];
+
+const testimonial = {
+  username: "camflint",
+  image: Cameron,
+  name: "Cameron Flint",
+  get role() {
+    return strings.verifiedUser();
+  },
+  link: "https://twitter.com/camflint/status/1481061416434286592",
+  text: "I'm pretty impressed at the progress @notesnook are making on their app — particularly in respect to how performant the app runs and behaves, despite the overhead of end-to-end encrypting user data."
+};
+
+const testimonials = Array.from({ length: 5 }, () => ({ ...testimonial }));
+
+const FEATURED_ON = [
+  {
+    id: "android-police",
+    logo: AndroidPolice,
+    title: AndroidPoliceTitle,
+    link: "https://www.androidpolice.com/tried-encrypted-all-in-one-productivity-app-blew-my-mind/"
+  },
+  {
+    id: "theverge",
+    logo: TheVerge,
+    link: "http://www.theverge.com/23942597/notes-text-evernote-onenote-keep-apps"
+  },
+
+  {
+    id: "freedom-press",
+    logo: FreedomPress,
+    link: "https://freedom.press/digisec/blog/note-taking-security/#notesnook"
+  },
+  {
+    id: "privacy-guides",
+    logo: PrivacyGuides,
+    title: PrivacyGuidesTitle,
+    link: "https://www.privacyguides.org/en/notebooks/#notesnook"
+  },
+  {
+    id: "techlore",
+    logo: Techlore,
+    title: TechloreTitle,
+    link: "https://www.youtube.com/watch?v=I9ibGRNjK3E"
+  },
+  {
+    id: "apple-insider",
+    logo: AppleInsider,
+    link: "https://appleinsider.com/articles/22/08/18/the-best-secure-note-apps-for-ios-ipados-and-macos-to-keep-your-thoughts-private"
+  },
+  {
+    id: "xda",
+    logo: XDA,
+    link: "https://www.xda-developers.com/note-taking-app-is-onenote-on-steroids/"
+  },
+  {
+    id: "ness-labs",
+    logo: NessLabs,
+    logoSize: { width: 61, height: 36 },
+    link: "https://nesslabs.com/"
+  }
 ];
 
 const FEATURE_ICONS: Record<string, Icon> = {
@@ -256,6 +333,62 @@ export function PlansList(props: PlansListProps) {
   );
 }
 
+export function FeaturedOn() {
+  return (
+    <Flex
+      sx={{
+        bg: "background",
+        flexWrap: "wrap",
+        gap: "spacing9",
+        px: "spacing14",
+        py: "spacing13",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      {FEATURED_ON.map((f) => (
+        <Link
+          key={f.id}
+          href={f.link}
+          title={f.id}
+          target="_blank"
+          sx={{
+            textDecoration: "none",
+            alignSelf: "stretch",
+            flexShrink: 0,
+            minWidth: 250
+          }}
+        >
+          <Flex
+            sx={{
+              bg: "background",
+              border: "1px solid var(--border-secondary)",
+              borderRadius: "16px",
+              boxShadow: "0px 4px 25px rgba(0,0,0,0.04)",
+              height: "90px",
+              px: "spacing9",
+              py: "spacing7",
+              alignItems: "center",
+              gap: "spacing9",
+              justifyContent: "center"
+            }}
+          >
+            <Image
+              src={f.logo}
+              sx={{
+                width: f.logoSize?.width,
+                height: f.logoSize?.height,
+                maxWidth: 200
+              }}
+            />
+            {f.title && <Image src={f.title} />}
+          </Flex>
+        </Link>
+      ))}
+    </Flex>
+  );
+}
+
 function RecurringPricing(props: PricingProps) {
   const { plan } = props;
   const isZero = plan.price.gross === 0;
@@ -388,6 +521,271 @@ function toMonthlyPrice(price: number, period: Period) {
     : period === "5-year"
     ? (price / (12 * 5)).toFixed(2)
     : (price / 12).toFixed(2);
+}
+
+export function TestimonialsCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [maxOffset, setMaxOffset] = useState(0);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateMaxOffset = () => {
+      const viewport = viewportRef.current;
+      const track = trackRef.current;
+      if (!viewport || !track) return;
+
+      setMaxOffset(Math.max(0, track.scrollWidth - viewport.clientWidth));
+    };
+
+    updateMaxOffset();
+
+    const resizeObserver = new ResizeObserver(updateMaxOffset);
+    if (viewportRef.current) resizeObserver.observe(viewportRef.current);
+    if (trackRef.current) resizeObserver.observe(trackRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const lastIndex = Math.ceil(maxOffset / 620);
+  const offset = Math.min(currentIndex * 620, maxOffset);
+
+  useEffect(() => {
+    setCurrentIndex((index) => Math.min(index, lastIndex));
+  }, [lastIndex]);
+
+  const isFirst = currentIndex === 0;
+  const isLast = currentIndex >= lastIndex;
+
+  const goToPrev = () => {
+    if (isFirst) return;
+    setCurrentIndex((prev) => prev - 1);
+  };
+
+  const goToNext = () => {
+    if (isLast) return;
+    setCurrentIndex((prev) => prev + 1);
+  };
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing13",
+        py: "spacing14",
+        alignItems: "center",
+        overflow: "hidden",
+        bg: "background",
+        position: "relative"
+      }}
+    >
+      <Image
+        src={Star}
+        sx={{
+          position: "absolute",
+          top: 93,
+          left: 100,
+          width: "46px",
+          height: "46px"
+        }}
+      />
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing6",
+          alignItems: "center"
+        }}
+      >
+        <Text
+          variant="heading"
+          sx={{
+            fontSize: "2xl",
+            textAlign: "center",
+            color: "heading",
+            fontWeight: 600,
+            lineHeight: "100%"
+          }}
+        >
+          Testimonials
+        </Text>
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "sm",
+            color: "paragraph",
+            textAlign: "center",
+            maxWidth: 689,
+            lineHeight: "1.5"
+          }}
+        >
+          {strings.testimonialsDescription()}
+        </Text>
+      </Flex>
+      <Flex
+        ref={viewportRef}
+        sx={{
+          width: "100%",
+          overflow: "hidden"
+        }}
+      >
+        <Flex
+          ref={trackRef}
+          sx={{
+            gap: "spacing7",
+            transform: `translateX(-${offset}px)`,
+            transition: "transform 0.3s ease"
+          }}
+        >
+          {testimonials.map((t, index) => (
+            <Flex
+              key={index}
+              sx={{
+                bg: "background",
+                border: "1px solid var(--border-secondary)",
+                borderRadius: "radius6",
+                flexDirection: "column",
+                gap: "spacing11",
+                px: "spacing7",
+                py: "spacing11",
+                width: 600,
+                flexShrink: 0,
+                position: "relative",
+                boxShadow: "0px 0px 25px 0px rgba(0,0,0,0.04)",
+                overflow: "hidden"
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  border: "1.5px dashed var(--border)",
+                  borderRadius: "32px",
+                  pointerEvents: "none",
+                  left: "8px",
+                  right: "8px",
+                  top: "6px",
+                  bottom: "6px"
+                }}
+              />
+              <Flex
+                sx={{
+                  flexDirection: "column",
+                  gap: "spacing7",
+                  alignItems: "flex-start"
+                }}
+              >
+                <Flex sx={{ gap: "spacing6", alignItems: "center" }}>
+                  <Flex
+                    sx={{
+                      bg: "background",
+                      border: "0.6px solid var(--border-secondary)",
+                      borderRadius: "radius4",
+                      p: "spacing2",
+                      boxShadow:
+                        "0px 4px 1px 0px rgba(0,0,0,0), 0px 3px 1px 0px rgba(0,0,0,0.01), 0px 2px 1px 0px rgba(0,0,0,0.05), 0px 1px 1px 0px rgba(0,0,0,0.09)",
+                      flexShrink: 0
+                    }}
+                  >
+                    <Image
+                      src={t.image}
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "radius3",
+                        objectFit: "cover"
+                      }}
+                    />
+                  </Flex>
+                  <Flex
+                    sx={{
+                      flexDirection: "column",
+                      gap: "spacing2",
+                      alignItems: "flex-start"
+                    }}
+                  >
+                    <Text
+                      variant="heading"
+                      sx={{
+                        fontSize: "xl",
+                        fontWeight: 600,
+                        lineHeight: "100%",
+                        color: "heading"
+                      }}
+                    >
+                      {t.name}
+                    </Text>
+                    <Text
+                      sx={{
+                        fontSize: 14,
+                        color: "paragraph",
+                        lineHeight: "1.3",
+                        letterSpacing: "-0.14px",
+                        fontWeight: 400
+                      }}
+                    >
+                      {t.role}
+                    </Text>
+                  </Flex>
+                </Flex>
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    color: "paragraph",
+                    lineHeight: "1.7",
+                    fontWeight: 400
+                  }}
+                >
+                  {t.text}
+                </Text>
+              </Flex>
+            </Flex>
+          ))}
+        </Flex>
+      </Flex>
+      <Flex sx={{ gap: "spacing7", alignItems: "center" }}>
+        <Flex
+          sx={{
+            width: 50,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "radius3",
+            bg: "background",
+            boxShadow: "0px 4px 64px 0px rgba(0,0,0,0.07)",
+            cursor: isFirst ? "default" : "pointer",
+            flexShrink: 0,
+            opacity: isFirst ? 0.4 : 1
+          }}
+          onClick={goToPrev}
+        >
+          <Flex
+            sx={{
+              transform: "rotate(180deg)"
+            }}
+          >
+            <ArrowRight size={24} color="icon" />
+          </Flex>
+        </Flex>
+        <Flex
+          sx={{
+            width: 50,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "radius3",
+            bg: "background",
+            boxShadow: "0px 4px 64px 0px rgba(0,0,0,0.07)",
+            cursor: isLast ? "default" : "pointer",
+            flexShrink: 0,
+            opacity: isLast ? 0.4 : 1
+          }}
+          onClick={goToNext}
+        >
+          <ArrowRight size={24} color="icon" />
+        </Flex>
+      </Flex>
+    </Flex>
+  );
 }
 
 const CancelInfoDialog = DialogManager.register(function CancelInfoDialog(

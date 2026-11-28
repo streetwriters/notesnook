@@ -17,35 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SubscriptionPlan } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { shell } from "@platform";
-import {
-  Button,
-  dataColor,
-  Flex,
-  ScrollContainer,
-  Text,
-  type ColorValue
-} from "@notesnook/ui-kit";
+import { SubscriptionPlan } from "@notesnook/core";
 import {
   ComparePlans,
+  FeaturedOn,
   Footer,
-  PlansList
+  PlansList,
+  TestimonialsCarousel
 } from "../dialogs/buy-dialog/plan-list";
+import { FlexScrollContainer } from "../components/scroll-container";
+import { Flex, Text, Button, Image, Box } from "@notesnook/ui-kit";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { useEffect } from "react";
 import { getQueryParams, hardNavigate } from "../navigation";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
 import { ArrowUp, CaretRight, Lightning } from "../components/icons";
-import { SvgImage } from "../components/svg-image";
-
-function toColor(value: string): ColorValue {
-  return /^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(value)
-    ? dataColor(value)
-    : "background";
-}
+import { Star, PlansFooter } from "../assets/files.generated";
 
 function Plans() {
   const user = useUserStore((store) => store.user);
@@ -61,146 +50,166 @@ function Plans() {
 
   return (
     <Flex
-      data-test-id="plans"
+      id="app"
+      bg="background-secondary"
       sx={{
+        overflow: "hidden",
         flexDirection: "column",
-        flex: 1,
-        bg: "background-secondary",
-        overflow: "hidden"
+        height: "100%",
+        postion: "relative"
       }}
     >
-      <ScrollContainer>
-        <Flex
-          sx={{
-            position: "relative",
-            flexDirection: "column",
-            alignItems: "center",
-            p: "spacing14",
-            gap: "spacing13"
-          }}
-        >
-          <SvgImage
-            name="star"
-            width={43}
-            height={43}
-            sx={{ position: "absolute", top: 72, left: 146 }}
-          />
-          <SvgImage
-            name="star"
-            width={25}
-            height={25}
-            sx={{ position: "absolute", top: 61, left: 959 }}
-          />
-          <SvgImage
-            name="star"
-            width={43}
-            height={43}
-            sx={{ position: "absolute", top: 266, right: 229 }}
-          />
-          <SvgImage
-            name="star"
-            width={64}
-            height={64}
-            sx={{ position: "absolute", bottom: -30, right: 73 }}
-          />
-          <Button
-            onClick={() => openURL("/")}
-            data-test-id="close-plans"
-            variant="new_bordered"
+      <Flex variant="columnFill" sx={{ overflowY: "hidden" }}>
+        <FlexScrollContainer>
+          <Flex
             sx={{
-              flexDirection: "row",
-              bg: "background",
-              position: "absolute",
-              top: 80,
-              right: 80,
-              gap: "spacing4"
+              position: "relative",
+              flexDirection: "column",
+              alignItems: "center",
+              p: "spacing14",
+              gap: "spacing13"
             }}
           >
-            {strings.skip()}
-            <CaretRight size={14} color="heading" />
-          </Button>
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                top: 72,
+                left: 146,
+                width: "43px",
+                height: "43px"
+              }}
+            />
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                top: 61,
+                left: 959,
+                width: "25px",
+                height: "25px"
+              }}
+            />
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                top: 266,
+                right: 229,
+                width: "43px",
+                height: "43px"
+              }}
+            />
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                bottom: -30,
+                right: 73,
+                width: "64px",
+                height: "64px"
+              }}
+            />
+            <Button
+              onClick={() => openURL("/")}
+              data-test-id="close-plans"
+              variant="new_bordered"
+              sx={{
+                background: "background",
+                position: "absolute",
+                top: 80,
+                right: 80,
+                gap: "spacing4"
+              }}
+            >
+              {strings.skip()}
+              <CaretRight size={14} color="heading" />
+            </Button>
+            <Flex
+              sx={{
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "spacing6"
+              }}
+            >
+              <Text
+                id="select-plan"
+                variant="heading"
+                sx={{ fontSize: "4xl", textAlign: "center" }}
+              >
+                {strings.notesnookPlansTitle()}
+              </Text>
+              <Text
+                variant="body"
+                sx={{
+                  fontSize: "sm",
+                  color: "paragraph",
+                  textAlign: "center",
+                  lineHeight: "1.5",
+                  fontWeight: 400
+                }}
+              >
+                {strings.notesnookPlansDesc[0]()}
+                <br />
+                {strings.notesnookPlansDesc[1]()}
+              </Text>
+            </Flex>
+            <PlansList
+              recommendedPlan={SubscriptionPlan.PRO}
+              onPlanSelected={(plan) => {
+                const url = new URLSearchParams({
+                  plan: Buffer.from(JSON.stringify(plan)).toString("base64")
+                });
+                hardNavigate(`/checkout`, url.toString());
+              }}
+            />
+          </Flex>
+          <FeaturedOn />
           <Flex
             sx={{
               flexDirection: "column",
-              alignItems: "center",
-              gap: "spacing6"
+              flex: 1
             }}
           >
-            <Text
-              variant="heading"
-              sx={{ fontSize: "4xl", textAlign: "center" }}
-            >
-              {strings.notesnookPlansTitle()}
-            </Text>
-            <Text
-              variant="body"
-              sx={{
-                fontSize: "sm",
-                color: "paragraph",
-                textAlign: "center",
-                lineHeight: 1.5,
-                fontWeight: 400
-              }}
-            >
-              {strings.notesnookPlansDesc[0]()}
-              {"\n"}
-              {strings.notesnookPlansDesc[1]()}
-            </Text>
+            <ComparePlans />
+            <TestimonialsCarousel />
+            <Footer />
+            <PlansCTA />
           </Flex>
-          <PlansList
-            recommendedPlan={SubscriptionPlan.PRO}
-            onPlanSelected={(plan) => {
-              const url = new URLSearchParams({
-                plan: Buffer.from(JSON.stringify(plan)).toString("base64")
-              });
-              hardNavigate(`/checkout`, url.toString());
-            }}
-          />
-        </Flex>
-        <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <ComparePlans />
-          <Footer />
-          <PlansCTA onChoosePlan={() => undefined} />
-        </Flex>
-      </ScrollContainer>
+        </FlexScrollContainer>
+      </Flex>
     </Flex>
   );
 }
 
-function PlansCTA(props: { onChoosePlan: () => void }) {
+function PlansCTA() {
   const colorScheme = useThemeStore((store) => store.colorScheme);
   const darkTheme = useThemeStore((store) => store.darkTheme);
   const lightTheme = useThemeStore((store) => store.lightTheme);
-  const inverseBackground = toColor(
+  const inverseBackground =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.background
-      : darkTheme.scopes.base.primary.background
-  );
-  const inverseHeading = toColor(
+      : darkTheme.scopes.base.primary.background;
+  const inverseHeading =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.heading
-      : darkTheme.scopes.base.primary.heading
-  );
-  const inverseParagraph = toColor(
+      : darkTheme.scopes.base.primary.heading;
+  const inverseParagraph =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.paragraph
-      : "#FFFFFF"
-  );
-  const inverseAccentForeground = toColor(
+      : "#FFFFFF";
+  const inverseAccentForeground =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.accentForeground
-      : darkTheme.scopes.base.primary.accentForeground
-  );
-  const inverseBorder = toColor(
+      : darkTheme.scopes.base.primary.accentForeground;
+  const inverseBorder =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.border
-      : darkTheme.scopes.base.primary.border
-  );
-  const inverseParagraphSecondary = toColor(
+      : darkTheme.scopes.base.primary.border;
+  const inverseParagraphSecondary =
     colorScheme === "dark"
       ? lightTheme.scopes.base.secondary.paragraph
-      : darkTheme.scopes.base.secondary.paragraph
-  );
+      : darkTheme.scopes.base.secondary.paragraph;
 
   return (
     <>
@@ -208,20 +217,22 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
         sx={{
           position: "relative",
           overflow: "hidden",
-          bg: inverseBackground,
+          background: inverseBackground,
           px: "spacing14",
           py: "spacing14"
         }}
       >
-        <SvgImage
-          name="plans-footer"
-          width={572}
-          height={572}
+        <Image
+          src={PlansFooter}
+          alt=""
           sx={{
             position: "absolute",
             top: 0,
             right: 100,
-            transform: [{ scale: 1.6 }]
+            scale: 1.6,
+            width: "572",
+            height: "100%",
+            display: ["none", "block"]
           }}
         />
         <Flex
@@ -240,8 +251,7 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
               gap: "spacing4",
               borderRadius: "radius2",
               p: "spacing3",
-              border: "1px solid",
-              borderColor: "border"
+              border: "1px solid var(--border)"
             }}
           >
             <Lightning size={15} color={inverseAccentForeground} />
@@ -267,12 +277,12 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 gap: "spacing3",
-                maxWidth: 650
+                maxWidth: "650px"
               }}
             >
               <Text
                 sx={{
-                  fontSize: 50,
+                  fontSize: "50px",
                   lineHeight: 1.2,
                   fontWeight: 600,
                   color: inverseHeading
@@ -291,10 +301,15 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
               </Text>
             </Flex>
             <Button
-              onClick={props.onChoosePlan}
+              onClick={() =>
+                document
+                  .getElementById("select-plan")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
               variant="new_accent"
               sx={{
                 alignSelf: "flex-start",
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "spacing3"
@@ -327,6 +342,7 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
         >
           <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
             <Text
+              aria-hidden="true"
               sx={{
                 color: inverseParagraphSecondary,
                 fontSize: "sm",
@@ -348,24 +364,30 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
           </Flex>
           <Flex sx={{ gap: "spacing7" }}>
             <Text
-              onClick={() => shell.openUrl("https://notesnook.com/privacy")}
+              as="a"
+              href="https://notesnook.com/privacy"
+              target="_blank"
+              rel="noreferrer"
               sx={{
                 color: inverseParagraph,
                 fontSize: "sm",
                 lineHeight: 1,
-
+                textDecoration: "none",
                 whiteSpace: "nowrap"
               }}
             >
               {strings.privacyPolicy()}
             </Text>
             <Text
-              onClick={() => shell.openUrl("https://notesnook.com/terms")}
+              as="a"
+              href="https://notesnook.com/terms"
+              target="_blank"
+              rel="noreferrer"
               sx={{
                 color: inverseParagraph,
                 fontSize: "sm",
                 lineHeight: 1,
-
+                textDecoration: "none",
                 whiteSpace: "nowrap"
               }}
             >

@@ -33,7 +33,18 @@ const svgFiles = [
   "vault",
   "workanywhere",
   "worklate",
-  "auth/capa-green"
+  "auth/capa-green",
+  "featured/android-police",
+  "featured/android-police-title",
+  "featured/appleinsider",
+  "featured/ness-labs",
+  "featured/privacy-guides",
+  "featured/privacy-guides-title",
+  "featured/techlore",
+  "featured/techlore-title",
+  "featured/theverge",
+  "featured/freedom-press",
+  "featured/xda"
 ];
 
 const svgEntries = svgFiles.map((file) => {
@@ -69,6 +80,30 @@ const rasterEntries = rasterFiles.map((file) => {
 fs.writeFileSync(
   path.join(outDir, "raster.generated.ts"),
   `${header}export const rasterAssets = {\n${rasterEntries.join(",\n")}\n} as const;\n\nexport type RasterAssetName = keyof typeof rasterAssets;\n`
+);
+
+// Each asset under the name apps/web gives its import
+// (`import AndroidPolice from "../../assets/featured/android-police.svg"`),
+// as the `src` the kit's Image draws: a file shared with apps/web imports the
+// same names from here.
+const pascal = (file) =>
+  file
+    .split("/")
+    .pop()
+    .replace(/\.\w+$/, "")
+    .replace(/(^|[-_])(\w)/g, (_, __, letter) => letter.toUpperCase());
+const fileEntries = [
+  ...svgFiles.map(
+    (file) => `export const ${pascal(file)}: string = svgAssets[${JSON.stringify(file)}];`
+  ),
+  ...rasterFiles.map(
+    (file) =>
+      `export const ${pascal(file)}: string = rasterAssets[${JSON.stringify(file)}];`
+  )
+];
+fs.writeFileSync(
+  path.join(outDir, "files.generated.ts"),
+  `${header}import { svgAssets } from "./svg.generated";\nimport { rasterAssets } from "./raster.generated";\n\n${fileEntries.join("\n")}\n`
 );
 
 console.log(`${svgFiles.length} svg assets, ${rasterFiles.length} raster assets`);
