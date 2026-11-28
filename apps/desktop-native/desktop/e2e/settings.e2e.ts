@@ -38,7 +38,7 @@ test("the user menu opens the settings dialog on the first section", async () =>
     expect(await count("menu-button-settings")).toBeGreaterThan(0)
   );
   await app.getByTestId("menu-button-settings").click();
-  await settle(async () => expect(await count("settings-dialog")).toBe(1));
+  await settle(async () => expect(await count("settings-navigation-menu")).toBe(1));
   expect(await count("settings-navigation-menu")).toBe(1);
 });
 
@@ -61,5 +61,5 @@ test("clicking the backdrop closes the dialog", async () => {
   await app.mouseMove({ x: 6, y: 400 });
   await app.mouseDown({ x: 6, y: 400 });
   await app.mouseUp({ x: 6, y: 400 });
-  await settle(async () => expect(await count("settings-dialog")).toBe(0));
+  await settle(async () => expect(await count("settings-navigation-menu")).toBe(0));
 });

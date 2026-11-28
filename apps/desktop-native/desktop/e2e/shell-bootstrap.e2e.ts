@@ -127,7 +127,7 @@ test("the account recovery route without a code returns to the app", async () =>
 
 test("the hash route /settings opens the settings dialog", async () => {
   await open("/notes", { initialHash: "#/settings" });
-  await waitForId("settings-dialog");
+  await waitForId("settings-navigation-menu");
 });
 
 test("the app lock gate shows the unlock screen when a credential exists", async () => {

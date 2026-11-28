@@ -71,7 +71,7 @@ describe("confirm dialog (delete local data)", () => {
   test("escape dismisses without deleting", async () => {
     await app.press("escape");
     await expectClosed(app, "confirm-dialog");
-    expect(await count(app, "settings-dialog")).toBe(1);
+    expect(await count(app, "settings-navigation-menu")).toBe(1);
   });
 });
 

@@ -58,5 +58,5 @@ test("the privacy toggle flips its checked state", async () => {
 });
 
 test("escape closes the settings dialog", async () => {
-  await closeWithEscape(app, "settings-dialog");
+  await closeWithEscape(app, "settings-navigation-menu");
 });

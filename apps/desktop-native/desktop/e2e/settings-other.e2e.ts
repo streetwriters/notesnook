@@ -40,5 +40,5 @@ test("the support section opens the report an issue dialog", async () => {
 });
 
 test("escape closes the settings dialog", async () => {
-  await closeWithEscape(app, "settings-dialog");
+  await closeWithEscape(app, "settings-navigation-menu");
 });

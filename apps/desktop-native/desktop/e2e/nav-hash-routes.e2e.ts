@@ -13,7 +13,7 @@ afterEach(async () => {
 describe("hash routes open dialogs", () => {
   test("/settings opens the settings dialog on the first section", async () => {
     app = await start({ initialHash: "#/settings" });
-    await expectDialog(app, "settings-dialog");
+    await expectDialog(app, "settings-navigation-menu");
     await settle(async () =>
       expect(await count(app!, "setting-email")).toBeGreaterThanOrEqual(0)
     );
@@ -21,7 +21,7 @@ describe("hash routes open dialogs", () => {
 
   test("/settings/appearance opens the appearance section", async () => {
     app = await start({ initialHash: "#/settings/appearance" });
-    await expectDialog(app, "settings-dialog");
+    await expectDialog(app, "settings-navigation-menu");
     await settle(async () =>
       expect(await count(app!, "setting-color-scheme")).toBe(1)
     );
@@ -29,7 +29,7 @@ describe("hash routes open dialogs", () => {
 
   test("/settings/vault opens the vault section", async () => {
     app = await start({ initialHash: "#/settings/vault" });
-    await expectDialog(app, "settings-dialog");
+    await expectDialog(app, "settings-navigation-menu");
     await settle(async () =>
       expect(await count(app!, "setting-create-vault")).toBe(1)
     );

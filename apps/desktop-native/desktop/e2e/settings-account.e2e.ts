@@ -48,5 +48,5 @@ test("account sections stay hidden while logged out", async () => {
 });
 
 test("escape closes the settings dialog", async () => {
-  await closeWithEscape(app, "settings-dialog");
+  await closeWithEscape(app, "settings-navigation-menu");
 });

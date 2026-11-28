@@ -49,9 +49,9 @@ describe("user menu while logged out", () => {
   test("settings opens the settings dialog", async () => {
     await clickId(app, "profile-dropdown");
     await clickMenu(app, "settings");
-    await expectDialog(app, "settings-dialog");
+    await expectDialog(app, "settings-navigation-menu");
     await app.press("escape");
-    await expectClosed(app, "settings-dialog");
+    await expectClosed(app, "settings-navigation-menu");
   });
 
   test("help and support opens the support section or external help", async () => {

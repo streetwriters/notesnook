@@ -73,7 +73,7 @@ describe("app lock with the soft authenticator", () => {
     await clickId(app, "dialog-yes");
     await expectClosed(app, "password-dialog");
     await app.press("escape");
-    await expectClosed(app, "settings-dialog");
+    await expectClosed(app, "settings-navigation-menu");
     await clickId(app, "lock-app");
     await clickId(app, "app-lock-use-security-key");
     await settle(async () =>

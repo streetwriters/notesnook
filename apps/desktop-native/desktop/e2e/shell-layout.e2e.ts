@@ -248,7 +248,7 @@ test("ctrl+, opens settings and escape closes it", async () => {
   await app.press("mod-,");
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("settings-dialog").count()).toBeGreaterThan(
+      expect(await app.getByTestId("settings-navigation-menu").count()).toBeGreaterThan(
         0
       ),
     { timeout: 10000, interval: 300 }
@@ -256,7 +256,7 @@ test("ctrl+, opens settings and escape closes it", async () => {
   await app.press("escape");
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("settings-dialog").count()).toBe(0),
+      expect(await app.getByTestId("settings-navigation-menu").count()).toBe(0),
     { timeout: 10000, interval: 300 }
   );
 });
