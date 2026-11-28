@@ -84,7 +84,7 @@ if (!authPage && (await offline.count())) {
 if (!authPage)
 await page.evaluate(
   async ({ seed, scheme, extras, noExtras, reminders, proUser }) => {
-    const { db } = await import("/common/db.ts");
+    const { db } = await import("/src/app/common/db.ts");
     const addNotebook = async (notebook, parentId) => {
       const id = await db.notebooks.add({ title: notebook.title });
       await new Promise((resolve) => setTimeout(resolve, 5));
@@ -174,11 +174,11 @@ await page.evaluate(
         }
       });
     }
-    const { store } = await import("/stores/note-store.ts");
+    const { store } = await import("/src/app/stores/note-store.ts");
     await store.refresh();
-    const appStore = await import("/stores/app-store.ts");
+    const appStore = await import("/src/app/stores/app-store.ts");
     await appStore.store.refreshNavItems();
-    const theme = await import("/stores/theme-store.ts");
+    const theme = await import("/src/app/stores/theme-store.ts");
     theme.store.setColorScheme(scheme);
   },
   {
@@ -210,7 +210,7 @@ const target = (spec) =>
     : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
 if (scenario.openPdf) {
   await page.evaluate(async (base64) => {
-    const { PdfPreviewDialog } = await import("/dialogs/pdf-preview-dialog.tsx");
+    const { PdfPreviewDialog } = await import("/src/app/dialogs/pdf-preview-dialog.tsx");
     PdfPreviewDialog.show({
       url: `data:application/pdf;base64,${base64}`,
       hash: "parity-pdf"
