@@ -384,7 +384,7 @@
     {
       "path": "components/editor/action-bar.tsx",
       "category": "platform",
-      "reason": "Same as web's EditorActionBar except: @dnd-kit's ReorderableList (DndContext, sensors, DragOverlay) is the kit's SortableList with the same moveItem callback; the tab strip does not scroll the active tab into view with scrollIntoView or turn the wheel into a horizontal scroll (DOM-only, the kit's scroll container handles the wheel); a tab's close button shows on hover with the kit's group-hover instead of a '.closeTabButton' descendant selector; hasNativeTitlebar comes from the environment service instead of a window global; the sidebar toggle and the mobile back button carry the test ids the desktop e2e specs find them by."
+      "reason": "Same as web's EditorActionBar except: @dnd-kit's ReorderableList (DndContext, sensors, DragOverlay) is the kit's SortableList with the same moveItem callback; the tab strip does not scroll the active tab into view with scrollIntoView or turn the wheel into a horizontal scroll (DOM-only); a drop only stops propagating when it carries a note, so the kit's SortableList still sees a tab being moved; the tab title does not set pointerEvents: none (the desktop test driver clicks the title and reports the tab covering it); a tab's close button shows on hover with the kit's group-hover instead of a '.closeTabButton' descendant selector; hasNativeTitlebar comes from the environment service instead of a window global; the tab strip subscribes to the sessions so a typed title reaches the tab (the kit's SortableList does not redraw rows on its own); the sidebar toggle and the mobile back button carry the test ids the desktop e2e specs find them by."
     },
     {
       "path": "components/editor/title-box.tsx",

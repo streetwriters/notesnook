@@ -391,6 +391,8 @@ export function EditorActionBar({
 
 const TabStrip = React.memo(function TabStrip() {
   const tabs = useEditorStore((store) => store.tabs);
+  // a tab's title is read from its session while drawing, so redraw when a session changes
+  useEditorStore((store) => store.sessions);
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
@@ -472,10 +474,9 @@ const TabStrip = React.memo(function TabStrip() {
             e.preventDefault();
           }}
           onDrop={(e) => {
-            e.stopPropagation();
-
             const noteId = getDragData(e.dataTransfer, "note")?.[0];
             if (!noteId) return;
+            e.stopPropagation();
 
             useEditorStore
               .getState()
@@ -677,10 +678,9 @@ function Tab(props: TabProps) {
         e.preventDefault();
       }}
       onDrop={(e) => {
-        e.stopPropagation();
-
         const noteId = getDragData(e.dataTransfer, "note")?.[0];
         if (!noteId) return;
+        e.stopPropagation();
 
         useEditorStore.getState().openSessionInTab(noteId, id);
       }}
@@ -781,7 +781,6 @@ function Tab(props: TabProps) {
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             overflowX: "hidden",
-            pointerEvents: "none",
             maxWidth: 120,
             color: isActive ? "paragraph-selected" : "paragraph-secondary"
           }}
