@@ -21,6 +21,7 @@ import {
   Children,
   createContext,
   useContext,
+  useId,
   useMemo,
   useSyncExternalStore,
   type ReactNode
@@ -34,7 +35,11 @@ import { DragDrop } from "@react-native-gpui/core/desktop";
 import type { BaseProps, StyleProp, SxProp } from "../../contracts";
 import { toPickedFile } from "../picked-file";
 import { mergeShorthands } from "../../shared/style/shorthand";
-import { matchRules, type SelectorRule } from "../../shared/style/selectors";
+import {
+  matchRules,
+  scopeHoverRules,
+  type SelectorRule
+} from "../../shared/style/selectors";
 import { useThemeContext } from "../theme";
 import { setScrollCommand } from "../element";
 import { keyboardEvent, lastPointer } from "./events";
@@ -193,11 +198,24 @@ export function useStyled(
     withInlineStyle(own, props.style),
     (props as { disabled?: boolean }).disabled
   );
-  const resolved = resolveSx(sx, context, {
+  const base = resolveSx(sx, context, {
     variantGroup: options.variantGroup,
     variant: props.variant ?? options.defaultVariant,
     breakpoint
   });
+  // Rules for the elements below while this one is hovered (`":hover .x"`)
+  // are drawn with group hover: this element is the group.
+  const ownGroup = useId();
+  const hoverGroup = base.rules?.some((rule) => rule.hover)
+    ? props.group ?? ownGroup
+    : undefined;
+  const resolved = useMemo(
+    () =>
+      hoverGroup && base.rules
+        ? { ...base, rules: scopeHoverRules(base.rules, hoverGroup) }
+        : base,
+    [base, hoverGroup]
+  );
 
   return useMemo(() => {
     const viewStyle: Style = withViewportUnits(resolved.style);
@@ -219,10 +237,11 @@ export function useStyled(
     };
     if (resolved.focusStyle || resolved.focusVisibleStyle)
       nativeProps.focusable = true;
+    if (hoverGroup) nativeProps.group = hoverGroup;
     for (const name in nativeProps)
       if (nativeProps[name] === undefined) delete nativeProps[name];
     return { resolved, viewStyle, textStyle, nativeProps };
-  }, [resolved, props]);
+  }, [resolved, props, hoverGroup]);
 }
 
 export function useMergedTextStyle(own: Style | undefined): Style | undefined {

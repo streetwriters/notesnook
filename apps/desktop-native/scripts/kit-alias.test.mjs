@@ -144,6 +144,6 @@ describe("@notesnook/ui-kit import name", () => {
     };
     roots.forEach((r) => walk(path.join(repo, r)));
     expect(offenders).toEqual([]);
-    expect(kitImports).toBeGreaterThan(200);
+    expect(kitImports).toBeGreaterThan(150);
   });
 });

@@ -358,7 +358,14 @@ function compute(
       ) as Declarations
     )
   });
-  if (groupHover) resolved.groupHoverStyle = resolveGroup(groupHover);
+  if (groupHover) {
+    resolved.groupHoverStyle = resolveGroup(groupHover);
+    // An element its group's hover reveals takes the click that follows.
+    if (groupHover.style.visibility === "visible") {
+      delete resolved.groupHoverStyle.style.pointerEvents;
+      delete resolved.style.pointerEvents;
+    }
+  }
   if (groupActive) resolved.groupActiveStyle = resolveGroup(groupActive);
   return resolved;
 }

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useRef } from "react";
 import { keydownHandler } from "../common/key-handler";
 import type {
-  UIMouseEvent as MouseEvent,
+  UINativeMouseEvent as MouseEvent,
   UINativeKeyboardEvent as KeyboardEvent
 } from "@notesnook/ui-kit";
 

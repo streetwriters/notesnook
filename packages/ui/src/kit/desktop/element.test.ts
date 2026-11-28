@@ -325,6 +325,25 @@ describe("a ref to a form control", () => {
     elementFor(host)!.click();
     expect(host.focus).toHaveBeenCalledOnce();
   });
+
+  it("runs its click handler when it has one, as a DOM click does", () => {
+    const host = { focus: vi.fn() };
+    const element = elementFor(host)!;
+    element.clickHandler = vi.fn();
+    element.click();
+    expect(element.clickHandler).toHaveBeenCalledOnce();
+    expect(host.focus).not.toHaveBeenCalled();
+  });
+
+  it("keeps the class names set from code", () => {
+    const element = elementFor({})!;
+    element.classList.add("flash", "other");
+    expect(element.classList.contains("flash")).toBe(true);
+    element.classList.remove("flash");
+    expect(element.classList.contains("flash")).toBe(false);
+    expect(element.classList.toggle("other")).toBe(false);
+    expect(element.classList.contains("other")).toBe(false);
+  });
 });
 
 describe("elements by id", () => {

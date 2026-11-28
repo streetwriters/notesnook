@@ -246,6 +246,18 @@ function Container(
   const clicks = useRef({ last: 0 });
   const onPress = pressHandler(props, clicks.current);
   const mergedTextStyle = useMergedTextStyle(textStyle);
+  // `element.click()` runs the handler, as it does in the DOM.
+  const press = useRef(onPress);
+  press.current = onPress;
+  useEffect(() => {
+    const current = element.current;
+    if (!current) return;
+    current.clickHandler = () =>
+      press.current?.({ target: current.node, currentTarget: current.node });
+    return () => {
+      current.clickHandler = undefined;
+    };
+  }, [element]);
 
   // A form is whatever handles `onSubmit`: its submit buttons and the Enter
   // key in its inputs raise the event.

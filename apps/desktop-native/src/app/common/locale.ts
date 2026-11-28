@@ -17,12 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment } from "@platform";
+import { window, navigator } from "../dialogs/desktop-bridge";
 import Config from "../utils/config";
 import { initLocale as initIntlLocale } from "@notesnook/intl";
 
 export async function initLocale() {
-  const navLang = environment.locale;
+  const desktopLocale =
+    typeof window.appLocale === "function" ? window.appLocale() : undefined;
+  const navLang =
+    desktopLocale ||
+    (typeof navigator !== "undefined" ? navigator.language : undefined);
 
   return initIntlLocale({
     getSavedLocale: () => Config.get<string>("appLanguage", ""),

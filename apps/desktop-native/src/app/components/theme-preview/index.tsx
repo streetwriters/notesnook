@@ -17,145 +17,149 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { alpha, Flex, Text } from "@notesnook/ui-kit";
+import { Circle, Notes, Notebook, StarOutline, Tag, Plus } from "../icons";
+import { ThemeMetadata } from "../../dialogs/theme-metadata";
 import { strings } from "@notesnook/intl";
-import { dataColor, Flex, Text, type ColorValue } from "@notesnook/ui-kit";
-import { Circle, Notebook, Notes, Plus, StarOutline, Tag } from "../icons";
-
-type PreviewColors = {
-  accent: string;
-  paragraph: string;
-  background: string;
-  border: string;
-  editor: string;
-  navigationMenu: { background: string; accent: string; icon: string };
-  list: {
-    background: string;
-    heading: string;
-    accent: string;
-    accentForeground: string;
-  };
-  statusBar: { background: string; icon: string; paragraph: string };
-};
 
 export type ThemePreviewProps = {
-  theme: { previewColors: PreviewColors };
+  theme: ThemeMetadata;
 };
 
-function color(value: string, alpha = ""): ColorValue {
-  return /^#[0-9a-f]{6}$/i.test(value)
-    ? dataColor(value + alpha)
-    : "background-secondary";
-}
-
 export function ThemePreview(props: ThemePreviewProps) {
-  const colors = props.theme.previewColors;
+  const { theme } = props;
 
   return (
     <Flex
-      data-test-id="theme-preview"
       sx={{
         position: "relative",
         flexDirection: "column",
         height: 200,
         borderRadius: "default",
         overflow: "hidden",
-        bg: color(colors.accent, "33"),
-        border: "2px solid",
-        borderColor: color(colors.accent)
+        bg: alpha(theme.previewColors.accent, 0.2),
+        //m: 2,
+
+        border: `2px solid ${theme.previewColors.accent}`,
+        gap: 0,
+        transition: "all 300ms ease-out",
+        ":hover": {
+          gap: 1,
+          p: 1,
+          "&> div.ui": { gap: 1 },
+          "& *": { border: "none" }
+        }
       }}
     >
       <Flex
         sx={{
-          flexDirection: "row",
           borderRadius: "default",
           p: "small",
           position: "absolute",
           bottom: 1,
-          right: 1,
-          zIndex: 1
+          right: 1
         }}
       >
-        {[colors.accent, colors.paragraph, colors.background].map((value) => (
-          <Circle key={value} color={color(value)} size={18} sx={{ ml: -12 }} />
+        {[
+          theme.previewColors.accent,
+          theme.previewColors.paragraph,
+          theme.previewColors.background
+        ].map((color) => (
+          <Circle
+            key={color}
+            color={color}
+            size={18}
+            sx={{
+              ml: -12
+            }}
+          />
         ))}
       </Flex>
-      <Flex sx={{ flexDirection: "row", flex: 1 }}>
+      <Flex
+        className="ui"
+        sx={{ flex: 1, gap: 0, transition: "all 300ms ease-out" }}
+      >
         <Flex
+          className="navigation"
           sx={{
-            bg: color(colors.navigationMenu.background),
+            bg: theme.previewColors.navigationMenu.background,
             width: 20,
             flexDirection: "column",
             gap: 2,
             py: 1,
-            borderRight: "1px solid",
-            borderRightColor: color(colors.border)
+            borderRight: `1px solid ${theme.previewColors.border}`
           }}
         >
-          {[Notes, Notebook, StarOutline, Tag].map((IconComponent, index) => (
-            <IconComponent
+          {[Notes, Notebook, StarOutline, Tag].map((Icon, index) => (
+            <Icon
               key={index.toString()}
-              color={color(
+              color={
                 index === 0
-                  ? colors.navigationMenu.accent
-                  : colors.navigationMenu.icon
-              )}
+                  ? theme.previewColors.navigationMenu.accent
+                  : theme.previewColors.navigationMenu.icon
+              }
               size={8}
             />
           ))}
         </Flex>
         <Flex
+          className="list"
           sx={{
-            flexDirection: "row",
-            bg: color(colors.list.background),
+            bg: theme.previewColors.list.background,
             flex: 0.3,
             p: 1,
-            borderRight: "1px solid",
-            borderRightColor: color(colors.border)
+            borderRight: `1px solid ${theme.previewColors.border}`
           }}
         >
           <Flex
             sx={{
-              flexDirection: "row",
               justifyContent: "space-between",
               width: 120
             }}
           >
             <Text
               variant="heading"
-              sx={{ color: color(colors.list.heading), fontSize: 7 }}
+              sx={{
+                color: theme.previewColors.list.heading,
+                fontSize: 7
+              }}
             >
               {strings.dataTypesPluralCamelCase.note()}
             </Text>
             <Plus
-              color={color(colors.list.accentForeground)}
+              color={theme.previewColors.list.accentForeground}
               size={8}
               sx={{
-                bg: color(colors.list.accent),
-                width: 10,
-                height: 10,
+                bg: theme.previewColors.list.accent,
+                size: 10,
                 borderRadius: 100
               }}
             />
           </Flex>
         </Flex>
-        <Flex sx={{ bg: color(colors.editor), flex: 1 }} />
+        <Flex
+          className="editor"
+          sx={{ bg: theme.previewColors.editor, flex: 1 }}
+        />
       </Flex>
       <Flex
+        className="statusbar"
         sx={{
-          flexDirection: "row",
           height: 10,
-          bg: color(colors.statusBar.background),
+          bg: theme.previewColors.statusBar.background,
           px: 1,
           alignItems: "center",
           gap: 1,
-          borderTop: "1px solid",
-          borderTopColor: color(colors.border)
+          borderTop: `1px solid ${theme.previewColors.border}`
         }}
       >
-        <Circle color={color(colors.statusBar.icon)} size={3} />
+        <Circle color={theme.previewColors.statusBar.icon} size={3} />
         <Text
           variant="subBody"
-          sx={{ fontSize: 5, color: color(colors.statusBar.paragraph) }}
+          sx={{
+            fontSize: 5,
+            color: theme.previewColors.statusBar.paragraph
+          }}
         >
           johndoe@email.com
         </Text>

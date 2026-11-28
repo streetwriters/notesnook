@@ -56,6 +56,7 @@ const STATE_PROPERTIES = new Set([
   "borderBottomColor",
   "borderLeftColor",
   "opacity",
+  "visibility",
   "boxShadow",
   "transform",
   "outline",
@@ -211,6 +212,13 @@ export function convertOutline(value: unknown): [string, unknown][] {
   const text = value.trim();
   if (text === "none" || /^\d+(?:\.\d+)?px\s+none\b/.test(text))
     return [["outlineWidth", 0]];
+  // `1px solid`, with the colour in `outlineColor`.
+  const colourless = /^(\d+(?:\.\d+)?)px\s+(?:solid|dashed|dotted)$/.exec(text);
+  if (colourless)
+    return [
+      ["outlineWidth", parseFloat(colourless[1])],
+      ["outlineOffset", 0]
+    ];
   const match = OUTLINE.exec(text);
   if (!match) return [];
   const color = match[2].trim();
@@ -390,7 +398,8 @@ export function convertDeclarations(
       case "overflowX":
       case "overflowY":
         if (value === "scroll")
-          converted.scrolls = key === "overflowY" ? "y" : converted.scrolls ?? "x";
+          converted.scrolls =
+            key === "overflowY" ? "y" : converted.scrolls ?? "x";
         style.overflow =
           value === "auto" ? "scroll" : value === "unset" ? "visible" : value;
         continue;
@@ -415,7 +424,8 @@ export function convertDeclarations(
         }
         break;
       case "visibility":
-        if (value === "hidden") {
+        // `collapse` is `hidden` for everything but table rows.
+        if (value === "hidden" || value === "collapse") {
           style.opacity = 0;
           style.pointerEvents = "none";
         }
@@ -453,5 +463,10 @@ export function convertStateDeclarations(declarations: Declarations) {
     if (STATE_PROPERTIES.has(key)) picked[key] = declarations[key];
   const { style } = convertDeclarations(picked);
   delete style.flexShrink;
+  delete style.pointerEvents;
+  // A state that shows a hidden element (`":hover .edit": { visibility:
+  // "visible" }`) undoes the opacity that hides it.
+  if (picked.visibility === "visible" && style.opacity === undefined)
+    style.opacity = 1;
   return style;
 }

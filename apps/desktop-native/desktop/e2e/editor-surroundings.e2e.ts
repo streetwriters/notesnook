@@ -103,14 +103,14 @@ describe("properties round trips through the database", () => {
     await typeInto(app, "editor-tag-input", "work");
     // The suggestions open once the typed text has been filtered, a moment
     // after the keys; Enter only adds the tag while they are open.
-    await settle(async () => expect(await count(app, "menu-backdrop")).toBe(1));
+    await settle(async () => expect(await count(app, "popup-backdrop")).toBe(1));
     await app.press("enter");
     await settle(async () => expect(await count(app, "tag")).toBe(1));
     // Desktop reopens the default suggestions once the field takes focus back
     // after the add (web closes them). Dismiss them so the next tests can click.
-    await settle(async () => expect(await count(app, "menu-backdrop")).toBe(1));
+    await settle(async () => expect(await count(app, "popup-backdrop")).toBe(1));
     await app.press("escape");
-    await settle(async () => expect(await count(app, "menu-backdrop")).toBe(0));
+    await settle(async () => expect(await count(app, "popup-backdrop")).toBe(0));
   });
 });
 

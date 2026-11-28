@@ -17,78 +17,133 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { shallow } from "zustand/shallow";
+import { MenuItem, PositionOptions } from "@notesnook/ui-kit";
 import {
-  getPointerPosition,
-  type MenuItem,
-  type PositionOptions,
-  type UIElement
-} from "@notesnook/ui-kit";
-import { useMenuStore, type MenuAnchor } from "../components/menu/store";
+  nativeMenuBridge as desktop,
+  HAS_NATIVE_MENUS as IS_DESKTOP_APP
+} from "../dialogs/desktop-bridge";
+import { isMac } from "../utils/platform";
+import createStore from "../common/store";
 
-export type MenuPosition = { x: number; y: number };
-
-export type MenuOptions = {
+type MenuOptions = {
+  position?: PositionOptions;
+  blocking?: boolean;
   title?: string;
-  position?: MenuPosition | MenuAnchor | PositionOptions;
+  forceCustom?: boolean;
+};
+type MenuStore = {
+  isOpen: boolean;
+  isNative: boolean;
+  items: MenuItem[];
+  title?: string;
+  options: MenuOptions;
+  open: (items: MenuItem[], option?: MenuOptions) => void;
+  close: () => void;
 };
 
-function isElement(target: unknown): target is UIElement {
-  return (
-    typeof target === "object" &&
-    target !== null &&
-    "getBoundingClientRect" in target
-  );
-}
-
-function targetOf(position?: MenuOptions["position"]) {
-  return position && "target" in position ? position.target : undefined;
-}
-
-function toAnchor(position?: MenuOptions["position"]): MenuAnchor {
-  // Web's `PositionOptions`: below its target element, or at the pointer.
-  if (position && !("x" in position)) {
-    const target = position.target;
-    if (isElement(target)) {
-      const rect = target.getBoundingClientRect();
-      return {
-        x: rect.x + (position.xOffset ?? 0),
-        y: rect.y,
-        width: position.align === "start" ? 0 : rect.width,
-        height: rect.height + (position.yOffset ?? 0)
-      };
+const [useMenuStore] = createStore<MenuStore>((set) => ({
+  isOpen: false,
+  isNative: false,
+  items: [],
+  title: undefined,
+  options: {
+    blocking: false
+  },
+  open: async (items, options = {}) => {
+    if (
+      IS_DESKTOP_APP &&
+      canShowNativeMenu(items) &&
+      isMac() &&
+      !options?.forceCustom
+    ) {
+      const resolvedItems = await resolveMenuItems(items);
+      desktop?.integration.showMenu.subscribe(
+        {
+          menuItems: JSON.parse(JSON.stringify(resolvedItems))
+        },
+        {
+          onData(ids) {
+            if (ids.length > 0) findAndCallAction(resolvedItems, ids);
+            set({ isOpen: false, isNative: false });
+          }
+        }
+      );
+      set({ options, isOpen: true, isNative: true });
+    } else {
+      set({ isOpen: true, isNative: false, items, options });
     }
-    position = undefined;
-  }
-  if (!position) {
-    const pointer = getPointerPosition();
-    return { x: pointer.x, y: pointer.y, width: 0, height: -5 };
-  }
-  if ("width" in position) return position;
-  return { x: position.x, y: position.y, width: 0, height: -5 };
+  },
+  close: () =>
+    set({
+      isOpen: false,
+      isNative: false,
+      items: [],
+      title: undefined
+    })
+}));
+export { useMenuStore };
+export function useMenuTrigger() {
+  const isOpen = useMenuStore((store) => store.isOpen);
+  const target = useMenuStore((store) => store.options?.position?.target);
+  const [open, close] = useMenuStore(
+    (store) => [store.open, store.close],
+    shallow
+  );
+
+  return {
+    openMenu: open,
+    closeMenu: close,
+    isOpen,
+    target
+  };
 }
 
 export const Menu = {
   openMenu: (items: MenuItem[], options: MenuOptions = {}) =>
-    useMenuStore
-      .getState()
-      .open(
-        items,
-        toAnchor(options.position),
-        options.title,
-        targetOf(options.position)
-      ),
+    useMenuStore.getState().open(items, options),
   closeMenu: () => useMenuStore.getState().close(),
-  isOpen: () => useMenuStore.getState().items !== undefined,
-  target: () => useMenuStore.getState().target
+  isOpen: () => useMenuStore.getState().isOpen,
+  target: () => useMenuStore.getState().options?.position?.target
 };
 
-export function useMenuTrigger() {
-  const isOpen = useMenuStore((store) => store.items !== undefined);
-  const target = useMenuStore((store) => store.target);
-  return {
-    openMenu: Menu.openMenu,
-    closeMenu: Menu.closeMenu,
-    isOpen,
-    target
-  };
+export function useMenu() {
+  const [items, options, isNative] = useMenuStore((store) => [
+    store.items,
+    store.options,
+    store.isNative
+  ]);
+  return { items, options, isNative };
+}
+
+async function resolveMenuItems(items: MenuItem[]): Promise<MenuItem[]> {
+  const serialized = [];
+  for (const item of items) {
+    if (item.type === "lazy-loader")
+      serialized.push(...(await resolveMenuItems(await item.items())));
+    else if (item.type === "button") {
+      if (item.menu) item.menu.items = await resolveMenuItems(item.menu.items);
+      serialized.push(item);
+    } else serialized.push(item);
+  }
+  return serialized;
+}
+
+function findAndCallAction(items: MenuItem[], ids: string[]) {
+  let _items: MenuItem[] = items;
+  const actionId = ids.at(-1);
+  for (const id of ids) {
+    const item = _items.find((item) => item.key === id);
+    if (!item || item?.type !== "button") continue;
+    if (id === actionId) {
+      item?.onClick?.();
+    } else {
+      _items = item.menu?.items || [];
+    }
+  }
+}
+
+function canShowNativeMenu(items: MenuItem[]) {
+  if (IS_TESTING) return false;
+  return items.every((item) => item.type !== "popup");
 }

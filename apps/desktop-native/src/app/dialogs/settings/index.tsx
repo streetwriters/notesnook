@@ -57,7 +57,7 @@ import {
   ShieldLock,
   Sync
 } from "../../components/icons";
-import { NavigationItem } from "../../components/navigation-menu/navigation-item";
+import NavigationItem from "../../components/navigation-menu/navigation-item";
 import { hashNavigate } from "../../navigation";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { AppearanceSettings } from "./appearance-settings";

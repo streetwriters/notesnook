@@ -17,9 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { MenuHost } from "../menu";
+import { MenuPresenter } from "@notesnook/ui-kit";
+import { useMenuTrigger, useMenu } from "../../hooks/use-menu";
+import useMobile from "../../hooks/use-mobile";
 
 function GlobalMenuWrapper() {
-  return <MenuHost />;
+  const { isOpen, closeMenu } = useMenuTrigger();
+  const { items, options, isNative } = useMenu();
+  const isMobile = useMobile();
+
+  return (
+    <MenuPresenter
+      isOpen={isOpen && !isNative}
+      onClose={closeMenu}
+      focusOnRender={!options.blocking}
+      blocking={options.blocking}
+      isMobile={isMobile}
+      position={options.position || {}}
+      items={items}
+      title={options.title}
+    />
+  );
 }
 export default GlobalMenuWrapper;

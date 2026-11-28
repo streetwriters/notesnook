@@ -140,7 +140,25 @@ export function mouseEvent<T = UIElement>(
   const pageX = native.pageX ?? native.clientX ?? native.x ?? 0;
   const pageY = native.pageY ?? native.clientY ?? native.y ?? 0;
   rememberPointer(pageX, pageY);
-  return withMembers(syntheticEvent<T>(type, event, element), {
+  const base = syntheticEvent<T>(type, event, element);
+  const members = mouseMembers(native, overrides, pageX, pageY);
+  return withMembers(base, {
+    ...members,
+    nativeEvent: {
+      ...members,
+      preventDefault: () => base.preventDefault(),
+      stopPropagation: () => base.stopPropagation()
+    }
+  });
+}
+
+function mouseMembers(
+  native: Record<string, any>,
+  overrides: MouseOverrides,
+  pageX: number,
+  pageY: number
+) {
+  return {
     ...modifiers(native),
     button:
       overrides.button ??
@@ -157,7 +175,7 @@ export function mouseEvent<T = UIElement>(
     pageY,
     x: native.locationX ?? native.offsetX ?? 0,
     y: native.locationY ?? native.offsetY ?? 0
-  });
+  };
 }
 
 export function keyboardEvent<T = UIElement>(

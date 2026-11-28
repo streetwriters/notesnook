@@ -17,17 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import ListContainer from "../components/list-container";
+import { useStore, store } from "../stores/tag-store";
+import { SidebarPlaceholder } from "../components/placeholders";
+import { db } from "../common/db";
+import { ListLoader } from "../components/loaders/list-loader";
+import { Flex, Input } from "@notesnook/ui-kit";
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
-import type { Tag, VirtualizedGrouping } from "@notesnook/core";
+import { Tag, VirtualizedGrouping } from "@notesnook/core";
+import { SidebarScroller } from "../components/sidebar-scroller";
 import { strings } from "@notesnook/intl";
-import { Flex, Input } from "@notesnook/ui-kit";
-import ListContainer from "../components/list-container";
-import { SidebarPlaceholder } from "../components/placeholders";
-import { ListLoader } from "../components/loaders/list-loader";
 import { Funnel } from "../components/icons";
-import { db } from "../common/db";
-import { useStore, store } from "../stores/tag-store";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
@@ -54,7 +55,6 @@ function Tags() {
     <Flex
       variant="columnFill"
       id="tags"
-      data-test-id="tags"
       sx={{
         flex: 1,
         mt: "spacing4"
@@ -65,12 +65,15 @@ function Tags() {
         refresh={refresh}
         items={items}
         placeholder={<SidebarPlaceholder variant="tags" />}
-        placeholderSx={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center"
+        sx={{
+          ".list-container-placeholder": {
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }
         }}
         header={<></>}
+        Scroller={SidebarScroller}
       />
       <Flex
         sx={{

@@ -17,62 +17,70 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { type ColorValue } from "@notesnook/ui-kit";
+import type * as React from "@notesnook/ui-kit/contracts/react";
 import { Checkbox as CheckboxIcon, CheckboxUnchecked } from "./icons";
 
 type CheckboxProps = {
   checked: boolean;
-  onToggle?: (ctrl: boolean) => void;
-  "aria-label"?: string;
+  onToggle?: (
+    event:
+      | React.MouseEvent<HTMLDivElement>
+      | React.KeyboardEvent<HTMLDivElement>
+  ) => void;
+  "aria-label": string;
   "data-test-id"?: string;
   size?: number;
-  checkboxUncheckedIconColor: ColorValue;
-  uncheckedGroupHoverColor?: ColorValue;
+  checkboxUncheckedIconColor: string;
+  checkboxUncheckedIconClassname?: string;
 };
 
 export function Checkbox(props: CheckboxProps) {
   const {
     checked,
     onToggle,
+    "aria-label": ariaLabel,
+    "data-test-id": dataTestId,
     size = 18,
-    checkboxUncheckedIconColor
+    checkboxUncheckedIconColor,
+    checkboxUncheckedIconClassname
   } = props;
 
   const Icon = checked ? CheckboxIcon : CheckboxUnchecked;
 
   return (
     <Icon
-      data-test-id={props["data-test-id"]}
-      title={props["aria-label"]}
+      role="checkbox"
+      aria-checked={checked}
+      aria-label={ariaLabel}
+      tabIndex={0}
+      data-test-id={dataTestId}
       onClick={(event) => {
         if (!onToggle) return;
+
         event.stopPropagation();
-        onToggle(event.ctrlKey || event.metaKey);
+        onToggle(event);
       }}
       onKeyDown={(event) => {
         if (!onToggle) return;
+
         if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
           event.stopPropagation();
-          onToggle(false);
+          onToggle(event);
         }
       }}
       size={size}
       color={checked ? "accent" : checkboxUncheckedIconColor}
+      className={checked ? undefined : checkboxUncheckedIconClassname}
       sx={{
         alignItems: "center",
         cursor: "pointer",
         flexShrink: 0,
-        borderRadius: 5,
-        ...(!checked && props.uncheckedGroupHoverColor
-          ? {
-              ":group-hover": {
-                group: "list-item",
-                style: { color: props.uncheckedGroupHoverColor }
-              }
-            }
-          : {}),
-        ":focus-visible": { outlineColor: "accent", outlineWidth: 2 }
+        borderRadius: "5px",
+        ":focus-visible": {
+          outline: "2px solid",
+          outlineColor: "accent"
+        }
       }}
     />
   );

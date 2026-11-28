@@ -17,72 +17,92 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ReactNode } from "react";
 import {
+  Button,
   Flex,
   Text,
-  type ColorValue,
-  type UIMouseEvent,
-  type UIDragEvent,
+  createButtonVariant,
+  type FlexProps,
   type MenuItem
 } from "@notesnook/ui-kit";
-import type { Icon } from "../icons";
+import type * as React from "@notesnook/ui-kit/contracts/react";
 import { Menu } from "../../hooks/use-menu";
+import { PropsWithChildren } from "react";
+import { Icon } from "../icons";
+import { SchemeColors } from "@notesnook/theme";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 
-export function NavigationItem(props: {
-  title: string;
+type NavigationItemProps = {
   icon?: Icon;
   iconSize?: number;
   collapsedIconSize?: number;
-  color?: ColorValue;
-  selected?: boolean;
+  color?: SchemeColors;
+  title?: string;
   isCollapsed?: boolean;
-  onDrop?: (event: UIDragEvent) => void;
+  isLoading?: boolean;
+  selected?: boolean;
   onClick?: () => void;
-  /** @deprecated Use `onClick`. */
-  onPress?: () => void;
   menuItems?: MenuItem[];
-  children?: ReactNode;
-}) {
+};
+
+function NavigationItem(
+  props: PropsWithChildren<
+    NavigationItemProps & { containerRef?: React.Ref<HTMLElement> } & FlexProps
+  >
+) {
   const {
-    icon: RowIcon,
+    icon: Icon,
     iconSize = 13,
     collapsedIconSize = 15,
-    selected,
-    menuItems,
+    color,
+    title,
+    isLoading,
+    children,
     isCollapsed,
-    onDrop
+    selected,
+    onClick,
+    menuItems,
+    sx,
+    containerRef,
+    ...restProps
   } = props;
+
   return (
     <Flex
-      data-test-id="navigation-item"
-      onDrop={onDrop}
-      title={props.title}
-      onClick={() => {
-        AppEventManager.publish(AppEvents.toggleSideMenu, false);
-        (props.onClick ?? props.onPress)?.();
+      {...restProps}
+      ref={containerRef}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.currentTarget.focus();
       }}
-      onContextMenu={
-        menuItems
-          ? (event: UIMouseEvent) => {
-              event.preventDefault();
-              event.stopPropagation();
-              Menu.openMenu(menuItems, {
-                position: { x: event.pageX, y: event.pageY }
-              });
-            }
-          : undefined
-      }
       sx={{
+        ...createButtonVariant(
+          selected ? "background-selected" : "transparent",
+          "transparent",
+          {
+            hover: {
+              bg: selected ? "hover-selected" : "hover"
+            }
+          }
+        ),
         borderRadius: "radius1",
         px: "spacing2",
         py: isCollapsed ? "spacing2" : "spacing4",
         alignItems: "center",
-        flexDirection: "row",
-        bg: selected ? "background-selected" : "transparent",
-        ":hover": { bg: selected ? "hover-selected" : "hover" },
-        ":drag-over": { bg: selected ? "hover-selected" : "hover" }
+        position: "relative",
+        ...sx
+      }}
+      onClick={() => {
+        AppEventManager.publish(AppEvents.toggleSideMenu, false);
+        if (onClick) onClick();
+      }}
+      data-test-id={`navigation-item`}
+      title={title}
+      onContextMenu={(e) => {
+        if (!menuItems) return;
+        e.preventDefault();
+        e.stopPropagation();
+        Menu.openMenu(menuItems);
       }}
     >
       <Flex
@@ -90,34 +110,56 @@ export function NavigationItem(props: {
           p: 0,
           flex: 1,
           alignItems: "center",
-          justifyContent: isCollapsed ? "center" : "flex-start",
-          flexDirection: "row"
+          justifyContent: isCollapsed ? "center" : "flex-start"
         }}
       >
-        {RowIcon ? (
-          <RowIcon
+        {Icon ? (
+          <Icon
             size={isCollapsed ? collapsedIconSize : iconSize}
-            color={props.color ?? (selected ? "icon-selected" : "icon")}
+            color={color || (selected ? "icon-selected" : "icon")}
+            rotate={isLoading}
           />
         ) : null}
+
         {isCollapsed ? null : (
           <Text
-            data-test-id="title"
             variant="body"
             sx={{
-              lineClamp: 1,
               fontSize: "xs",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
               fontWeight: "normal",
               color: selected ? "paragraph-selected" : "paragraph",
-              pr: "spacing1",
-              ml: "spacing3"
+              pr: "spacing1"
             }}
+            ml="spacing3"
+            data-test-id="title"
           >
-            {props.title}
+            {title}
           </Text>
         )}
       </Flex>
-      {isCollapsed ? null : props.children}
+      {children && !isCollapsed ? children : null}
     </Flex>
   );
+}
+export default NavigationItem;
+
+export function SortableNavigationItem(
+  props: PropsWithChildren<
+    {
+      id: string;
+      onDragEnter?: React.DragEventHandler<HTMLElement>;
+      onDragLeave?: React.DragEventHandler<HTMLElement>;
+      onDrop?: React.DragEventHandler<HTMLElement>;
+    } & NavigationItemProps
+  >
+) {
+  // apps/web makes the item sortable with @dnd-kit's useSortable (DOM
+  // listeners and CSS transforms). Here the kit's SortableList, which
+  // ReorderableList renders the items in, moves the rows.
+  const { id: _id, ...restProps } = props;
+
+  return <NavigationItem {...restProps} />;
 }

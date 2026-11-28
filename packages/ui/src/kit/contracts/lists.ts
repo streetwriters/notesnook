@@ -122,7 +122,12 @@ export type ScrollerProps = {
   tabIndex?: number;
   "data-testid"?: string;
   "data-virtuoso-scroller"?: boolean;
-} & RefAttributes<UIElement>;
+  [name: `data-${string}`]: string | number | boolean | undefined;
+  // The ref is the kit's element. It is typed loosely because apps/web's
+  // scrollers are `forwardRef<HTMLDivElement, ScrollerProps>`, and a ref to a
+  // DOM element type does not take a `UIElement`.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} & RefAttributes<any>;
 
 export type TopItemListProps = {
   children?: ReactNode;
@@ -136,7 +141,9 @@ export type TableProps = {
 
 export type TableRowProps<D> = ItemProps<D>;
 
-export interface Components<Data = unknown, Context = unknown> {
+// The defaults are react-virtuoso's, so `Components["Scroller"]` fits any list.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Components<Data = any, Context = any> {
   EmptyPlaceholder?: ComponentType<ContextProp<Context>>;
   Footer?: ComponentType<ContextProp<Context>>;
   Header?: ComponentType<ContextProp<Context>>;
@@ -145,7 +152,9 @@ export interface Components<Data = unknown, Context = unknown> {
   TopItemList?: ComponentType<TopItemListProps & ContextProp<Context>>;
 }
 
-export interface TableComponents<Data = unknown, Context = unknown> {
+// The defaults are react-virtuoso's, so `Components["Scroller"]` fits any list.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface TableComponents<Data = any, Context = any> {
   EmptyPlaceholder?: ComponentType<ContextProp<Context>>;
   Scroller?: ComponentType<ScrollerProps & ContextProp<Context>>;
   Table?: ComponentType<TableProps & ContextProp<Context>>;
@@ -247,34 +256,3 @@ export interface SortableListProps<T extends SortableItem> {
 export declare function SortableList<T extends SortableItem>(
   props: SortableListProps<T>
 ): JSX.Element;
-
-/**
- * A list's keyboard cursor and click registry, for native lists: they have no
- * DOM to focus or click, so each item registers its open action with its index.
- * Web's list reads the DOM instead, so web never provides it.
- */
-export type ListSelection = {
-  focusedIndex: number;
-  register: (index: number, open: () => void) => () => void;
-  onItemPress: (
-    index: number,
-    id: string,
-    event: UIMouseEvent,
-    open: () => void
-  ) => void;
-};
-export declare const ListSelectionContext: Context<ListSelection | undefined>;
-export declare function useListSelection(): ListSelection | undefined;
-
-/**
- * The state behind a `ListSelection` on a native list: the keyboard cursor, the
- * open action of each item by index, and the press handler that the list's
- * keyboard selection gets. Web's list has none of it; it reads the DOM instead.
- */
-export type ListCursor = {
-  selection: ListSelection;
-  setFocusedIndex: (index: number) => void;
-  openAt: (index: number) => void;
-  bindPress: (handler: (event: UIMouseEvent, index: number) => void) => void;
-};
-export declare function useListCursor(): ListCursor;

@@ -23,7 +23,7 @@ import "@formatjs/intl-pluralrules/polyfill-force";
 import "@formatjs/intl-pluralrules/locale-data/en";
 import "./platform";
 import { createRoot } from "react-dom/client";
-import { initLocaleSync } from "../../app/common/locale-sync";
+import { initLocaleSync } from "../locale-sync";
 
 async function start() {
   if (new URLSearchParams(location.search).get("page") === "primitives") {

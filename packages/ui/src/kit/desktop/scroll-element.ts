@@ -106,6 +106,13 @@ export function createScrollElement(
   } = {
     focus: () => node()?.focus?.(),
     blur: () => node()?.blur?.(),
+    click: () => node()?.focus?.(),
+    classList: {
+      add: () => undefined,
+      remove: () => undefined,
+      contains: () => false,
+      toggle: (_name, force) => !!force
+    },
     getBoundingClientRect: () => {
       const native = node()?.getBoundingClientRect?.();
       if (native) return rect(native.x, native.y, native.width, native.height);

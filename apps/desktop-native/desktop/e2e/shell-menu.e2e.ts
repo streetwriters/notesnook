@@ -67,7 +67,7 @@ test("the dark mode item switches the theme and a click outside closes the menu"
   await app.getByTestId("profile-dropdown").click();
   await app.waitForIdle();
   expect(await app.getByTestId("menu-container").count()).toBe(1);
-  await app.click((await app.query("testID", "menu-backdrop", true))[0].tag);
+  await app.click((await app.query("testID", "popup-backdrop", true))[0].tag);
   await app.waitForIdle();
   expect(await app.getByTestId("menu-container").count()).toBe(0);
 });

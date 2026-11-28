@@ -21,8 +21,66 @@ import { describe, expect, test } from "vitest";
 import {
   matchRules,
   parseSelector,
+  scopeHoverRules,
   selectorRules
 } from "./style/selectors";
+
+describe("rules for the elements below a hovered one", () => {
+  test("a selector after :hover and a selector nested in :hover are hover rules", () => {
+    const rules = selectorRules({
+      bg: "background",
+      ":hover #profile-picture-edit": { visibility: "visible" },
+      ":hover": {
+        bg: "hover",
+        ".reminder-checkbox-unchecked-icon": { color: "border-tertiary" },
+        "& > div.ui": { gap: 1 }
+      },
+      ".plain": { color: "accent" }
+    });
+    expect(rules).toEqual([
+      {
+        targets: [{ classes: [], id: "profile-picture-edit" }],
+        style: { visibility: "visible" },
+        hover: true
+      },
+      {
+        targets: [{ classes: ["reminder-checkbox-unchecked-icon"] }],
+        style: { color: "border-tertiary" },
+        hover: true
+      },
+      {
+        targets: [{ tag: "div", classes: ["ui"] }],
+        style: { gap: 1 },
+        hover: true
+      },
+      { targets: [{ classes: ["plain"] }], style: { color: "accent" } }
+    ]);
+  });
+
+  test("a hover rule reaches the element as a group hover of the hovered one", () => {
+    const rules = scopeHoverRules(
+      selectorRules({
+        ":hover .icon": { color: "accent" },
+        ".icon": { color: "icon" }
+      })!,
+      "g1"
+    );
+    expect(matchRules(rules, { className: "icon" })).toEqual({
+      color: "icon",
+      ":group-hover": { group: "g1", style: { color: "accent" } }
+    });
+    expect(matchRules(rules, { className: "other" })).toBeUndefined();
+  });
+
+  test("other pseudo classes are still not rules", () => {
+    expect(
+      selectorRules({ ":focus .icon": { color: "accent" } })
+    ).toBeUndefined();
+    expect(
+      selectorRules({ ":hover": { ":first-of-type": { color: "accent" } } })
+    ).toBeUndefined();
+  });
+});
 
 describe("parseSelector", () => {
   test("a nested tag, with or without &", () => {

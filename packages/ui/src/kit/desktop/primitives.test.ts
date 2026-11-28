@@ -77,6 +77,13 @@ vi.mock("@platform", () => ({ shell: { openExternal: vi.fn() } }));
 vi.mock("@react-native-gpui/core/desktop", () => ({ DragDrop: {} }));
 vi.mock("@react-native-gpui/fs", () => ({}));
 vi.mock("../shared/icons", () => ({ CaretDown: () => null }));
+const presented = vi.hoisted(() => ({ props: undefined as any }));
+vi.mock("./menu", () => ({
+  MenuPresenter: (props: any) => {
+    presented.props = props;
+    return null;
+  }
+}));
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -342,6 +349,52 @@ describe("Select", () => {
       )
     );
     expect(title()).toContain("Beta");
+  });
+});
+
+describe("Select menu", () => {
+  it("opens its own menu below itself and raises onChange for a new option", () => {
+    const onChange = vi.fn();
+    presented.props = undefined;
+    render(
+      h(
+        Select,
+        { defaultValue: "a", onChange },
+        h("option", { value: "a" }, "Alpha"),
+        h("option", { value: "b" }, "Beta")
+      )
+    );
+    expect(presented.props).toBeUndefined();
+    fire(() => pressable().props.onPress(press()));
+    expect(presented.props.position.location).toBe("below");
+    expect(
+      presented.props.items.map((item: any) => [item.title, item.isChecked])
+    ).toEqual([
+      ["Alpha", true],
+      ["Beta", false]
+    ]);
+    fire(() => presented.props.items[1].onClick());
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(onChange.mock.calls[0][0].target.value).toBe("b");
+    fire(() => presented.props.onClose());
+    expect(JSON.stringify(root.toJSON())).toContain("Beta");
+  });
+});
+
+describe("element.click()", () => {
+  it("runs the element's onClick", () => {
+    const onClick = vi.fn();
+    let element: any;
+    render(
+      h(Flex, {
+        onClick,
+        ref: (node: any) => {
+          element = node ?? element;
+        }
+      })
+    );
+    fire(() => element.click());
+    expect(onClick).toHaveBeenCalledOnce();
   });
 });
 

@@ -18,235 +18,217 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  type ReactNode
-} from "react";
-import { Item } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import { environment } from "@platform";
-import {
-  Box,
   Flex,
   Text,
-  type ColorValue,
-  type UIMouseEvent,
-  type UIDragEvent,
-  type UIKeyboardEvent,
-  type MenuItem,
-  type SxProp,
-  useListSelection
+  alpha,
+  type ThemeUIStyleObject,
+  type MenuItem
 } from "@notesnook/ui-kit";
 import {
   store as selectionStore,
   useStore as useSelectionStore
 } from "../../stores/selection-store";
-import { Menu } from "../../hooks/use-menu";
+import { useMenuTrigger } from "../../hooks/use-menu";
+import { useRef } from "react";
+import type * as React from "@notesnook/ui-kit/contracts/react";
+import { SchemeColors } from "@notesnook/theme";
+import { Item } from "@notesnook/core";
 import { setDragData } from "../../utils/data-transfer";
+import { strings } from "@notesnook/intl";
 
-/**
- * The row's position in its list, for the desktop keyboard selection. Lists
- * and trees provide it, so item components need no index prop (web's have
- * none: DOM focus moves between rows there).
- */
-export const ListItemIndex = createContext<number | undefined>(undefined);
-
-type ListItemColors = {
-  heading: ColorValue;
-  accent: ColorValue;
-  background: ColorValue;
-  backgroundSelected: ColorValue;
-};
-
-type ListItemProps<TItem extends Item = Item, TContext = unknown> = {
-  colors?: ListItemColors;
+type ListItemProps<TItem extends Item, TContext> = {
+  colors?: {
+    heading: SchemeColors;
+    accent: SchemeColors;
+    background: SchemeColors;
+    backgroundSelected: SchemeColors;
+  };
   isFocused?: boolean;
   isCompact?: boolean;
   isDisabled?: boolean;
   item: TItem;
-  index?: number;
-  onClick?: (event: UIMouseEvent) => void;
   draggable?: boolean;
-  onDragEnter?: (event: UIDragEvent) => void;
-  onDragLeave?: (event: UIDragEvent) => void;
-  onDrop?: (event: UIDragEvent) => void;
+
+  onKeyPress?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onClick?: () => void;
   onMiddleClick?: () => void;
-  onKeyPress?: (event: UIKeyboardEvent) => void;
+  onSelect?: () => void;
+
+  onDragEnter?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDragLeave?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
+
+  title: string | JSX.Element;
+  header?: JSX.Element;
+  body?: JSX.Element | string;
+  footer?: JSX.Element;
+
   context?: TContext;
   menuItems?: (
     item: TItem,
     ids?: string[],
     context?: TContext
   ) => Promise<MenuItem[]> | MenuItem[];
-  title: string | ReactNode;
-  header?: ReactNode;
-  body?: string | ReactNode;
-  footer?: ReactNode;
-  sx?: SxProp;
+
+  sx?: ThemeUIStyleObject;
 };
 
-const DEFAULT_COLORS: ListItemColors = {
-  heading: "heading",
-  accent: "accent",
-  background: "background",
-  backgroundSelected: "background-secondary"
-};
-
-export default function ListItem<TItem extends Item, TContext = unknown>(
+function ListItem<TItem extends Item, TContext>(
   props: ListItemProps<TItem, TContext>
 ) {
   const {
-    colors = DEFAULT_COLORS,
+    colors: { heading, background, accent, backgroundSelected } = {
+      heading: "heading",
+      accent: "accent",
+      background: "background",
+      backgroundSelected: "background-secondary"
+    },
     isFocused,
     isCompact,
     isDisabled,
-    item
+    item,
+    sx,
+    context,
+    onDragEnter,
+    onDragLeave,
+    onDrop,
+    draggable
   } = props;
-  const selection = useListSelection();
-  const rowIndex = useContext(ListItemIndex);
-  const index = props.index ?? rowIndex;
+
+  const listItemRef = useRef<HTMLDivElement>(null);
+  const { openMenu, target } = useMenuTrigger();
+  const isMenuTarget = target && target === listItemRef.current;
+
   const isSelected = useSelectionStore((store) => {
-    const isInSelection = store.selectedItems.includes(item.id);
+    const isInSelection = store.selectedItems.includes(props.item.id);
     return isFocused
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;
   });
-  const isCursor =
-    selection !== undefined &&
-    index !== undefined &&
-    selection.focusedIndex === index;
-  const selected = isSelected || isFocused;
-
-  const onClickRef = useRef(props.onClick);
-  onClickRef.current = props.onClick;
-  useEffect(() => {
-    if (!selection || index === undefined) return;
-    return selection.register(index, () =>
-      onClickRef.current?.(undefined as never)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection, index]);
-
-  const openContextMenu = async (event: UIMouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!props.menuItems) return;
-
-    let title: string | undefined = undefined;
-    let selectedItems = selectionStore.get().selectedItems;
-    if (selectedItems.findIndex((i) => i === item.id) === -1)
-      selectedItems = [item.id];
-
-    let menuItems = await props.menuItems(item, selectedItems, props.context);
-    if (selectedItems.length > 1) {
-      title = strings.itemsSelected(selectedItems.length);
-      const multiSelectItemsAndSeparators = menuItems.filter(
-        (item) => item.type === "separator" || item.multiSelect === true
-      );
-      menuItems = multiSelectItemsAndSeparators.filter(
-        (item, index, items) =>
-          item.type !== "separator" ||
-          (items[index - 1]?.multiSelect === true &&
-            items[index + 1]?.multiSelect === true)
-      );
-    }
-    if (!menuItems.length) return;
-
-    Menu.openMenu(menuItems, {
-      title,
-      position: { x: event.pageX, y: event.pageY }
-    });
-  };
+  const selected = isSelected || isMenuTarget || isFocused;
 
   return (
     <Flex
-      data-test-id="list-item"
       id={`id_${item.id}`}
       className={isSelected ? "selected" : ""}
-      draggable={props.draggable}
-      onDragStart={
-        props.draggable
-          ? (event) => {
-              let selectedItems = selectionStore.get().selectedItems;
-              if (selectedItems.findIndex((i) => i === item.id) === -1)
-                selectedItems = [item.id];
-              return setDragData(event.dataTransfer, item.type, selectedItems);
-            }
-          : undefined
-      }
-      onDragEnter={props.onDragEnter}
-      onDragLeave={props.onDragLeave}
-      onDrop={props.onDrop}
-      group="list-item"
-      onContextMenu={openContextMenu}
-      onKeyUp={(event) => {
-        if (event.key !== "Enter") props.onKeyPress?.(event);
+      ref={listItemRef}
+      draggable={draggable}
+      onDragEnter={onDragEnter}
+      onDrop={onDrop}
+      onDragOver={(e) => e.preventDefault()}
+      onDragLeave={onDragLeave}
+      onDragEnd={onDragLeave}
+      onDragStart={(e) => {
+        if (!draggable) return;
+        let selectedItems = selectionStore.get().selectedItems;
+        if (selectedItems.findIndex((i) => i === item.id) === -1) {
+          selectedItems = [];
+          selectedItems.push(item.id);
+        }
+        setDragData(e.dataTransfer, item.type, selectedItems);
       }}
-      onMouseDown={(event) => {
-        if (event.button == 1 && props.onMiddleClick) {
-          event.preventDefault();
+      onContextMenu={async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let title = undefined;
+        let selectedItems = selectionStore.get().selectedItems; // .filter((i) => i.type === item.type);
+
+        if (selectedItems.findIndex((i) => i === item.id) === -1) {
+          selectedItems = [];
+          selectedItems.push(item.id);
+        }
+        let menuItems = await props.menuItems?.(item, selectedItems, context);
+
+        if (selectedItems.length > 1) {
+          title = strings.itemsSelected(selectedItems.length);
+          const multiSelectItemsAndSeparators = menuItems?.filter(
+            (item) => item.type === "separator" || item.multiSelect === true
+          );
+          menuItems = multiSelectItemsAndSeparators?.filter(
+            (item, index, items) =>
+              item.type !== "separator" ||
+              (items[index - 1]?.multiSelect === true &&
+                items[index + 1]?.multiSelect === true)
+          );
+        }
+
+        if (!menuItems) return;
+
+        openMenu(menuItems, {
+          title
+        });
+      }}
+      tabIndex={-1}
+      sx={{
+        // px: 1,
+        // py: isCompact ? 0 : 1,
+        // pr: isCompact ? 10 : 0,
+        // height: isCompact ? 25 : "inherit",
+        // cursor: "pointer",
+        position: "relative",
+        overflow: "hidden",
+        maxWidth: "100%",
+
+        flexDirection: isCompact ? "row" : "column",
+        justifyContent: isCompact ? "space-between" : "center",
+        alignItems: isCompact ? "center" : undefined,
+
+        opacity: isDisabled ? 0.7 : 1,
+
+        backgroundColor: selected ? backgroundSelected : background,
+
+        ":focus": {
+          backgroundColor: selected ? "hover-selected" : "hover"
+        },
+        ":focus-visible": {
+          outline: `1px solid`,
+          outlineColor: accent === "accent" ? "accent" : alpha("accent", 0.7),
+          backgroundColor:
+            isSelected || isFocused ? "background-selected" : background
+        },
+        ...sx,
+        ":hover": {
+          backgroundColor: selected ? "hover-selected" : "hover",
+          ...(sx as { ":hover"?: ThemeUIStyleObject })?.[":hover"]
+        }
+      }}
+      onKeyUp={(e) => {
+        if (e.key !== "Enter") {
+          if (props.onKeyPress) props.onKeyPress(e);
+        }
+      }}
+      onClick={(e) => {
+        if (!e.metaKey && !e.shiftKey && !e.ctrlKey && props.onClick) {
+          props.onClick();
+        }
+      }}
+      onMouseDown={(e) => {
+        if (e.button == 1 && props.onMiddleClick) {
+          e.preventDefault();
           props.onMiddleClick();
         }
       }}
-      onClick={(event) => {
-        if (selection && index !== undefined)
-          selection.onItemPress(index, item.id, event, () =>
-            props.onClick?.(event)
-          );
-        else props.onClick?.(event);
-      }}
-      sx={{
-        flexDirection: isCompact ? "row" : "column",
-        justifyContent: isCompact ? "space-between" : "center",
-        alignItems: isCompact ? "center" : "stretch",
-        maxWidth: "100%",
-        overflow: "hidden",
-        opacity: isDisabled ? 0.7 : 1,
-        bg: selected
-          ? colors.backgroundSelected
-          : isCursor
-          ? "hover"
-          : colors.background,
-        ":hover": { bg: selected ? "hover-selected" : "hover" },
-        ":drag-over": { bg: selected ? "hover-selected" : "hover" },
-        ...props.sx
-      }}
+      data-test-id={`list-item`}
     >
-      {environment.isDev && selected ? (
-        <Box
-          data-test-id="list-item-selected"
-          sx={{ position: "absolute", width: 0, height: 0 }}
-        />
-      ) : null}
-      {environment.isDev && isSelected ? (
-        <Box
-          data-test-id="list-item-in-selection"
-          sx={{ position: "absolute", width: 0, height: 0 }}
-        />
-      ) : null}
-      {environment.isDev && isCursor ? (
-        <Box
-          data-test-id="list-item-cursor"
-          sx={{ position: "absolute", width: 0, height: 0 }}
-        />
-      ) : null}
-      {!isCompact ? props.header : null}
+      {!isCompact && props.header}
+
       <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
         {typeof props.title === "string" ? (
           <Text
-            data-test-id="title"
-            variant="body"
+            dir="auto"
+            data-test-id={`title`}
+            variant={"body"}
             sx={{
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
+              whiteSpace: "pre",
               overflow: "hidden",
+              textOverflow: "ellipsis",
               fontWeight: isCompact ? "body" : "medium",
               color:
-                selected && colors.heading === "heading"
-                  ? "heading-selected"
-                  : colors.heading
+                selected && heading === "heading"
+                  ? `heading-selected`
+                  : heading,
+              display: "block"
             }}
           >
             {props.title}
@@ -254,26 +236,37 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
         ) : (
           props.title
         )}
-        {!isCompact && props.body ? (
-          typeof props.body === "string" ? (
+
+        {!isCompact &&
+          props.body &&
+          (typeof props.body === "string" ? (
             <Text
-              data-test-id="description"
+              as="p"
+              dir="auto"
+              data-test-id={`description`}
               sx={{
-                lineClamp: 4,
                 color: "paragraph",
                 fontSize: "xs",
                 width: "100%",
-                lineHeight: 19.2
+                lineHeight: "1.2rem",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "pre-wrap",
+                position: "relative",
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical"
               }}
             >
               {props.body}
             </Text>
           ) : (
             props.body
-          )
-        ) : null}
+          ))}
       </Flex>
-      {props.footer}
+
+      {props.footer ? <>{props.footer}</> : null}
     </Flex>
   );
 }
+export default ListItem;

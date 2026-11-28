@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type {
+  UIClassList,
   UIElement,
   UIInputElement,
   UIRect,
@@ -165,8 +166,31 @@ export function measureInWindow(
 /** The subset of `HTMLElement` the kit gives as a ref and as an event target. */
 export class DesktopElement implements UIInputElement {
   control: ElementControl | undefined;
+  /** The element's `onClick`, set by the component that draws it. */
+  clickHandler: (() => void) | undefined;
+  private classes: Set<string> | undefined;
 
   constructor(readonly node: NativeNode) {}
+
+  /**
+   * Class names set from code. They are kept and can be read back, but
+   * nothing is drawn for them: desktop has no stylesheet to match a class
+   * added after render.
+   */
+  get classList(): UIClassList {
+    const classes = (this.classes ??= new Set());
+    return {
+      add: (...names) => names.forEach((name) => classes.add(name)),
+      remove: (...names) => names.forEach((name) => classes.delete(name)),
+      contains: (name) => classes.has(name),
+      toggle: (name, force) => {
+        const on = force ?? !classes.has(name);
+        if (on) classes.add(name);
+        else classes.delete(name);
+        return on;
+      }
+    };
+  }
 
   focus(_options?: { preventScroll?: boolean }) {
     this.node.focus?.();
@@ -176,9 +200,13 @@ export class DesktopElement implements UIInputElement {
     this.node.blur?.();
   }
 
-  /** Does what a click on this element's label does. */
+  /**
+   * Does what a click on this element does: a control does what a click on
+   * its label does, an element with `onClick` runs it, any other takes focus.
+   */
   click() {
     if (this.control?.click) this.control.click();
+    else if (this.clickHandler) this.clickHandler();
     else this.focus();
   }
 

@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, type ReactNode } from "react";
 import {
+  Box,
   Flex,
   ThemeScope,
+  type BoxProps,
   type SxProp,
   type ThemeScopeName
 } from "@notesnook/ui-kit";
@@ -58,15 +60,30 @@ export function BaseThemeProvider(props: {
   );
 }
 
-export function ScopedThemeProvider(props: {
-  scope?: ThemeScopeName;
-  sx?: SxProp;
-  children?: ReactNode;
-}) {
-  const { scope = "base", sx, children } = props;
+/**
+ * As apps/web's (the theme package's EmotionThemeProvider): a box that draws
+ * its children in a theme scope and takes every box prop. `injectCssVars` is
+ * accepted: desktop colours are resolved per scope, with no CSS variables.
+ */
+export function ScopedThemeProvider(
+  props: {
+    scope?: ThemeScopeName;
+    injectCssVars?: boolean;
+  } & Omit<BoxProps, "variant">
+) {
+  const {
+    scope = "base",
+    injectCssVars: _injectCssVars,
+    children,
+    ...restProps
+  } = props;
+  // With no box props it only scopes the theme: a box here would take part
+  // in the layout, where web's bare <div> does not hold back a fixed child.
+  if (Object.keys(restProps).length === 0)
+    return <ThemeScope scope={scope}>{children}</ThemeScope>;
   return (
     <ThemeScope scope={scope}>
-      <Flex sx={sx}>{children}</Flex>
+      <Box {...restProps}>{children}</Box>
     </ThemeScope>
   );
 }

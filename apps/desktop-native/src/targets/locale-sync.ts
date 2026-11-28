@@ -17,4 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "@notesnook/ui-kit/shared/menu-store";
+import { environment } from "@platform";
+import Config from "../app/utils/config";
+import { initLocaleSync as initIntlLocaleSync } from "@notesnook/intl";
+
+/**
+ * Synchronous start-up locale: the saved language, or the system locale when
+ * none is saved. Web only has the async initLocale in common/locale.
+ */
+export function initLocaleSync() {
+  return initIntlLocaleSync({
+    getSavedLocale: () => Config.get<string>("appLanguage", ""),
+    systemLocale: environment.locale ?? "en"
+  });
+}

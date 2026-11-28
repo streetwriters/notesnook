@@ -17,17 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment } from "@platform";
-import Config from "../utils/config";
-import { initLocaleSync as initIntlLocaleSync } from "@notesnook/intl";
+import { ReactDOM, HTMLElement } from "@notesnook/ui-kit";
+import { ScopedThemeProvider } from "../components/theme-provider";
+import { Lightbox } from "../components/lightbox";
 
 /**
- * Synchronous start-up locale: the saved language, or the system locale when
- * none is saved. Web only has the async initLocale in common/locale.
+ * Opens the lightbox on an image, the way common/attachments does for an
+ * attachment. For the e2e boot option that opens it without one.
  */
-export function initLocaleSync() {
-  return initIntlLocaleSync({
-    getSavedLocale: () => Config.get<string>("appLanguage", ""),
-    systemLocale: environment.locale ?? "en"
-  });
+export function showLightbox(image: string) {
+  const container = document.getElementById("dialogContainer");
+  if (!(container instanceof HTMLElement)) return;
+  ReactDOM.render(
+    <ScopedThemeProvider>
+      <Lightbox
+        image={image}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(container);
+        }}
+      />
+    </ScopedThemeProvider>,
+    container
+  );
 }

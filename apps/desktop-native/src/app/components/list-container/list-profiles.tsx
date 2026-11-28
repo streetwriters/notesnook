@@ -32,8 +32,7 @@ import SearchResult from "../search-result";
 
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_LINE_HEIGHT =
-  // apps/web measures a paragraph of the page; desktop has no document.
-  16 - 1;
+  (document.getElementById("p")?.clientHeight || 16) - 1;
 export const DEFAULT_ITEM_HEIGHT = SINGLE_LINE_HEIGHT * 4 * DEFAULT_LINE_HEIGHT;
 
 type ListItemWrapperProps = {

@@ -17,25 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ComponentType } from "react";
-import { ListItemIndex } from "../list-item";
-import {
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-  type ReactNode,
-  type Ref
-} from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { usePersistentState } from "../../hooks/use-persistent-state";
 import {
   Virtuoso,
-  type UIMouseEvent,
+  type Components,
+  type ItemProps,
   type VirtuosoHandle,
-  ListSelectionContext,
-  useListCursor
+  type UINativeMouseEvent as MouseEvent
 } from "@notesnook/ui-kit";
+import type * as React from "@notesnook/ui-kit/contracts/react";
 import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
-import { usePersistentState } from "../../hooks/use-persistent-state";
+import { CustomScrollbarsVirtualList, waitForElement } from "../list-container";
 
 export type VirtualizedTreeHandle<T> = {
   refresh: () => void;
@@ -56,7 +49,7 @@ export type TreeNode<T = any> = {
 };
 type ExpandedIds = Record<string, boolean>;
 type TreeViewProps<T> = {
-  treeRef?: Ref<VirtualizedTreeHandle<T>> | null;
+  treeRef?: React.Ref<VirtualizedTreeHandle<T>> | null;
   rootId: string;
   itemHeight?: number;
   itemGap?: number;
@@ -67,46 +60,45 @@ type TreeViewProps<T> = {
     expanded: boolean;
     expand: () => void;
     collapse: () => void;
-    select: (event?: UIMouseEvent) => void;
-  }) => ReactNode;
+  }) => React.ReactNode;
   saveKey?: string;
-  "data-test-id"?: string;
+
   testId?: string;
-  Scroller?: ComponentType<any>;
+  placeholder?: () => React.ReactNode;
   onSelect?: (id: string) => void;
   onDeselect?: (id: string) => void;
   bulkSelect?: (ids: string[]) => void;
   deselectAll?: () => void;
   isSelected?: (id: string) => boolean;
-};
+  style?: React.CSSProperties;
 
+  Scroller?: Components["Scroller"];
+};
 export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   const {
     rootId,
-    itemHeight = 33,
-    itemGap = 0,
+    itemHeight,
+    itemGap,
     renderItem: Node,
     getChildNodes,
     treeRef,
     saveKey,
-    onSelect,
+
+    placeholder: Placeholder,
+    isSelected,
     onDeselect,
-    bulkSelect,
+    onSelect,
     deselectAll,
-    isSelected
+    bulkSelect,
+    testId,
+    Scroller
   } = props;
-  const list = useRef<VirtuosoHandle>(null);
-  const cursor = useListCursor();
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
-  const [expandedIds, setPersistedIds] = usePersistentState<ExpandedIds>(
+  const [expandedIds, setExpandedIds] = usePersistentState<ExpandedIds>(
     saveKey,
     {}
   );
-  const expandedRef = useRef(expandedIds);
-  const setExpandedIds = (next: ExpandedIds) => {
-    expandedRef.current = next;
-    setPersistedIds(next);
-  };
+  const list = useRef<VirtuosoHandle>(null);
 
   useImperativeHandle(
     treeRef,
@@ -114,11 +106,11 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       async refresh() {
         const { children } = await fetchChildren(
           { id: rootId, depth: -1, data: {} as T, hasChildren: true },
-          expandedRef.current,
+          expandedIds,
           getChildNodes
         );
         setNodes(children);
-        setExpandedIds({ ...expandedRef.current });
+        setExpandedIds(expandedIds);
       },
       async resetAndRefresh() {
         setNodes([]);
@@ -128,8 +120,9 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         const node = nodes[index];
         const removeIds: string[] = [node.id];
         for (const treeNode of nodes) {
-          if (treeNode.parentId && removeIds.includes(treeNode.parentId))
+          if (treeNode.parentId && removeIds.includes(treeNode.parentId)) {
             removeIds.push(treeNode.id);
+          }
         }
 
         const filtered = nodes.filter((n) => !removeIds.includes(n.id));
@@ -139,14 +132,17 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
         }
 
         const childNodes = await getChildNodes(node);
-        if (childNodes.length > 0 && itemOptions?.expand)
-          expandedRef.current[node.id] = true;
+        if (childNodes.length > 0 && itemOptions?.expand) {
+          expandedIds[node.id] = true;
+        }
 
         const { children } = await fetchChildren(
           node,
-          expandedRef.current,
+          expandedIds,
           getChildNodes
         );
+
+        const hasChildren = children.length > 0;
 
         filtered.splice(
           index,
@@ -155,28 +151,17 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
             id: node.id,
             data: item,
             depth: node.depth,
-            hasChildren: children.length > 0,
+            hasChildren: hasChildren,
             parentId: node.parentId
           },
           ...children
         );
-        setExpandedIds({ ...expandedRef.current });
+        setExpandedIds(expandedIds);
         setNodes(filtered);
       }
     }),
-    [expandedIds, getChildNodes, nodes, rootId, setExpandedIds]
+    [expandedIds, getChildNodes, nodes, rootId]
   );
-
-  useEffect(() => {
-    fetchChildren(
-      { depth: -1, id: rootId, data: {} as T, hasChildren: true },
-      expandedRef.current,
-      getChildNodes
-    ).then(({ children, expandedIds }) => {
-      setNodes(children);
-      setExpandedIds({ ...expandedIds });
-    });
-  }, [rootId]);
 
   const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
     length: nodes.length,
@@ -200,73 +185,127 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       bulkSelect?.(ids);
     },
     focusItemAt: (index) => {
-      cursor.setFocusedIndex(index);
-      list.current?.scrollToIndex({ index });
+      const id = nodes[index]?.id;
+      if (!id || !list.current) return;
+
+      waitForElement(list.current, index, `id_${id}`, (element) =>
+        element.focus()
+      );
     },
     skip: () => false,
-    open: cursor.openAt
+    open: (index) => {
+      const id = nodes[index]?.id;
+      if (!id || !list.current) return;
+
+      waitForElement(list.current, index, `id_${id}`, (element) =>
+        element.click()
+      );
+    }
   });
-  cursor.bindPress(onMouseUp);
+
+  useEffect(() => {
+    fetchChildren(
+      { depth: -1, id: rootId, data: {} as T, hasChildren: true },
+      expandedIds,
+      getChildNodes
+    ).then(({ children, expandedIds }) => {
+      setNodes(children);
+      setExpandedIds(expandedIds);
+    });
+    console.log("fetching");
+  }, [rootId]);
 
   return (
-    <ListSelectionContext.Provider value={cursor.selection}>
-      <Virtuoso
-        data-test-id={props.testId ?? props["data-test-id"]}
-        components={props.Scroller ? { Scroller: props.Scroller } : undefined}
-        ref={list}
-        style={{ flex: 1 }}
-        tabIndex={0}
-        onKeyDown={(e) => onKeyDown(e.nativeEvent)}
-        onBlur={() => cursor.setFocusedIndex(-1)}
-        totalCount={nodes.length}
-        computeItemKey={(index) => nodes[index]?.id ?? `${index}`}
-        defaultItemHeight={itemHeight + itemGap}
-        itemContent={(index) => {
-          const node = nodes[index];
-          if (!node) return null;
-          return (
-            <ListItemIndex.Provider value={index}>
-              <Node
-                item={node}
-                index={index}
-                select={() => undefined}
-                expanded={nodes[index + 1]?.parentId === node.id}
-                collapse={() => {
-                  setExpandedIds({ ...expandedRef.current, [node.id]: false });
-                  setNodes((tree) => {
-                    const removeIds: string[] = [];
-                    for (const treeNode of tree) {
-                      if (
-                        treeNode.parentId &&
-                        (treeNode.parentId === node.id ||
-                          removeIds.includes(treeNode.parentId))
-                      )
-                        removeIds.push(treeNode.id);
-                    }
-                    return tree.filter((n) => !removeIds.includes(n.id));
-                  });
-                }}
-                expand={async () => {
-                  const { children } = await fetchChildren(
-                    node,
-                    expandedRef.current,
-                    getChildNodes
-                  );
-                  setExpandedIds({ ...expandedRef.current, [node.id]: true });
-                  setNodes((tree) => {
-                    if (tree.some((n) => n.parentId === node.id)) return tree;
-                    const copy = tree.slice();
-                    const at = copy.findIndex((n) => n.id === node.id);
-                    copy.splice(at + 1, 0, ...children);
-                    return copy;
-                  });
-                }}
-              />
-            </ListItemIndex.Provider>
-          );
-        }}
-      />
-    </ListSelectionContext.Provider>
+    <Virtuoso
+      data-test-id={testId}
+      ref={list}
+      totalCount={nodes.length}
+      computeItemKey={(i) => nodes[i].id}
+      fixedItemHeight={
+        itemHeight !== undefined ? itemHeight + (itemGap || 0) : undefined
+      }
+      onKeyDown={(e) => onKeyDown(e.nativeEvent)}
+      context={{
+        onMouseUp,
+        itemGap
+      }}
+      components={{
+        Scroller: (Scroller as any) || CustomScrollbarsVirtualList,
+        Item: VirtuosoItem,
+        EmptyPlaceholder: Placeholder
+      }}
+      itemContent={(index) => {
+        const node = nodes[index];
+        return (
+          <Node
+            item={node}
+            index={index}
+            expanded={expandedIds[node.id]}
+            collapse={() => {
+              if (!expandedIds[node.id]) return;
+
+              const expanded = { ...expandedIds, [node.id]: false };
+              setNodes((tree) => {
+                const removeIds: string[] = [];
+                for (const treeNode of tree) {
+                  if (
+                    treeNode.parentId &&
+                    (treeNode.parentId === node.id ||
+                      removeIds.includes(treeNode.parentId))
+                  ) {
+                    removeIds.push(treeNode.id);
+                  }
+                }
+                return tree.filter((n) => !removeIds.includes(n.id));
+              });
+              setExpandedIds(expanded);
+            }}
+            expand={async () => {
+              if (expandedIds[node.id]) return;
+
+              const { children } = await fetchChildren(
+                node,
+                expandedIds,
+                getChildNodes
+              );
+              setExpandedIds({ ...expandedIds, [node.id]: true });
+              setNodes((tree) => {
+                const copy = tree.slice();
+                copy.splice(index + 1, 0, ...children);
+                return copy;
+              });
+            }}
+          />
+        );
+      }}
+    />
+  );
+}
+
+type ListContext = {
+  onMouseUp: (e: MouseEvent, index: number) => void;
+  itemGap?: number;
+};
+function VirtuosoItem({
+  item: _item,
+  context,
+  ...props
+}: ItemProps<TreeNode> & {
+  context?: ListContext;
+}) {
+  return (
+    <div
+      {...props}
+      style={{
+        ...props.style,
+        paddingBottom: context?.itemGap
+      }}
+      onMouseUp={(e) =>
+        context?.onMouseUp(e.nativeEvent, props["data-item-index"])
+      }
+    >
+      {props.children}
+    </div>
   );
 }
 

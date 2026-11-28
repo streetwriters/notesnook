@@ -53,6 +53,18 @@ export interface UIMouseEvent<T = UIElement>
   clientY: number;
   pageX: number;
   pageY: number;
+  /** The DOM event behind React's: on desktop the same values. */
+  nativeEvent: UINativeMouseEvent;
+}
+
+export interface UINativeMouseEvent extends UIEvent, Modifiers {
+  button: number;
+  buttons: number;
+  detail: number;
+  clientX: number;
+  clientY: number;
+  pageX: number;
+  pageY: number;
 }
 
 export type Key =

@@ -122,8 +122,4 @@ export type {
 export { WebThemeProvider, ThemeScope } from "./theme";
 export { ThemeBridge, syncThemeEngine } from "./theme-bridge";
 export { dataColor } from "../shared/style/data-color";
-export {
-  ListSelectionContext,
-  useListCursor,
-  useListSelection
-} from "../shared/list-selection";
+export { DomRoot, HTMLElement, ReactDOM } from "./react-dom";

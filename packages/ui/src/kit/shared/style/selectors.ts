@@ -26,8 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // (`as`, or the element's HTML tag), `.class` and `#id`; `*` matches every
 // element. A descendant and a child combinator both mean "anywhere below".
 // Selectors with a pseudo class or element, an attribute or a sibling
-// combinator are not matched: desktop draws states with `:hover` and
-// `:group-hover`.
+// combinator are not matched, with one exception: a rule for an element below
+// while this one is hovered, written `":hover .child"` or as a selector
+// nested in `":hover"`. Such a rule is marked `hover`, and the element that
+// wrote it draws it with the kit's group hover.
 
 export interface SelectorTarget {
   tag?: string;
@@ -38,6 +40,8 @@ export interface SelectorTarget {
 export interface SelectorRule {
   targets: SelectorTarget[];
   style: Record<string, unknown>;
+  /** Applies only while the element that wrote the rule is hovered. */
+  hover?: boolean;
 }
 
 export interface ElementIdentity {
@@ -93,6 +97,27 @@ export function parseSelector(key: string): SelectorTarget[] | undefined {
   return targets.length ? targets : undefined;
 }
 
+const HOVER_PREFIX = /^&?:hover\s+/;
+
+/**
+ * Hover rules as rules the elements below can draw: each style becomes a
+ * `:group-hover` of the group named `group`, which the element that wrote
+ * the rules must be.
+ */
+export function scopeHoverRules(
+  rules: readonly SelectorRule[],
+  group: string
+): SelectorRule[] {
+  return rules.map((rule) =>
+    rule.hover
+      ? {
+          targets: rule.targets,
+          style: { ":group-hover": { group, style: rule.style } }
+        }
+      : rule
+  );
+}
+
 /** The nested selector rules of an `sx` object, in the order written. */
 export function selectorRules(
   sx: Record<string, unknown>
@@ -103,9 +128,32 @@ export function selectorRules(
     if (!value || typeof value !== "object" || Array.isArray(value)) continue;
     // `input` is the kit's own key for the fields below an element.
     if (key === "input") continue;
-    const targets = parseSelector(key);
+    if (key === ":hover" || key === "&:hover") {
+      // `":hover": { ".child": {…} }`
+      const nested = value as Record<string, unknown>;
+      for (const nestedKey in nested) {
+        const style = nested[nestedKey];
+        if (!style || typeof style !== "object" || Array.isArray(style))
+          continue;
+        const targets = parseSelector(nestedKey);
+        if (targets)
+          (rules ??= []).push({
+            targets,
+            style: style as Record<string, unknown>,
+            hover: true
+          });
+      }
+      continue;
+    }
+    // `":hover .child": {…}`
+    const hover = HOVER_PREFIX.exec(key);
+    const targets = parseSelector(hover ? key.slice(hover[0].length) : key);
     if (targets)
-      (rules ??= []).push({ targets, style: value as Record<string, unknown> });
+      (rules ??= []).push({
+        targets,
+        style: value as Record<string, unknown>,
+        ...(hover ? { hover: true } : undefined)
+      });
   }
   return rules;
 }

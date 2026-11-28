@@ -364,7 +364,7 @@ export function NotebookItem(props: {
           <SelectedCheck
             size={15}
             item={notebook}
-            onClick={(ctrl) => onSelect(notebook, ctrl)}
+            onClick={(e) => onSelect(notebook, e.ctrlKey || e.metaKey)}
           />
           <Text
             data-test-id="notebook-title"

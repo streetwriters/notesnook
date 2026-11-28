@@ -155,9 +155,7 @@ export function Attachment({
   const onContextMenu = (event: UIMouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    Menu.openMenu(AttachmentMenuItems(item, status), {
-      position: { x: event.pageX, y: event.pageY }
-    });
+    Menu.openMenu(AttachmentMenuItems(item, status));
   };
   const onKeyUp = async (event: UIKeyboardEvent) => {
     if (event.key === "Delete") {

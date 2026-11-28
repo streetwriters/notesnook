@@ -48,7 +48,7 @@ import {
   Uploading,
   type Icon
 } from "../components/icons";
-import { NavigationItem } from "../components/navigation-menu/navigation-item";
+import NavigationItem from "../components/navigation-menu/navigation-item";
 import { db } from "../common/db";
 import type {
   Attachment as AttachmentType,

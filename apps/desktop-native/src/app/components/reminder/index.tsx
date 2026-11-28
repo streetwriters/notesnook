@@ -18,41 +18,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import dayjs from "dayjs";
-import {
-  formatDate,
-  formatReminderTime,
-  getReminderGroup,
-  getUpcomingReminderTime,
-  type Reminder as ReminderType
-} from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import { Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import ListItem from "../list-item";
-import { Checkbox } from "../checkbox";
+import { Flex, Text, type MenuItem } from "@notesnook/ui-kit";
 import {
-  ArrowCounterClockwise,
-  ArrowsClockwise,
-  Bell,
-  BellSimpleSlash,
-  CheckSquare,
-  PencilSimple,
+  Vibrate,
   ReminderOff,
+  ArrowCounterClockwise,
   Trash,
-  Vibrate
+  ArrowsClockwise,
+  BellSimpleSlash,
+  Bell,
+  PencilSimple,
+  CheckSquare
 } from "../icons";
+import {
+  formatReminderTime,
+  formatDate,
+  getReminderGroup,
+  getUpcomingReminderTime
+} from "@notesnook/core";
 import { hashNavigate } from "../../navigation";
 import { Multiselect } from "../../common/multi-select";
 import { store } from "../../stores/reminder-store";
 import { db } from "../../common/db";
 import { useStore as useSettingStore } from "../../stores/setting-store";
-import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { Reminder as ReminderType } from "@notesnook/core";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import {
   EditReminderDialog,
   getReminderRepeatText,
   getWeekDays
 } from "../../dialogs/add-reminder-dialog";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { strings } from "@notesnook/intl";
+import { Checkbox } from "../checkbox";
+import dayjs from "dayjs";
 import { showToast } from "../../utils/toast";
 
 const PRIORITY_ICON_MAP = {
@@ -130,7 +130,7 @@ function Reminder(props: ReminderProps) {
                 data-test-id="reminder-complete"
                 size={15}
                 checkboxUncheckedIconColor="border"
-                uncheckedGroupHoverColor="border-tertiary"
+                checkboxUncheckedIconClassname="reminder-checkbox-unchecked-icon"
               />
               <Text
                 data-test-id="title"
@@ -150,11 +150,8 @@ function Reminder(props: ReminderProps) {
             </Flex>
             <Flex sx={{ alignItems: "center", gap: "spacing3", flexShrink: 0 }}>
               <Flex
+                className="reminder-item-elevated-icon"
                 sx={{
-                  ":group-hover": {
-                    group: "list-item",
-                    style: { backgroundColor: "background-tertiary" }
-                  },
                   alignItems: "center",
                   backgroundColor: "background-secondary",
                   borderRadius: "radius1",
@@ -175,11 +172,8 @@ function Reminder(props: ReminderProps) {
               </Flex>
               {reminder.mode === "repeat" && (
                 <Flex
+                  className="reminder-item-elevated-icon"
                   sx={{
-                    ":group-hover": {
-                      group: "list-item",
-                      style: { backgroundColor: "background-tertiary" }
-                    },
                     alignItems: "center",
                     backgroundColor: "background-secondary",
                     borderRadius: "radius1",
@@ -231,6 +225,14 @@ function Reminder(props: ReminderProps) {
         px: "spacing6",
         py: "spacing4",
         opacity: completed ? 0.5 : 1,
+        ":hover": {
+          ".reminder-checkbox-unchecked-icon": {
+            color: "border-tertiary"
+          },
+          ".reminder-item-elevated-icon": {
+            backgroundColor: "background-tertiary"
+          }
+        },
         ...(compact && {
           borderRadius: "radius1",
           p: "spacing2",

@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { download } from "../../common/attachments";
+import { strings } from "@notesnook/intl";
+import { db } from "../../common/db";
 import { decryptToTempFile } from "../../common/fs";
 
 /**
@@ -26,9 +27,14 @@ import { decryptToTempFile } from "../../common/fs";
  * `removeTempFile`. Undefined when the attachment cannot be found or read.
  */
 export async function decryptAttachmentToTempFile(hash: string) {
-  const response = await download(hash);
-  if (!response) return;
-  const { attachment, key } = response;
+  const attachment = await db.attachments.attachment(hash);
+  if (!attachment) return;
+  const downloadResult = await db
+    .fs()
+    .downloadFile(attachment.hash, attachment.hash, attachment.chunkSize);
+  if (!downloadResult) throw new Error(strings.failedToDownloadFile());
+  const key = await db.attachments.decryptKey(attachment.key);
+  if (!key) throw new Error(strings.invalidKeyForAttachment());
   const path = await decryptToTempFile(attachment.hash, {
     key,
     iv: attachment.iv,

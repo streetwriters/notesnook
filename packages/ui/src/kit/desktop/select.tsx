@@ -27,14 +27,13 @@ import {
 } from "react";
 import type * as Contract from "../contracts/primitives";
 import type { UIElement, UISelectElement } from "../contracts/elements";
-import { useMenuStore } from "../shared/menu-store";
 import { CaretDown } from "../shared/icons";
 import {
   elementFor,
-  measureInWindow,
   type DesktopElement,
   type ElementControl
 } from "./element";
+import { MenuPresenter } from "./menu";
 import { Button, Flex, Text } from "./primitives";
 import { changeEvent } from "./style/events";
 import { testIdOf } from "./style/native-props";
@@ -91,65 +90,73 @@ export const Select = forwardRef<UISelectElement, Contract.SelectProps>(
     const value = props.value ?? own;
     const trigger = useRef<DesktopElement | null>(null);
     const control = useRef<ElementControl>({}).current;
+    const [isOpen, setIsOpen] = useState(false);
     control.value = value === undefined ? "" : String(value);
     const selected = options.find(
       (option) => String(option.value) === control.value
     );
 
     return (
-      <Button
-        ref={(node: UIElement | null) => {
-          trigger.current = elementFor(node, control);
-          const element = trigger.current as UISelectElement | null;
-          if (typeof ref === "function") ref(element);
-          else if (ref) ref.current = element;
-        }}
-        type="button"
-        id={props.id}
-        title={props.title}
-        disabled={props.disabled}
-        data-test-id={testIdOf(props)}
-        onClick={() => {
-          measureInWindow(trigger.current, (x, y, width, height) => {
-            useMenuStore.getState().open(
-              options.map((option) => ({
-                type: "button" as const,
-                key: String(option.value),
-                title: option.title,
-                isDisabled: option.disabled,
-                isChecked: String(option.value) === control.value,
-                onClick: () => {
-                  const next = String(option.value);
-                  const changed = next !== control.value;
-                  control.value = next;
-                  if (props.value === undefined) setOwn(option.value);
-                  if (changed) onChange?.(changeEvent(trigger.current));
-                }
-              })),
-              { x, y, width, height }
-            );
-          });
-        }}
-        sx={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "spacing3",
-          bg: "background-secondary",
-          border: "1px solid",
-          borderColor: "border",
-          borderRadius: "radius1",
-          p: "5px",
-          overflow: "hidden",
-          ...props.sx
-        }}
-      >
-        <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
-          <Text sx={{ color: "paragraph", fontSize: "xs" }}>
-            {selected?.title ?? ""}
-          </Text>
-        </Flex>
-        <CaretDown size={13} color="icon" />
-      </Button>
+      <>
+        {isOpen ? (
+          <MenuPresenter
+            isOpen
+            onClose={() => setIsOpen(false)}
+            position={{
+              target: trigger.current,
+              isTargetAbsolute: true,
+              location: "below"
+            }}
+            items={options.map((option) => ({
+              type: "button" as const,
+              key: String(option.value),
+              title: option.title,
+              isDisabled: option.disabled,
+              isChecked: String(option.value) === control.value,
+              onClick: () => {
+                const next = String(option.value);
+                const changed = next !== control.value;
+                control.value = next;
+                if (props.value === undefined) setOwn(option.value);
+                if (changed) onChange?.(changeEvent(trigger.current));
+              }
+            }))}
+          />
+        ) : null}
+        <Button
+          ref={(node: UIElement | null) => {
+            trigger.current = elementFor(node, control);
+            const element = trigger.current as UISelectElement | null;
+            if (typeof ref === "function") ref(element);
+            else if (ref) ref.current = element;
+          }}
+          type="button"
+          id={props.id}
+          title={props.title}
+          disabled={props.disabled}
+          data-test-id={testIdOf(props)}
+          onClick={() => setIsOpen(true)}
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "spacing3",
+            bg: "background-secondary",
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "radius1",
+            p: "5px",
+            overflow: "hidden",
+            ...props.sx
+          }}
+        >
+          <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
+            <Text sx={{ color: "paragraph", fontSize: "xs" }}>
+              {selected?.title ?? ""}
+            </Text>
+          </Flex>
+          <CaretDown size={13} color="icon" />
+        </Button>
+      </>
     );
   }
 );

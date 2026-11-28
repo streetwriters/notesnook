@@ -56,6 +56,26 @@ export const desktop = environment.isDesktopApp
     }
   : undefined;
 
+/**
+ * Web's Electron shell can draw a menu natively (`integration.showMenu`); the
+ * native host has no such call. hooks/use-menu.ts imports these two in place
+ * of `IS_DESKTOP_APP` and `desktop`, so its code stays web's and every menu is
+ * drawn in the app.
+ */
+export const HAS_NATIVE_MENUS = false;
+export const nativeMenuBridge = undefined as
+  | {
+      integration: {
+        showMenu: {
+          subscribe: (
+            input: { menuItems: unknown },
+            handlers: { onData: (ids: string[]) => void }
+          ) => void;
+        };
+      };
+    }
+  | undefined;
+
 const NODE_PLATFORMS = { macOS: "darwin", Windows: "win32", Linux: "linux" };
 
 /** The OS as Electron's `window.os()` (Node's `os.platform()`) names it. */
@@ -65,8 +85,17 @@ export function getPlatform(): string | null {
   return NODE_PLATFORMS[os as keyof typeof NODE_PLATFORMS] ?? os;
 }
 
-/** The members of `window` the shared dialogs call. */
+/** `navigator`, as far as shared code reads it: the system language. */
+export const navigator = {
+  get language() {
+    return environment.locale;
+  }
+};
+
+/** The members of `window` the shared files call. */
 const nativeWindow = {
+  /** Electron's preload gives the app locale; this host has `navigator`'s. */
+  appLocale: undefined as (() => string) | undefined,
   open(url: string | URL, _target?: string) {
     void shell.openUrl(url.toString());
     return null;

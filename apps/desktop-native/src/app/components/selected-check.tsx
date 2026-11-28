@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import type { UIMouseEvent } from "@notesnook/ui-kit";
+import type * as React from "@notesnook/ui-kit/contracts/react";
 import { CheckboxRemove } from "./icons";
 import { Checkbox } from "./checkbox";
 import {
@@ -29,29 +29,23 @@ import {
 export function SelectedCheck({
   item,
   size = 20,
-  ...props
+  onClick
 }: {
   item?: { id: string };
   size?: number;
-  onClick?: (ctrl: boolean) => void;
-  /** @deprecated Use `onClick`. */
-  onPress?: (ctrl: boolean) => void;
+  onClick?: (
+    event:
+      | React.MouseEvent<HTMLDivElement>
+      | React.KeyboardEvent<HTMLDivElement>
+  ) => void;
 }) {
-  const onClick = props.onClick ?? props.onPress;
   const selectedItems = useRelationChangesStore((store) => store.selected);
   const selectedItem =
     item && selectedItems[findSelectionIndex(item, selectedItems)];
 
   if (selectedItem?.op === "remove") {
     return (
-      <CheckboxRemove
-        size={size}
-        onClick={(event: UIMouseEvent) => {
-          event.stopPropagation();
-          onClick?.(event.ctrlKey || event.metaKey);
-        }}
-        color="accent-error"
-      />
+      <CheckboxRemove size={size} onClick={onClick} color="accent-error" />
     );
   }
 

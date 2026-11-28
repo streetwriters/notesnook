@@ -17,66 +17,49 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import {
-  memo,
-  useEffect,
-  useState,
-  type PropsWithChildren,
-  type ReactNode
-} from "react";
-import {
-  formatDate,
-  ResolvedItem,
-  usePromise,
-  useUnresolvedItem
-} from "@notesnook/common";
-import {
-  createInternalLink,
-  highlightInternalLinks,
-  type ContentBlock,
-  type Note,
-  type VirtualizedGrouping
-} from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import {
-  Box,
-  Button,
-  dataColor,
-  Flex,
-  Text,
-  type SxProp
-} from "@notesnook/ui-kit";
-import {
-  Bell,
-  BoxArrowDown,
-  CaretDown,
-  Checkmark,
-  Clock,
-  ClockCounterClockwise,
-  CloudSlash,
-  Copy,
-  Ellipse,
-  FileDoc,
-  FileText,
-  LinkHorizontal,
+  Star,
   Lock,
-  Notebook,
-  NotePin,
-  NoteReadonly,
-  PencilSimple,
-  Plus,
+  Circle,
+  Checkmark,
   SpellCheck,
   SquaresFour,
-  Star,
   Table,
+  LinkHorizontal,
+  Copy,
+  ClockCounterClockwise,
+  Clock,
+  PencilSimple,
+  NoteReadonly,
+  Plus,
+  Icon,
+  Notebook,
   Tag,
-  type Icon
+  FileDoc,
+  FileText,
+  CaretDown,
+  NotePin,
+  BoxArrowDown,
+  Cloud,
+  Bell,
+  Ellipse,
+  CloudSlash
 } from "../icons";
 import {
+  Button,
+  Flex,
+  Text,
+  Box,
+  useThemeUI,
+  type FlexProps
+} from "@notesnook/ui-kit";
+import { IS_DESKTOP_APP } from "../../dialogs/desktop-bridge";
+import {
   useEditorStore,
-  type DefaultEditorSession,
-  type PropertiesTabId,
-  type ReadonlyEditorSession
+  ReadonlyEditorSession,
+  DefaultEditorSession,
+  PropertiesTabId
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
@@ -84,25 +67,40 @@ import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { store as noteStore } from "../../stores/note-store";
 import { store as notebookStore } from "../../stores/notebook-store";
 import { store as tagStore } from "../../stores/tag-store";
-import { useStore as useSettingStore } from "../../stores/setting-store";
-import { store as appStore } from "../../stores/app-store";
 import Toggle from "./toggle";
 import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
-import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
 import ScrollContainer from "../scroll-container";
+import {
+  formatDate,
+  usePromise,
+  ResolvedItem,
+  useUnresolvedItem
+} from "@notesnook/common";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { ListItemWrapper } from "../list-container/list-profiles";
 import ListContainer from "../list-container";
+import { copyNoteLink } from "../../common";
 import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
-import { TabItem } from "../navigation-menu/tab-item";
-import IconTag from "../icon-tag";
-import { ListLoader } from "../loaders/list-loader";
-import { copyNoteLink } from "../../common";
+import {
+  ContentBlock,
+  Note,
+  VirtualizedGrouping,
+  createInternalLink,
+  highlightInternalLinks
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { Theme } from "@notesnook/theme";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
-import { navigate } from "../../navigation";
+import { TabItem } from "../navigation-menu/tab-item";
 import TableOfContents from "../editor/table-of-contents";
+import IconTag from "../icon-tag";
+import { navigate } from "../../navigation";
+import { store as appStore } from "../../stores/app-store";
+import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
+import { ListLoader } from "../loaders/list-loader";
 
 const tabs = [
   {
@@ -163,7 +161,7 @@ const tools = [
     icon: SpellCheck,
     label: strings.spellCheck(),
     property: "spellcheck",
-    isHidden: () => !useSpellChecker.getState().enabled
+    isHidden: () => IS_DESKTOP_APP && !useSpellChecker.getState().enabled
   }
 ] as const;
 
@@ -193,6 +191,7 @@ function EditorProperties(props: EditorPropertiesProps) {
   return (
     <Flex
       sx={{
+        display: "flex",
         height: "100%",
         width: "100%",
         borderLeft: "1px solid",
@@ -203,13 +202,15 @@ function EditorProperties(props: EditorPropertiesProps) {
         scope="editorSidebar"
         sx={{
           flex: 1,
+          display: "flex",
           bg: "background",
-          overflow: "hidden",
+          overflowY: "hidden",
+          overflowX: "hidden",
           flexDirection: "column",
           py: "spacing4"
         }}
       >
-        <Flex sx={{ gap: "spacing2", px: "spacing4", flexShrink: 0 }}>
+        <Flex sx={{ gap: "spacing2", px: "spacing4" }}>
           {tabs.map((tab) => (
             <TabItem
               key={tab.id}
@@ -255,7 +256,7 @@ function EditorProperties(props: EditorPropertiesProps) {
     </Flex>
   );
 }
-export default memo(EditorProperties);
+export default React.memo(EditorProperties);
 
 function Properties({ sessionId }: EditorPropertiesProps) {
   const dateFormat = useSettingStore((store) => store.dateFormat);
@@ -362,8 +363,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
       <Section
         title={strings.metadata()}
         sx={{
-          borderTop: "1px solid",
-          borderTopColor: "separator",
+          borderTop: "1px solid var(--separator)",
           mt: "spacing4",
           pt: "spacing4"
         }}
@@ -420,7 +420,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
                     data-test-id={
                       item.key === "dateCreated" ? "date-created" : undefined
                     }
-                    selectable
+                    className="selectable"
                     sx={{
                       color: "paragraph",
                       fontSize: "3xs",
@@ -457,8 +457,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
           <Section
             title={strings.colors()}
             sx={{
-              borderTop: "1px solid",
-              borderTopColor: "separator",
+              borderTop: "1px solid var(--separator)",
               mt: "spacing4",
               pt: "spacing4"
             }}
@@ -490,13 +489,14 @@ function CopyNoteLink({ note }: { note: Note }) {
   return (
     <Button
       sx={{
+        display: "flex",
         alignItems: "center",
         gap: "spacing2",
         flexShrink: 0,
         color: "accent",
         p: 0,
         ":hover": {
-          bg: "transparent"
+          bg: "transparent !important"
         }
       }}
       onClick={async () => {
@@ -514,7 +514,8 @@ function CopyNoteLink({ note }: { note: Note }) {
 
 function InternalLinks({ noteId }: { noteId: string }) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
-  const itemGap = 3;
+  const { theme } = useThemeUI();
+  const itemGap = (theme as Theme).space?.spacing1;
   const linkedNotes = usePromise(() => {
     return db.relations
       .from({ id: noteId, type: "note" }, "note")
@@ -552,7 +553,7 @@ function InternalLinks({ noteId }: { noteId: string }) {
           sx={{
             color: "paragraph-secondary",
             fontSize: "xs",
-            lineHeight: 1
+            lineHeight: "100%"
           }}
         >
           {emptyText}
@@ -590,8 +591,8 @@ function InternalLinks({ noteId }: { noteId: string }) {
                 fontSize: "3xs",
                 color: "heading-secondary",
                 fontWeight: 500,
-                lineHeight: 1,
-                letterSpacing: 0.33
+                lineHeight: "100%",
+                letterSpacing: "0.33px"
               }}
             >
               {linkedNotes.value.length}
@@ -614,8 +615,8 @@ function InternalLinks({ noteId }: { noteId: string }) {
                 fontSize: "3xs",
                 color: "heading-secondary",
                 fontWeight: 500,
-                lineHeight: 1,
-                letterSpacing: 0.33
+                lineHeight: "100%",
+                letterSpacing: "0.33px"
               }}
             >
               {referencedIn.value.length}
@@ -707,7 +708,8 @@ function LinkedNote({
             p: "spacing2",
             borderRadius: "radius1",
             textAlign: "left",
-            justifyContent: "flex-start",
+            display: "flex",
+            justifyContent: "start",
             alignItems: "center",
             gap: "spacing3",
             bg: isExpanded ? "background-selected" : "transparent"
@@ -739,12 +741,12 @@ function LinkedNote({
               />
             </Button>
           ) : (
-            <FileText size={13} color="paragraph" />
+            <FileText size={13} color="paragraph-primary" />
           )}
           <Text
             sx={{
               fontSize: "xs",
-              color: isExpanded ? "paragraph-selected" : "paragraph"
+              color: isExpanded ? "paragraph-selected" : "paragraph-primary"
             }}
           >
             {item.title}
@@ -765,6 +767,7 @@ function LinkedNote({
                   mt: "spacing1",
                   gap: "spacing3",
                   textAlign: "left",
+                  display: "flex",
                   alignItems: "center"
                 }}
                 onClick={() =>
@@ -782,7 +785,7 @@ function LinkedNote({
                     py: "spacing1",
                     px: "spacing2",
                     borderRadius: "radius1",
-                    lineHeight: 1
+                    lineHeight: "100%"
                   }}
                 >
                   {block.type.toUpperCase()}
@@ -791,7 +794,7 @@ function LinkedNote({
                   sx={{
                     color: "paragraph",
                     fontSize: "xs",
-                    lineHeight: 1,
+                    lineHeight: "100%",
                     whiteSpace: "pre-wrap"
                   }}
                 >
@@ -838,7 +841,8 @@ function ReferencedIn({
             p: "spacing2",
             borderRadius: "radius1",
             textAlign: "left",
-            justifyContent: "flex-start",
+            display: "flex",
+            justifyContent: "start",
             alignItems: "center",
             gap: "spacing3",
             bg: isExpanded ? "background-selected" : "transparent"
@@ -862,7 +866,7 @@ function ReferencedIn({
           <Text
             sx={{
               fontSize: "xs",
-              color: isExpanded ? "paragraph-selected" : "paragraph"
+              color: isExpanded ? "paragraph-selected" : "paragraph-primary"
             }}
           >
             {item.title}
@@ -884,6 +888,7 @@ function ReferencedIn({
                     mt: "spacing1",
                     textAlign: "left",
                     whiteSpace: "pre-wrap",
+                    display: "flex",
                     alignItems: "center",
                     flexDirection: "row",
                     gap: "spacing3",
@@ -897,14 +902,15 @@ function ReferencedIn({
                   }
                 >
                   <Text sx={{ color: "accent" }}>{blockIndex + 1}.</Text>
-                  <Text sx={{ color: "accent" }}>
+                  <Text as="div" sx={{ color: "accent" }}>
                     {link.map((slice) =>
                       slice.highlighted ? (
                         <Text
                           key={slice.text}
+                          as="span"
                           sx={{
                             color: "accent",
-                            textDecorationLine: "underline"
+                            textDecoration: "underline solid var(--accent)"
                           }}
                         >
                           {slice.text}
@@ -944,6 +950,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
         onClick={addColor}
         variant="secondary"
         sx={{
+          display: "flex",
           alignItems: "center",
           justifyContent: "center",
           width: 25,
@@ -984,7 +991,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
             >
               <Ellipse
                 size={25}
-                color={dataColor(c.colorCode)}
+                color={c.colorCode}
                 data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
               />
               {isChecked && (
@@ -1016,8 +1023,7 @@ function Tags({ noteId }: { noteId: string }) {
     <Section
       title={strings.dataTypesPluralCamelCase.tag()}
       sx={{
-        borderTop: "1px solid",
-        borderTopColor: "separator",
+        borderTop: "1px solid var(--separator)",
         mt: "spacing4",
         pt: "spacing4"
       }}
@@ -1039,17 +1045,19 @@ function Tags({ noteId }: { noteId: string }) {
                   appStore.get().setNavigationTab("tags");
                   navigate(`/tags/${item.id}`);
                 }}
-                containerSx={{
-                  bg: "background-tertiary",
-                  px: "spacing3",
-                  py: "spacing2",
-                  ":hover": { bg: "hover" }
-                }}
                 onDismiss={async () => {
                   await db.relations.unlink(item, { id: noteId, type: "note" });
                   await tagStore.get().refresh();
                   await noteStore.get().refresh();
                   result.refresh();
+                }}
+                styles={{
+                  container: {
+                    bg: "background-tertiary",
+                    px: "spacing3",
+                    py: "spacing2",
+                    ":hover": { bg: "hover" }
+                  }
                 }}
               />
             )}
@@ -1075,8 +1083,7 @@ function Notebooks({ noteId }: { noteId: string }) {
     <Section
       title={strings.notebooks()}
       sx={{
-        borderTop: "1px solid",
-        borderTopColor: "separator",
+        borderTop: "1px solid var(--separator)",
         mt: "spacing4",
         pt: "spacing4"
       }}
@@ -1098,17 +1105,19 @@ function Notebooks({ noteId }: { noteId: string }) {
                   appStore.get().setNavigationTab("notebooks");
                   navigate(`/notebooks/${item.id}`);
                 }}
-                containerSx={{
-                  bg: "background-tertiary",
-                  px: "spacing3",
-                  py: "spacing2",
-                  ":hover": { bg: "hover" }
-                }}
                 onDismiss={async () => {
                   await db.relations.unlink(item, { id: noteId, type: "note" });
                   await notebookStore.get().refresh();
                   await noteStore.get().refresh();
                   result.refresh();
+                }}
+                styles={{
+                  container: {
+                    bg: "background-tertiary",
+                    px: "spacing3",
+                    py: "spacing2",
+                    ":hover": { bg: "hover" }
+                  }
                 }}
               />
             )}
@@ -1140,9 +1149,11 @@ function Reminders({ noteId }: { noteId: string }) {
       refresh={result.status === "fulfilled" ? result.refresh : () => {}}
       sx={{
         flex: 1,
-        px: "spacing4"
+        px: "spacing4",
+        ".list-container-placeholder": {
+          p: 0
+        }
       }}
-      placeholderSx={{ pt: 0, px: 0 }}
       placeholder={
         <Section
           title={strings.dataTypesPluralCamelCase.reminder()}
@@ -1153,7 +1164,7 @@ function Reminders({ noteId }: { noteId: string }) {
               sx={{
                 color: "paragraph-secondary",
                 fontSize: "xs",
-                lineHeight: 1
+                lineHeight: "100%"
               }}
             >
               {strings.noRemindersToShow()}
@@ -1161,11 +1172,12 @@ function Reminders({ noteId }: { noteId: string }) {
             <Button
               variant="new_anchor"
               sx={{
+                display: "flex",
                 alignItems: "center",
-                alignSelf: "flex-start",
                 gap: "spacing3",
+                width: "fit-content",
                 p: 0,
-                textDecorationLine: "none"
+                textDecoration: "none"
               }}
               onClick={async () => {
                 const note = await db.notes.note(noteId);
@@ -1219,7 +1231,8 @@ function Reminders({ noteId }: { noteId: string }) {
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
-  const itemGap = 3;
+  const { theme } = useThemeUI();
+  const itemGap = (theme as Theme).space?.spacing1;
   const nonce = useAttachmentStore((store) => store.nonce);
   const result = usePromise(
     () =>
@@ -1241,7 +1254,7 @@ function Attachments({ noteId }: { noteId: string }) {
           sx={{
             color: "paragraph-secondary",
             fontSize: "xs",
-            lineHeight: 1
+            lineHeight: "100%"
           }}
         >
           {strings.noAttachedFiles()}
@@ -1264,7 +1277,8 @@ function Attachments({ noteId }: { noteId: string }) {
   );
 }
 function SessionHistory({ noteId }: { noteId: string }) {
-  const itemGap = 3;
+  const { theme } = useThemeUI();
+  const itemGap = (theme as Theme).space?.spacing1;
   const result = usePromise(
     () =>
       db.noteHistory
@@ -1300,14 +1314,13 @@ function SessionHistory({ noteId }: { noteId: string }) {
           sx={{
             color: "paragraph-secondary",
             fontSize: "xs",
-            lineHeight: 1
+            lineHeight: "100%"
           }}
         >
           {strings.noHistoryItems()}
         </Text>
       ) : (
         <VirtualizedList
-          autoHeight
           mode="dynamic"
           estimatedSize={28}
           itemGap={itemGap}
@@ -1327,15 +1340,15 @@ function SessionHistory({ noteId }: { noteId: string }) {
 type SectionProps = {
   title?: string;
   subtitle?: string;
-  headerAction?: ReactNode;
-  sx?: SxProp;
-};
+  headerAction?: React.ReactNode;
+} & FlexProps;
 export function Section({
   title,
   subtitle,
   headerAction,
   children,
-  sx
+  sx,
+  ...otherProps
 }: PropsWithChildren<SectionProps>) {
   return (
     <Flex
@@ -1343,6 +1356,7 @@ export function Section({
         flexDirection: "column",
         ...sx
       }}
+      {...otherProps}
     >
       {title || subtitle || headerAction ? (
         <Flex
@@ -1363,7 +1377,7 @@ export function Section({
                   fontSize: "3xs",
                   color: "heading-secondary",
                   fontWeight: 500,
-                  letterSpacing: 0.33,
+                  letterSpacing: "0.33px",
                   lineHeight: 1
                 }}
               >

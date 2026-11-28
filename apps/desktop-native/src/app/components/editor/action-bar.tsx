@@ -542,8 +542,7 @@ function Tab(props: {
               onClick: props.onPin,
               isChecked: isPinned
             }
-          ],
-          { position: { x: event.pageX, y: event.pageY } }
+          ]
         );
       }}
       onClick={() => props.onFocus()}

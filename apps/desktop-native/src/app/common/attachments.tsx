@@ -22,10 +22,12 @@ import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
 import { db } from "./db";
 import { checkUpload, decryptFile, saveFile } from "./fs";
+import { ScopedThemeProvider } from "../components/theme-provider";
 import { Lightbox } from "../components/lightbox";
+import { ReactDOM, HTMLElement } from "@notesnook/ui-kit";
 import { Attachment } from "@notesnook/core";
 
-export async function download(hash: string, groupId?: string) {
+async function download(hash: string, groupId?: string) {
   const attachment = await db.attachments.attachment(hash);
   if (!attachment) {
     logger.debug("could not find attachment for download", { hash, groupId });
@@ -132,6 +134,9 @@ export async function checkAttachment(hash: string) {
 }
 
 export async function previewImageAttachment(attachment: Attachment) {
+  const container = document.getElementById("dialogContainer");
+  if (!(container instanceof HTMLElement)) return;
+
   const dataurl = await downloadAttachment(
     attachment.hash,
     "base64",
@@ -141,5 +146,15 @@ export async function previewImageAttachment(attachment: Attachment) {
     return showToast("error", strings.imagePreviewFailed());
   }
 
-  Lightbox.show({ image: dataurl });
+  ReactDOM.render(
+    <ScopedThemeProvider>
+      <Lightbox
+        image={dataurl}
+        onClose={() => {
+          ReactDOM.unmountComponentAtNode(container);
+        }}
+      />
+    </ScopedThemeProvider>,
+    container
+  );
 }

@@ -17,71 +17,66 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
 import {
-  Button,
   Flex,
   Text,
-  type ColorValue,
-  type UIMouseEvent,
-  type SxProp
+  Button,
+  type ThemeUICSSObject
 } from "@notesnook/ui-kit";
-import { Close, type Icon } from "../icons";
+import type * as React from "@notesnook/ui-kit/contracts/react";
+import { Close, Icon } from "../icons";
+import { strings } from "@notesnook/intl";
 
 type IconTagProps = {
   text: string;
-  /** Accepted for web's call sites; desktop has no stylesheet to match it. */
-  className?: string;
   title?: string;
   icon: Icon;
   iconSize?: number;
-  onClick?: (event: UIMouseEvent) => void;
+  className?: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
   styles?: {
-    container?: SxProp;
-    icon?: { color?: ColorValue };
-    text?: { color?: ColorValue; fontSize?: SxProp["fontSize"] };
+    icon?: ThemeUICSSObject;
+    container?: ThemeUICSSObject;
+    text?: ThemeUICSSObject;
   };
   testId?: string;
   highlight?: boolean;
   selected?: boolean;
-  chip?: boolean;
-  containerSx?: SxProp;
   onDismiss?: () => void;
 };
 
 function IconTag(props: IconTagProps) {
   const {
-    icon: IconComponent,
+    icon: Icon,
     text,
     title,
     iconSize = 11,
+    className,
     onClick,
     onDismiss,
     styles,
     testId,
     highlight,
-    selected,
-    chip = true,
-    containerSx
+    selected
   } = props;
 
   return (
     <Flex
+      className={className}
       data-test-id={testId}
+      onClick={(e) => {
+        if (onClick) {
+          e.stopPropagation();
+          onClick(e);
+        }
+      }}
       title={title || text}
-      onClick={
-        onClick
-          ? (event) => {
-              event.stopPropagation();
-              onClick(event);
-            }
-          : undefined
-      }
       sx={{
-        flexDirection: "row",
         alignItems: "center",
-        bg: selected ? "background-tertiary" : "background-secondary",
-        borderRadius: 26,
+        backgroundColor: selected
+          ? "background-tertiary"
+          : "background-secondary",
+        borderRadius: "26px",
         cursor: onClick ? "pointer" : "default",
         flexShrink: 0,
         gap: "spacing2",
@@ -90,57 +85,52 @@ function IconTag(props: IconTagProps) {
         overflow: "hidden",
         px: "spacing2",
         py: "spacing1",
-        ...(chip
-          ? {
-              ":group-hover": {
-                group: "list-item",
-                style: { bg: "background-tertiary" }
-              }
-            }
-          : {}),
-        ...styles?.container,
-        ...containerSx
+        ...styles?.container
       }}
     >
-      <IconComponent
+      <Icon
         size={iconSize}
-        color={styles?.icon?.color ?? (highlight ? "accent" : "icon-secondary")}
+        color={highlight ? "accent" : "icon-secondary"}
+        sx={{ flexShrink: 0, ...styles?.icon }}
       />
       <Text
         sx={{
-          lineClamp: 1,
-          color: styles?.text?.color ?? (highlight ? "accent" : "paragraph"),
-          fontSize: styles?.text?.fontSize ?? "3xs",
-          fontWeight: "medium"
+          color: highlight ? "accent" : "paragraph",
+          fontSize: "3xs",
+          fontWeight: "medium",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          ...styles?.text
         }}
       >
         {text}
       </Text>
-      {onDismiss ? (
+      {onDismiss && (
         <Button
-          variant="secondary"
-          title={strings.remove()}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onDismiss();
-          }}
+          variant="new_secondary"
           sx={{
             flexShrink: 0,
-            height: 15,
-            width: 15,
+            height: "15px",
+            width: "15px",
+            display: "flex",
             alignItems: "center",
             justifyContent: "center",
             p: 0,
-            border: "none",
+            border: 0,
             ml: "spacing1",
             borderRadius: "radius1",
-            bg: "transparent"
+            background: "transparent"
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDismiss();
           }}
         >
-          <Close size={11} />
+          <Close size={11} title={strings.remove()} />
         </Button>
-      ) : null}
+      )}
     </Flex>
   );
 }

@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren, useEffect, useRef } from "react";
-import Config from "../../utils/config";
-import { useDatabaseReady } from "../../stores/boot-store";
 import { Box, Button, Text, Flex } from "@notesnook/ui-kit";
 import {
   Close,
@@ -50,7 +48,7 @@ export type RouteContainerButton = {
   icon: Icon;
 };
 
-export type RouteContainerProps = Omit<RouteResult, "key"> & {
+export type RouteContainerProps = RouteResult & {
   routeKey?: string;
 };
 function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
@@ -69,31 +67,19 @@ function useHasItems(
   type: RouteContainerProps["type"],
   routeKey?: RouteContainerProps["routeKey"]
 ) {
-  const hasNoteItems = useNoteStore((store) => {
-    const items = routeKey === "home" ? store.notes : store.contextNotes;
-    return items ? items.length > 0 : undefined;
-  });
+  const hasNoteItems = useNoteStore((store) =>
+    Boolean((routeKey === "home" ? store.notes : store.contextNotes)?.length)
+  );
   const hasReminderItems = useReminderStore((store) =>
-    store.reminders ? store.reminders.length > 0 : undefined
+    Boolean(store.reminders?.length)
   );
-  const hasTrashItems = useTrashStore((store) =>
-    store.trash ? store.trash.length > 0 : undefined
-  );
+  const hasTrashItems = useTrashStore((store) => Boolean(store.trash?.length));
 
-  const actual =
-    type === "reminders"
-      ? hasReminderItems
-      : type === "trash"
-      ? hasTrashItems
-      : hasNoteItems;
-  // The native host opens the database after the first frame: until the
-  // lists load, use what the route had last time so the header does not jump.
-  const cacheKey = `hasItems:${routeKey}:${type}`;
-  const cached = Config.get<boolean>(cacheKey, false);
-  useEffect(() => {
-    if (actual !== undefined && actual !== cached) Config.set(cacheKey, actual);
-  }, [actual, cached, cacheKey]);
-  return actual ?? cached;
+  return type === "reminders"
+    ? hasReminderItems
+    : type === "trash"
+    ? hasTrashItems
+    : hasNoteItems;
 }
 
 function useGroupingState(
@@ -155,7 +141,6 @@ function HeaderActions({
   routeButton,
   hasItems
 }: HeaderActionsProps) {
-  const isDatabaseReady = useDatabaseReady();
   return (
     <Box
       sx={{
@@ -167,9 +152,7 @@ function HeaderActions({
     >
       {routeButton && (
         <Button
-          data-test-id="route-action"
           variant="tertiary"
-          disabled={!isDatabaseReady}
           title={routeButton.title}
           onClick={routeButton.onClick}
           sx={{ p: 0 }}
@@ -180,7 +163,6 @@ function HeaderActions({
       {hasItems && (
         <Button
           variant="tertiary"
-          disabled={!isDatabaseReady}
           title={strings.groupAndSort()}
           data-test-id={`${groupingKey}-sort-button`}
           onClick={() =>
@@ -197,7 +179,6 @@ function HeaderActions({
       {hasItems && canToggleView && viewMode && (
         <Button
           variant="tertiary"
-          disabled={!isDatabaseReady}
           title={
             viewMode === "compact"
               ? strings.switchToDetailedView()
@@ -218,15 +199,9 @@ function HeaderActions({
 
 function Header(props: RouteContainerProps) {
   const { type, routeKey } = props;
-  const isDatabaseReady = useDatabaseReady();
   const titlePromise = usePromise<string | undefined>(
-    () =>
-      typeof props.title === "string"
-        ? props.title
-        : isDatabaseReady
-        ? props.title?.()
-        : undefined,
-    [props.title, isDatabaseReady]
+    () => (typeof props.title === "string" ? props.title : props.title?.()),
+    [props.title]
   );
   const isMobile = useMobile();
   const isSearching = useSearchStore((store) => store.isSearching);
@@ -290,7 +265,6 @@ function Header(props: RouteContainerProps) {
             }}
           >
             <Text
-              data-test-id="route-title"
               sx={{
                 color: "heading",
                 fontSize: "lg",
@@ -351,7 +325,17 @@ function Header(props: RouteContainerProps) {
                     fontSize: "xs",
                     color: "paragraph",
                     bg: "background-secondary",
-                    borderRadius: "dialog"
+                    borderRadius: "dialog",
+                    "::placeholder": {
+                      color: "paragraph-secondary",
+                      textAlign: "start"
+                    },
+                    "& + .rightActions #search-action-button": {
+                      opacity: query ? 1 : 0
+                    },
+                    "&:focus + .rightActions #search-action-button": {
+                      opacity: 1
+                    }
                   }
                 }}
                 defaultValue={query}

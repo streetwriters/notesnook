@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { describe, expect, test } from "vitest";
 import {
+  convertStateDeclarations,
   convertAnimation,
   convertDeclarations,
   convertOutline,
@@ -29,12 +30,12 @@ import { registerStylesheet } from "../../shared/style/css-motion";
 
 describe("sx keys taken from apps/web", () => {
   test("pointerEvents all is auto; colorScheme is ignored", () => {
-    expect(convertDeclarations({ pointerEvents: "all" }).style.pointerEvents).toBe(
-      "auto"
-    );
-    expect(convertDeclarations({ colorScheme: "dark" }).style).not.toHaveProperty(
-      "colorScheme"
-    );
+    expect(
+      convertDeclarations({ pointerEvents: "all" }).style.pointerEvents
+    ).toBe("auto");
+    expect(
+      convertDeclarations({ colorScheme: "dark" }).style
+    ).not.toHaveProperty("colorScheme");
   });
 
   test("display block, fit-content and bolder draw as desktop defaults", () => {
@@ -105,9 +106,21 @@ describe("sx keys taken from apps/web", () => {
   test("visibility hidden draws nothing and takes no pointer events", () => {
     const { style } = convertDeclarations({ visibility: "hidden" });
     expect(style).toMatchObject({ opacity: 0, pointerEvents: "none" });
+    expect(convertDeclarations({ visibility: "collapse" }).style).toMatchObject(
+      { opacity: 0, pointerEvents: "none" }
+    );
     expect(
       convertDeclarations({ visibility: "visible" }).style.opacity
     ).toBeUndefined();
+  });
+
+  test("a state that makes an element visible shows it", () => {
+    expect(convertStateDeclarations({ visibility: "visible" })).toEqual({
+      opacity: 1
+    });
+    expect(convertStateDeclarations({ visibility: "hidden" })).toEqual({
+      opacity: 0
+    });
   });
 
   test("overflowWrap and wordWrap are dropped", () => {
@@ -167,9 +180,11 @@ describe("sx keys taken from apps/web", () => {
     expect(
       convertDeclarations({ outline: "2px solid var(--accent)" }).style
     ).toMatchObject({ outlineWidth: 2, outlineColor: "accent" });
+    // The colour can come from `outlineColor`, as apps/web's list item has it.
     expect(
-      convertDeclarations({ outline: "2px solid" }).style.outlineWidth
-    ).toBeUndefined();
+      convertDeclarations({ outline: "2px solid", outlineColor: "accent" })
+        .style
+    ).toMatchObject({ outlineWidth: 2, outlineColor: "accent" });
   });
 });
 
@@ -350,9 +365,9 @@ describe("logical alignment from apps/web", () => {
   });
 
   test("a px radius is a number of pixels", () => {
-    expect(convertDeclarations({ borderRadius: "150px" }).style.borderRadius).toBe(
-      150
-    );
+    expect(
+      convertDeclarations({ borderRadius: "150px" }).style.borderRadius
+    ).toBe(150);
   });
 });
 
@@ -377,9 +392,9 @@ describe("CSS values apps/web writes that the contract now accepts", () => {
     expect(convertDeclarations({ position: "sticky" }).style.position).toBe(
       "relative"
     );
-    expect(convertDeclarations({ position: "static" }).style).not.toHaveProperty(
-      "position"
-    );
+    expect(
+      convertDeclarations({ position: "static" }).style
+    ).not.toHaveProperty("position");
     expect(convertDeclarations({ position: "absolute" }).style.position).toBe(
       "absolute"
     );
@@ -409,9 +424,9 @@ describe("CSS values apps/web writes that the contract now accepts", () => {
   });
 
   test("a background with no gradient is a colour; none and url() draw nothing", () => {
-    expect(convertDeclarations({ background: "#ff0000" }).style.backgroundColor).toBe(
-      "#ff0000"
-    );
+    expect(
+      convertDeclarations({ background: "#ff0000" }).style.backgroundColor
+    ).toBe("#ff0000");
     for (const value of ["none", "url(a.png)"]) {
       const { style } = convertDeclarations({
         background: value,
@@ -420,9 +435,9 @@ describe("CSS values apps/web writes that the contract now accepts", () => {
       expect(style).not.toHaveProperty("backgroundColor");
       expect(style).not.toHaveProperty("experimental_backgroundImage");
     }
-    expect(convertDeclarations({ backgroundSize: "auto" }).style).not.toHaveProperty(
-      "experimental_backgroundSize"
-    );
+    expect(
+      convertDeclarations({ backgroundSize: "auto" }).style
+    ).not.toHaveProperty("experimental_backgroundSize");
   });
 
   test("!important is dropped from the value", () => {
@@ -445,9 +460,9 @@ describe("CSS values apps/web writes that the contract now accepts", () => {
   });
 
   test("inline-flex lays out as a row, grid as the default column", () => {
-    expect(convertDeclarations({ display: "inline-flex" }).style.flexDirection).toBe(
-      "row"
-    );
+    expect(
+      convertDeclarations({ display: "inline-flex" }).style.flexDirection
+    ).toBe("row");
     const grid = convertDeclarations({
       display: "grid",
       gridTemplateColumns: "1fr 1fr"
@@ -473,7 +488,10 @@ describe("CSS motion strings", () => {
       "@keyframes convertTestSlide { from { opacity: 0; transform: translateY(30px); width: 10px; } to { opacity: 1; transform: translateY(0); } }"
     );
     expect(
-      convertAnimation("convertTestSlide 1s ease-out 0.2s both", (frame) => frame)
+      convertAnimation(
+        "convertTestSlide 1s ease-out 0.2s both",
+        (frame) => frame
+      )
     ).toEqual({
       // Only what desktop animates is kept from a frame (no width).
       animationName: {

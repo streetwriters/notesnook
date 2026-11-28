@@ -30,7 +30,7 @@ import {
   useStore as useNotesStore
 } from "../stores/note-store";
 
-type NotesProps = { header?: ReactNode };
+type NotesProps = { header?: JSX.Element };
 function Notes(props: NotesProps) {
   const { header } = props;
   const context = useNotesStore((store) => store.context);

@@ -95,6 +95,20 @@ export declare function ScrollContainer(
   props: ScrollContainerProps & RefAttributes<UIElement>
 ): JSX.Element;
 
+/**
+ * The two `react-dom` calls apps/web makes to draw outside the tree
+ * (`ReactDOM.render` into `document.getElementById("dialogContainer")`), an
+ * element to render into, and the class `container instanceof HTMLElement`
+ * tests. On the web they are react-dom's, a `<div>` and the DOM's class.
+ */
+export declare const ReactDOM: {
+  render(element: ReactNode, container: UIElement): void;
+  unmountComponentAtNode(container: UIElement): boolean;
+};
+export declare function DomRoot(props: { id: string }): JSX.Element;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export declare const HTMLElement: new (...args: any[]) => UIElement;
+
 export interface LayoutRootProps {
   children?: ReactNode;
 }

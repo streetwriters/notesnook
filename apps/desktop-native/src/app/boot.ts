@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EV, EVENTS } from "@notesnook/core";
 import { config, environment, history, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
-import { initLocaleSync } from "./common/locale-sync";
+import { initLocaleSync } from "../targets/locale-sync";
 import { getCurrentPath } from "./navigation";
 import { DEFAULT_ITERATIONS, useKeyStore } from "./interfaces/key-store";
 import { randomBytes } from "./interfaces/subtle";
@@ -280,8 +280,8 @@ async function run(options: BootOptions) {
     });
   }
   if (environment.isDev && options.openLightbox) {
-    const { Lightbox } = await import("./components/lightbox");
-    Lightbox.show({ image: options.openLightbox.image });
+    const { showLightbox } = await import("./dev/show-lightbox");
+    showLightbox(options.openLightbox.image);
   }
   if (environment.isDev && options.seedUser) await seedUser(options.seedUser);
   if (environment.isDev && options.attachmentBench) {

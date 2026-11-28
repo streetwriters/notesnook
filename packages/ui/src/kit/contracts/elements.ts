@@ -40,9 +40,20 @@ export interface UIScrollToOptions {
   behavior?: "auto" | "smooth" | "instant";
 }
 
+/** The class names set on an element from code, as `element.classList`. */
+export interface UIClassList {
+  add(...names: string[]): void;
+  remove(...names: string[]): void;
+  contains(name: string): boolean;
+  toggle(name: string, force?: boolean): boolean;
+}
+
 export interface UIElement {
   focus(options?: { preventScroll?: boolean }): void;
   blur(): void;
+  /** Runs the element's `onClick`, as a click on it would. */
+  click(): void;
+  readonly classList: UIClassList;
   getBoundingClientRect(): UIRect;
   scrollIntoView(arg?: boolean | UIScrollIntoViewOptions): void;
   scrollTo(options: UIScrollToOptions): void;

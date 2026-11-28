@@ -42,6 +42,9 @@ import type { StyleProp } from "./style";
 
 import type * as R from "react";
 
+// With this module as a file's `React`, its JSX is still checked by React's.
+export type { JSX } from "react";
+
 export type ReactNode = R.ReactNode;
 export type ReactElement = R.ReactElement;
 export type Ref<T> = R.Ref<T>;
@@ -65,15 +68,19 @@ export type Key = R.Key;
 
 
 export type CSSProperties = StyleProp;
-export type SyntheticEvent<T = UIElement> = UISyntheticEvent<T>;
-export type MouseEvent<T = UIElement> = UIMouseEvent<T>;
-export type KeyboardEvent<T = UIElement> = UIKeyboardEvent<T>;
-export type DragEvent<T = UIElement> = UIDragEvent<T>;
-export type FocusEvent<T = UIElement> = UIFocusEvent<T>;
-export type WheelEvent<T = UIElement> = UIWheelEvent<T>;
-export type ClipboardEvent<T = UIElement> = UIClipboardEvent<T>;
-export type FormEvent<T = UIElement> = UIFormEvent<T>;
+// The element parameter is dropped: apps/web names DOM element types
+// (`HTMLDivElement`) that a kit element is not, and the handler gets the
+// kit's event whatever it names.
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export type SyntheticEvent<_T = unknown> = UISyntheticEvent;
+export type MouseEvent<_T = unknown, _E = unknown> = UIMouseEvent;
+export type KeyboardEvent<_T = unknown> = UIKeyboardEvent;
+export type DragEvent<_T = unknown> = UIDragEvent;
+export type FocusEvent<_T = unknown> = UIFocusEvent;
+export type WheelEvent<_T = unknown> = UIWheelEvent;
+export type ClipboardEvent<_T = unknown> = UIClipboardEvent;
+export type FormEvent<_T = unknown> = UIFormEvent;
 export type ChangeEvent<T = UIChangeEvent["currentTarget"]> =
   UIChangeEvent<T>;
-export type MouseEventHandler<T = UIElement> = (event: UIMouseEvent<T>) => void;
-export type DragEventHandler<T = UIElement> = (event: UIDragEvent<T>) => void;
+export type MouseEventHandler<_T = unknown> = (event: UIMouseEvent) => void;
+export type DragEventHandler<_T = unknown> = (event: UIDragEvent) => void;

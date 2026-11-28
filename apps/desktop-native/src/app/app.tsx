@@ -27,17 +27,17 @@ import {
   type SplitPaneHandle,
   DragGhostHost,
   PopoverHost,
+  DomRoot,
   ToastHost
 } from "@notesnook/ui-kit";
 import { ActionBar } from "./components/editor/action-bar";
-import { MenuHost } from "./components/menu";
+import GlobalMenuWrapper from "./components/global-menu-wrapper";
 import { DialogHost } from "./common/dialog-manager";
 import { useEditorStore } from "./stores/editor-store";
 import TabsView from "./components/editor";
 import CachedRouter from "./components/cached-router";
-import { NavigationMenu } from "./components/navigation-menu";
-import { StatusBar } from "./components/status-bar";
-import { LightboxHost } from "./components/lightbox";
+import NavigationMenu from "./components/navigation-menu";
+import StatusBar from "./components/status-bar";
 import HashRouter from "./components/hash-router";
 import AppEffects from "./app-effects";
 import { AppEventManager, AppEvents } from "./common/app-events";
@@ -111,12 +111,12 @@ export function App(props: { titleBarInset?: number }) {
         <DesktopAppContents navPane={navPane} isFocusMode={isFocusMode} />
       )}
       {isMobile ? null : <StatusBar />}
-      <MenuHost />
+      <GlobalMenuWrapper />
       <DialogHost />
       <PopoverHost />
       <ToastHost />
       <DragGhostHost />
-      <LightboxHost />
+      <DomRoot id="dialogContainer" />
     </Flex>
   );
 }
@@ -130,6 +130,7 @@ function DesktopAppContents(props: {
   const { navPane, isFocusMode } = props;
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
   const isTablet = useTablet();
+  const isDatabaseReady = useDatabaseReady();
   const { isFocused } = useWindowFocus();
 
   useEffect(() => {
@@ -190,10 +191,13 @@ function DesktopAppContents(props: {
         >
           <ThemeScope scope="navigationMenu">
             <Flex sx={{ flex: 1, opacity: isFocused ? 1 : 0.7 }}>
-              <NavigationMenu
-                onExpand={() => navPane.current?.expand(0)}
-                canExpand={!isTablet}
-              />
+              {/* The menu reads the database as it renders, as on web. */}
+              {isDatabaseReady ? (
+                <NavigationMenu
+                  onExpand={() => navPane.current?.expand(0)}
+                  canExpand={!isTablet}
+                />
+              ) : null}
             </Flex>
           </ThemeScope>
         </Pane>
@@ -234,6 +238,7 @@ function MobileAppContents(props: {
   onEditorPaneVisibilityChange: (isActive: boolean) => void;
 }) {
   const { onSideMenuVisibilityChange, onEditorPaneVisibilityChange } = props;
+  const isDatabaseReady = useDatabaseReady();
   const { index, slideToIndex } = useSlider({
     onChange: (current) => {
       onSideMenuVisibilityChange(current === 0);
@@ -303,7 +308,7 @@ function MobileAppContents(props: {
       {index === 0 ? (
         <ThemeScope scope="navigationMenu">
           <Flex sx={{ flex: 1 }}>
-            <NavigationMenu canExpand={false} />
+            {isDatabaseReady ? <NavigationMenu canExpand={false} /> : null}
           </Flex>
         </ThemeScope>
       ) : null}

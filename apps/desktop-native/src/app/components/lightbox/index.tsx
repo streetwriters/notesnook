@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import { create } from "zustand";
 import { strings } from "@notesnook/intl";
 import {
   Box,
@@ -336,24 +335,4 @@ function LightboxView(props: LightboxProps) {
   );
 }
 
-const useLightboxStore = create<{ props?: LightboxProps }>(() => ({}));
-
-export const Lightbox = Object.assign(LightboxView, {
-  show(props: LightboxProps) {
-    useLightboxStore.setState({
-      props: {
-        ...props,
-        onClose: () => {
-          props.onClose?.();
-          useLightboxStore.setState({ props: undefined });
-        }
-      }
-    });
-  }
-});
-
-export function LightboxHost() {
-  const props = useLightboxStore((store) => store.props);
-  if (!props) return null;
-  return <LightboxView {...props} />;
-}
+export { LightboxView as Lightbox };

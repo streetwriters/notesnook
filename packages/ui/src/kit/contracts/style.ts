@@ -310,6 +310,9 @@ export type SxProp = Omit<
  */
 export type SxStyle = SxProp | ThemeCallback<SxProp>;
 
+/** A component's `sx` prop, as `SxProp` of `@theme-ui/core`. */
+export type SxProps = { sx?: SxStyle };
+
 export type ThemeUICSSObject = SxProp;
 export type ThemeUIStyleObject = SxStyle;
 export type RestrictedSxProp = SxProp;
