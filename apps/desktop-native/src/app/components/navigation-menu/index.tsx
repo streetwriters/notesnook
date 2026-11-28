@@ -25,6 +25,7 @@ import {
   Image,
   Text,
   SortableList,
+  Freeze,
   type MenuItem
 } from "@notesnook/ui-kit";
 import {
@@ -114,7 +115,6 @@ import {
   withFeatureCheck
 } from "../../common";
 import { TabItem } from "./tab-item";
-import { Freeze } from "react-freeze";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useTagStore } from "../../stores/tag-store";

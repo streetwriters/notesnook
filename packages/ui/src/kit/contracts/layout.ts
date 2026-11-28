@@ -109,6 +109,12 @@ export declare function DomRoot(props: { id: string }): JSX.Element;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export declare const HTMLElement: new (...args: any[]) => UIElement;
 
+/** react-freeze's `Freeze`: keeps hidden children mounted without drawing them. */
+export declare function Freeze(props: {
+  freeze: boolean;
+  children?: ReactNode;
+}): JSX.Element;
+
 export interface LayoutRootProps {
   children?: ReactNode;
 }

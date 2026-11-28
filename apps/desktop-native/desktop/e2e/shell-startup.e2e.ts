@@ -23,17 +23,21 @@ import path from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { launchApp } from "./launch";
-import { count, itemCounts, routeTitle, seedNotes } from "./dialogs";
+import {
+  count,
+  itemCounts,
+  routeTitle,
+  seedNotes,
+  texts
+} from "./dialogs";
 
 const DELAY = 6000;
 const SHELL = [
   "app",
   "tabs",
   "sidebar-toggle",
-  "navigation-menu-root",
-  "tab-home",
   "routeHeader",
-  "status-bar",
+  "theme-scope-statusBar",
   "editor-tabs-view"
 ];
 
@@ -76,7 +80,9 @@ test("the shell is on screen before the database is ready and content fills in a
   expect(await count(app!, "list-placeholder")).toBe(0);
   expect(await count(app!, "list-item")).toBe(0);
   expect(await count(app!, "authForm")).toBe(0);
-  expect(await itemCounts(app!)).not.toContain("0");
+  // The navigation menu is web's: it reads the database as it renders, so
+  // its pane stays empty until the database is ready.
+  expect(await count(app!, "theme-scope-navigationMenu")).toBe(0);
   expect(await texts(app!, "title")).not.toContain("Apple pie");
 
   await vi.waitFor(
@@ -86,6 +92,7 @@ test("the shell is on screen before the database is ready and content fills in a
   expect(Date.now() - shownAt).toBeGreaterThan(DELAY / 2);
   expect(await count(app!, "list-placeholder")).toBe(0);
   expect(await count(app!, "list-item")).toBe(seedNotes.length);
+  expect(await count(app!, "tab-home")).toBeGreaterThan(0);
   await vi.waitFor(
     async () => expect(await itemCounts(app!)).toContain("3"),
     { timeout: 20000, interval: 300 }
@@ -130,11 +137,11 @@ test("with app lock enabled the unlock screen is the first frame and no list ren
   await waitFor("unlock-note-title");
   for (const id of [
     "app",
-    "navigation-menu-root",
+    "theme-scope-navigationMenu",
     "routeHeader",
     "list-item",
     "list-placeholder",
-    "status-bar"
+    "theme-scope-statusBar"
   ])
     expect(await count(app!, id), id).toBe(0);
 
@@ -144,5 +151,5 @@ test("with app lock enabled the unlock screen is the first frame and no list ren
   expect(await count(app!, "app")).toBe(0);
 
   await waitFor("app-lock-password");
-  expect(await count(app!, "navigation-menu-root")).toBe(0);
+  expect(await count(app!, "theme-scope-navigationMenu")).toBe(0);
 }, 300000);

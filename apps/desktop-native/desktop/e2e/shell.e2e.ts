@@ -64,7 +64,7 @@ test("the shell shows the navigation, list and editor panes and the status bar",
     "global-split-pane",
     "pane-list-pane",
     "editor-tabs-view",
-    "status-bar"
+    "theme-scope-statusBar"
   ])
     expect(await app.getByTestId(id).count(), id).toBeGreaterThan(0);
 });

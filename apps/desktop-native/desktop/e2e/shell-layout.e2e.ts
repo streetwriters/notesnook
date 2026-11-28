@@ -70,7 +70,7 @@ async function frame(id: string) {
 }
 
 test("the navigation pane is 250px wide and the list pane 380px at the default size", async () => {
-  const nav = await frame("navigation-menu-root");
+  const nav = await frame("theme-scope-navigationMenu");
   expect(nav.width).toBeGreaterThanOrEqual(240);
   const list = await frame("pane-list-pane");
   expect(list.width).toBeGreaterThan(300);
@@ -80,7 +80,7 @@ test("collapsing the sidebar shows icon only navigation and pressing a tab expan
   await app.getByTestId("sidebar-toggle").click();
   await vi.waitFor(
     async () =>
-      expect((await frame("navigation-menu-root")).width).toBeLessThan(80),
+      expect((await frame("theme-scope-navigationMenu")).width).toBeLessThan(80),
     { timeout: 10000, interval: 300 }
   );
   expect(await app.getByTestId("tab-notebooks").count()).toBeGreaterThan(0);
@@ -88,7 +88,7 @@ test("collapsing the sidebar shows icon only navigation and pressing a tab expan
 
   await app.getByTestId("tab-notebooks").click();
   await vi.waitFor(
-    async () => expect((await frame("navigation-menu-root")).width).toBe(250),
+    async () => expect((await frame("theme-scope-navigationMenu")).width).toBe(250),
     { timeout: 10000, interval: 300 }
   );
   expect(await app.getByTestId("profile-dropdown").count()).toBeGreaterThan(0);
@@ -96,7 +96,7 @@ test("collapsing the sidebar shows icon only navigation and pressing a tab expan
   await app.mouseMove({ x: 900, y: 400 });
   await vi.waitFor(
     async () =>
-      expect((await frame("navigation-menu-root")).width).toBeLessThan(80),
+      expect((await frame("theme-scope-navigationMenu")).width).toBeLessThan(80),
     { timeout: 10000, interval: 300 }
   );
 
@@ -105,7 +105,7 @@ test("collapsing the sidebar shows icon only navigation and pressing a tab expan
     async () =>
       expect(
         (
-          await frame("navigation-menu-root")
+          await frame("theme-scope-navigationMenu")
         ).width
       ).toBeGreaterThanOrEqual(240),
     { timeout: 10000, interval: 300 }
@@ -116,7 +116,7 @@ test("a tablet sized window collapses the navigation pane", async () => {
   await app.setWindowSize(800, 700);
   await vi.waitFor(
     async () =>
-      expect((await frame("navigation-menu-root")).width).toBeLessThan(80),
+      expect((await frame("theme-scope-navigationMenu")).width).toBeLessThan(80),
     { timeout: 10000, interval: 300 }
   );
   await app.setWindowSize(1200, 800);
@@ -124,7 +124,7 @@ test("a tablet sized window collapses the navigation pane", async () => {
     async () =>
       expect(
         (
-          await frame("navigation-menu-root")
+          await frame("theme-scope-navigationMenu")
         ).width
       ).toBeGreaterThanOrEqual(240),
     { timeout: 10000, interval: 300 }
@@ -155,14 +155,14 @@ test("swiping sideways in a phone sized window moves between the panes", async (
   await vi.waitFor(
     async () =>
       expect(
-        await app.getByTestId("navigation-menu-root").count()
+        await app.getByTestId("theme-scope-navigationMenu").count()
       ).toBeGreaterThan(0),
     { timeout: 10000, interval: 300 }
   );
   await swipe(300, 100);
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("navigation-menu-root").count()).toBe(0),
+      expect(await app.getByTestId("theme-scope-navigationMenu").count()).toBe(0),
     { timeout: 10000, interval: 300 }
   );
   expect(await app.getByTestId("virtuoso-scroller").count()).toBeGreaterThan(0);
@@ -171,14 +171,14 @@ test("swiping sideways in a phone sized window moves between the panes", async (
   await vi.waitFor(
     async () =>
       expect(
-        await app.getByTestId("navigation-menu-root").count()
+        await app.getByTestId("theme-scope-navigationMenu").count()
       ).toBeGreaterThan(0),
     { timeout: 10000, interval: 300 }
   );
   await swipe(300, 100);
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("navigation-menu-root").count()).toBe(0),
+      expect(await app.getByTestId("theme-scope-navigationMenu").count()).toBe(0),
     { timeout: 10000, interval: 300 }
   );
   await app.setWindowSize(1200, 800);
@@ -195,13 +195,13 @@ test("a phone sized window shows one pane at a time", async () => {
   );
   expect(await app.getByTestId("global-split-pane").count()).toBe(0);
   expect(await app.getByTestId("virtuoso-scroller").count()).toBeGreaterThan(0);
-  expect(await app.getByTestId("navigation-menu-root").count()).toBe(0);
+  expect(await app.getByTestId("theme-scope-navigationMenu").count()).toBe(0);
 
   await app.getByTestId("sidebar-toggle").click();
   await vi.waitFor(
     async () =>
       expect(
-        await app.getByTestId("navigation-menu-root").count()
+        await app.getByTestId("theme-scope-navigationMenu").count()
       ).toBeGreaterThan(0),
     { timeout: 10000, interval: 300 }
   );
@@ -218,7 +218,7 @@ test("a phone sized window shows one pane at a time", async () => {
 });
 
 test("the status bar shows no sync item while logged out and the vault item only when unlocked", async () => {
-  expect(await app.getByTestId("status-bar").count()).toBeGreaterThan(0);
+  expect(await app.getByTestId("theme-scope-statusBar").count()).toBeGreaterThan(0);
   expect(await app.getByTestId("sync-status-synced").count()).toBe(0);
   expect(await app.getByTestId("vault-unlocked").count()).toBe(0);
   expect(await app.getByTestId("lock-app").count()).toBe(0);
@@ -279,7 +279,7 @@ test("releasing the sash outside the window ends the drag", async () => {
   await app.waitForIdle();
   await app.setWindowSize(1200, 800);
   await vi.waitFor(
-    async () => expect((await frame("navigation-menu-root")).width).toBe(250),
+    async () => expect((await frame("theme-scope-navigationMenu")).width).toBe(250),
     { timeout: 10000, interval: 300 }
   );
   const [sash] = await app.query("testID", "global-split-pane-sash-0", true);
@@ -292,9 +292,9 @@ test("releasing the sash outside the window ends the drag", async () => {
   await app.mouseMove({ x: centre.x + 60, y: centre.y });
   await app.mouseUp({ x: 5000, y: centre.y });
   await app.waitForIdle();
-  const released = (await frame("navigation-menu-root")).width;
+  const released = (await frame("theme-scope-navigationMenu")).width;
   expect(released).toBeGreaterThan(250);
   await app.mouseMove({ x: centre.x + 160, y: centre.y });
   await app.waitForIdle();
-  expect((await frame("navigation-menu-root")).width).toBe(released);
+  expect((await frame("theme-scope-navigationMenu")).width).toBe(released);
 });

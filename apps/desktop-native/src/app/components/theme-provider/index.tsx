@@ -83,7 +83,11 @@ export function ScopedThemeProvider(
     return <ThemeScope scope={scope}>{children}</ThemeScope>;
   return (
     <ThemeScope scope={scope}>
-      <Box {...restProps}>{children}</Box>
+      {/* Web's box carries the class theme-scope-<scope>; here it is the
+          test id, so the e2e specs can find the scope's box. */}
+      <Box data-test-id={`theme-scope-${scope}`} {...restProps}>
+        {children}
+      </Box>
     </ThemeScope>
   );
 }

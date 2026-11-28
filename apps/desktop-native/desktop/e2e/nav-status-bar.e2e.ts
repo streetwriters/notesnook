@@ -19,15 +19,15 @@ afterEach(async () => {
 
 describe("status bar", () => {
   test("is rendered below the panes", async () => {
-    expect(await count(app, "status-bar")).toBe(1);
-    const [bar] = await app.query("testID", "status-bar", true);
+    expect(await count(app, "theme-scope-statusBar")).toBe(1);
+    const [bar] = await app.query("testID", "theme-scope-statusBar", true);
     const size = await app.getWindowSize();
     expect(bar.frame.y + bar.frame.height).toBeGreaterThan(size.height - 40);
   });
 
   test("shows a sync status entry while logged out", async () => {
     await settle(async () => {
-      const entries = await app.query("testID", "status-bar", true);
+      const entries = await app.query("testID", "theme-scope-statusBar", true);
       expect(entries.length).toBe(1);
     });
   });

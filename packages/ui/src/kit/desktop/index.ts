@@ -40,6 +40,7 @@ export { WebView } from "./webview";
 export { PdfViewer } from "./pdf";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "../shared/style/data-color";
+export { Freeze } from "../shared/freeze";
 export { DomRoot, HTMLElement, ReactDOM } from "./react-dom";
 export { keyframes } from "../shared/style/css-motion";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./title-bar";

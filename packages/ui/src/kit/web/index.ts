@@ -122,4 +122,5 @@ export type {
 export { WebThemeProvider, ThemeScope } from "./theme";
 export { ThemeBridge, syncThemeEngine } from "./theme-bridge";
 export { dataColor } from "../shared/style/data-color";
+export { Freeze } from "../shared/freeze";
 export { DomRoot, HTMLElement, ReactDOM } from "./react-dom";

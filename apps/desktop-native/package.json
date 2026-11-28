@@ -89,7 +89,6 @@
     "openpgp": "6.3.2",
     "qrcode-generator": "^1.4.4",
     "react": "19.2.3",
-    "react-freeze": "^1.0.4",
     "react-native": "0.87.1",
     "react-native-device-info": "^14.1.1",
     "react-native-get-random-values": "^1.11.0",

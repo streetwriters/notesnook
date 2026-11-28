@@ -64,7 +64,7 @@ test("the home tab lists the routes and colours", async () => {
 });
 
 test("every navigation item takes the full width of the navigation pane", async () => {
-  const [root] = await app.query("testID", "navigation-menu-root", true);
+  const [root] = await app.query("testID", "theme-scope-navigationMenu", true);
   const items = await app.query("testID", "navigation-item", true);
   expect(items.length).toBeGreaterThan(5);
   for (const item of items)
