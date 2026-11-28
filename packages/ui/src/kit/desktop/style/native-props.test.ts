@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { activeElement } from "../element";
 import { describe, expect, it, vi } from "vitest";
 import {
   nativeEventProps,
@@ -82,8 +83,19 @@ describe("attributes", () => {
       tooltip: "Tip",
       accessibilityLabel: "Close",
       accessibilityElementsHidden: true,
-      focusable: true
+      focusable: true,
+      onFocus: expect.any(Function),
+      onBlur: expect.any(Function)
     });
+  });
+
+  it("a focusable element reports its focus, for document.activeElement", () => {
+    const node = {};
+    const props = nativeEventProps({ tabIndex: -1 }, host()) as any;
+    props.onFocus({ currentTarget: node, target: node });
+    expect(activeElement()?.node).toBe(node);
+    props.onBlur({ currentTarget: node, target: node });
+    expect(activeElement()).toBeNull();
   });
 
   it("gives nothing for an element with no handlers or attributes", () => {

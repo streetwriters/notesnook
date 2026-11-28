@@ -20,7 +20,7 @@ afterAll(async () => {
 });
 
 const firstVisibleTitle = async () => {
-  const list = (await app.query("testID", "virtual-list", true))[0];
+  const list = (await app.query("testID", "virtuoso-scroller", true))[0];
   const titles = (await app.query("testID", "title", true))
     .filter(
       (entry: { text?: string; frame: { x: number; y: number } }) =>
@@ -38,8 +38,8 @@ const firstVisibleTitle = async () => {
 
 describe("scroll position through a search", () => {
   test("the list keeps its position when search starts and ends", async () => {
-    await settle(async () => expect(await count(app, "virtual-list")).toBe(1));
-    const list = (await app.query("testID", "virtual-list", true))[0];
+    await settle(async () => expect(await count(app, "virtuoso-scroller")).toBe(1));
+    const list = (await app.query("testID", "virtuoso-scroller", true))[0];
     for (let step = 0; step < 10; step++) await app.scroll(list.tag, 0, -120, 6);
     await app.waitForIdle();
     const before = await firstVisibleTitle();

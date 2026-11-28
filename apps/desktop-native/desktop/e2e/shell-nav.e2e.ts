@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { launchApp } from "./launch";
+import { routeTitle } from "./dialogs";
 import { navClick, navVisible, listTitles } from "./nav";
 import { isRowCursor, isRowSelected, waitUntil } from "./views";
 
@@ -106,7 +107,7 @@ test("the notebooks and tags tabs list their items and navigate", async () => {
   await navClick(app, "urgent");
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("route-title").textContent()).toBe(
+      expect(await routeTitle(app)).toBe(
         "#urgent"
       ),
     { timeout: 20000, interval: 300 }
@@ -116,7 +117,7 @@ test("the notebooks and tags tabs list their items and navigate", async () => {
   await navClick(app, "Notes");
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("route-title").textContent()).toBe("Notes"),
+      expect(await routeTitle(app)).toBe("Notes"),
     { timeout: 20000, interval: 300 }
   );
 });

@@ -8,6 +8,7 @@ import {
   count,
   expectClosed,
   expectDialog,
+  clickButtonIn,
   openCommandPalette,
   seedNotes,
   settle,
@@ -101,7 +102,7 @@ describe("add reminder dialog", () => {
   test("opens from the reminders list with its sections and closes with escape", async () => {
     await clickId(app, "tab-home");
     await navClick(app, "Reminders");
-    await clickId(app, "route-action");
+    await clickButtonIn(app, "routeHeader");
     await expectDialog(app, "add-reminder-dialog", "New reminder");
     expect(await count(app, "title-input")).toBe(1);
     expect(await count(app, "description-input")).toBe(1);
@@ -111,7 +112,7 @@ describe("add reminder dialog", () => {
   });
 
   test("choosing repeat shows the recurring modes", async () => {
-    await clickId(app, "route-action");
+    await clickButtonIn(app, "routeHeader");
     await expectDialog(app, "add-reminder-dialog");
     await clickId(app, "mode-repeat");
     await settle(async () =>

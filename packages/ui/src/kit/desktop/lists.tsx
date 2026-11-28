@@ -92,7 +92,8 @@ function VirtuosoCore(props: CoreProps) {
   const { viewStyle, nativeProps } = useStyled(
     {
       sx: common.style,
-      "data-test-id": common["data-test-id"],
+      // react-virtuoso marks its scroller with this id.
+      "data-test-id": common["data-test-id"] ?? "virtuoso-scroller",
       id: common.id
     } as never,
     { defaults: { display: "flex", flexDirection: "column", flex: 1 } }

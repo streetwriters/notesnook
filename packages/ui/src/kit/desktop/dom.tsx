@@ -41,7 +41,7 @@ import {
 import { SvgXml } from "react-native-svg";
 import type { SxProp } from "../contracts/style";
 import { registerStylesheet } from "../shared/style/css-motion";
-import { getElementById } from "./element";
+import { activeElement, getElementById } from "./element";
 import { mergeSx } from "../shared/style/shorthand";
 import {
   Box,
@@ -101,7 +101,9 @@ export const document = {
   querySelectorAll: (_selector: string): never[] => [],
   addEventListener: (_type: string, _listener: unknown) => undefined,
   removeEventListener: (_type: string, _listener: unknown) => undefined,
-  activeElement: null,
+  get activeElement() {
+    return activeElement();
+  },
   hidden: false
 };
 

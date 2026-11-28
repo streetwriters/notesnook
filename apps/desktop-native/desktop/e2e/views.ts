@@ -2,7 +2,7 @@ import { PNG } from "pngjs";
 import { expect, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { listTitles, navClick, navRightClick } from "./nav";
-import { clickId, count, settle, start, texts } from "./dialogs";
+import { clickId, count, routeTitle, settle, start, texts } from "./dialogs";
 
 export { clickId, count, settle, texts, navClick, navRightClick, listTitles };
 
@@ -78,14 +78,8 @@ export async function startViews(extra: Record<string, unknown> = {}) {
 
 export async function goTo(app: DesktopApp, route: string) {
   await clickId(app, "tab-home");
-  const current = await app.getByTestId("route-title").count();
-  const isCurrent =
-    current > 0 &&
-    (await app.getByTestId("route-title").textContent()) === route;
-  if (!isCurrent) await navClick(app, route);
-  await settle(async () =>
-    expect(await app.getByTestId("route-title").textContent()).toBe(route)
-  );
+  if ((await routeTitle(app)) !== route) await navClick(app, route);
+  await settle(async () => expect(await routeTitle(app)).toBe(route));
 }
 
 export async function openTab(app: DesktopApp, tab: "notebooks" | "tags") {
@@ -180,36 +174,32 @@ export async function rowBackground(app: DesktopApp, title: string) {
   return windowPixel(app, match.frame.x - 6, match.frame.y + 8);
 }
 
-async function hasRowMarker(app: DesktopApp, title: string, marker: string) {
+async function rowProps(app: DesktopApp, title: string) {
   const entry = await titleEntry(app, title);
-  const rows: { frame: { y: number; height: number } }[] = await app.query(
-    "testID",
-    "list-item",
-    true
-  );
+  const rows: { tag: number; frame: { y: number; height: number } }[] =
+    await app.query("testID", "list-item", true);
   const row = rows.find(
     (candidate) =>
       entry.frame.y >= candidate.frame.y &&
       entry.frame.y <= candidate.frame.y + candidate.frame.height
   );
-  if (!row) return false;
-  const markers: { frame: { y: number } }[] = await app.query(
-    "testID",
-    marker,
-    true
-  );
-  return markers.some(
-    (marker) =>
-      marker.frame.y >= row.frame.y - 1 &&
-      marker.frame.y <= row.frame.y + row.frame.height
-  );
+  return row ? app.getProps(row.tag) : undefined;
 }
 
-export const isRowSelected = (app: DesktopApp, title: string) =>
-  hasRowMarker(app, title, "list-item-selected");
+const LIST_BACKGROUND = 0xffffffff;
 
-export const isRowCursor = (app: DesktopApp, title: string) =>
-  hasRowMarker(app, title, "list-item-cursor");
+// The list item is apps/web's: a selected row (or the open note's) is drawn
+// on a background of its own, and the keyboard cursor is the focused row.
+// The background is read without the hover and focus styles over it.
+export const isRowSelected = async (app: DesktopApp, title: string) => {
+  const props = await rowProps(app, title);
+  return !!props && props.baseBackgroundColor !== LIST_BACKGROUND;
+};
+
+export const isRowCursor = async (app: DesktopApp, title: string) => {
+  const props = await rowProps(app, title);
+  return !!props && props.states.includes("focus");
+};
 
 export async function waitUntil(check: () => Promise<boolean>) {
   await vi.waitFor(async () => expect(await check()).toBe(true), {

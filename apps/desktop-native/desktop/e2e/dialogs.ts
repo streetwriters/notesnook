@@ -68,6 +68,66 @@ export async function texts(app: DesktopApp, id = "title") {
   );
 }
 
+type TreeNode = {
+  testID?: string;
+  text?: string;
+  children?: TreeNode[];
+};
+
+/** The texts drawn inside each element with this test id, in tree order. */
+export async function textsUnder(app: DesktopApp, id: string) {
+  const found: string[][] = [];
+  const collect = (node: TreeNode, into: string[]) => {
+    if (node.text) into.push(node.text);
+    for (const child of node.children ?? []) collect(child, into);
+  };
+  const walk = (node: TreeNode) => {
+    if (node.testID === id) {
+      const texts: string[] = [];
+      collect(node, texts);
+      found.push(texts);
+    }
+    for (const child of node.children ?? []) walk(child);
+  };
+  walk((await app.tree()) as TreeNode);
+  return found;
+}
+
+/** The title of the open route: the first text of the route header. */
+export async function routeTitle(app: DesktopApp) {
+  return (await textsUnder(app, "routeHeader"))[0]?.[0];
+}
+
+/** The item counts the navigation items show. */
+export async function itemCounts(app: DesktopApp) {
+  return (await textsUnder(app, "navigation-item")).flatMap((texts) =>
+    texts.filter((text) => /^\d+$/.test(text))
+  );
+}
+
+type Framed = {
+  tag: number;
+  frame: { x: number; y: number; width: number; height: number };
+};
+
+/** Clicks the nth button (left to right) inside the element with this id. */
+export async function clickButtonIn(app: DesktopApp, id: string, nth = 0) {
+  const [container]: Framed[] = await app.query("testID", id, true);
+  expect(container, id).toBeDefined();
+  const buttons: Framed[] = (await app.query("role", "button", true)).filter(
+    (button: Framed) =>
+      button.frame.x >= container.frame.x &&
+      button.frame.y >= container.frame.y &&
+      button.frame.x + button.frame.width <=
+        container.frame.x + container.frame.width + 0.5 &&
+      button.frame.y + button.frame.height <=
+        container.frame.y + container.frame.height + 0.5
+  );
+  buttons.sort((a, b) => a.frame.x - b.frame.x);
+  expect(buttons.length, `buttons in ${id}`).toBeGreaterThan(nth);
+  await app.click(buttons[nth].tag);
+}
+
 export async function clickTitle(app: DesktopApp, title: string) {
   await settle(async () => expect(await texts(app)).toContain(title));
   const entry = (await app.query("testID", "title", true)).find(

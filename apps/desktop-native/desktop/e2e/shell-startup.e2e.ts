@@ -23,7 +23,7 @@ import path from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { launchApp } from "./launch";
-import { count, seedNotes, texts } from "./dialogs";
+import { count, itemCounts, routeTitle, seedNotes } from "./dialogs";
 
 const DELAY = 6000;
 const SHELL = [
@@ -33,7 +33,6 @@ const SHELL = [
   "navigation-menu-root",
   "tab-home",
   "routeHeader",
-  "route-title",
   "status-bar",
   "editor-tabs-view"
 ];
@@ -73,11 +72,11 @@ test("the shell is on screen before the database is ready and content fills in a
   const shownAt = Date.now();
 
   for (const id of SHELL) expect(await count(app!, id), id).toBeGreaterThan(0);
-  expect(await texts(app!, "route-title")).toContain("Notes");
+  expect([await routeTitle(app!)]).toContain("Notes");
   expect(await count(app!, "list-placeholder")).toBe(0);
   expect(await count(app!, "list-item")).toBe(0);
   expect(await count(app!, "authForm")).toBe(0);
-  expect(await texts(app!, "item-count")).not.toContain("0");
+  expect(await itemCounts(app!)).not.toContain("0");
   expect(await texts(app!, "title")).not.toContain("Apple pie");
 
   await vi.waitFor(
@@ -88,7 +87,7 @@ test("the shell is on screen before the database is ready and content fills in a
   expect(await count(app!, "list-placeholder")).toBe(0);
   expect(await count(app!, "list-item")).toBe(seedNotes.length);
   await vi.waitFor(
-    async () => expect(await texts(app!, "item-count")).toContain("3"),
+    async () => expect(await itemCounts(app!)).toContain("3"),
     { timeout: 20000, interval: 300 }
   );
 });
@@ -98,10 +97,10 @@ test("an empty database shows the placeholder only once it is loaded", async () 
   await open(dir, { resetConfig: true, delayDatabaseMs: DELAY });
   await waitFor("app");
   expect(await count(app!, "list-placeholder")).toBe(0);
-  expect(await texts(app!, "item-count")).not.toContain("0");
+  expect(await itemCounts(app!)).not.toContain("0");
   await waitFor("list-placeholder");
   await vi.waitFor(
-    async () => expect(await texts(app!, "item-count")).toContain("0"),
+    async () => expect(await itemCounts(app!)).toContain("0"),
     { timeout: 20000, interval: 300 }
   );
 });

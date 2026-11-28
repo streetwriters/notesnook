@@ -24,7 +24,7 @@ import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
 import { popupPosition, type PopupSize } from "../shared/popup-position";
 import { useEscape } from "../shared/use-escape";
-import { measureInWindow } from "./element";
+import { activeElement, measureInWindow } from "./element";
 import { useWindowSize } from "./hooks";
 import { lastPointer } from "./style/use-styled";
 import { Box, Flex } from "./primitives";
@@ -274,7 +274,12 @@ function Presenter(props: Contract.PopupPresenterProps) {
   });
 
   useEffect(() => {
-    if (focusOnRender) content.current?.focus?.();
+    if (!focusOnRender) return;
+    // As react-modal on the web: the element that had the focus gets it back
+    // when the popup closes, so the keyboard carries on where it was.
+    const previous = activeElement();
+    content.current?.focus?.();
+    return () => previous?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

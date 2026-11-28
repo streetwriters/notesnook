@@ -10,7 +10,7 @@ import {
   openTab,
   resetUi
 } from "./views";
-import { clickId, count } from "./dialogs";
+import { clickId, count, routeTitle } from "./dialogs";
 
 let app: DesktopApp;
 
@@ -61,7 +61,7 @@ describe("colors section", () => {
     await settle(async () => expect(await navVisible(app, "Red")).toBe(true));
     await navClick(app, "Red");
     await settle(async () =>
-      expect(await app.getByTestId("route-title").textContent()).toBe("Red")
+      expect(await routeTitle(app)).toBe("Red")
     );
   });
 

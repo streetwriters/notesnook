@@ -87,7 +87,7 @@ test("the notes list shows the seeded notes", async () => {
 });
 
 async function routeTitle() {
-  return app.getByTestId("route-title").textContent();
+  return (await import("./dialogs")).routeTitle(app);
 }
 
 test("navigating between sections changes the route and the list", async () => {

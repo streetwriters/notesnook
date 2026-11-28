@@ -165,8 +165,8 @@ test("swiping sideways in a phone sized window moves between the panes", async (
       expect(await app.getByTestId("navigation-menu-root").count()).toBe(0),
     { timeout: 10000, interval: 300 }
   );
-  expect(await app.getByTestId("virtual-list").count()).toBeGreaterThan(0);
-  const [list] = await app.query("testID", "virtual-list", true);
+  expect(await app.getByTestId("virtuoso-scroller").count()).toBeGreaterThan(0);
+  const [list] = await app.query("testID", "virtuoso-scroller", true);
   await app.scroll(list.tag, 200, 0);
   await vi.waitFor(
     async () =>
@@ -194,7 +194,7 @@ test("a phone sized window shows one pane at a time", async () => {
     { timeout: 10000, interval: 300 }
   );
   expect(await app.getByTestId("global-split-pane").count()).toBe(0);
-  expect(await app.getByTestId("virtual-list").count()).toBeGreaterThan(0);
+  expect(await app.getByTestId("virtuoso-scroller").count()).toBeGreaterThan(0);
   expect(await app.getByTestId("navigation-menu-root").count()).toBe(0);
 
   await app.getByTestId("sidebar-toggle").click();
@@ -205,7 +205,7 @@ test("a phone sized window shows one pane at a time", async () => {
       ).toBeGreaterThan(0),
     { timeout: 10000, interval: 300 }
   );
-  expect(await app.getByTestId("virtual-list").count()).toBe(0);
+  expect(await app.getByTestId("virtuoso-scroller").count()).toBe(0);
 
   await app.setWindowSize(1200, 800);
   await vi.waitFor(

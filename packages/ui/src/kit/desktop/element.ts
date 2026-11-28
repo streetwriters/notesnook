@@ -390,6 +390,19 @@ export function controlElement(control: ElementControl): DesktopElement {
   return element;
 }
 
+let focused: DesktopElement | null = null;
+
+/** The kit element that has the keyboard focus, as `document.activeElement`. */
+export function activeElement(): DesktopElement | null {
+  return focused;
+}
+
+/** Called by the kit's elements as they take and lose the focus. */
+export function setFocused(element: DesktopElement | null, has: boolean) {
+  if (has) focused = element;
+  else if (focused === element) focused = null;
+}
+
 const ids = new Map<string, DesktopElement>();
 
 export function registerElementId(id: string, element: DesktopElement) {

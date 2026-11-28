@@ -390,20 +390,27 @@ function MenuItems(props: {
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
-      {items.map((item) => {
+      {items.map((item, index) => {
         if (item.isHidden) return null;
-        if (item.type === "separator") return <Separator key={item.key} />;
+        // apps/web's menus repeat keys (two separators keyed "sep"), so the
+        // React key is made unique here: the second and later uses get their
+        // position added.
+        const reactKey =
+          items.findIndex((other) => other.key === item.key) === index
+            ? item.key
+            : `${item.key}:${index}`;
+        if (item.type === "separator") return <Separator key={reactKey} />;
         if (item.type === "lazy-loader")
           return (
-            <LazyItems key={item.key} loader={item.items} onClose={onClose} />
+            <LazyItems key={reactKey} loader={item.items} onClose={onClose} />
           );
         if (item.type === "popup") {
           const Popup = item.component;
-          return <Popup key={item.key} onClick={onClose} />;
+          return <Popup key={reactKey} onClick={onClose} />;
         }
         const isOpen = openKey === item.key && !!item.menu;
         return (
-          <Box key={item.key} sx={{ position: "relative" }}>
+          <Box key={reactKey} sx={{ position: "relative" }}>
             <MenuButton
               item={item}
               onClose={onClose}

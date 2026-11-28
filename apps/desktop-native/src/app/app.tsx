@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useRef, useState } from "react";
 import {
+  Box,
   Flex,
   Pane,
   SplitPane,
@@ -110,7 +111,11 @@ export function App(props: { titleBarInset?: number }) {
       ) : (
         <DesktopAppContents navPane={navPane} isFocusMode={isFocusMode} />
       )}
-      {isMobile ? null : <StatusBar />}
+      {isMobile ? null : (
+        <Box data-test-id="status-bar" sx={{ flexShrink: 0 }}>
+          <StatusBar />
+        </Box>
+      )}
       <GlobalMenuWrapper />
       <DialogHost />
       <PopoverHost />
@@ -190,7 +195,10 @@ function DesktopAppContents(props: {
           maxSize={isTablet ? 0 : 500}
         >
           <ThemeScope scope="navigationMenu">
-            <Flex sx={{ flex: 1, opacity: isFocused ? 1 : 0.7 }}>
+            <Flex
+              data-test-id="navigation-menu-root"
+              sx={{ flex: 1, opacity: isFocused ? 1 : 0.7 }}
+            >
               {/* The menu reads the database as it renders, as on web. */}
               {isDatabaseReady ? (
                 <NavigationMenu

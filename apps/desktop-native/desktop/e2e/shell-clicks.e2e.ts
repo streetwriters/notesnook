@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { afterAll, beforeAll, expect, test } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
+import { routeTitle } from "./dialogs";
 import {
   count,
   goTo,
@@ -52,7 +53,7 @@ test("a click without movement on a sidebar row navigates to the route", async (
   await goTo(app, "Notes");
   await navClick(app, "Favorites");
   await settle(async () =>
-    expect(await app.getByTestId("route-title").textContent()).toBe("Favorites")
+    expect(await routeTitle(app)).toBe("Favorites")
   );
 });
 

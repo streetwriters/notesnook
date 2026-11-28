@@ -79,12 +79,8 @@ export async function waitForShellContent(app: DesktopApp) {
       expect(
         (await app.query("testID", "navigation-item", true)).length
       ).toBeGreaterThan(0);
-      const counts: { text?: string }[] = await app.query(
-        "testID",
-        "item-count",
-        true
-      );
-      expect(counts.some((count) => !!count.text)).toBe(true);
+      // The navigation items show their counts once the lists have loaded.
+      expect(JSON.stringify(await app.tree())).toMatch(/"text":"\d+"/);
     },
     { timeout: 60000, interval: 1000 }
   );
