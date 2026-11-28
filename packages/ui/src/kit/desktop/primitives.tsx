@@ -229,10 +229,12 @@ function Container(
   props: Contract.BoxProps & {
     variantGroup?: "variants";
     defaults?: SxProp;
+    /** Puts the box's contents inside a provider, after its text is drawn. */
+    around?: (contents: ReactNode) => ReactNode;
   },
   ref: ForwardedRef<UIElement>
 ) {
-  const { children, defaults } = props;
+  const { children, defaults, around } = props;
   const { resolved, viewStyle, textStyle, nativeProps } = useStyled(props, {
     variantGroup: "variants",
     defaults,
@@ -297,13 +299,14 @@ function Container(
   const text = hasText(children)
     ? wrapChildren(children, mergedTextStyle)
     : children;
-  let content = textStyle ? (
+  let content: ReactNode = textStyle ? (
     <InheritedTextStyle.Provider value={mergedTextStyle}>
       {text}
     </InheritedTextStyle.Provider>
   ) : (
     text
   );
+  if (around) content = around(content);
   if (form)
     content = (
       <FormContext.Provider value={form}>{content}</FormContext.Provider>
@@ -565,14 +568,15 @@ export const Label = forwardRef<UIElement, Contract.LabelProps>(function Label(
             else control?.click?.();
           }
         : props.onClick,
-      children: (
+      // The label's text takes the label's own colour and size, so the
+      // provider goes around the contents the box has already drawn.
+      around: (contents) => (
         <LabelContext.Provider value={registry}>
-          {wrapChildren(props.children)}
+          {contents}
         </LabelContext.Provider>
       ),
       defaults: {
         display: "flex",
-        alignItems: "center",
         ...(activates ? { cursor: "default" } : null)
       }
     },
