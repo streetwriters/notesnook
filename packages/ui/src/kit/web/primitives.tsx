@@ -168,9 +168,8 @@ export const Icon = forwardRef<Contract.UIElement, Contract.IconProps>(
       sx,
       ...rest
     } = props;
-    // An icon's `.path` is a whole SVG document for icons drawn from SVG files.
-    const isDocument =
-      !!pathOrDocument && pathOrDocument.trimStart().startsWith("<");
+    // An icon's `.path` can hold a whole SVG document (anything starting with `<`).
+    const isDocument = !!pathOrDocument?.trimStart().startsWith("<");
     const path = isDocument ? undefined : pathOrDocument;
     const svg = svgDocument ?? (isDocument ? pathOrDocument : undefined);
     const theme = useTheme() as Any;

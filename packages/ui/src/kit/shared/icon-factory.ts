@@ -31,7 +31,14 @@ export type IconProps = Omit<UIIconProps, "path" | "svg" | "rotate"> & {
   rotate?: boolean | number;
   rotateDirection?: "clockwise" | "counterclockwise";
 };
-export type Icon = (props: IconProps) => ReactElement;
+export type Icon = ((props: IconProps) => ReactElement) & {
+  /**
+   * The drawing as a string, for APIs that take an icon as one (a menu item's
+   * `icon: Plus.path`): an SVG path for `mdiIcon`, the whole SVG document for
+   * `svgIcon`; `Icon`'s `path` prop draws either. Unset for a hand-written icon.
+   */
+  readonly path?: string;
+};
 
 const SPIN: Record<"clockwise" | "counterclockwise", SxProp> = {
   clockwise: {
@@ -74,13 +81,13 @@ function iconProps(
 }
 
 export function mdiIcon(path: string, rotate = false): Icon {
-  const Component: Icon = (props) =>
+  const Component = (props: IconProps) =>
     createElement(UIIcon, iconProps(props, rotate, { path }));
-  return Component;
+  return Object.assign(Component, { path });
 }
 
 export function svgIcon(svg: string, rotate = false): Icon {
-  const Component: Icon = (props) =>
+  const Component = (props: IconProps) =>
     createElement(UIIcon, iconProps(props, rotate, { svg }));
-  return Component;
+  return Object.assign(Component, { path: svg });
 }

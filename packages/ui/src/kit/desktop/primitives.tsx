@@ -718,6 +718,10 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
       tag: props.field
     }
   );
+  // A DOM input has an intrinsic width; a native text field with `width:
+  // "auto"` and no text would size to nothing and could not be clicked.
+  if (viewStyle.width === "auto" && viewStyle.minWidth === undefined)
+    (viewStyle as Record<string, unknown>).minWidth = 136;
   const control = useControl();
   if (props.value !== undefined) control.value = String(props.value);
   else if (control.value === undefined)
@@ -1193,7 +1197,6 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   const [setRef] = useElementRef(ref, { id: props.id });
   const IconView = resolved.animated ? AnimatedView : AnyView;
   const size = props.size ?? 24;
-  const svg = props.svg ?? (isSvgDocument(props.path) ? props.path : undefined);
   const pixels =
     typeof size === "number"
       ? size
@@ -1207,6 +1210,10 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
       ? `${own} rotate(${props.rotate}deg)`
       : [...((own as any[]) ?? []), { rotate: `${props.rotate}deg` }]
     : own;
+  // An icon's `.path` can hold a whole SVG document (anything starting with `<`).
+  const svgDocument =
+    props.svg ??
+    (props.path?.trimStart().startsWith("<") ? props.path : undefined);
   return (
     <IconView
       ref={setRef}
@@ -1218,8 +1225,13 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
         ...(transform ? { transform } : null)
       }}
     >
-      {svg ? (
-        <SvgXml xml={svg} width={pixels} height={pixels} color={color} />
+      {svgDocument ? (
+        <SvgXml
+          xml={svgDocument}
+          width={pixels}
+          height={pixels}
+          color={color}
+        />
       ) : (
         <Svg width={pixels} height={pixels} viewBox="0 0 24 24">
           <Path d={props.path} fill={color} />
@@ -1228,11 +1240,6 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
     </IconView>
   );
 });
-
-/** Whether an icon `path` holds a whole SVG document rather than a `d`. */
-function isSvgDocument(path: string | undefined): path is string {
-  return !!path && path.trimStart().startsWith("<");
-}
 
 export type { ReactNode };
 
