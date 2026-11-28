@@ -51,6 +51,7 @@ vi.mock("react-native", () => {
     Text: host("Text"),
     TextInput: host("TextInput"),
     Pressable: host("Pressable"),
+    ScrollView: host("ScrollView"),
     Image: host("Image"),
     Dimensions: {
       get: () => ({ width: 1200, height: 800 }),
@@ -496,6 +497,40 @@ describe("raw HTML elements and nested selectors", () => {
     expect(style("plain").color).not.toBe("#ff0000");
     expect(style("other").color).not.toBe("#ff0000");
     expect(style("other").opacity).toBeUndefined();
+  });
+
+  it("overflow scroll scrolls, with the box's layout on its content; auto does not", () => {
+    render(
+      h(
+        Box,
+        null,
+        h(Flex, {
+          "data-test-id": "scroller",
+          sx: {
+            position: "fixed",
+            overflowY: "scroll",
+            overflowX: "hidden",
+            flexDirection: "column",
+            gap: 10,
+            width: 300
+          }
+        }),
+        h(Flex, { "data-test-id": "clipped", sx: { overflowY: "auto" } })
+      )
+    );
+    const scrollers = root.root.findAll(
+      (node) => (node.type as unknown) === "ScrollView"
+    );
+    expect(scrollers).toHaveLength(1);
+    const { style, contentContainerStyle, horizontal } = scrollers[0].props;
+    expect(horizontal).toBe(false);
+    expect(style).toMatchObject({ position: "absolute", width: 300 });
+    expect(style).not.toHaveProperty("gap");
+    expect(contentContainerStyle).toMatchObject({
+      flexGrow: 1,
+      flexDirection: "column",
+      gap: 10
+    });
   });
 
   it("a <style> element registers its keyframes and draws nothing", async () => {

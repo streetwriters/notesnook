@@ -20,5 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "react-native-url-polyfill/auto";
 import "web-streams-polyfill/polyfill";
 import { Buffer } from "buffer";
+import { installIntersectionObserver } from "@notesnook/ui-kit/desktop/intersection-observer";
 
 if (!globalThis.Buffer) globalThis.Buffer = Buffer;
+
+// DOM globals that files shared with apps/web use.
+installIntersectionObserver();
+// Hermes has no console timers; apps/web times a few loads with them.
+const timers = console as { time?: unknown; timeEnd?: unknown };
+timers.time ??= () => undefined;
+timers.timeEnd ??= () => undefined;

@@ -17,25 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState, type ReactNode } from "react";
-import type { NoteStats, WrappedStats } from "@notesnook/core";
-import { formatBytes } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
-import {
-  Button,
-  Flex,
-  Grid,
-  ScrollContainer,
-  Text,
-  useThemeColor,
-  useWindowSize,
-  type SxProp
-} from "@notesnook/ui-kit";
+import { Button, Flex, Text, Box, FlexProps } from "@notesnook/ui-kit";
 import { db } from "../common/db";
+import { useState, useEffect, useRef } from "react";
+import { NoteStats, WrappedStats } from "@notesnook/core";
+import { formatBytes } from "@notesnook/common";
 import { ArrowDown, ArrowLeft, Loading } from "../components/icons";
 import { hardNavigate } from "../navigation";
-import { Logo } from "../components/navigation-menu/logo";
 import { MonthlyActivityHeatmap } from "../components/monthly-activity-heatmap";
+import { strings } from "@notesnook/intl";
 
 function formatNumber(num: number) {
   return num.toLocaleString();
@@ -45,68 +35,92 @@ function formatCount(num: number) {
 }
 
 interface SlideProps {
-  children: ReactNode;
+  children: React.ReactNode;
   pattern?: "dots" | "grid" | "diagonal" | "none";
-  sx?: SxProp;
 }
 
-const SLIDE_IN: SxProp = {
-  animation: {
-    keyframes: {
-      from: { opacity: 0, transform: [{ translateY: 40 }] },
-      to: { opacity: 1, transform: [{ translateY: 0 }] }
-    },
-    duration: 800,
-    iterationCount: 1,
-    easing: "ease-out"
-  }
-};
+function Slide({
+  children,
+  pattern = "none",
+  sx,
+  ...flexProps
+}: SlideProps & FlexProps) {
+  const slideRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-function patternStyle(pattern: SlideProps["pattern"], color: string): SxProp {
-  switch (pattern) {
-    case "dots":
-      return {
-        experimental_backgroundImage: `radial-gradient(circle, ${color} 1px, transparent 1px)`,
-        experimental_backgroundSize: "20px 20px",
-        experimental_backgroundPosition: "center"
-      };
-    case "grid":
-      return {
-        experimental_backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`,
-        experimental_backgroundSize: "30px 30px",
-        experimental_backgroundPosition: "center"
-      };
-    case "diagonal":
-      return {
-        experimental_backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 20px, ${color} 20px, ${color} 21px)`
-      };
-    default:
-      return {};
-  }
-}
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
 
-function Slide({ children, sx, pattern }: SlideProps) {
-  const { height } = useWindowSize();
-  const border = useThemeColor("border");
+    if (slideRef.current) {
+      observer.observe(slideRef.current);
+    }
+
+    return () => {
+      if (slideRef.current) {
+        observer.unobserve(slideRef.current);
+      }
+    };
+  }, []);
+
+  const getBackgroundPattern = () => {
+    switch (pattern) {
+      case "dots":
+        return "radial-gradient(circle, var(--border) 1px, transparent 1px)";
+      case "grid":
+        return "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)";
+      case "diagonal":
+        return "repeating-linear-gradient(-45deg, transparent, transparent 20px, var(--border) 20px, var(--border) 21px)";
+      default:
+        return "none";
+    }
+  };
+
+  const getBackgroundSize = () => {
+    switch (pattern) {
+      case "dots":
+        return "20px 20px";
+      case "grid":
+        return "30px 30px";
+      case "diagonal":
+      default:
+        return "auto";
+    }
+  };
+
   return (
     <Flex
+      ref={slideRef}
       sx={{
-        minHeight: height,
+        minHeight: "100vh",
         minWidth: "100%",
+        scrollSnapAlign: "start",
+        scrollSnapStop: "always",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         p: 4,
         position: "relative",
-        ...patternStyle(pattern, border)
+        backgroundImage: getBackgroundPattern(),
+        backgroundSize: getBackgroundSize(),
+        backgroundPosition: "center"
       }}
     >
       <Flex
+        {...flexProps}
         sx={{
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          ...SLIDE_IN,
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? "translateY(0)" : "translateY(50px)",
+          transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
           ...sx
         }}
       >
@@ -121,10 +135,14 @@ function WelcomeSlide({ loading }: { loading: boolean }) {
     <Slide pattern="dots">
       <Text
         sx={{
-          fontSize: 96,
+          fontSize: "6rem",
           fontWeight: "bold",
           mb: 3,
-          textAlign: "center"
+          textAlign: "center",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          animation: "slideUp 1s ease-out"
         }}
       >
         🎉
@@ -132,23 +150,30 @@ function WelcomeSlide({ loading }: { loading: boolean }) {
       <Text
         variant="heading"
         sx={{
-          fontSize: [32, 48, 64],
+          fontSize: ["2rem", "3rem", "4rem"],
           fontWeight: "bold",
           mb: 2,
-          textAlign: "center"
+          textAlign: "center",
+          animation: "slideUp 1s ease-out 0.2s both"
         }}
       >
         {strings.yourYearWrapped(new Date().getFullYear())}
       </Text>
 
       {loading ? (
-        <Loading size={30} color="icon" />
+        <Loading
+          sx={{
+            animation: "fadeIn 1s ease-out 0.4s both"
+          }}
+          size={30}
+        />
       ) : (
         <>
           <Text
             sx={{
-              fontSize: [16, 19.2],
-              textAlign: "center"
+              fontSize: ["1rem", "1.2rem"],
+              textAlign: "center",
+              animation: "fadeIn 1s ease-out 0.4s both"
             }}
           >
             {strings.letsLookBackAtYourYearInNotesnook()}
@@ -159,12 +184,13 @@ function WelcomeSlide({ loading }: { loading: boolean }) {
               mt: 4,
               fontSize: "title",
               color: "paragraph-secondary",
-              textAlign: "center"
+              textAlign: "center",
+              animation: "fadeIn 1s ease-out 0.4s both"
             }}
           >
             {strings.scrollDownToExplore()}
           </Text>
-          <ArrowDown color="paragraph-secondary" sx={{ mt: 2 }} />
+          <ArrowDown sx={{ mt: 2 }} color="paragraph-secondary" />
         </>
       )}
     </Slide>
@@ -179,8 +205,9 @@ function TotalNotesSlide({ count }: { count: number }) {
           <Text
             variant="body"
             sx={{
-              fontSize: [19.2, 24],
-              textAlign: "center"
+              fontSize: ["1.2rem", "1.5rem"],
+              textAlign: "center",
+              animation: "fadeIn 0.8s ease-out"
             }}
           >
             {strings.youCreated()}
@@ -188,9 +215,10 @@ function TotalNotesSlide({ count }: { count: number }) {
           <Text
             variant="heading"
             sx={{
-              fontSize: [80, 112, 128],
+              fontSize: ["5rem", "7rem", "8rem"],
               textAlign: "center",
-              color: "accent"
+              color: "accent",
+              animation: "scaleIn 0.8s ease-out 0.2s both"
             }}
           >
             {formatNumber(count)}
@@ -198,8 +226,9 @@ function TotalNotesSlide({ count }: { count: number }) {
           <Text
             variant="body"
             sx={{
-              fontSize: [19.2, 24],
-              textAlign: "center"
+              fontSize: ["1.2rem", "1.5rem"],
+              textAlign: "center",
+              animation: "fadeIn 0.8s ease-out 0.4s both"
             }}
           >
             {strings.notesThisYear()}
@@ -208,30 +237,32 @@ function TotalNotesSlide({ count }: { count: number }) {
         <Flex
           sx={{
             flexDirection: "column",
-            ml: 5,
-            borderLeft: "1px solid",
-            borderLeftColor: "border",
-            pl: 5
+            ml: [0, 5],
+            mt: [4, 0],
+            borderLeft: ["none", "1px solid var(--border)"],
+            pl: [0, 5],
+            borderTop: ["1px solid var(--border)", "none"]
           }}
         >
           <Text
             variant="body"
+            color="paragraph-secondary"
             sx={{
-              fontSize: [19.2, 19.2],
+              fontSize: ["1.2rem", "1.2rem"],
+              animation: "fadeIn 0.8s ease-out",
               lineHeight: 1.8
             }}
           >
-            {strings.thats()}{" "}
-            <Text sx={{ fontWeight: "bold" }}>{formatNumber(count)}</Text>
-            {"\n"}
+            {strings.thats()} <strong>{formatNumber(count)}</strong>
+            <br />
             {strings.wrappedIdeas()}
-            {"\n"}
+            <br />
             {strings.wrappedThoughts()}
-            {"\n"}
+            <br />
             {strings.wrappedMemories()}
-            {"\n"}
+            <br />
             {strings.hundredPercentEncrypted()}
-            {"\n"}
+            <br />
             {strings.hundredPercentYours()}
           </Text>
         </Flex>
@@ -260,8 +291,9 @@ function TotalWordsSlide({ count }: { count: number }) {
       <Text
         variant="body"
         sx={{
-          fontSize: [19.2, 24],
-          textAlign: "center"
+          fontSize: ["1.2rem", "1.5rem"],
+          textAlign: "center",
+          animation: "fadeIn 0.8s ease-out"
         }}
       >
         {strings.youWroteATotalOf()}
@@ -269,9 +301,10 @@ function TotalWordsSlide({ count }: { count: number }) {
       <Text
         variant="heading"
         sx={{
-          fontSize: [80, 112],
+          fontSize: ["5rem", "7rem"],
           textAlign: "center",
-          color: "accent"
+          color: "accent",
+          animation: "scaleIn 0.8s ease-out 0.2s both"
         }}
       >
         {formatNumber(count)}
@@ -279,8 +312,9 @@ function TotalWordsSlide({ count }: { count: number }) {
       <Text
         variant="body"
         sx={{
-          fontSize: [19.2, 24],
-          textAlign: "center"
+          fontSize: ["1.2rem", "1.5rem"],
+          textAlign: "center",
+          animation: "fadeIn 0.8s ease-out 0.4s both"
         }}
       >
         {strings.wordsThisYear()}
@@ -288,10 +322,11 @@ function TotalWordsSlide({ count }: { count: number }) {
       {tagline ? (
         <Text
           variant="body"
+          color="paragraph-secondary"
           sx={{
-            fontSize: [19.2, 19.2],
-            borderTop: "1px solid",
-            borderTopColor: "border",
+            fontSize: ["1.2rem", "1.2rem"],
+            animation: "fadeIn 0.8s ease-out",
+            borderTop: "1px solid var(--border)",
             mt: 3,
             pt: 3
           }}
@@ -315,13 +350,13 @@ function ActivityStatsSlide({
   if (!mostNotesCreatedInMonth && !mostNotesCreatedInDay) return null;
 
   return (
-    <Slide pattern="diagonal" sx={{ alignItems: "flex-start" }}>
+    <Slide pattern="diagonal" sx={{ alignItems: "start" }}>
       {mostNotesCreatedInMonth && (
         <>
           <Text
             variant="body"
             sx={{
-              fontSize: [19.2, 24]
+              fontSize: ["1.2rem", "1.5rem"]
             }}
           >
             {strings.yourMostProductiveMonthWas()}
@@ -336,14 +371,14 @@ function ActivityStatsSlide({
             <Text
               variant="heading"
               sx={{
-                fontSize: [80, 112, 48]
+                fontSize: ["5rem", "7rem", "3rem"]
               }}
             >
               {mostNotesCreatedInMonth.month}
             </Text>
             <Text
               variant="body"
-              sx={{ fontSize: 16 }}
+              sx={{ fontSize: "1rem" }}
               color="paragraph-secondary"
             >
               {strings.notes(mostNotesCreatedInMonth.count)}
@@ -356,7 +391,7 @@ function ActivityStatsSlide({
           <Text
             variant="body"
             sx={{
-              fontSize: [19.2, 24],
+              fontSize: ["1.2rem", "1.5rem"],
               mt: 5
             }}
           >
@@ -372,14 +407,14 @@ function ActivityStatsSlide({
             <Text
               variant="heading"
               sx={{
-                fontSize: [80, 112, 48]
+                fontSize: ["5rem", "7rem", "3rem"]
               }}
             >
               {mostNotesCreatedInDay.day}
             </Text>
             <Text
               variant="body"
-              sx={{ fontSize: 16 }}
+              sx={{ fontSize: "1rem" }}
               color="paragraph-secondary"
             >
               {strings.notes(mostNotesCreatedInDay.count)}
@@ -397,26 +432,34 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
       pattern="dots"
       sx={{
         bg: "background-secondary",
-        border: "1px solid",
-        borderColor: "accent",
+        border: "1px solid var(--accent)",
         borderRadius: "dialog",
-
+        boxShadow: "-15px 15px 0px 0px var(--accent)",
         p: 5
       }}
     >
-      <Flex sx={{ position: "absolute", bottom: 20, right: 20 }}>
-        <Logo size={20} />
-      </Flex>
+      <svg
+        style={{
+          height: 20,
+          width: 20,
+          position: "absolute",
+          bottom: "20px",
+          right: "20px"
+        }}
+      >
+        <use href="#themed-logo" />
+      </svg>
       <Text
         variant="heading"
         sx={{
-          fontSize: 19.2,
+          fontSize: "1.2rem",
           fontWeight: 800,
           textAlign: "center",
-
-          letterSpacing: -1,
-          mb: 25,
-          textDecorationLine: "underline"
+          transform: "skew(-10deg) scaleX(1.5)",
+          letterSpacing: "-1px",
+          mb: "25px",
+          textDecorationLine: "underline",
+          textDecorationColor: "border"
         }}
       >
         {strings.notesnookWrappedYear(new Date().getFullYear())}
@@ -424,7 +467,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
       <Flex
         sx={{
           flexDirection: ["column", "row"],
-          gap: 30,
+          gap: "30px",
           justifyContent: "center",
           alignItems: "center"
         }}
@@ -435,7 +478,15 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
             flex: 1
           }}
         >
-          <Grid columns={3} sx={{ gap: 4 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gridTemplateRows: "1fr 1fr",
+              gap: 4,
+              height: "100%"
+            }}
+          >
             {[
               {
                 icon: "📝",
@@ -477,64 +528,62 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
                   gap: 1
                 }}
               >
-                <Text sx={{ fontSize: 24 }}>{icon}</Text>
+                <Text sx={{ fontSize: "1.5rem" }}>{icon}</Text>
                 <Text
                   sx={{
-                    fontSize: 32,
+                    fontSize: "2rem",
                     fontWeight: "bold"
                   }}
                 >
                   {formatCount(count)}
                 </Text>
-                <Text sx={{ fontSize: 13.6, color: "paragraph-secondary" }}>
+                <Text sx={{ fontSize: "0.85rem", color: "fontTertiary" }}>
                   {label}
                 </Text>
               </Flex>
             ))}
-          </Grid>
+          </Box>
 
           <Flex
             sx={{
               flexDirection: "column",
               gap: 2,
-              borderTop: "1px solid",
-              borderTopColor: "border",
+              borderTop: "1px solid var(--border)",
               mt: 6,
-              pt: 3
+              pt: 3,
+              "& strong": {
+                color: "accent"
+              }
             }}
           >
-            <Text sx={{ fontSize: 16, fontWeight: "bold" }}>
+            <Text sx={{ fontSize: "1rem", fontWeight: "bold" }}>
               {strings.funFactsOfTheYear()}
             </Text>
             {stats.mostNotesCreatedInMonth && (
-              <Text sx={{ fontSize: 14.4, color: "paragraph-secondary" }}>
+              <Text sx={{ fontSize: "0.9rem", color: "fontTertiary" }}>
                 {"📅 "}
                 {strings.yourMostProductiveMonthWas()}{" "}
-                <Text sx={{ color: "accent", fontWeight: "bold" }}>
-                  {stats.mostNotesCreatedInMonth.month}
-                </Text>
+                <Text as="strong">{stats.mostNotesCreatedInMonth.month}</Text>
               </Text>
             )}
             {stats.mostNotesCreatedInDay && (
-              <Text sx={{ fontSize: 14.4, color: "paragraph-secondary" }}>
+              <Text sx={{ fontSize: "0.9rem", color: "fontTertiary" }}>
                 {"🗓️ "}
                 {strings.yourFavoriteDayToWriteWas()}{" "}
-                <Text sx={{ color: "accent", fontWeight: "bold" }}>
-                  {stats.mostNotesCreatedInDay.day}
-                </Text>
+                <Text as="strong">{stats.mostNotesCreatedInDay.day}</Text>
               </Text>
             )}
             {stats.largestNote && (
               <Text
                 sx={{
-                  fontSize: 14.4,
-                  color: "paragraph-secondary",
+                  fontSize: "0.9rem",
+                  color: "fontTertiary",
                   maxWidth: 340
                 }}
               >
                 {"📝 "}
                 {strings.yourLongestNoteWas()}{" "}
-                <Text sx={{ color: "accent", fontWeight: "bold" }}>
+                <Text as="strong">
                   {strings.wordsCount(stats.largestNote.length)}
                 </Text>
               </Text>
@@ -542,16 +591,14 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
             {stats.largestAttachment && (
               <Text
                 sx={{
-                  fontSize: 14.4,
-                  color: "paragraph-secondary",
+                  fontSize: "0.9rem",
+                  color: "fontTertiary",
                   maxWidth: 340
                 }}
               >
                 {"🔗 "}
                 {strings.yourLargestAttachmentWas()}{" "}
-                <Text sx={{ fontWeight: "bold" }}>
-                  {formatBytes(stats.largestAttachment.size)}
-                </Text>
+                <strong>{formatBytes(stats.largestAttachment.size)}</strong>
               </Text>
             )}
           </Flex>
@@ -560,7 +607,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
         <Flex
           sx={{
             flexDirection: "column",
-            justifyContent: "flex-start",
+            justifyContent: "stretch",
             height: "100%",
             flex: 1
           }}
@@ -572,17 +619,17 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
               alignItems: "center"
             }}
           >
-            <Text sx={{ fontSize: 40 }}>✍️</Text>
+            <Text sx={{ fontSize: "2.5rem" }}>✍️</Text>
             <Text
               sx={{
-                fontSize: 48,
+                fontSize: "3rem",
                 fontWeight: "bold",
                 color: "accent"
               }}
             >
               {formatNumber(stats.totalWords)}
             </Text>
-            <Text sx={{ fontSize: 16, color: "paragraph-secondary" }}>
+            <Text sx={{ fontSize: "1rem", color: "fontTertiary" }}>
               {strings.wordsWritten()}
             </Text>
           </Flex>
@@ -590,8 +637,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
           <Flex
             sx={{
               flexDirection: "column",
-              borderTop: "1px solid",
-              borderTopColor: "border",
+              borderTop: "1px solid var(--border)",
               mt: 6,
               pt: 2,
               flex: 1
@@ -600,8 +646,8 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
             <MonthlyActivityHeatmap monthlyStats={stats.monthlyStats} />
             <Text
               sx={{
-                fontSize: 16,
-                color: "paragraph-secondary",
+                fontSize: "1rem",
+                color: "fontTertiary",
                 textAlign: "center"
               }}
             >
@@ -612,7 +658,8 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
       </Flex>
       <Text
         variant="body"
-        sx={{ mt: 2, borderTop: "1px solid", borderTopColor: "border", pt: 2 }}
+        color="paragraph-secondary"
+        sx={{ mt: 2, borderTop: "1px solid var(--border)", pt: 2 }}
       >
         {strings.generatedLocallyOnDevice()}
       </Text>
@@ -628,7 +675,9 @@ export default function Wrapped() {
     async function loadWrapped() {
       setLoading(true);
       try {
+        console.time("wrapped - getting from core");
         const wrapped = await db.wrapped.get();
+        console.timeEnd("wrapped - getting from core");
         setStats(wrapped);
       } finally {
         setLoading(false);
@@ -638,8 +687,61 @@ export default function Wrapped() {
   }, []);
 
   return (
-    <Flex sx={{ flex: 1, bg: "background" }}>
-      <ScrollContainer>
+    <>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes scaleIn {
+            from {
+              opacity: 0;
+              transform: scale(0.8);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+
+        `}
+      </style>
+      <Flex
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          flexDirection: "column",
+          overflowY: "scroll",
+          overflowX: "hidden",
+          scrollSnapType: "y mandatory",
+          scrollBehavior: "smooth",
+          "&::-webkit-scrollbar": {
+            display: "none"
+          },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none"
+        }}
+      >
         <WelcomeSlide loading={loading} />
         {stats ? (
           <>
@@ -656,25 +758,23 @@ export default function Wrapped() {
             <SummarySlide stats={stats} />
           </>
         ) : null}
-      </ScrollContainer>
+      </Flex>
 
       <Button
         onClick={() => hardNavigate("/")}
         variant="secondary"
-        sx={{ position: "absolute", top: 3, left: 3, zIndex: 1000 }}
+        sx={{
+          position: "fixed",
+          top: 3,
+          left: 3,
+          zIndex: 1000
+        }}
       >
-        <Flex
-          sx={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 1,
-            justifyContent: "center"
-          }}
-        >
-          <ArrowLeft size={16} color="icon" />
+        <Flex sx={{ alignItems: "center", gap: 1, justifyContent: "center" }}>
+          <ArrowLeft size={16} />
           <Text variant="body">{strings.goBackToApp()}</Text>
         </Flex>
       </Button>
-    </Flex>
+    </>
   );
 }

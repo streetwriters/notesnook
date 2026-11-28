@@ -1017,11 +1017,6 @@
       "reason": "Native start-up sequence (database host, key store, locale) that runs before the app mounts on the GPUI host; web boots in root.tsx and index.ts."
     },
     {
-      "path": "views/wrapped.tsx",
-      "category": "platform",
-      "reason": "Web's Wrapped slides use CSS the desktop renderer cannot draw (rem font sizes, keyframe animations, gradient backgrounds, position: fixed, scroll snapping, '& strong' selectors), so the slides are rebuilt with kit sizes, static colours and an absolute overlay."
-    },
-    {
       "path": "components/route-container/index.tsx",
       "category": "platform",
       "reason": "Buttons stay disabled and the title waits until the native database host is ready, and the has-items flag is cached in Config so the header does not jump before the lists load; the search field drops web's CSS selector styles (placeholder colour, sibling opacity) the kit has no stylesheet for; route-title and route-action carry test ids for the e2e specs."

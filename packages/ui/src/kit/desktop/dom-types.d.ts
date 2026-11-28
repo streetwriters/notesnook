@@ -29,6 +29,23 @@ import type {
 } from "../contracts/elements";
 
 declare global {
+  /** The kit's polyfill (intersection-observer.ts), measured against the window. */
+  class IntersectionObserver {
+    constructor(
+      callback: (
+        entries: {
+          target: UIElement;
+          isIntersecting: boolean;
+          intersectionRatio: number;
+        }[],
+        observer: IntersectionObserver
+      ) => void,
+      options?: { threshold?: number | number[]; rootMargin?: string }
+    );
+    observe(target: UIElement): void;
+    unobserve(target: UIElement): void;
+    disconnect(): void;
+  }
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface HTMLElement extends UIElement {}
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

@@ -490,4 +490,39 @@ describe("CSS motion strings", () => {
       convertAnimation("notRegistered 1s", (frame) => frame)
     ).toBeUndefined();
   });
+
+  test("a background clipped to the text fills no box", () => {
+    const { style } = convertDeclarations({
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      fontSize: "6rem"
+    });
+    expect(style).not.toHaveProperty("experimental_backgroundImage");
+    expect(style).not.toHaveProperty("backgroundColor");
+    expect(style.fontSize).toBe(96);
+  });
+
+  test("a one-argument skew is a skew along x", () => {
+    expect(
+      convertDeclarations({ transform: "skew(-10deg) scaleX(1.5)" }).style
+        .transform
+    ).toBe("skewX(-10deg) scaleX(1.5)");
+    expect(
+      convertDeclarations({ transform: "skew(10deg, 5deg)" }).style.transform
+    ).toBe("skew(10deg, 5deg)");
+  });
+
+  test("only overflow scroll asks for a scrolling box", () => {
+    expect(convertDeclarations({ overflowY: "scroll" }).scrolls).toBe("y");
+    expect(convertDeclarations({ overflowX: "scroll" }).scrolls).toBe("x");
+    expect(
+      convertDeclarations({ overflowX: "scroll", overflowY: "scroll" }).scrolls
+    ).toBe("y");
+    expect(convertDeclarations({ overflow: "scroll" }).scrolls).toBe("y");
+    for (const value of ["auto", "hidden", "visible"])
+      expect(
+        convertDeclarations({ overflowY: value, overflow: value }).scrolls
+      ).toBeUndefined();
+  });
 });

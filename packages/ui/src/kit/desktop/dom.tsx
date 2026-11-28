@@ -56,6 +56,8 @@ import {
   Textarea
 } from "./primitives";
 import { Select } from "./select";
+import { resolveCssVars } from "./style/resolve";
+import { useThemeContext } from "./theme";
 
 type Props = Record<string, any>;
 type DomComponent = ComponentType<any>;
@@ -116,6 +118,7 @@ function Svg(props: Props) {
     if (typeof href === "string" && href.startsWith("#"))
       symbol ??= svgSymbols.get(href.slice(1));
   });
+  const { colors } = useThemeContext();
   if (!symbol) return null;
   const style: Props = props.style ?? {};
   const width = numberOf(style.width) ?? numberOf(props.width) ?? 24;
@@ -126,7 +129,11 @@ function Svg(props: Props) {
       style={{ ...style, width, height }}
       sx={props.sx}
     >
-      <SvgXml xml={symbol} width={width} height={height} />
+      <SvgXml
+        xml={resolveCssVars(symbol, colors)}
+        width={width}
+        height={height}
+      />
     </Box>
   );
 }

@@ -26,6 +26,12 @@ export type { Declarations };
 
 export interface ConvertedStyle {
   style: Record<string, unknown>;
+  /**
+   * The axis the element scrolls on: `overflow`, `overflowY` or `overflowX`
+   * is `scroll`, which the element asks for by name. `auto` only clips, as it
+   * always has on desktop: use the kit's ScrollContainer for those.
+   */
+  scrolls?: "x" | "y";
   numberOfLines?: number;
   selectable?: boolean;
   objectFit?: string;
@@ -287,6 +293,9 @@ export function convertDeclarations(
   let isFlex = false;
   let nowrap = false;
   let ellipsis = false;
+  const clipsToText =
+    declarations.WebkitBackgroundClip === "text" ||
+    declarations.backgroundClip === "text";
 
   for (const key in declarations) {
     let value = declarations[key];
@@ -339,6 +348,9 @@ export function convertDeclarations(
       case "backgroundImage":
         // Gradients are drawn; images (`url()`) are not.
         if (typeof value !== "string" || value === "none") continue;
+        // A background clipped to the text (a gradient as the text colour)
+        // cannot be drawn: the text keeps its own colour and no box is filled.
+        if (clipsToText) continue;
         if (GRADIENT.test(value)) style.experimental_backgroundImage = value;
         else if (key === "background" && !/url\(/.test(value))
           style.backgroundColor = value;
@@ -372,11 +384,21 @@ export function convertDeclarations(
       case "transition":
       case "animation":
         continue;
+      case "overflow":
+        if (value === "scroll") converted.scrolls ??= "y";
+        break;
       case "overflowX":
       case "overflowY":
+        if (value === "scroll")
+          converted.scrolls = key === "overflowY" ? "y" : converted.scrolls ?? "x";
         style.overflow =
           value === "auto" ? "scroll" : value === "unset" ? "visible" : value;
         continue;
+      case "transform":
+        // CSS's one-argument skew() is a skew along x.
+        if (typeof value === "string")
+          value = value.replace(/\bskew\(([^,)]+)\)/g, "skewX($1)");
+        break;
       case "inset":
         for (const side of ["top", "right", "bottom", "left"])
           for (const [, v] of convertValue(side, value)) style[side] = v;

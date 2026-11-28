@@ -36,6 +36,7 @@ import {
 import {
   Image as NativeImage,
   Pressable,
+  ScrollView,
   Text as NativeText,
   TextInput,
   View
@@ -82,6 +83,7 @@ import {
 } from "./style/use-styled";
 
 const AnyView = View as any;
+const AnyScrollView = ScrollView as any;
 
 function resolveLineHeight(style: Record<string, any>) {
   if (typeof style.lineHeight === "number" && style.lineHeight < 5)
@@ -220,6 +222,9 @@ function hasText(children: ReactNode): boolean {
   return Array.isArray(children) && children.some(hasText);
 }
 
+const SCROLL_CONTENT_KEYS =
+  /^(?:flexDirection|flexWrap|justifyContent|alignItems|alignContent|gap|rowGap|columnGap|padding(?:Top|Right|Bottom|Left)?)$/;
+
 function Container(
   props: Contract.BoxProps & {
     variantGroup?: "variants";
@@ -305,6 +310,29 @@ function Container(
   for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
   // Pressable things show the hand cursor unless the style says otherwise.
   if (onPress && style.cursor === undefined) style.cursor = "pointer";
+  if (resolved.scrolls) {
+    // `overflow: scroll` scrolls, as a DOM box does. The box's own layout of
+    // its children (direction, alignment, gap, padding) is the scrolled
+    // content's; flexGrow keeps the content at least as large as the box.
+    const content_: Record<string, unknown> = { flexGrow: 1 };
+    for (const key of Object.keys(style))
+      if (SCROLL_CONTENT_KEYS.test(key)) {
+        content_[key] = style[key];
+        delete style[key];
+      }
+    return (
+      <AnyScrollView
+        ref={setRef}
+        {...nativeProps}
+        horizontal={resolved.scrolls === "x"}
+        scrollEventThrottle={16}
+        style={style}
+        contentContainerStyle={content_}
+      >
+        {content}
+      </AnyScrollView>
+    );
+  }
   if (onPress)
     return (
       <PressableComponent

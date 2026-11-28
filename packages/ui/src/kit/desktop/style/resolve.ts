@@ -39,6 +39,8 @@ export interface ResolvedStyle {
   numberOfLines?: number;
   selectable?: boolean;
   objectFit?: "cover" | "contain" | "fill";
+  /** The axis an `overflow: scroll` element scrolls on. */
+  scrolls?: "x" | "y";
   hoverStyle?: Record<string, unknown>;
   activeStyle?: Record<string, unknown>;
   focusStyle?: Record<string, unknown>;
@@ -339,6 +341,7 @@ function compute(
     animated: motion.some(Boolean) ? true : undefined,
     numberOfLines: converted.numberOfLines,
     selectable: converted.selectable,
+    scrolls: converted.scrolls,
     objectFit: converted.objectFit as ResolvedStyle["objectFit"]
   };
   for (const state in states) {
