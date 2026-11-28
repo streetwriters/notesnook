@@ -12,7 +12,12 @@ module.exports = function (api) {
     overrides: [
       {
         include: path.join(__dirname, "src"),
-        plugins: [path.join(__dirname, "tools/babel-plugin-hoist-sx.js")]
+        plugins: [
+          path.join(__dirname, "tools/babel-plugin-hoist-sx.js"),
+          // Raw HTML tags (<strong>, <span>, <style>…) in files shared with
+          // apps/web are drawn with the desktop kit's elements.
+          path.join(__dirname, "tools/babel-plugin-dom-elements.js")
+        ]
       }
     ]
   };

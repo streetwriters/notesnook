@@ -464,3 +464,89 @@ describe("nested input styles", () => {
     });
   });
 });
+
+describe("raw HTML elements and nested selectors", () => {
+  it("a rule in a parent's sx styles the elements it names below it", async () => {
+    const { Dom } = await import("./dom");
+    render(
+      h(
+        Flex,
+        { sx: { "& strong": { color: "#ff0000" }, ".quiet": { opacity: 0.5 } } },
+        h(
+          Text,
+          { "data-test-id": "line" },
+          "Most notes in ",
+          h(Dom.strong, { "data-test-id": "month" }, "March"),
+          h(Dom.span, { "data-test-id": "plain", className: "quiet" }, "!")
+        ),
+        h(Text, { "data-test-id": "other" }, "untouched")
+      )
+    );
+    const style = (id: string) =>
+      root.root.findAll(
+        (node) =>
+          typeof node.type === "string" &&
+          (node.props.testID === id || node.props["data-test-id"] === id)
+      )[0].props.style;
+    expect(style("month").color).toBe("#ff0000");
+    // <strong> is bold on its own.
+    expect(Number(style("month").fontWeight)).toBeGreaterThanOrEqual(600);
+    expect(style("plain").fontWeight).not.toBe(style("month").fontWeight);
+    expect(style("plain")).toMatchObject({ opacity: 0.5 });
+    expect(style("plain").color).not.toBe("#ff0000");
+    expect(style("other").color).not.toBe("#ff0000");
+    expect(style("other").opacity).toBeUndefined();
+  });
+
+  it("a <style> element registers its keyframes and draws nothing", async () => {
+    const { Dom } = await import("./dom");
+    const { getKeyframes } = await import("../shared/style/css-motion");
+    render(
+      h(
+        Box,
+        null,
+        h(
+          Dom.style,
+          null,
+          "@keyframes domTestFade { from { opacity: 0; } to { opacity: 1; } }"
+        ),
+        h(Box, {
+          "data-test-id": "animated",
+          sx: { animation: "domTestFade 1s ease-out both" }
+        })
+      )
+    );
+    expect(getKeyframes("domTestFade")).toEqual({
+      from: { opacity: 0 },
+      to: { opacity: 1 }
+    });
+    const animated = root.root.findAll(
+      (node) =>
+        typeof node.type === "string" &&
+        (node.props.testID === "animated" ||
+          node.props["data-test-id"] === "animated")
+    )[0];
+    expect(animated.props.style).toMatchObject({
+      animationName: { from: { opacity: 0 }, to: { opacity: 1 } },
+      animationFillMode: "both"
+    });
+  });
+
+  it("an svg draws a registered symbol and nothing for an unknown one", async () => {
+    const { Dom, registerSvgSymbol } = await import("./dom");
+    registerSvgSymbol("dom-test-logo", "<svg viewBox='0 0 1 1'></svg>");
+    render(
+      h(
+        Box,
+        null,
+        h(Dom.svg, { style: { width: 20, height: 20 } }, h("use", { href: "#dom-test-logo" })),
+        h(Dom.svg, null, h("use", { href: "#not-registered" }))
+      )
+    );
+    const drawn = root.root.findAll(
+      (node) => typeof node.type === "string" && node.props.xml !== undefined
+    );
+    expect(drawn).toHaveLength(1);
+    expect(drawn[0].props).toMatchObject({ width: 20, height: 20 });
+  });
+});

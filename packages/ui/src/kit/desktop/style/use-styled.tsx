@@ -34,6 +34,7 @@ import { DragDrop } from "@react-native-gpui/core/desktop";
 import type { BaseProps, StyleProp, SxProp } from "../../contracts";
 import { toPickedFile } from "../picked-file";
 import { mergeShorthands } from "../../shared/style/shorthand";
+import { matchRules, type SelectorRule } from "../../shared/style/selectors";
 import { useThemeContext } from "../theme";
 import { setScrollCommand } from "../element";
 import { keyboardEvent, lastPointer } from "./events";
@@ -95,6 +96,31 @@ export interface StyledOptions {
   variantGroup?: "variants" | "text" | "buttons" | "forms";
   defaultVariant?: string;
   defaults?: SxProp;
+  /** The element's HTML tag on the web, for nested selectors; `as` wins. */
+  tag?: string;
+}
+
+/** The nested selector rules of the elements above (see selectors.ts). */
+const SelectorRules = createContext<readonly SelectorRule[] | undefined>(
+  undefined
+);
+
+/** Hands an element's nested selector rules to the kit elements below it. */
+export function SelectorScope(props: {
+  rules: SelectorRule[] | undefined;
+  children: ReactNode;
+}) {
+  const above = useContext(SelectorRules);
+  const rules = useMemo(
+    () => (props.rules ? [...(above ?? []), ...props.rules] : above),
+    [above, props.rules]
+  );
+  if (!props.rules) return <>{props.children}</>;
+  return (
+    <SelectorRules.Provider value={rules}>
+      {props.children}
+    </SelectorRules.Provider>
+  );
 }
 
 export interface StyledResult {
@@ -151,11 +177,20 @@ export function useStyled(
 ): StyledResult {
   const context = useThemeContext();
   const breakpoint = useBreakpoint();
+  const rules = useContext(SelectorRules);
+  let own = mergeShorthands(props, options.defaults, context.theme);
+  if (rules) {
+    // As in CSS, a rule from an element above wins over the element's own
+    // styles: `.parent strong` is more specific than the child's class.
+    const selected = matchRules(rules, {
+      tag: props.as ?? options.tag,
+      className: props.className,
+      id: props.id
+    });
+    if (selected) own = { ...own, ...selected } as SxProp;
+  }
   const sx = withDisabledStyle(
-    withInlineStyle(
-      mergeShorthands(props, options.defaults, context.theme),
-      props.style
-    ),
+    withInlineStyle(own, props.style),
     (props as { disabled?: boolean }).disabled
   );
   const resolved = resolveSx(sx, context, {

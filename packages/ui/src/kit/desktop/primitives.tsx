@@ -74,6 +74,7 @@ import { pressHandler, testIdOf } from "./style/native-props";
 import { resolveColor } from "./style/resolve";
 import {
   InheritedTextStyle,
+  SelectorScope,
   useInheritedTextStyle,
   useMergedTextStyle,
   useStyled,
@@ -229,7 +230,8 @@ function Container(
   const { children, defaults } = props;
   const { resolved, viewStyle, textStyle, nativeProps } = useStyled(props, {
     variantGroup: "variants",
-    defaults
+    defaults,
+    tag: "div"
   });
   const ViewComponent = resolved.animated ? AnimatedView : AnyView;
   const PressableComponent = resolved.animated
@@ -297,6 +299,8 @@ function Container(
         {content}
       </InputSxContext.Provider>
     );
+  if (resolved.rules)
+    content = <SelectorScope rules={resolved.rules}>{content}</SelectorScope>;
   const style = { ...viewStyle };
   for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
   // Pressable things show the hand cursor unless the style says otherwise.
@@ -376,7 +380,8 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
   const inherited = useInheritedTextStyle();
   const { resolved, viewStyle, nativeProps } = useStyled(props, {
     variantGroup: "text",
-    defaultVariant: "default"
+    defaultVariant: "default",
+    tag: "span"
   });
   const [setRef] = useElementRef(ref, { id: props.id });
   const clicks = useRef({ last: 0 });
@@ -393,6 +398,11 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
     clicks.current
   );
   const TextComponent = resolved.animated ? AnimatedText : AnyText;
+  const content = dangerouslySetInnerHTML
+    ? htmlToText(dangerouslySetInnerHTML.__html)
+    : hasLineBreak(props.children)
+    ? withLineBreaks(props.children)
+    : props.children;
   return (
     <TextComponent
       ref={setRef}
@@ -410,11 +420,11 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
       }
       onPress={onPress}
     >
-      {dangerouslySetInnerHTML
-        ? htmlToText(dangerouslySetInnerHTML.__html)
-        : hasLineBreak(props.children)
-        ? withLineBreaks(props.children)
-        : props.children}
+      {resolved.rules ? (
+        <SelectorScope rules={resolved.rules}>{content}</SelectorScope>
+      ) : (
+        content
+      )}
     </TextComponent>
   );
 });
@@ -425,6 +435,7 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
     const { resolved, viewStyle, textStyle, nativeProps } = useStyled(props, {
       variantGroup: "buttons",
       defaultVariant: "primary",
+      tag: "button",
       defaults: {
         display: "flex",
         alignItems: "center",
@@ -601,7 +612,8 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
     {
       variantGroup: "forms",
       defaultVariant: props.field,
-      defaults: { p: 2 }
+      defaults: { p: 2 },
+      tag: props.field
     }
   );
   const control = useControl();

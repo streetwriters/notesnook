@@ -31,6 +31,7 @@ import {
 } from "./convert";
 import { normalizeVariant } from "../../shared/style/variants";
 import { keyframesVersion } from "../../shared/style/css-motion";
+import { selectorRules, type SelectorRule } from "../../shared/style/selectors";
 
 export interface ResolvedStyle {
   style: Record<string, unknown>;
@@ -45,6 +46,8 @@ export interface ResolvedStyle {
   dragOverStyle?: Record<string, unknown>;
   groupHoverStyle?: { group: string; style: Record<string, unknown> };
   groupActiveStyle?: { group: string; style: Record<string, unknown> };
+  /** The nested selectors of the `sx`, for the kit elements below. */
+  rules?: SelectorRule[];
 }
 
 type VariantGroup = "variants" | "text" | "buttons" | "forms";
@@ -342,6 +345,8 @@ function compute(
     resolved[STATE_KEYS[state as keyof typeof STATE_KEYS]] =
       convertStateDeclarations(states[state as keyof typeof STATE_KEYS]!);
   }
+  const rules = selectorRules(own);
+  if (rules) resolved.rules = rules;
   const resolveGroup = (entry: { group: string; style: Declarations }) => ({
     group: entry.group,
     style: convertStateDeclarations(
