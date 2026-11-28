@@ -42,11 +42,6 @@
       "reason": "The password field's widest width is 400 where web writes max(30%, 400px): the desktop layout has no CSS min()/max(). Otherwise identical to web."
     },
     {
-      "path": "components/filtered-list/index.tsx",
-      "category": "platform",
-      "reason": "The filter input is styled through Field's styles.input where web reaches it with an `input` selector in sx: desktop has no stylesheet selectors. Otherwise identical to web."
-    },
-    {
       "path": "components/pdf-preview/index.tsx",
       "category": "platform",
       "reason": "Web draws PDFs with @react-pdf-viewer (DOM, canvas and its stylesheet); desktop draws them with the kit's PDF viewer over @react-native-gpui/pdf and saves, copies and prints through @platform files, shell and window services."
@@ -139,12 +134,7 @@
     {
       "path": "components/monthly-activity-heatmap/index.tsx",
       "category": "platform",
-      "reason": "Web shows each bar's tooltip with CSS child selectors (&:hover .tooltip, &:hover .bar) and CSS transition strings; desktop has no stylesheet selectors and uses the kit's hover state on each bar."
-    },
-    {
-      "path": "components/properties/toggle.tsx",
-      "category": "platform",
-      "reason": "Web sizes the switch's label with a `& label` selector; desktop has no stylesheet selectors and styles the label itself."
+      "reason": "Web shows each bar's tooltip with pseudo-class selectors (&:hover .tooltip, &:hover .bar); desktop matches no selector with a pseudo class and uses the kit's hover state on each bar."
     },
     {
       "path": "components/auth-container/index.tsx",
@@ -164,7 +154,7 @@
     {
       "path": "components/notebook-picker.tsx",
       "category": "platform",
-      "reason": "Web reveals each notebook's add button with CSS child selectors (&:hover .add-sub-notebook, &:focus-within) and styles the list with listStyle; desktop has no stylesheet selectors or list markers and uses the kit's group hover."
+      "reason": "Web reveals each notebook's add button with pseudo-class selectors (&:hover .add-sub-notebook, &:focus-within) and styles the list with listStyle; desktop matches no pseudo-class selectors and has no list markers, so it uses the kit's group hover."
     },
     {
       "path": "components/dialog/index.tsx",
@@ -314,7 +304,7 @@
     {
       "path": "dialogs/settings/index.tsx",
       "category": "platform",
-      "reason": "Web styles the settings rows through child selectors (& > *, & > label), reads inputs with document.getElementById and DOM element refs; desktop has no stylesheet or DOM."
+      "reason": "Web reads input values with document.getElementById and DOM element refs (HTMLInputElement) to save the settings fields; desktop's scoped document has no form inputs to look up, so the fields hold their values in state. The '& > *, & > label' row styles now draw on desktop."
     },
     {
       "path": "dialogs/command-palette/command-palette-dialog.tsx",
@@ -349,7 +339,7 @@
     {
       "path": "dialogs/settings/components/user-profile.tsx",
       "category": "platform",
-      "reason": "Web shows the edit button through a ':hover #profile-picture-edit' selector; desktop has no selectors and uses the kit's group hover."
+      "reason": "Web shows the edit button through a ':hover #profile-picture-edit' selector; desktop matches no selector with a pseudo class and uses the kit's group hover."
     },
     {
       "path": "dialogs/settings/components/themes-selector.tsx",
@@ -379,7 +369,7 @@
     {
       "path": "dialogs/buy-dialog/buy-dialog.tsx",
       "category": "platform",
-      "reason": "Web imports an SVG asset as a URL (rocket.svg?url), uses <span> and the IS_TESTING build global; desktop takes assets from the generated asset modules."
+      "reason": "Web imports an SVG asset as a URL (rocket.svg?url) and reads the IS_TESTING build global; desktop takes assets from the generated asset modules and has no build globals. (<span> now draws on desktop.)"
     },
     {
       "path": "dialogs/issue-dialog.tsx",
@@ -435,11 +425,6 @@
       "path": "dialogs/prompt.tsx",
       "category": "platform",
       "reason": "Web passes a DOM input ref to Field (inputRef, HTMLInputElement); desktop's Field has no inputRef."
-    },
-    {
-      "path": "dialogs/buy-dialog/upgrade-dialog.tsx",
-      "category": "platform",
-      "reason": "Web colours the icon through a '& path' selector and uses <strong>; desktop has no selectors and colours the icon directly."
     },
     {
       "path": "dialogs/settings/app-lock-settings.ts",
@@ -994,17 +979,17 @@
     {
       "path": "views/notebooks.tsx",
       "category": "platform",
-      "reason": "Web pads Virtuoso's viewport through a '[data-viewport-type=\"element\"]' selector with a calc() width; desktop has no selectors, so the padding is on the container."
+      "reason": "Web pads Virtuoso's viewport through an attribute selector ('[data-viewport-type=\"element\"]') with a calc() width; desktop matches no attribute selectors and has no calc(), so the padding is on the container."
     },
     {
       "path": "components/reminder/index.tsx",
       "category": "platform",
-      "reason": "Desktop has no class selectors, so web's ':hover .reminder-…' rules become the kit's :group-hover on the list-item group, for the checkbox colour and the icon backgrounds."
+      "reason": "Desktop matches no selector with a pseudo class (':hover .reminder-\u2026'), so those rules become the kit's :group-hover on the list-item group, for the checkbox colour and the icon backgrounds."
     },
     {
       "path": "components/note/index.tsx",
       "category": "platform",
-      "reason": "Platform services and kit colours: open-link, copy and print go through the shell, clipboard and environment services (print hidden where the host cannot print), and the note colour is a data colour with its alpha in the hex code because the kit has no alpha() from @theme-ui/color. The ':hover .note-chip' rule is dropped: desktop has no class selectors, and IconTag draws the chip hover itself."
+      "reason": "Platform services and kit colours: open-link, copy and print go through the shell, clipboard and environment services (print hidden where the host cannot print), and the note colour is a data colour with its alpha in the hex code because the kit has no alpha() from @theme-ui/color. The ':hover .note-chip' rule is dropped: desktop matches no pseudo-class selectors, and IconTag draws the chip hover itself."
     },
     {
       "path": "components/notebook/index.tsx",
@@ -1014,17 +999,17 @@
     {
       "path": "components/search-result/index.tsx",
       "category": "platform",
-      "reason": "Highlighted matches are kit Text with their own background, since the desktop kit has no <span> and no '.match' class selector; the rows give React keys (web leaves them out) and the expand button keeps the search-result-expand test id the e2e specs use."
+      "reason": "The rows give React keys (web leaves them out) and the expand button keeps the search-result-expand test id the e2e specs use; the highlighted matches are kit Text with their own background, kept until the e2e specs that read them are moved onto web's <span class=\"match\"> markup, which desktop now draws."
     },
     {
       "path": "components/trash-item/index.tsx",
       "category": "platform",
-      "reason": "Drops web's ':hover .trash-chip' rule: desktop has no class selectors, and IconTag draws the chip hover itself."
+      "reason": "Drops web's ':hover .trash-chip' rule: desktop matches no selector with a pseudo class, and IconTag draws the chip hover itself."
     },
     {
       "path": "views/tags.tsx",
       "category": "platform",
-      "reason": "The list placeholder is centred through ListContainer's placeholderSx (desktop has no '.list-container-placeholder' selector) and ListContainer takes no Scroller; the view keeps the tags test id the e2e specs use."
+      "reason": "ListContainer takes no Scroller (desktop scrolls natively) and its placeholder is centred through placeholderSx; the view keeps the tags test id the e2e specs use."
     },
     {
       "path": "components/notebook-header.tsx",

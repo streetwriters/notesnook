@@ -25,6 +25,7 @@ import {
   usePromise
 } from "@notesnook/common";
 import { DialogManager } from "../../common/dialog-manager";
+import BaseDialog from "../../components/dialog";
 import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { Button, Flex, Text } from "@notesnook/ui-kit";
 import { FeatureCaption } from "./feature-caption";
@@ -32,7 +33,7 @@ import { getAllPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import { formatRecurringPeriodShort } from "./plan-list";
 import { useCheckoutStore } from "./store";
 import { BuyDialog } from "./buy-dialog";
-import { ErrorText } from "../components/error-text";
+import { ErrorText } from "../../components/error-text";
 import { getCurrencySymbol } from "../../common/currencies";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { ChangePlanDialog } from "./change-plan-dialog";
@@ -40,7 +41,6 @@ import { Loading } from "../../components/icons";
 import { showToast } from "../../utils/toast";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { strings } from "@notesnook/intl";
-import Dialog from "../../components/dialog";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
@@ -74,7 +74,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
   ].map((id) => getFeature(id));
 
   return (
-    <Dialog
+    <BaseDialog
       testId="upgrade-dialog"
       title={strings.unlockFeatureToday()}
       description={strings.upgradePlanTo(metadata.title)}
@@ -99,8 +99,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             gap: 1,
             bg: "background-secondary",
             borderRadius: "dialog",
-            border: "1px solid",
-            borderColor: "border",
+            border: "1px solid var(--border)",
             p: 1,
             alignSelf: "stretch"
           }}
@@ -121,11 +120,21 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
               <Flex key={f.id} sx={{ justifyContent: "space-between" }}>
                 <Text
                   variant="body"
-                  sx={{ color: f.id === feature.id ? "accent" : "paragraph" }}
+                  color={f.id === feature.id ? "accent" : "paragraph"}
                 >
                   {f.title}
                 </Text>
-                <Text variant="body">
+                <Text
+                  variant="body"
+                  sx={{
+                    "& path": {
+                      fill:
+                        f.id === feature.id
+                          ? "var(--accent) !important"
+                          : "var(--paragraph-secondary) !important"
+                    }
+                  }}
+                >
                   <FeatureCaption caption={caption} />
                 </Text>
               </Flex>
@@ -133,7 +142,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           })}
         </Flex>
         <Text variant="body">
-          <Text sx={{ fontWeight: "bold" }}>{strings.cancelAnytime()}</Text>{" "}
+          <strong>{strings.cancelAnytime()}</strong>{" "}
           {strings.dayMoneyBackGuarantee(PERIOD_METADATA.yearly.refundDays)}
         </Text>
         {!subscription || subscription.plan === SubscriptionPlan.FREE ? (
@@ -155,14 +164,10 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
               }}
             >
               {plan ? (
-                <Text>
-                  {strings.upgradeToPlan(
-                    metadata.title,
-                    `${getCurrencySymbol(plan.currency)}${
-                      plan.price.gross
-                    }${formatRecurringPeriodShort(plan.period)}`
-                  )}
-                </Text>
+                strings.upgradeToPlan(
+                  metadata.title,
+                  `${getCurrencySymbol(plan.currency)}${plan.price.gross}${formatRecurringPeriodShort(plan.period)}`
+                )
               ) : (
                 <Loading size={16} color="accentForeground" />
               )}
@@ -196,13 +201,13 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             }}
           >
             {plan ? (
-              <Text>{strings.changePlan()}</Text>
+              <>{strings.changePlan()}</>
             ) : (
               <Loading size={16} color="accentForeground" />
             )}
           </Button>
         )}
       </Flex>
-    </Dialog>
+    </BaseDialog>
   );
 });

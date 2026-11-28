@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Switch, Text } from "@notesnook/ui-kit";
-import type { Icon } from "../icons";
+import { Flex, Text, Switch } from "@notesnook/ui-kit";
+import { Icon } from "../icons";
 
 type ToggleProps = {
   icon: Icon;
@@ -32,25 +32,25 @@ function Toggle(props: ToggleProps) {
 
   return (
     <Flex
-      data-test-id={props.testId}
-      onClick={() => onToggle(!isOn)}
       sx={{
-        flexDirection: "row",
         cursor: "pointer",
         alignItems: "center",
         justifyContent: "space-between",
         gap: "spacing4",
-        borderRadius: "radius2"
+        borderRadius: "radius2",
+        "& label": { width: "auto", flexShrink: 0 }
       }}
+      data-test-id={props.testId}
+      onClick={() => onToggle(!isOn)}
     >
       <Flex
-        data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
         sx={{
-          flexDirection: "row",
           alignItems: "center",
+          display: "flex",
           minWidth: 0,
           gap: "spacing4"
         }}
+        data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
       >
         <Flex
           sx={{
@@ -63,16 +63,28 @@ function Toggle(props: ToggleProps) {
             bg: "background-tertiary"
           }}
         >
-          <ToggleIcon size={15} color="icon" />
+          <ToggleIcon size={15} />
         </Flex>
-        <Text sx={{ lineClamp: 1, color: "heading", fontSize: "xs" }}>
+        <Text
+          sx={{
+            color: "heading",
+            fontSize: "xs",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap"
+          }}
+        >
           {label}
         </Text>
       </Flex>
       <Switch
+        sx={{
+          m: 0,
+          bg: isOn ? "accent" : "icon-disabled",
+          flexShrink: 0
+        }}
         checked={isOn}
-        onChange={(e) => onToggle(e.target.checked)}
-        sx={{ m: 0, bg: isOn ? "accent" : "icon-disabled", flexShrink: 0 }}
+        onClick={(e) => e.stopPropagation()}
       />
     </Flex>
   );

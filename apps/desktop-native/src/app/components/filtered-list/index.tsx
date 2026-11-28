@@ -20,9 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useRef, useState } from "react";
 import Field from "../field";
 import { Close, Plus, SearchIcon } from "../icons";
+import { Button, Text } from "@notesnook/ui-kit";
 import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
 import { strings } from "@notesnook/intl";
-import { Button, Text, useThemeUI } from "@notesnook/ui-kit";
+import { Box, useThemeUI } from "@notesnook/ui-kit";
 
 type FilteredListProps<T> = {
   placeholders: { filter: string; empty: string; emptyList: string };
@@ -61,8 +62,8 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         inputRef={inputRef}
         data-test-id={"filter-input"}
         autoFocus
-        sx={{ mb: "spacing7" }}
-        styles={{
+        sx={{
+          mb: "spacing7",
           input: {
             pl: "spacing10",
             py: "spacing6",
