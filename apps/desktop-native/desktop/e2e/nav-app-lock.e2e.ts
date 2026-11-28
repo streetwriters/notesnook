@@ -6,6 +6,7 @@ import {
   count,
   expectClosed,
   expectDialog,
+  clickSettingControl,
   openSettings,
   settle,
   start,
@@ -45,7 +46,7 @@ describe("app lock with the soft authenticator", () => {
   });
 
   test("registering a security key asks for the app lock password then the key PIN", async () => {
-    await clickId(app, "setting-security-key-button-0");
+    await clickSettingControl(app, "security-key");
     await typeInto(app, "password", PASSWORD);
     await clickId(app, "dialog-yes");
     await settle(async () => expect(await count(app, "pin")).toBe(1));
@@ -56,7 +57,7 @@ describe("app lock with the soft authenticator", () => {
 
   test("a wrong PIN shows the retries message and closes the PIN dialog", async () => {
     app.allowErrors(/ERR_WEBAUTHN_PIN_INVALID/u);
-    await clickId(app, "setting-security-key-button-0");
+    await clickSettingControl(app, "security-key");
     await typeInto(app, "pin", "0000");
     await clickId(app, "dialog-yes");
     await settle(async () =>
@@ -68,7 +69,7 @@ describe("app lock with the soft authenticator", () => {
   });
 
   test("locking the app shows the unlock view and the PIN unlocks it", async () => {
-    await clickId(app, "setting-security-key-button-0");
+    await clickSettingControl(app, "security-key");
     await typeInto(app, "pin", PIN);
     await clickId(app, "dialog-yes");
     await expectClosed(app, "password-dialog");

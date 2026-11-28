@@ -6,6 +6,8 @@ import {
   closeWithEscape,
   count,
   expectSettings,
+  clickSettingControl,
+  settingControl,
   openSettings,
   settle,
   start
@@ -32,7 +34,7 @@ describe.each(dataSections)("$title section", (section) => {
 
 test("the vault section opens the create vault password dialog", async () => {
   await chooseSection(app, "Vault");
-  await clickId(app, "setting-create-vault-button-0");
+  await clickSettingControl(app, "create-vault");
   await settle(async () => expect(await count(app, "password-dialog")).toBe(1));
   await app.press("escape");
   await settle(async () => expect(await count(app, "password-dialog")).toBe(0));
@@ -41,19 +43,13 @@ test("the vault section opens the create vault password dialog", async () => {
 test("the privacy toggle flips its checked state", async () => {
   await chooseSection(app, "Privacy");
   await expectSettings(app, ["hide-note-title"]);
-  const before = await app.query(
-    "testID",
-    "setting-hide-note-title-toggle-0",
-    true
-  );
-  expect(before.length).toBe(1);
-  await clickId(app, "setting-hide-note-title-toggle-0");
+  const before = (await settingControl(app, "hide-note-title")).state.checked;
+  expect(typeof before).toBe("boolean");
+  await clickSettingControl(app, "hide-note-title");
   await settle(async () =>
-    expect(
-      (
-        await app.query("testID", "setting-hide-note-title-toggle-0", true)
-      ).length
-    ).toBe(1)
+    expect((await settingControl(app, "hide-note-title")).state.checked).toBe(
+      !before
+    )
   );
 });
 

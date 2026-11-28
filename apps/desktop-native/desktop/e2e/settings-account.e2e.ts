@@ -6,6 +6,7 @@ import {
   closeWithEscape,
   count,
   expectSettings,
+  clickSettingControl,
   openSettings,
   settle,
   start
@@ -32,7 +33,7 @@ describe.each(accountSections)("$title section", (section) => {
 
 test("the profile section opens the confirm dialog for deleting local data", async () => {
   await chooseSection(app, "Profile");
-  await clickId(app, "setting-delete-data-for-not-logged-in-user-button-0");
+  await clickSettingControl(app, "delete-data-for-not-logged-in-user");
   await settle(async () => expect(await count(app, "confirm-dialog")).toBe(1));
   await clickId(app, "dialog-no");
   await settle(async () => expect(await count(app, "confirm-dialog")).toBe(0));

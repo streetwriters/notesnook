@@ -6,6 +6,7 @@ import {
   closeWithEscape,
   count,
   expectSettings,
+  clickSettingControl,
   openSettings,
   settle,
   start
@@ -32,7 +33,7 @@ describe.each(otherSections)("$title section", (section) => {
 
 test("the support section opens the report an issue dialog", async () => {
   await chooseSection(app, "Help and support");
-  await clickId(app, "setting-report-issue-button-0");
+  await clickSettingControl(app, "report-issue");
   await settle(async () =>
     expect(await count(app, "dialog")).toBeGreaterThan(0)
   );

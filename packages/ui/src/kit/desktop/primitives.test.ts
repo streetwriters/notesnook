@@ -84,6 +84,9 @@ vi.mock("./menu", () => ({
     return null;
   }
 }));
+// The raw HTML cases load dom.tsx, which imports the colour picker and so its
+// native wheel. No case here draws a colour input, so the picker is not loaded.
+vi.mock("./color-picker", () => ({ ColorPicker: () => null }));
 
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
 

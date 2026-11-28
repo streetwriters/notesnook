@@ -2,7 +2,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, vi } from "vitest";
-import { type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp, type Match } from "@react-native-gpui/testing";
 import { launchApp, waitForShellContent } from "./launch";
 
 const NOW = Date.now();
@@ -195,7 +195,36 @@ export async function openCommandPalette(app: DesktopApp) {
 export async function openSettings(app: DesktopApp) {
   await clickId(app, "profile-dropdown");
   await clickId(app, "menu-button-settings");
-  await expectDialog(app, "settings-dialog");
+  await expectDialog(app, "settings-navigation-menu");
+}
+
+/**
+ * The nth button or switch drawn in a settings row (`setting-<key>`), in
+ * reading order. A dropdown's trigger is a button too. Web's settings draw no
+ * ids on their controls, so they are found by role inside the row.
+ */
+export async function settingControl(app: DesktopApp, key: string, nth = 0) {
+  let control: Match | undefined;
+  await settle(async () => {
+    const [row] = await app.query("testID", `setting-${key}`, true);
+    expect(row).toBeDefined();
+    const controls = [
+      ...(await app.query("role", "button", true, undefined, row.tag)),
+      ...(await app.query("role", "switch", true, undefined, row.tag))
+    ].sort((a, b) => a.frame.y - b.frame.y || a.frame.x - b.frame.x);
+    control = controls[nth];
+    expect(control).toBeDefined();
+  });
+  return control as Match;
+}
+
+export async function clickSettingControl(
+  app: DesktopApp,
+  key: string,
+  nth = 0
+) {
+  const control = await settingControl(app, key, nth);
+  await app.click(control.tag);
 }
 
 export async function chooseSection(app: DesktopApp, title: string) {

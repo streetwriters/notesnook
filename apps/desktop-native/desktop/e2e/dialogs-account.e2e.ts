@@ -9,6 +9,7 @@ import {
   count,
   expectClosed,
   expectDialog,
+  clickSettingControl,
   openSettings,
   settle,
   start,
@@ -35,7 +36,7 @@ afterAll(async () => {
 describe("password dialog (create vault)", () => {
   test("opens from the vault settings with a password field and buttons", async () => {
     await chooseSection(app, "Vault");
-    await clickId(app, "setting-create-vault-button-0");
+    await clickSettingControl(app, "create-vault");
     await expectDialog(app, "password-dialog");
     expect(await count(app, "password")).toBeGreaterThan(0);
     expect(await count(app, "dialog-yes")).toBe(1);
@@ -48,7 +49,7 @@ describe("password dialog (create vault)", () => {
   });
 
   test("submitting a password creates the vault", async () => {
-    await clickId(app, "setting-create-vault-button-0");
+    await clickSettingControl(app, "create-vault");
     await expectDialog(app, "password-dialog");
     await typeInto(app, "password", "correct horse battery");
     await clickId(app, "dialog-yes");
@@ -62,7 +63,7 @@ describe("password dialog (create vault)", () => {
 describe("confirm dialog (delete local data)", () => {
   test("opens with a title, message and both buttons", async () => {
     await chooseSection(app, "Profile");
-    await clickId(app, "setting-delete-data-for-not-logged-in-user-button-0");
+    await clickSettingControl(app, "delete-data-for-not-logged-in-user");
     await expectDialog(app, "confirm-dialog");
     expect(await count(app, "dialog-yes")).toBe(1);
     expect(await count(app, "dialog-no")).toBe(1);
@@ -78,7 +79,7 @@ describe("confirm dialog (delete local data)", () => {
 describe("progress and prompt dialogs", () => {
   test("backup creation shows no stuck progress dialog afterwards", async () => {
     await chooseSection(app, "Backup & export");
-    await clickId(app, "setting-create-backup-dropdown-0");
+    await clickSettingControl(app, "create-backup");
     await clickMenu(app, "partial");
     await settle(async () =>
       expect(readdirSync(backupDirectory).length).toBeGreaterThan(0)

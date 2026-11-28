@@ -39,6 +39,8 @@ import {
   type ReactNode
 } from "react";
 import { SvgXml } from "react-native-svg";
+import type { InputProps } from "../contracts/primitives";
+import type { UIInputElement } from "../contracts/elements";
 import type { SxProp } from "../contracts/style";
 import { registerStylesheet } from "../shared/style/css-motion";
 import { activeElement, getElementById } from "./element";
@@ -54,8 +56,10 @@ import {
   Link,
   Radio,
   Text,
-  Textarea
+  Textarea,
+  useColorField
 } from "./primitives";
+import { ColorPicker } from "./color-picker";
 import { Select } from "./select";
 import { resolveCssVars } from "./style/resolve";
 import { useThemeContext } from "./theme";
@@ -167,11 +171,30 @@ function Style(props: { children?: ReactNode }) {
   return null;
 }
 
-/** `<input>`: a checkbox, a radio or a text field, by its `type`. */
+/**
+ * `<input type="color">`: the kit's colour picker. Mapped here, not left to
+ * `Input`'s colour field, which loads the picker with a require because the
+ * picker imports the primitives. Nothing imports this file back, so it can
+ * import the picker directly.
+ */
+const ColorInput = forwardRef<UIInputElement, Props>(function ColorInput(
+  props,
+  ref
+) {
+  return (
+    <ColorPicker
+      {...useColorField(props as unknown as InputProps, ref)}
+    />
+  );
+});
+
+/** `<input>`: a checkbox, a radio, a colour picker or a text field, by its `type`. */
 const InputElement = forwardRef<unknown, Props>(function InputElement(
   props,
   ref
 ) {
+  if (props.type === "color")
+    return <ColorInput {...props} ref={ref as never} />;
   const Component: DomComponent =
     props.type === "checkbox" ? Checkbox : props.type === "radio" ? Radio : Input;
   return createElement(Component, { ...props, ref });

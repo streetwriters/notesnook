@@ -790,31 +790,43 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
   );
 });
 
+/**
+ * The picker of a colour input, as web's `<input type="color">` gives it: its
+ * `ref`, `value` and `onChange`. A write to `ref.current.value` redraws it.
+ */
+export function useColorField(
+  props: Contract.InputProps,
+  ref: ForwardedRef<UIInputElement>
+) {
+  const [own, setOwn] = useState(String(props.defaultValue ?? "#000000"));
+  const value = props.value === undefined ? own : String(props.value);
+  const control = useControl();
+  control.value = value;
+  control.setValue = (text) => {
+    if (props.value === undefined) setOwn(text);
+  };
+  const [setRef, element] = useControlRef(ref, control);
+  return {
+    ref: setRef,
+    "data-test-id": testIdOf(props),
+    sx: props.sx,
+    value,
+    onChange: (color: string) => {
+      control.value = color;
+      if (props.value === undefined) setOwn(color);
+      props.onChange?.(changeEvent(element.current));
+    }
+  };
+}
+
 const ColorField = forwardRef<UIInputElement, Contract.InputProps>(
   function ColorField(props, ref) {
-    const [own, setOwn] = useState(String(props.defaultValue ?? "#000000"));
-    const value = props.value === undefined ? own : String(props.value);
-    const control = useControl();
-    control.value = value;
-    const [setRef, element] = useControlRef(ref, control);
     // Required when drawn: the colour picker is built from these primitives.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { ColorPicker } = require("./color-picker") as {
       ColorPicker: typeof Contract.ColorPicker;
     };
-    return (
-      <ColorPicker
-        ref={setRef}
-        data-test-id={testIdOf(props)}
-        sx={props.sx}
-        value={value}
-        onChange={(color) => {
-          control.value = color;
-          if (props.value === undefined) setOwn(color);
-          props.onChange?.(changeEvent(element.current));
-        }}
-      />
-    );
+    return <ColorPicker {...useColorField(props, ref)} />;
   }
 );
 
