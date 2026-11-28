@@ -11,7 +11,7 @@ const { chromium } = createRequire(path.join(webDir, "package.json"))(
 );
 
 const [scenarioName, scheme, outDir, seedFile] = process.argv.slice(2);
-const baseUrl = process.env.WEB_URL ?? "http://localhost:5183/";
+const baseUrl = process.env.WEB_URL ?? "http://localhost:5190/";
 const scenario = scenarios[scenarioName];
 const seed = JSON.parse(fs.readFileSync(seedFile, "utf8"));
 fs.mkdirSync(outDir, { recursive: true });

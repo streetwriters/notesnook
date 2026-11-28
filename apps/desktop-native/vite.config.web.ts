@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import react from "@vitejs/plugin-react";
+import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
 
@@ -129,6 +130,19 @@ function intlStaticLocales(): Plugin {
   };
 }
 
+// Shared dialogs import `window` from dialogs/desktop-bridge so their code stays
+// web's. In a .tsx file that binding shadows the global in React Refresh's
+// per-module wrapper (`window.$RefreshReg$`), which then throws "can't detect
+// preamble" and the dev app never renders. Those files go without fast refresh.
+const BRIDGE_WINDOW_IMPORT =
+  /import\s*\{[^}]*\bwindow\b[^}]*\}\s*from\s*["'][^"']*\/desktop-bridge["']/;
+function filesShadowingWindow(appDir: string): string[] {
+  return (fs.readdirSync(appDir, { recursive: true }) as string[])
+    .filter((file) => /\.[jt]sx$/.test(file))
+    .map((file) => path.join(appDir, file))
+    .filter((file) => BRIDGE_WINDOW_IMPORT.test(fs.readFileSync(file, "utf8")));
+}
+
 function noDesktopFallback(): Plugin {
   return {
     name: "nn-no-desktop-fallback",
@@ -160,7 +174,7 @@ export default defineConfig({
     sharedWebAppDependencies(),
     intlStaticLocales(),
     noDesktopFallback(),
-    react()
+    react({ exclude: [/node_modules/, ...filesShadowingWindow(path.join(root, "src/app"))] })
   ],
   define: {
     __DEV__: JSON.stringify(process.env.NODE_ENV !== "production"),

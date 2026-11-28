@@ -85,6 +85,8 @@ The web target (`src/targets/web`) implements the same `@notesnook/ui-kit` and `
 
 Vite resolves `@notesnook/ui-kit` and `@platform` only to `src/targets/web`. Importing anything that resolves into `src/targets/desktop` fails the build, and `@react-native-gpui/*` and `react-native` imports become a stub that throws "... is not implemented on web" when used.
 
+The visual parity tools (`tools/parity`, `node tools/parity/run.mjs <scenario> [scheme]`) capture the web side from this dev server (`WEB_URL`, default `http://localhost:5190/`) and seed it through its source modules, so start `npm run web` first. Shared `.tsx` files that import `window` from `dialogs/desktop-bridge` are left out of React Refresh in `vite.config.web.ts`: that import shadows the global the refresh wrapper reads, and the dev app would not render.
+
 What works: layout, navigation, theming, dialogs and popovers, lists, the local database (shared with `apps/web`'s wa-sqlite dialect), crypto (`globalThis.crypto`, sodium wasm), config and key-value storage (localStorage), clipboard, file pick and download, window title and fullscreen.
 
 What is stubbed or limited:
