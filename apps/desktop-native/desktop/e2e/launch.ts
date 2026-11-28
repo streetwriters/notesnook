@@ -40,6 +40,19 @@ afterAll(async () => {
 });
 let counter = 0;
 
+/**
+ * Two lists in web's code, copied as is, render children without a `key`, so
+ * React warns once per app: the settings dialog maps each setting's controls
+ * with no key (dialogs/settings/index.tsx), and Field keys its actions by
+ * `testId`, which route-container's hamburger action leaves out
+ * (components/field/index.tsx). Desktop must keep web's files, so the fix waits
+ * for web (follow-up "Give the settings dialog's control list keys in web").
+ * Only the key warning from those three owners is let through; any other key
+ * warning still fails the test.
+ */
+const WEB_SETTINGS_KEY_WARNING =
+  /unique "key" prop.*It was passed a child from (SettingsDialog|SettingItem|ForwardRef\(Field\))\./u;
+
 const slug = (value: string) => value.replace(/[^a-z0-9]+/gi, "-").slice(0, 80);
 
 export async function launchApp(options: Options): Promise<DesktopApp> {
@@ -54,6 +67,7 @@ export async function launchApp(options: Options): Promise<DesktopApp> {
     initialProps: { disableNetwork: true, ...options.initialProps },
     logFile
   });
+  app.allowErrors(WEB_SETTINGS_KEY_WARNING);
   running.add(app);
   mkdirSync(pidDir, { recursive: true });
   writeFileSync(pidFile(app), "");

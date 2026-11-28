@@ -29,8 +29,14 @@ export async function start(
       RN_GPUI_APP_DATA_DIR: mkdtempSync(path.join(tmpdir(), "notesnook-e2e-"))
     }
   });
+  // A locked app draws the unlock screen instead of `app`; callers that start
+  // locked pass `waitForShell = false` and unlock first.
+  const ready = waitForShell ? ["app"] : ["app", "app-lock-password"];
   await vi.waitFor(
-    async () => expect(await app.getByTestId("app").count()).toBeGreaterThan(0),
+    async () => {
+      const counts = await Promise.all(ready.map((id) => count(app, id)));
+      expect(Math.max(...counts)).toBeGreaterThan(0);
+    },
     { timeout: 90000, interval: 500 }
   );
   if (waitForShell) await waitForShellContent(app);

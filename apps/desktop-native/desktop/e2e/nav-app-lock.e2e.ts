@@ -32,7 +32,9 @@ beforeAll(async () => {
   await waitForShellContent(app);
   await openSettings(app);
   await chooseSection(app, "App lock");
-});
+  // Launch, unlock and two settings steps take longer than the default hook
+  // timeout on a debug build.
+}, 180000);
 
 afterAll(async () => {
   await app.close();
