@@ -17,21 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Fragment } from "react";
+import { IS_DESKTOP_APP } from "./desktop-bridge";
 import { formatKey, getGroupedKeybindings } from "@notesnook/common";
 import { Flex, Text } from "@notesnook/ui-kit";
-import { environment } from "@platform";
-import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { DialogManager } from "../common/dialog-manager";
+import Dialog from "../components/dialog";
 import { isMac } from "../utils/platform";
 import { strings } from "@notesnook/intl";
-import Dialog from "../components/dialog";
 
 export const KeyboardShortcutsDialog = DialogManager.register(
-  function KeyboardShortcutsDialog(props: BaseDialogProps<boolean>) {
-    const groupedKeybindings = getGroupedKeybindings(
-      environment.isDesktopApp,
-      isMac()
-    );
+  function KeyboardShortcutsDialog(props) {
+    const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP, isMac());
+
     return (
       <Dialog
         isOpen={true}
@@ -39,15 +36,21 @@ export const KeyboardShortcutsDialog = DialogManager.register(
         width={750}
         onClose={() => props.onClose(false)}
       >
-        <Flex sx={{ flexDirection: "column", mt: 2, gap: 1 }}>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            mt: 2,
+            gap: 1
+          }}
+        >
           {groupedKeybindings.map((group) => {
             return (
               <Flex key={group.category} sx={{ flexDirection: "column" }}>
                 <Text
                   variant="subtitle"
                   sx={{
-                    borderBottom: "1px solid",
-                    borderBottomColor: "border",
+                    borderBottom: "1px solid var(--border)",
                     mb: 1,
                     pb: 1
                   }}
@@ -80,30 +83,31 @@ export const KeyboardShortcutsDialog = DialogManager.register(
 
 function Keys({ keys }: { keys: string[] }) {
   return (
-    <Flex sx={{ gap: 1, flexDirection: "row", alignItems: "center" }}>
+    <Flex sx={{ gap: 1 }}>
       {keys.map((key, index) => (
-        <Fragment key={key}>
+        <>
           {key.split(" ").map((k) => (
             <Text
               key={k}
+              as="code"
               sx={{
                 bg: "background",
                 color: "paragraph",
                 px: 1,
                 borderRadius: 5,
-                fontFamily: "monospace",
                 fontSize: "body",
-                border: "1px solid",
-                borderColor: "border"
+                border: "1px solid var(--border)"
               }}
             >
               {formatKey(k, isMac())}
             </Text>
           ))}
           {keys.length - 1 !== index && (
-            <Text sx={{ fontSize: "subBody" }}>/</Text>
+            <Text as="span" sx={{ fontSize: "0.8em" }}>
+              /
+            </Text>
           )}
-        </Fragment>
+        </>
       ))}
     </Flex>
   );

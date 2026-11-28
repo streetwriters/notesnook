@@ -17,18 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
+import { IS_DESKTOP_APP } from "./desktop-bridge";
 import { EVENTS } from "@notesnook/core";
-import { Flex, Text } from "@notesnook/ui-kit";
-import { environment } from "@platform";
+import { Text } from "@notesnook/ui-kit";
+import { useCallback, useEffect, useState } from "react";
 import { createBackup } from "../common";
 import { db } from "../common/db";
 import { TaskManager } from "../common/task-manager";
+import Dialog from "../components/dialog";
+import { ErrorText } from "../components/error-text";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { ErrorText } from "../components/error-text";
-import { LinkText } from "./components/link-text";
-import Dialog from "../components/dialog";
 
 type MigrationProgressEvent = {
   collection: string;
@@ -45,7 +44,9 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
 
   const startMigration = useCallback(async () => {
     setIsProcessing(true);
+
     await createBackup();
+
     await TaskManager.startTask({
       type: "modal",
       title: strings.applyingChanges(),
@@ -64,6 +65,7 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
         task({ text: strings.processing() });
         try {
           await db.migrations.migrate();
+
           props.onClose(true);
         } catch (e) {
           console.error(e);
@@ -74,7 +76,7 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
   }, [props]);
 
   useEffect(() => {
-    if (environment.isDesktopApp) {
+    if (IS_DESKTOP_APP) {
       (async () => {
         await startMigration();
       })();
@@ -92,22 +94,26 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
           onClick: startMigration
         }}
       >
-        <ErrorText error={error} sx={{ borderRadius: "default" }} />
-        <Text variant="subBody" sx={{ mt: 2 }}>
+        <ErrorText
+          error={error}
+          as="p"
+          sx={{
+            borderRadius: "default",
+            wordWrap: "normal",
+            overflowWrap: "break-word"
+          }}
+        />
+        <Text as="p" variant={"subBody"} sx={{ mt: 2 }}>
           {strings.migrationErrorNotice()[0]}{" "}
-          <LinkText href="https://discord.com/invite/zQBK97EE22">
-            Discord
-          </LinkText>{" "}
+          <a href="https://discord.com/invite/zQBK97EE22">Discord</a>{" "}
           {strings.migrationErrorNotice()[1]}{" "}
-          <LinkText href="mailto:support@streetwriters.co">
-            support@streetwriters.co
-          </LinkText>
+          <a href="mailto:support@streetwriters.co">support@streetwriters.co</a>
         </Text>
       </Dialog>
     );
   }
 
-  if (environment.isDesktopApp || isProcessing) return null;
+  if (IS_DESKTOP_APP || isProcessing) return null;
 
   return (
     <Dialog
@@ -120,9 +126,9 @@ export const MigrationDialog = DialogManager.register(function MigrationDialog(
         onClick: startMigration
       }}
     >
-      <Flex>
-        <Text variant="body">{strings.migrationSaveBackupDesc()}</Text>
-      </Flex>
+      <Text as="p" variant={"body"}>
+        {strings.migrationSaveBackupDesc()}
+      </Text>
     </Dialog>
   );
 });

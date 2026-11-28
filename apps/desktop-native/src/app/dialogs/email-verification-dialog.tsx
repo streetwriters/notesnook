@@ -99,6 +99,7 @@ export const EmailVerificationDialog = DialogManager.register(
       >
         <Flex sx={{ flexDirection: "column" }}>
           <Text
+            as="span"
             variant="body"
             sx={{ borderRadius: "default", alignSelf: "stretch" }}
           >
@@ -109,15 +110,13 @@ export const EmailVerificationDialog = DialogManager.register(
             title={strings.confirmEmailTroubleshoot()}
             sx={{
               mt: 2,
-              bg: "background-secondary",
+              bg: "var(--background-secondary)",
               borderRadius: "default"
             }}
           >
-            <Text variant="body" sx={{ px: 1, pb: 1 }}>
+            <Text variant={"body"} px={1} pb={1}>
               {strings.confirmEmailTroubleshootNotice()[0]}{" "}
-              <Text sx={{ fontWeight: "bold" }}>
-                {strings.confirmEmailTroubleshootNotice()[1]}
-              </Text>{" "}
+              <b>{strings.confirmEmailTroubleshootNotice()[1]}</b>{" "}
               {strings.confirmEmailTroubleshootNotice()[2]}.
             </Text>
           </Accordion>

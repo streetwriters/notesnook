@@ -17,17 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
-import {
-  Checkbox,
-  Flex,
-  Input,
-  ScrollContainer,
-  Text
-} from "@notesnook/ui-kit";
-import { deleteItem } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
 import { Language, useSpellChecker } from "../../../hooks/use-spell-checker";
+import { Input, Label } from "@notesnook/ui-kit";
+import { useCallback, useEffect, useState } from "react";
+import { deleteItem } from "@notesnook/core";
+import { FlexScrollContainer } from "../../../components/scroll-container";
+import { strings } from "@notesnook/intl";
 
 export function SpellCheckerLanguages() {
   const spellChecker = useSpellChecker();
@@ -56,38 +51,38 @@ export function SpellCheckerLanguages() {
   );
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
+    <>
       <Input
         placeholder={strings.filterLanguages()}
-        sx={{ mx: "2px", my: 2 }}
-        onChange={({ target: { value: text } }) =>
-          filter(text.toLowerCase().trim())
-        }
+        sx={{ mx: "2px", my: 2, width: "auto" }}
+        onChange={(e) => filter(e.currentTarget.value.toLowerCase().trim())}
       />
-      <ScrollContainer sx={{ maxHeight: 400 }}>
-        <Flex sx={{ flexDirection: "column" }}>
-          {languages.map((lang) => (
-            <Flex
-              key={lang.code}
-              sx={{ flexDirection: "row", alignItems: "center", mb: 1, gap: 1 }}
-            >
-              <Checkbox
-                sx={{ width: 14, height: 14 }}
-                checked={enabledLanguages.includes(lang.code)}
-                onChange={async ({ target: { checked: checked } }) => {
-                  const copiedLanguages = enabledLanguages.slice();
+      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
+        {languages.map((lang) => (
+          <Label key={lang.code} variant="text.body" sx={{ mb: 1 }}>
+            <input
+              type="checkbox"
+              style={{
+                accentColor: "var(--accent)",
+                marginRight: 1,
+                width: 14,
+                height: 14
+              }}
+              checked={enabledLanguages.includes(lang.code)}
+              onChange={async (e) => {
+                const { checked } = e.currentTarget;
+                const copiedLanguages = enabledLanguages.slice();
 
-                  if (checked) copiedLanguages.push(lang.code);
-                  else deleteItem(copiedLanguages, lang.code);
+                if (checked) copiedLanguages.push(lang.code);
+                else deleteItem(copiedLanguages, lang.code);
 
-                  await spellChecker.setLanguages(copiedLanguages);
-                }}
-              />
-              <Text variant="body">{lang.name}</Text>
-            </Flex>
-          ))}
-        </Flex>
-      </ScrollContainer>
-    </Flex>
+                await spellChecker.setLanguages(copiedLanguages);
+              }}
+            />
+            <span style={{ marginLeft: 5 }}>{lang.name}</span>
+          </Label>
+        ))}
+      </FlexScrollContainer>
+    </>
   );
 }

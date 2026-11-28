@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@notesnook/ui-kit";
+import { Box } from "@notesnook/ui-kit";
 import { strings } from "@notesnook/intl";
-import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
 type ExportErrorsDialogProps = BaseDialogProps<boolean> & {
   count: number;
@@ -47,20 +47,25 @@ export const ExportErrorsDialog = DialogManager.register(
         onClose={() => onClose(false)}
         positiveButton={{
           text: strings.okay(),
-          onClick: () => onClose(true)
+          onClick: () => onClose(true),
+          autoFocus: true
         }}
       >
-        <Flex sx={{ mt: "spacing4", mb: "spacing7", flexDirection: "column" }}>
+        <Box
+          as="ol"
+          sx={{
+            mt: "spacing4",
+            mb: "spacing7",
+            fontFamily: "body",
+            color: "paragraph",
+            fontSize: "md",
+            lineHeight: 1.4
+          }}
+        >
           {errors.map((error, index) => (
-            <Text
-              key={`${index}-${error.message}`}
-              selectable
-              sx={{ color: "paragraph", fontSize: "md", lineHeight: 1.4 }}
-            >
-              {`${index + 1}. ${error.message}`}
-            </Text>
+            <li key={`${index}-${error.message}`}>{error.message}</li>
           ))}
-        </Flex>
+        </Box>
       </Dialog>
     );
   }

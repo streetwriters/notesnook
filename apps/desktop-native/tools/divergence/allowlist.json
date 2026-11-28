@@ -422,11 +422,6 @@
       "reason": "Web lays the feature table out with CSS grid and sizes text in rem; desktop lays out with flexbox only."
     },
     {
-      "path": "dialogs/settings/components/spell-checker-languages.tsx",
-      "category": "platform",
-      "reason": "Web lists languages with raw <input type=checkbox> and <span> elements; desktop uses the kit's Checkbox."
-    },
-    {
       "path": "dialogs/settings/components/subscription-status.tsx",
       "category": "platform",
       "reason": "Web lays the status card out with CSS grid (gridTemplateRows, gridRow); desktop lays out with flexbox only."
@@ -447,29 +442,9 @@
       "reason": "Web colours the icon through a '& path' selector and uses <strong>; desktop has no selectors and colours the icon directly."
     },
     {
-      "path": "dialogs/keyboard-shortcuts-dialog.tsx",
-      "category": "platform",
-      "reason": "Web sizes the key caps in em units, which desktop's text layout has no parent font size for."
-    },
-    {
       "path": "dialogs/settings/app-lock-settings.ts",
       "category": "platform",
       "reason": "Web registers security keys with the browser's WebAuthn and window.crypto; desktop goes through @platform webauthn, whose calls take different arguments."
-    },
-    {
-      "path": "dialogs/migration-dialog.tsx",
-      "category": "platform",
-      "reason": "Web links to support with raw <a> elements; desktop uses the kit's Link."
-    },
-    {
-      "path": "dialogs/export-errors-dialog.tsx",
-      "category": "platform",
-      "reason": "Web lists the errors as an HTML <ol>/<li> list; desktop has no list elements and numbers Text rows."
-    },
-    {
-      "path": "dialogs/email-verification-dialog.tsx",
-      "category": "platform",
-      "reason": "Web emphasises part of the notice with a raw <b> element; desktop uses the kit's Text."
     },
     {
       "path": "dialogs/mfa/multi-factor-dialog.tsx",
@@ -515,11 +490,6 @@
       "path": "dialogs/components/**",
       "category": "platform",
       "reason": "Desktop stand-ins for what web's dialogs draw with raw HTML or DOM (date input, markdown HTML, radio input, anchored popover, field with DOM refs); used by the allowlisted dialogs."
-    },
-    {
-      "path": "dialogs/settings/components/circle-partners.tsx",
-      "category": "platform",
-      "reason": "Web draws the partner logos with a raw <img> element; desktop uses the kit's Image."
     },
     {
       "path": "components/editor/index.tsx",
