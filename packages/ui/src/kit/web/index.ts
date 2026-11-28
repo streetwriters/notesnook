@@ -23,38 +23,23 @@ export * from "./hooks";
 export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./layout";
 export { GroupedVirtuoso, TableVirtuoso, Virtuoso } from "./lists";
-// The types the contract names: the primitives' and Modal's are the
-// contract's; the lists are react-virtuoso's own, so their types are too.
+// The prop types of theme-ui's components are theme-ui's own with the kit's
+// props (./primitives); the kit-only components' are the contract's; the
+// lists are react-virtuoso's own, so their types are too.
 export type {
   AriaAttributes,
   BaseProps,
-  BoxProps,
-  ButtonProps,
-  CheckboxProps,
   ColorPickerProps,
   DataAttributes,
-  DonutProps,
   ElementTag,
-  FlexProps,
-  GridProps,
   IconProps,
-  ImageProps,
-  InputProps,
-  LabelProps,
-  LinkProps,
-  ProgressProps,
   QRCodeHandle,
   QRCodeProps,
-  RadioProps,
-  SelectProps,
-  SliderProps,
-  SwitchProps,
-  TextareaProps,
-  TextProps,
   TextVariantPath,
   ThemeScopeProps
 } from "../contracts/primitives";
 export type { ModalProps, ModalStyles } from "../contracts/dialog";
+export type * from "../contracts/style";
 export type {
   CalculateViewLocation,
   CalculateViewLocationParams,
@@ -90,7 +75,49 @@ export { useThemeUI } from "@theme-ui/core";
 export { alpha } from "@theme-ui/color";
 export { createButtonVariant } from "@notesnook/theme";
 export { showToast, ToastHost } from "./toast";
-export * from "./primitives";
+export {
+  Box,
+  Button,
+  Checkbox,
+  ColorPicker,
+  Donut,
+  Flex,
+  FormData,
+  Grid,
+  Icon,
+  Image,
+  Input,
+  Label,
+  Link,
+  Progress,
+  QRCode,
+  Radio,
+  Select,
+  Slider,
+  Switch,
+  Text,
+  Textarea
+} from "./primitives";
+export type {
+  BoxProps,
+  ButtonProps,
+  CheckboxProps,
+  DonutProps,
+  FlexProps,
+  GridProps,
+  ImageProps,
+  InputProps,
+  KitProps,
+  LabelProps,
+  LinkProps,
+  ProgressProps,
+  RadioProps,
+  SelectProps,
+  SliderProps,
+  SwitchProps,
+  TextareaProps,
+  TextProps
+} from "./primitives";
 export { WebThemeProvider, ThemeScope } from "./theme";
 export { ThemeBridge, syncThemeEngine } from "./theme-bridge";
 export { dataColor } from "../shared/style/data-color";

@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import { environment, keyboard } from "@platform";
 import type * as Contract from "../contracts/overlays";
 import type { UIElement } from "../contracts/elements";
-import type { SxProp } from "../contracts/style";
+import type { ColorValue, SxProp } from "../contracts/style";
 import { mdiIcon } from "../shared/icon-factory";
 import { dataColor } from "../shared/style/data-color";
 import { measureInWindow } from "./element";
@@ -87,8 +87,8 @@ function MenuButton(props: {
   const { item } = props;
   const dangerous = item.variant === "dangerous";
   const IconComponent = item.iconComponent;
-  const iconColor =
-    item.styles?.icon?.color ?? (dangerous ? "icon-error" : "icon-secondary");
+  const iconColor = (item.styles?.icon?.color ??
+    (dangerous ? "icon-error" : "icon-secondary")) as ColorValue;
   const hasSubmenu = !!item.menu;
   return (
     <Button

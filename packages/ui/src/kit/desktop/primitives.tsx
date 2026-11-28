@@ -50,6 +50,7 @@ import type {
   UITextAreaElement
 } from "../contracts/elements";
 import type { UIMouseEvent } from "../contracts/events";
+import type { SxProp } from "../contracts/style";
 import {
   controlElement,
   elementFor,
@@ -61,6 +62,7 @@ import {
 import { htmlToText } from "./html-text";
 import { setFormFields, type FormField } from "./form-data";
 import { useThemeContext } from "./theme";
+import { mergeSx, sxObject } from "../shared/style/shorthand";
 import {
   changeEvent,
   syntheticEvent,
@@ -219,7 +221,7 @@ function hasText(children: ReactNode): boolean {
 function Container(
   props: Contract.BoxProps & {
     variantGroup?: "variants";
-    defaults?: Contract.BoxProps["sx"];
+    defaults?: SxProp;
   },
   ref: ForwardedRef<UIElement>
 ) {
@@ -286,9 +288,11 @@ function Container(
     content = (
       <FormContext.Provider value={form}>{content}</FormContext.Provider>
     );
-  if (props.sx?.input)
+  // A function-form `sx` is theme-ui's; the nested `input` key is the kit's.
+  const inputSx = typeof props.sx === "function" ? undefined : props.sx?.input;
+  if (inputSx)
     content = (
-      <InputSxContext.Provider value={props.sx.input}>
+      <InputSxContext.Provider value={inputSx}>
         {content}
       </InputSxContext.Provider>
     );
@@ -330,7 +334,10 @@ export const Grid = forwardRef<UIElement, Contract.GridProps>(function Grid(
   props,
   ref
 ) {
-  const { columns, children } = props;
+  // Equal columns are drawn; theme-ui's other forms lay out as one column.
+  const columns =
+    typeof props.columns === "number" && props.columns > 0 ? props.columns : 1;
+  const { children } = props;
   const [width, setWidth] = useState(0);
   const { resolved } = useStyled(props, { variantGroup: "variants" });
   const columnGap =
@@ -529,7 +536,10 @@ export const Link = forwardRef<UIElement, Contract.LinkProps>(function Link(
     <Text
       ref={ref}
       {...(props as Contract.TextProps)}
-      sx={{ color: "accent", textDecorationLine: "underline", ...props.sx }}
+      sx={mergeSx(
+        { color: "accent", textDecorationLine: "underline" },
+        props.sx
+      )}
     />
   );
 });
@@ -578,7 +588,15 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
   const context = useThemeContext();
   const inputSx = useContext(InputSxContext);
   const { viewStyle, nativeProps } = useStyled(
-    inputSx ? { ...props, sx: { ...props.sx, ...inputSx } } : props,
+    inputSx
+      ? {
+          ...props,
+          sx: {
+            ...sxObject(props.sx, context.theme),
+            ...sxObject(inputSx, context.theme)
+          }
+        }
+      : props,
     {
       variantGroup: "forms",
       defaultVariant: props.field,

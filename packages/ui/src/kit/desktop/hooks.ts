@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Appearance, Dimensions, useWindowDimensions } from "react-native";
 import { Platform, useColorScheme } from "react-native";
 import type * as Contract from "../contracts/hooks";
-import type { StateStyle } from "../contracts/style";
+import type { SxProp } from "../contracts/style";
 import { formatShortcutFor, type ShortcutPlatform } from "../shared/shortcut";
 import { lastPointer } from "./style/events";
 import { alphaToken, withAlpha } from "./style/resolve";
@@ -92,10 +92,8 @@ export const createButtonVariant: typeof Contract.createButtonVariant = (
   color = "paragraph",
   states
 ) => {
-  // The states are drawn as desktop's `StateStyle`; the cast only narrows the
-  // wider `SxProp` they are typed as in the contract to that shape.
-  const hover = states?.hover as StateStyle | undefined;
-  const active = states?.active as StateStyle | undefined;
+  const hover = states?.hover;
+  const active = states?.active;
   return {
     bg: background,
     color,

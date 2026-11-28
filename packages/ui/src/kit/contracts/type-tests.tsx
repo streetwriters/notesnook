@@ -104,22 +104,22 @@ export const valid: SxProp = {
 };
 
 export const selector: SxProp = {
-  // @ts-expect-error selectors are not part of the contract
+  // A nested selector, as apps/web writes it: accepted, ignored on desktop.
   "&:hover svg path": { fill: "icon" }
 };
 
 export const classSelector: SxProp = {
-  // @ts-expect-error class selectors are not part of the contract
+  // A class selector: accepted, ignored on desktop.
   ".active": { color: "accent" }
 };
 
 export const nestedState: SxProp = {
-  // @ts-expect-error only the listed state keys exist
+  // A structural pseudo class: accepted, ignored on desktop.
   ":first-of-type": { color: "accent" }
 };
 
 export const mediaQuery: SxProp = {
-  // @ts-expect-error responsive values are arrays, not media queries
+  // A media query: accepted; desktop draws the min-width ones.
   "@media (max-width: 480px)": { display: "none" }
 };
 
@@ -131,7 +131,7 @@ export const cssVariable: SxProp = {
 };
 
 export const unknownCssVariable: SxProp = {
-  // @ts-expect-error only theme tokens can be written as CSS variables
+  // Any CSS variable is a colour string; desktop draws the theme's tokens.
   color: "var(--not-a-theme-color)"
 };
 
@@ -149,17 +149,17 @@ export const viewportUnits: SxProp = {
 };
 
 export const unknownToken: SxProp = {
-  // @ts-expect-error not a theme colour
+  // Any string is a CSS colour value, as in theme-ui.
   bg: "not-a-theme-color"
 };
 
 export const unsupportedUnit: SxProp = {
-  // @ts-expect-error rem is not a supported unit
+  // Rem is drawn as a multiple of 16px.
   width: "10rem"
 };
 
 export const unsupportedDisplay: SxProp = {
-  // @ts-expect-error grid is not a display value desktop can lay out
+  // Grid is accepted; desktop lays it out as a flex box.
   display: "grid"
 };
 
@@ -169,7 +169,7 @@ export const dataColors: SxProp = {
 };
 
 export const rawColorString: SxProp = {
-  // @ts-expect-error a raw string is not a colour value, use dataColor
+  // A raw CSS colour, as apps/web writes it.
   bg: "#ff0000"
 };
 
@@ -180,7 +180,7 @@ export const outline: SxProp = {
 };
 
 export const outlineShorthand: SxProp = {
-  // @ts-expect-error outline needs a colour too
+  // The CSS outline shorthand, with or without a colour.
   outline: "2px solid"
 };
 
@@ -199,17 +199,17 @@ export const motion: SxProp = {
 };
 
 export const transitionOnState: SxProp = {
-  // @ts-expect-error state styles change instantly, they take no transition
+  // Accepted as in theme-ui; desktop state styles change instantly.
   ":hover": { transition: { property: "opacity", duration: 100 } }
 };
 
 export const animatedProperty: SxProp = {
-  // @ts-expect-error only opacity, transform and colours animate
+  // Accepted; desktop animates opacity, transform and colours only.
   transition: { property: "width", duration: 100 }
 };
 
 export const stateWithLayout: SxProp = {
-  // @ts-expect-error state styles only change visual properties
+  // Accepted as in theme-ui; desktop state styles only change visual properties.
   ":hover": { width: 10 }
 };
 
@@ -227,13 +227,12 @@ export const elements = [
   // @ts-expect-error pane sizes are numbers
   <Pane key="16" id="x" initialSize="250px" />,
   <Grid key="10" columns={7} gap={1} rowGap={2} />,
-  // @ts-expect-error grids are equal columns, not template strings
+  // theme-ui's other forms: a template string, or a grid given only in sx.
   <Grid key="11" columns="1fr 1fr" />,
-  // @ts-expect-error columns is required
-  <Grid key="12" />,
+  <Grid key="12" sx={{ gridTemplateColumns: "1fr auto" }} />,
   <Box key="7" className="selectable" />,
   <Box key="8" style={{ flex: 1 }} />,
-  // @ts-expect-error raw colour strings are not tokens
+  // A raw CSS colour, as on a theme-ui component.
   <Box key="9" bg="#ff0000" />
 ];
 
@@ -547,15 +546,15 @@ export const strict = [
   <Checkbox key="1" onChange={(checked: boolean) => !checked} />,
   // @ts-expect-error onChange delivers an event, not the text
   <Input key="2" onChange={(text: string) => text.length} />,
-  // @ts-expect-error lineClamp is a number of lines
-  <Text key="3" sx={{ lineClamp: "2" }} />,
-  // @ts-expect-error only cover, contain and fill can be drawn
+  // CSS's line-clamp, a number of lines.
+  <Text key="3" sx={{ lineClamp: 2 }} />,
+  // Any CSS object-fit; desktop draws cover, contain and fill.
   <Image key="4" src="a.png" sx={{ objectFit: "scale-down" }} />,
   // @ts-expect-error desktop has no canvas element
   <Box key="5" as="canvas" />,
-  // @ts-expect-error inline style takes the properties desktop can draw
+  // An inline style is React's CSSProperties.
   <Box key="6" style={{ float: "left" }} />,
-  // @ts-expect-error inline style display is flex or none
+  // An inline style is React's CSSProperties.
   <Box key="7" style={{ display: "grid" }} />,
   // @ts-expect-error an input's ref needs the input element
   <Input key="8" ref={boxRef} />

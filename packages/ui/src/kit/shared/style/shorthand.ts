@@ -56,16 +56,36 @@ export const SHORTHAND_KEYS = [
   "backgroundColor"
 ] as const;
 
+/**
+ * The element's `sx` as an object: theme-ui's function form is called with
+ * `theme`.
+ */
+export function sxObject(
+  sx: BaseProps["sx"],
+  theme?: object
+): SxProp | undefined {
+  return typeof sx === "function" ? sx((theme ?? {}) as never) : sx;
+}
+
+/** `sx` laid over `base`, keeping theme-ui's function form a function. */
+export function mergeSx(base: SxProp, sx: BaseProps["sx"]): BaseProps["sx"] {
+  if (typeof sx === "function")
+    return (theme) => ({ ...base, ...sx(theme) } as SxProp);
+  return { ...base, ...sx } as SxProp;
+}
+
 export function mergeShorthands(
   props: BaseProps,
-  defaults?: SxProp
+  defaults?: SxProp,
+  theme?: object
 ): SxProp | undefined {
+  const sx = sxObject(props.sx, theme);
   let merged: Record<string, unknown> | undefined;
   for (const key of SHORTHAND_KEYS) {
     const value = (props as Record<string, unknown>)[key];
     if (value === undefined) continue;
     (merged ??= {})[key] = value;
   }
-  if (!merged && !defaults) return props.sx;
-  return { ...defaults, ...merged, ...props.sx } as SxProp;
+  if (!merged && !defaults) return sx;
+  return { ...defaults, ...merged, ...sx } as SxProp;
 }

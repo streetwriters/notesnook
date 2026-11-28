@@ -120,7 +120,7 @@ setScrollCommand((node, x, y, animated) =>
 /** `style` is laid over `sx`, as an inline style is over a class on the web. */
 function withInlineStyle(sx: SxProp | undefined, style: StyleProp | undefined) {
   if (!style) return sx;
-  const inline: Record<string, unknown> = { ...style };
+  const inline: Record<string, unknown> = { ...(style as object) };
   // Only the object form of `transition` is drawn on desktop.
   if (typeof inline.transition === "string") delete inline.transition;
   return { ...sx, ...inline } as SxProp;
@@ -152,7 +152,10 @@ export function useStyled(
   const context = useThemeContext();
   const breakpoint = useBreakpoint();
   const sx = withDisabledStyle(
-    withInlineStyle(mergeShorthands(props, options.defaults), props.style),
+    withInlineStyle(
+      mergeShorthands(props, options.defaults, context.theme),
+      props.style
+    ),
     (props as { disabled?: boolean }).disabled
   );
   const resolved = resolveSx(sx, context, {

@@ -36,7 +36,7 @@ import { Global } from "@emotion/react";
 import { Box as ThemeUIBox } from "@theme-ui/components";
 import { MacScrollbar } from "mac-scrollbar";
 import "mac-scrollbar/dist/mac-scrollbar.css";
-import { Box, Flex } from "./primitives";
+import { KitBox as Box, KitFlex as Flex } from "./primitives";
 import { LAYOUT_DEFAULTS_CSS } from "./kit-sx";
 import { toThemeUISx } from "./sx";
 

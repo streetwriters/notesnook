@@ -17,9 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { CSSProperties } from "react";
 import type { Theme, ThemeColor } from "@notesnook/theme";
+import type {
+  CSSPseudoSelectorProps,
+  StylePropertyValue,
+  Theme as ThemeUITheme,
+  ThemeUICSSProperties
+} from "@theme-ui/css";
+
+// The kit's `sx` is theme-ui's: every key and value apps/web writes
+// type-checks, so a file shared with apps/web needs no changes. What desktop
+// draws of it is narrower (see docs/ui-kit-web-api.md): lengths in px, %, rem,
+// em, vw and vh, CSS colours, flexbox, the state keys below, linear gradients
+// and keyframe animations of opacity and transform. Keys and values it cannot
+// draw (selectors, grid, tables, scroll snapping) are accepted and ignored.
 
 type ThemeSpace = Theme["space"];
+/** Any CSS value: kept as written, so the named ones still autocomplete. */
+type CssString = string & {};
 
 export type ColorToken = ThemeColor | "transparent";
 
@@ -27,12 +43,15 @@ declare const dataColorBrand: unique symbol;
 export type DataColor = string & { readonly [dataColorBrand]: true };
 /** A theme token written as the CSS variable apps/web uses, `var(--accent)`. */
 export type CssVarColor = `var(--${ColorToken})`;
-export type ColorValue = ColorToken | DataColor | CssVarColor;
+/**
+ * A theme token, or any CSS colour (`#rrggbb`, `rgb()`, `rgba()`, a colour
+ * name, `currentColor`).
+ */
+export type ColorValue = ColorToken | DataColor | CssVarColor | CssString;
 
 /**
- * Colours that come from user data (a note's colour, a colour tag) are not
- * theme tokens. `dataColor` is the only way to make one: it accepts a hex
- * colour (#rgb, #rgba, #rrggbb or #rrggbbaa) and throws for anything else.
+ * A colour from user data (a note's colour, a colour tag): a hex colour
+ * (#rgb, #rgba, #rrggbb or #rrggbbaa); throws for anything else.
  */
 export declare function dataColor(hex: string): DataColor;
 export type SpaceToken =
@@ -41,29 +60,41 @@ export type SpaceToken =
   | "auto"
   | `${number}px`
   | `${number}%`
-  | number;
+  | number
+  | CssString;
 export type RadiusToken =
   | keyof Theme["radii"]
   | number
   | `${number}px`
-  | `${number}%`;
-export type FontSizeToken = keyof Theme["fontSizes"] | number;
-export type FontFamilyToken = keyof Theme["fonts"];
+  | `${number}%`
+  | CssString;
+/** `rem` and `em` are drawn as multiples of 16px. */
+export type FontSizeToken = keyof Theme["fontSizes"] | number | CssString;
+export type FontFamilyToken = keyof Theme["fonts"] | CssString;
 /** `bolder` is drawn as 700. */
-export type FontWeightToken = keyof Theme["fontWeights"] | number | "bolder";
-export type ShadowToken = keyof Theme["shadows"];
+export type FontWeightToken =
+  | keyof Theme["fontWeights"]
+  | number
+  | "bolder"
+  | CssString;
+export type ShadowToken = keyof Theme["shadows"] | CssString;
 export type IconSizeToken = keyof Theme["iconSizes"] | number;
 
-/** `vw` and `vh` are a share of the window, measured when the style is drawn. */
+/**
+ * `vw` and `vh` are a share of the window, measured when the style is drawn;
+ * `rem` and `em` are multiples of 16px.
+ */
 export type Length =
   | number
   | `${number}px`
   | `${number}%`
   | `${number}vw`
   | `${number}vh`
+  | `${number}rem`
   | "auto"
   /** Drawn as the default size: desktop boxes already fit their content. */
-  | "fit-content";
+  | "fit-content"
+  | CssString;
 export type Responsive<T> = T | (T | null)[];
 
 type BorderLineStyle = "solid" | "dashed" | "dotted";
@@ -73,7 +104,8 @@ export type Border =
   | 0
   | `${number}px ${BorderLineStyle}`
   | `${number}px ${BorderLineStyle} ${ColorToken}`
-  | `${number}px ${BorderLineStyle} ${CssVarColor}`;
+  | `${number}px ${BorderLineStyle} ${CssVarColor}`
+  | CssString;
 
 export type Transform = {
   translateX?: number;
@@ -122,12 +154,6 @@ export type AnimationSpec = {
   easing?: Easing;
 };
 
-export type ColorProps = {
-  color?: ColorValue;
-  bg?: ColorValue | (ColorValue | null)[];
-  backgroundColor?: ColorValue | (ColorValue | null)[];
-};
-
 type SpaceKeys =
   | "m"
   | "mt"
@@ -162,249 +188,127 @@ type SpaceKeys =
   | "columnGap";
 
 /**
- * Spacing may also be a theme callback, as in theme-ui: desktop resolves it
- * with the same css() pass that resolves the tokens.
+ * A theme callback. The theme is the Notesnook theme and theme-ui's at once,
+ * so a callback written for either type-checks.
+ */
+export type ThemeCallback<T = unknown> = (theme: Theme & ThemeUITheme) => T;
+type Empty = undefined | null | false;
+/** theme-ui's responsive value: one value, or one per breakpoint. */
+type ResponsiveValue<T> = T | Empty | (T | Empty)[];
+type NotCallable<T> = Exclude<T, (...args: never[]) => unknown>;
+
+/** The colour props of a theme-ui component. */
+export type ColorProps = {
+  color?: ResponsiveValue<ColorValue>;
+  bg?: ResponsiveValue<ColorValue>;
+  backgroundColor?: ResponsiveValue<ColorValue>;
+};
+
+/**
+ * The spacing props of a theme-ui component. Spacing may also be a theme
+ * callback: desktop resolves it with the same css() pass that resolves the
+ * tokens.
  */
 export type SpaceProps = {
   [K in SpaceKeys]?:
-    | Responsive<SpaceToken>
-    | ((theme: Theme) => SpaceToken | Length);
+    | ResponsiveValue<SpaceToken>
+    | ThemeCallback;
 };
 
-export type StateStyle = ColorProps & {
-  borderColor?: ColorValue;
-  outlineColor?: ColorValue;
-  outlineWidth?: number;
-  outlineOffset?: number;
-  opacity?: number;
-  boxShadow?: ShadowToken;
-  transform?: Transform;
-};
+/**
+ * The style of a state (`:hover`, `:focus`…). Desktop draws its colours,
+ * opacity, outline, shadow and transform.
+ */
+export type StateStyle = SxStyle;
 
-export type GroupStateStyle = { group: string; style: StateStyle };
+export type GroupStateStyle = { group: string; style: SxProp };
 
-type LayoutProps = {
-  /** `block` is drawn as the default layout: desktop has no inline flow. */
-  display?: Responsive<"flex" | "none" | "block">;
-  position?: "relative" | "absolute";
-  top?: Length | SpaceToken;
-  right?: Length | SpaceToken;
-  bottom?: Length | SpaceToken;
-  left?: Length | SpaceToken;
-  zIndex?: number;
-  /** A number, or one written as a string (`"1"`) as CSS allows. */
-  flex?: number | `${number}`;
-  flexGrow?: number;
-  flexShrink?: number;
-  flexBasis?: Length;
-  flexDirection?: Responsive<
-    "row" | "column" | "row-reverse" | "column-reverse"
-  >;
-  flexWrap?: "nowrap" | "wrap" | "wrap-reverse";
-  /** `start` and `end` are drawn as `flex-start` and `flex-end`. */
-  alignItems?:
-    | "flex-start"
-    | "flex-end"
-    | "start"
-    | "end"
-    | "center"
-    | "stretch"
-    | "baseline";
-  alignSelf?:
-    | "auto"
-    | "flex-start"
-    | "flex-end"
-    | "start"
-    | "end"
-    | "center"
-    | "stretch"
-    | "baseline";
-  alignContent?:
-    | "flex-start"
-    | "flex-end"
-    | "start"
-    | "end"
-    | "center"
-    | "stretch"
-    | "space-between"
-    | "space-around";
-  justifyContent?:
-    | "flex-start"
-    | "flex-end"
-    | "start"
-    | "end"
-    | "center"
-    | "space-between"
-    | "space-around"
-    | "space-evenly";
-  width?: Responsive<Length>;
-  height?: Responsive<Length>;
-  minWidth?: Responsive<Length>;
-  minHeight?: Responsive<Length>;
-  maxWidth?: Responsive<Length>;
-  maxHeight?: Responsive<Length>;
-  aspectRatio?: number;
-  overflow?: Responsive<"visible" | "hidden" | "scroll">;
-  /** Desktop has one overflow for both axes; the last one written wins. */
-  overflowX?: Responsive<"visible" | "hidden" | "scroll" | "auto" | "unset">;
-  overflowY?: Responsive<"visible" | "hidden" | "scroll" | "auto" | "unset">;
-  /** Sets top, right, bottom and left to the same length. */
-  inset?: Length;
-  /** theme-ui's width + height shorthand. */
-  size?: Responsive<Length>;
-};
-
-type AppearanceProps = {
-  opacity?: number;
-  experimental_backgroundImage?: string;
-  experimental_backgroundSize?: string;
-  experimental_backgroundPosition?: string;
-  borderRadius?: Responsive<RadiusToken>;
-  borderTopLeftRadius?: RadiusToken;
-  borderTopRightRadius?: RadiusToken;
-  borderBottomLeftRadius?: RadiusToken;
-  borderBottomRightRadius?: RadiusToken;
-  border?: Border;
-  borderTop?: Border;
-  borderRight?: Border;
-  borderBottom?: Border;
-  borderLeft?: Border;
-  borderColor?: ColorValue;
-  borderTopColor?: ColorValue;
-  borderRightColor?: ColorValue;
-  borderBottomColor?: ColorValue;
-  borderLeftColor?: ColorValue;
-  borderWidth?: number;
-  borderTopWidth?: number;
-  borderRightWidth?: number;
-  borderBottomWidth?: number;
-  borderLeftWidth?: number;
-  borderStyle?: BorderLineStyle;
-  /** A colour only; gradients and images are not drawn. */
-  background?: ColorValue;
-  /** "none", or width, style and colour together. */
-  outline?: "none" | `${number}px ${BorderLineStyle} ${ColorToken}`;
-  /** hidden draws nothing and takes no pointer events, but keeps its space. */
-  visibility?: "visible" | "hidden";
-  outlineColor?: ColorValue;
-  outlineWidth?: number;
-  outlineOffset?: number;
-  outlineStyle?: "solid" | "dashed" | "dotted";
-  boxShadow?: ShadowToken;
-  transform?: Transform | CssTransform;
-  /** `unset` is the default cursor. */
-  cursor?:
-    | "default"
-    | "pointer"
-    | "text"
-    | "not-allowed"
-    | "grab"
-    | "move"
-    | "unset";
-  /** Accepted and ignored: desktop form controls follow the kit theme. */
-  colorScheme?: "light" | "dark" | "normal";
-  /** `all` is drawn as `auto`. */
-  pointerEvents?: "auto" | "none" | "all";
-  userSelect?: "auto" | "none" | "text";
-  objectFit?: "cover" | "contain" | "fill";
-  /** Accepted for parity; desktop text areas have no resize handle. */
-  resize?: "none" | "vertical" | "horizontal" | "both";
-};
-
-type TextStyleProps = {
-  fontSize?: Responsive<FontSizeToken>;
-  fontFamily?: FontFamilyToken;
-  fontWeight?: FontWeightToken;
-  fontStyle?: "normal" | "italic";
-  lineHeight?: number | `${number}px` | `${number}%` | "body" | "heading";
-  letterSpacing?: number;
-  /** `start` and `end` are drawn as `left` and `right`. */
-  textAlign?: "left" | "center" | "right" | "justify" | "start" | "end";
-  textDecorationLine?: "none" | "underline" | "line-through";
-  textDecoration?: "none" | "underline" | "line-through";
-  textDecorationColor?: ColorValue;
-  /** Desktop always wraps long words; accepted for parity. */
-  overflowWrap?: "normal" | "break-word" | "anywhere";
-  wordWrap?: "normal" | "break-word";
-  textTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
-  textOverflow?: "clip" | "ellipsis";
-  whiteSpace?: "normal" | "nowrap" | "pre" | "pre-wrap";
-  wordBreak?: "normal" | "break-all" | "break-word";
-  lineClamp?: number;
-};
-
-type StateKeys = {
+/** The keys only the kit has, and the kit-only shapes of three CSS ones. */
+type KitKeys = {
   /**
    * Styles for the text fields inside this element, as web's nested `input`
    * selector: drawn over the field's own styles.
    */
-  input?: SxProp;
-  ":hover"?: StateStyle;
-  ":active"?: StateStyle;
-  ":focus"?: StateStyle;
-  ":focus-visible"?: StateStyle;
+  input?: SxStyle;
   /** Applied while the element's `disabled` prop is set. */
   ":disabled"?: StateStyle;
   ":drag-over"?: StateStyle;
   ":group-hover"?: GroupStateStyle;
   ":group-active"?: GroupStateStyle;
+  /** A list of transform parts, or the CSS string apps/web writes. */
+  transform?: Transform | CssTransform | ThemeUICSSProperties["transform"];
+  /**
+   * The kit's object, or a CSS `transition` string: desktop draws the
+   * properties in AnimatableProperty and ignores the others.
+   */
+  transition?: TransitionSpec | ThemeUICSSProperties["transition"];
+  /**
+   * The kit's object, or a CSS `animation` string naming keyframes made with
+   * the kit's `keyframes` or written in a `<style>` element.
+   */
+  animation?: AnimationSpec | ThemeUICSSProperties["animation"];
+  experimental_backgroundImage?: string;
+  experimental_backgroundSize?: string;
+  experimental_backgroundPosition?: string;
+  /** theme-ui's width + height shorthand. */
+  size?: ThemeUICSSProperties["size"] | Responsive<Length>;
 };
 
-type MotionProps = {
-  transition?: TransitionSpec;
-  animation?: AnimationSpec;
+// theme-ui's own callbacks take theme-ui's theme; with one callback type per
+// key, `(theme) => …` gets its parameter type from the kit's.
+type SpaceCallbacks = {
+  [K in SpaceKeys]?:
+    | NotCallable<ThemeUICSSProperties[K]>
+    | ThemeCallback;
 };
 
-export type SxProp = ColorProps &
-  SpaceProps &
-  LayoutProps &
-  AppearanceProps &
-  TextStyleProps &
-  StateKeys &
-  MotionProps;
+type KitValue =
+  | Transform
+  | TransitionSpec
+  | AnimationSpec
+  | GroupStateStyle
+  | ThemeCallback
+  | SxStyle;
+
+/**
+ * theme-ui's style object (every CSS property with theme lookups, responsive
+ * arrays and theme callbacks, pseudo selectors, nested selectors), with the
+ * kit's own keys.
+ */
+export type SxProp = Omit<
+  ThemeUICSSProperties,
+  keyof KitKeys | SpaceKeys
+> &
+  // Pseudo selectors (`:hover`, `::placeholder`…), each a nested `sx`.
+  { [K in keyof CSSPseudoSelectorProps<ThemeUITheme>]?: SxStyle } &
+  KitKeys &
+  SpaceCallbacks & {
+    variant?: string;
+    label?: string;
+    // Nested selectors (`"& strong"`, `th`), and CSS properties not named
+    // above. An index signature has to cover every key, so it lists the
+    // kit's own shapes too.
+    [selectorOrProperty: string]:
+      | StylePropertyValue<string | number>
+      | KitValue
+      | undefined;
+  };
+
+/**
+ * An `sx` object, or theme-ui's function of the theme that returns one: what
+ * a component's `sx` prop and a nested selector take.
+ */
+export type SxStyle = SxProp | ThemeCallback<SxProp>;
 
 export type ThemeUICSSObject = SxProp;
-export type ThemeUIStyleObject = SxProp;
+export type ThemeUIStyleObject = SxStyle;
 export type RestrictedSxProp = SxProp;
 
-type Unresponsive<T> = Exclude<T, readonly unknown[]>;
-type StyleLength = number | `${number}px` | "auto";
-type StyleSpaceKeys =
-  | "margin"
-  | "marginTop"
-  | "marginRight"
-  | "marginBottom"
-  | "marginLeft"
-  | "padding"
-  | "paddingTop"
-  | "paddingRight"
-  | "paddingBottom"
-  | "paddingLeft"
-  | "gap"
-  | "rowGap"
-  | "columnGap";
-
-export type StyleProp = {
-  [K in keyof LayoutProps]?: Unresponsive<LayoutProps[K]>;
-} & {
-  [K in StyleSpaceKeys]?: StyleLength;
-} & {
-  opacity?: number;
-  visibility?: "visible" | "hidden";
-  color?: string;
-  backgroundColor?: string;
-  borderColor?: string;
-  borderWidth?: number;
-  borderRadius?: number;
-  fontSize?: number;
-  cursor?: AppearanceProps["cursor"];
-  pointerEvents?: AppearanceProps["pointerEvents"];
-  userSelect?: AppearanceProps["userSelect"];
-  objectFit?: AppearanceProps["objectFit"];
-  transform?: string;
-  transition?: string;
-  overscrollBehavior?: "auto" | "contain" | "none";
-};
+/**
+ * An inline style, as React's `style`: CSS properties with no theme lookups
+ * and no responsive arrays. Desktop draws the ones it draws of `sx`.
+ */
+export type StyleProp = CSSProperties;
 
 export type ThemeScopeName =
   | "base"

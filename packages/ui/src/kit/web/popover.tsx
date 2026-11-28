@@ -24,7 +24,7 @@ import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
 import { useEscape } from "../shared/use-escape";
 import { useWindowSize } from "./hooks";
-import { Flex } from "./primitives";
+import { KitFlex as Flex } from "./primitives";
 import { ThemeScope } from "./theme";
 
 type Rect = { x: number; y: number; width: number; height: number };

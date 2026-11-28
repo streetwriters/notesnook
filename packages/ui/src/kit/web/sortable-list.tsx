@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useState } from "react";
 import type * as Contract from "../contracts/lists";
-import { Flex } from "./primitives";
+import { KitFlex as Flex } from "./primitives";
 
 // The item being dragged, shared so a list can refuse another list's items.
 let active: Contract.SortableItem | undefined;

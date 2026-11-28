@@ -17,7 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useImperativeHandle, useMemo, type Ref } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  type ForwardRefExoticComponent,
+  type PropsWithoutRef,
+  type Ref,
+  type RefAttributes
+} from "react";
 import * as ThemeUI from "@theme-ui/components";
 import { useTheme } from "@emotion/react";
 import qrcode from "qrcode-generator";
@@ -31,42 +39,121 @@ export { ThemeScope } from "./theme";
  * the kit's own handling (`kit-sx.tsx`): the kit-only `sx` shapes and props,
  * and the layout defaults the kit has always set on these components.
  */
-export const Box = withKitSx<typeof Contract.Box>(ThemeUI.Box, {
+
+/** The props the kit adds to a theme-ui component (see `kit-sx.tsx`). */
+export interface KitProps {
+  /** The name `:group-hover` in a child's `sx` selects on. */
+  group?: string;
+  selectable?: boolean;
+  /** `false` keeps focus where it was when the element is pressed. */
+  focusable?: boolean;
+  selectTextOnFocus?: boolean;
+  "data-test-id"?: string;
+}
+
+/**
+ * A theme-ui component as the kit exports it on the web: theme-ui's own
+ * props, `sx`, DOM events and DOM element ref, with the kit's props on top.
+ * This is what apps/web type-checks against, so its DOM code
+ * (`event.nativeEvent`, `ref.current.classList`, `React.MouseEvent` handlers)
+ * and the theme-ui typed components it hands these props to keep compiling.
+ * The kit-only `sx` shapes (`:group-hover`, a transition object) are drawn
+ * here too (`sx.ts`), but only the contract types them.
+ */
+type WebProps<P> = Omit<P, keyof KitProps> & KitProps;
+type WebPrimitive<P, E> = ForwardRefExoticComponent<
+  PropsWithoutRef<WebProps<P>> & RefAttributes<E>
+>;
+
+export type BoxProps = WebProps<ThemeUI.BoxProps>;
+export type FlexProps = WebProps<ThemeUI.FlexProps>;
+export type GridProps = WebProps<ThemeUI.GridProps>;
+export type TextProps = WebProps<ThemeUI.TextProps>;
+export type ButtonProps = WebProps<ThemeUI.ButtonProps>;
+export type LabelProps = WebProps<ThemeUI.LabelProps>;
+export type LinkProps = WebProps<ThemeUI.LinkProps>;
+export type ImageProps = WebProps<ThemeUI.ImageProps>;
+export type InputProps = WebProps<ThemeUI.InputProps>;
+export type TextareaProps = WebProps<ThemeUI.TextareaProps>;
+export type CheckboxProps = WebProps<ThemeUI.CheckboxProps>;
+export type RadioProps = WebProps<ThemeUI.RadioProps>;
+export type SelectProps = WebProps<ThemeUI.SelectProps>;
+export type SwitchProps = WebProps<ThemeUI.SwitchProps>;
+export type SliderProps = WebProps<ThemeUI.SliderProps>;
+export type ProgressProps = WebProps<ThemeUI.ProgressProps>;
+export type DonutProps = WebProps<ThemeUI.DonutProps>;
+
+export const Box = withKitSx<WebPrimitive<ThemeUI.BoxProps, any>>(ThemeUI.Box, {
   className: "nn-box"
 });
-export const Flex = withKitSx<typeof Contract.Flex>(ThemeUI.Flex, {
-  className: "nn-flex"
-});
-export const Grid = withKitSx<typeof Contract.Grid>(ThemeUI.Grid);
-export const Text = withKitSx<typeof Contract.Text>(ThemeUI.Text, {
-  className: "nn-text"
-});
-export const Button = withKitSx<typeof Contract.Button>(ThemeUI.Button, {
+export const Flex = withKitSx<WebPrimitive<ThemeUI.FlexProps, HTMLElement>>(
+  ThemeUI.Flex,
+  { className: "nn-flex" }
+);
+export const Grid = withKitSx<WebPrimitive<ThemeUI.GridProps, HTMLDivElement>>(
+  ThemeUI.Grid
+);
+export const Text = withKitSx<WebPrimitive<ThemeUI.TextProps, HTMLDivElement>>(
+  ThemeUI.Text,
+  { className: "nn-text" }
+);
+export const Button = withKitSx<
+  WebPrimitive<ThemeUI.ButtonProps, HTMLButtonElement>
+>(ThemeUI.Button, {
   className: "nn-button",
   // theme-ui's button is `inline-block`; the kit lays its children out in a row.
   sx: { display: "flex" }
 });
-export const Label = withKitSx<typeof Contract.Label>(ThemeUI.Label);
-export const Link = withKitSx<typeof Contract.Link>(ThemeUI.Link, {
+export const Label = withKitSx<
+  WebPrimitive<ThemeUI.LabelProps, HTMLLabelElement>
+>(ThemeUI.Label);
+export const Link = withKitSx<
+  WebPrimitive<ThemeUI.LinkProps, HTMLAnchorElement>
+>(ThemeUI.Link, {
   defaults: { target: "_blank", rel: "noreferrer" }
 });
-export const Image = withKitSx<typeof Contract.Image>(ThemeUI.Image);
-export const Input = withKitSx<typeof Contract.Input>(ThemeUI.Input, {
+export const Image = withKitSx<
+  WebPrimitive<ThemeUI.ImageProps, HTMLImageElement>
+>(ThemeUI.Image);
+export const Input = withKitSx<
+  WebPrimitive<ThemeUI.InputProps, HTMLInputElement>
+>(ThemeUI.Input, {
   className: "nn-input"
 });
-export const Textarea = withKitSx<typeof Contract.Textarea>(ThemeUI.Textarea, {
+export const Textarea = withKitSx<
+  WebPrimitive<ThemeUI.TextareaProps, HTMLTextAreaElement>
+>(ThemeUI.Textarea, {
   className: "nn-input nn-textarea"
 });
-export const Checkbox = withKitSx<typeof Contract.Checkbox>(ThemeUI.Checkbox);
-export const Radio = withKitSx<typeof Contract.Radio>(ThemeUI.Radio);
-export const Select = withKitSx<typeof Contract.Select>(ThemeUI.Select);
-export const Switch = withKitSx<typeof Contract.Switch>(ThemeUI.Switch);
-export const Slider = withKitSx<typeof Contract.Slider>(ThemeUI.Slider);
-export const Progress = withKitSx<typeof Contract.Progress>(ThemeUI.Progress);
-export const Donut = withKitSx<typeof Contract.Donut>(ThemeUI.Donut);
+export const Checkbox = withKitSx<
+  WebPrimitive<ThemeUI.CheckboxProps, HTMLInputElement>
+>(ThemeUI.Checkbox);
+export const Radio = withKitSx<
+  WebPrimitive<ThemeUI.RadioProps, HTMLInputElement>
+>(ThemeUI.Radio);
+export const Select = withKitSx<
+  WebPrimitive<ThemeUI.SelectProps, HTMLSelectElement>
+>(ThemeUI.Select);
+export const Switch = withKitSx<
+  WebPrimitive<ThemeUI.SwitchProps, HTMLInputElement>
+>(ThemeUI.Switch);
+export const Slider = withKitSx<
+  WebPrimitive<ThemeUI.SliderProps, HTMLInputElement>
+>(ThemeUI.Slider);
+export const Progress = withKitSx<
+  WebPrimitive<ThemeUI.ProgressProps, HTMLProgressElement>
+>(ThemeUI.Progress);
+export const Donut = withKitSx<WebPrimitive<ThemeUI.DonutProps, SVGSVGElement>>(
+  ThemeUI.Donut
+);
 
 // Kit-only components: theme-ui has no equivalent, so these keep a web
-// version of their own, built on the primitives above.
+// version of their own, built on the primitives above. They are written
+// against the contract (its `sx` shapes and events), as the same components
+// are on desktop, so they take the elements typed that way.
+export const KitBox = Box as unknown as typeof Contract.Box;
+export const KitFlex = Flex as unknown as typeof Contract.Flex;
+export const KitInput = Input as unknown as typeof Contract.Input;
 
 type Any = Record<string, any>;
 
@@ -92,7 +179,7 @@ export const Icon = forwardRef<Contract.UIElement, Contract.IconProps>(
         ? sizeToken
         : theme.iconSizes?.[sizeToken] ?? 18;
     return (
-      <Flex
+      <KitFlex
         {...rest}
         ref={ref}
         className="nn-icon"
@@ -128,7 +215,7 @@ export const Icon = forwardRef<Contract.UIElement, Contract.IconProps>(
             dangerouslySetInnerHTML={{ __html: svg }}
           />
         ) : null}
-      </Flex>
+      </KitFlex>
     );
   }
 );
@@ -139,7 +226,7 @@ export const ColorPicker = forwardRef<
 >(function ColorPicker(props, ref) {
   const { value, onChange, ...rest } = props;
   return (
-    <Input
+    <KitInput
       {...(rest as Any)}
       ref={ref as never}
       type="color"
@@ -149,45 +236,44 @@ export const ColorPicker = forwardRef<
   );
 });
 
-export const QRCode = forwardRef<
-  Contract.QRCodeHandle,
-  Contract.QRCodeProps
->(function QRCode(props, ref: Ref<Contract.QRCodeHandle>) {
-  const { value, size, ecLevel, logo: _logo, sx, ...rest } = props;
-  const svg = useMemo(() => {
-    const code = qrcode(0, ecLevel ?? "M");
-    code.addData(value);
-    code.make();
-    return code.createSvgTag({ cellSize: 1, margin: 0, scalable: true });
-  }, [value, ecLevel]);
-  useImperativeHandle(
-    ref,
-    () => ({
-      toSVG: () => svg,
-      toPNG: async () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = canvas.height = size;
-        const context = canvas.getContext("2d")!;
-        const image = new window.Image();
-        image.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-        await image.decode();
-        context.drawImage(image, 0, 0, size, size);
-        const blob = await new Promise<Blob | null>((resolve) =>
-          canvas.toBlob(resolve)
-        );
-        return new Uint8Array(await blob!.arrayBuffer());
-      }
-    }),
-    [svg, size]
-  );
-  return (
-    <Box
-      {...(rest as Any)}
-      {...({ dangerouslySetInnerHTML: { __html: svg } } as Any)}
-      sx={{ width: size, height: size, bg: "background", ...sx }}
-    />
-  );
-});
+export const QRCode = forwardRef<Contract.QRCodeHandle, Contract.QRCodeProps>(
+  function QRCode(props, ref: Ref<Contract.QRCodeHandle>) {
+    const { value, size, ecLevel, logo: _logo, sx, ...rest } = props;
+    const svg = useMemo(() => {
+      const code = qrcode(0, ecLevel ?? "M");
+      code.addData(value);
+      code.make();
+      return code.createSvgTag({ cellSize: 1, margin: 0, scalable: true });
+    }, [value, ecLevel]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        toSVG: () => svg,
+        toPNG: async () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = size;
+          const context = canvas.getContext("2d")!;
+          const image = new window.Image();
+          image.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+          await image.decode();
+          context.drawImage(image, 0, 0, size, size);
+          const blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve)
+          );
+          return new Uint8Array(await blob!.arrayBuffer());
+        }
+      }),
+      [svg, size]
+    );
+    return (
+      <KitBox
+        {...(rest as Any)}
+        {...({ dangerouslySetInnerHTML: { __html: svg } } as Any)}
+        sx={{ width: size, height: size, bg: "background", ...sx }}
+      />
+    );
+  }
+);
 
 /** The browser's own FormData. */
 export const FormData = globalThis.FormData;

@@ -49,7 +49,7 @@ import type {
   ColorValue,
   SpaceProps,
   StyleProp,
-  SxProp,
+  SxStyle,
   ThemeScopeName
 } from "./style";
 
@@ -116,7 +116,8 @@ export interface BaseProps<T = UIElement>
     ColorProps,
     DataAttributes,
     AriaAttributes {
-  sx?: SxProp;
+  /** An object, or theme-ui's function of the theme that returns one. */
+  sx?: SxStyle;
   style?: StyleProp;
   className?: string;
   as?: ElementTag;
@@ -169,14 +170,22 @@ export interface BoxProps extends BaseProps {
 export interface FlexProps extends BoxProps {}
 
 export interface GridProps extends BoxProps {
-  columns: number;
+  /**
+   * A number of equal columns, drawn on desktop too. theme-ui's other forms
+   * (a template string, one value per breakpoint) and a grid given only in
+   * `sx` are accepted; desktop lays those out as one column.
+   */
+  columns?: number | string | (number | string | null)[];
+  /** The smallest width of a column, as in theme-ui. */
+  width?: number | string | (number | string | null)[];
+  repeat?: "fit" | "fill";
 }
 
 /** theme-ui's dotted variant path from the theme root, `text.body`. */
 export type TextVariantPath = `text.${keyof Theme["text"] & string}`;
 
 export interface TextProps extends BaseProps {
-  variant?: keyof Theme["text"] | TextVariantPath;
+  variant?: keyof Theme["text"] | TextVariantPath | (string & {});
   selectable?: boolean;
   dangerouslySetInnerHTML?: { __html: string };
   href?: string;
@@ -186,7 +195,7 @@ export interface TextProps extends BaseProps {
 }
 
 export interface ButtonProps extends BaseProps {
-  variant?: keyof Theme["buttons"];
+  variant?: keyof Theme["buttons"] | (string & {});
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   /** Focuses the button when it mounts. */
@@ -199,13 +208,17 @@ export interface ButtonProps extends BaseProps {
 }
 
 export interface LabelProps extends BaseProps {
-  variant?: keyof Theme["forms"] | TextVariantPath;
+  variant?: keyof Theme["forms"] | TextVariantPath | (string & {});
   htmlFor?: string;
   children?: ReactNode;
 }
 
 export interface LinkProps extends BaseProps {
-  variant?: keyof Theme["variants"] | keyof Theme["text"] | TextVariantPath;
+  variant?:
+    | keyof Theme["variants"]
+    | keyof Theme["text"]
+    | TextVariantPath
+    | (string & {});
   href?: string;
   target?: "_blank" | "_self";
   rel?: string;
@@ -219,7 +232,7 @@ export interface ImageProps extends BaseProps {
 }
 
 export interface InputProps extends BaseProps<UIInputElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   type?:
     | "text"
     | "password"
@@ -259,7 +272,7 @@ export interface InputProps extends BaseProps<UIInputElement> {
 }
 
 export interface TextareaProps extends BaseProps<UITextAreaElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   value?: string | number;
   defaultValue?: string | number;
   placeholder?: string;
@@ -275,7 +288,7 @@ export interface TextareaProps extends BaseProps<UITextAreaElement> {
 }
 
 export interface CheckboxProps extends BaseProps<UIInputElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   name?: string;
   checked?: boolean;
   defaultChecked?: boolean;
@@ -284,7 +297,7 @@ export interface CheckboxProps extends BaseProps<UIInputElement> {
 }
 
 export interface RadioProps extends BaseProps<UIInputElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   checked?: boolean;
   defaultChecked?: boolean;
   value?: string;
@@ -294,7 +307,7 @@ export interface RadioProps extends BaseProps<UIInputElement> {
 }
 
 export interface SwitchProps extends BaseProps<UIInputElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -302,7 +315,7 @@ export interface SwitchProps extends BaseProps<UIInputElement> {
 }
 
 export interface SliderProps extends BaseProps<UIInputElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   value?: number;
   defaultValue?: number;
   min?: number;
@@ -361,7 +374,7 @@ export interface QRCodeHandle {
 }
 
 export interface SelectProps extends BaseProps<UISelectElement> {
-  variant?: keyof Theme["forms"];
+  variant?: keyof Theme["forms"] | (string & {});
   name?: string;
   value?: string | number;
   defaultValue?: string | number;
