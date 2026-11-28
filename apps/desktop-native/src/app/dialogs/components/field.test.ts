@@ -41,6 +41,7 @@ vi.mock("react-native", () => {
     });
   return {
     View: host("View"),
+    ScrollView: host("ScrollView"),
     Text: host("Text"),
     TextInput: host("TextInput"),
     Pressable: host("Pressable"),
@@ -70,6 +71,7 @@ vi.mock("../../../../../../packages/ui/node_modules/react-native", () => {
     });
   return {
     View: host("View"),
+    ScrollView: host("ScrollView"),
     Text: host("Text"),
     TextInput: host("TextInput"),
     Pressable: host("Pressable"),

@@ -53,6 +53,7 @@ function reactNative() {
     });
   return {
     View: host("View"),
+    ScrollView: host("ScrollView"),
     Text: host("Text"),
     TextInput: host("TextInput"),
     Pressable: host("Pressable"),
