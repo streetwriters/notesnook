@@ -213,3 +213,33 @@ describe("CSS motion and theme-ui's forms in sx", () => {
     expect(style).not.toHaveProperty("&::-webkit-scrollbar");
   });
 });
+
+describe("responsive display arrays (editor action bar tools)", () => {
+  const context = {
+    key: {},
+    colors: {},
+    theme: { breakpoints: ["480px", "1000px", "1000px"] }
+  } as never;
+  const tool = (hidden: boolean, hideOnMobile: boolean) => ({
+    display: [hideOnMobile ? "none" : "flex", hidden ? "none" : "flex"]
+  });
+
+  test("a hidden tool is not drawn on a desktop-width window", () => {
+    for (const breakpoint of [1, 2, 3])
+      expect(
+        resolveSx(tool(true, true) as never, context, { breakpoint }).style
+          .display
+      ).toBe("none");
+  });
+
+  test("a shown tool is drawn on desktop and hideOnMobile hides it when narrow", () => {
+    expect(
+      resolveSx(tool(false, true) as never, context, { breakpoint: 1 }).style
+        .display
+    ).not.toBe("none");
+    expect(
+      resolveSx(tool(false, true) as never, context, { breakpoint: 0 }).style
+        .display
+    ).toBe("none");
+  });
+});
