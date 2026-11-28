@@ -64,8 +64,10 @@ function CachedRouter() {
     };
   else cached.current[routeResult.key].props = routeResult.props;
 
+  // React warns when a "key" is spread into JSX, so the route key goes by name.
+  const { key: routeKey, ...routeProps } = routeResult;
   return (
-    <RouteContainer {...routeResult} routeKey={routeResult.key}>
+    <RouteContainer {...routeProps} routeKey={routeKey}>
       {Object.entries(isDatabaseReady ? cached.current : {}).map(
         ([key, { Component, props }]) => (
           <Activity

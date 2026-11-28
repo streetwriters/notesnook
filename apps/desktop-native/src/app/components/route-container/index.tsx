@@ -50,7 +50,7 @@ export type RouteContainerButton = {
   icon: Icon;
 };
 
-export type RouteContainerProps = RouteResult & {
+export type RouteContainerProps = Omit<RouteResult, "key"> & {
   routeKey?: string;
 };
 function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
