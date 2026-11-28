@@ -245,6 +245,9 @@ test("ctrl+t opens a new editor tab and ctrl+w closes it", async () => {
 });
 
 test("ctrl+, opens settings and escape closes it", async () => {
+  // In the editor Ctrl+, is the subscript key (as on web), so take the focus
+  // out of the editor first: a fresh note's editor starts focused.
+  await app.getByTestId("tab-title").first().click();
   await app.press("mod-,");
   await vi.waitFor(
     async () =>

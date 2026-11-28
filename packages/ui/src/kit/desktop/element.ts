@@ -193,6 +193,10 @@ export class DesktopElement implements UIInputElement {
   }
 
   focus(_options?: { preventScroll?: boolean }) {
+    // The DOM does nothing when the element already has the focus; running
+    // the native focus again re-fires `onFocus`, which made the tag input
+    // reopen its suggestions right after Enter added a tag.
+    if (focused === this) return;
     this.node.focus?.();
   }
 

@@ -202,7 +202,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             }}
           />
           <Text variant="body" sx={{ mr: 1 }}>
-            / {state?.pageCount ?? 0}
+            {`/ ${state?.pageCount ?? 0}`}
           </Text>
           <ToolbarButton
             data-test-id={strings.goToNextPage()}
@@ -316,7 +316,12 @@ export function PdfPreview(props: PdfPreviewProps) {
             onChange={(e) => setPassword(e.target.value)}
             placeholder={strings.enterPassword()}
             onKeyDown={(e) => {
-              if (e.key === "Enter") controller.current?.unlock(password);
+              // The field's own text, not `password`: Enter can arrive before
+              // the render that follows the last change.
+              if (e.key === "Enter")
+                controller.current?.unlock(
+                  (e.currentTarget as HTMLInputElement).value ?? password
+                );
             }}
             sx={{ width: "95%", maxWidth: 400 }}
           />

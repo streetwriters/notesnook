@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { strings } from "@notesnook/intl";
 import { Button, Flex, Text } from "@notesnook/ui-kit";
 import Field from "../field";
@@ -114,17 +114,22 @@ export function UnlockScreen(props: {
   const [selected, setMode] = useState<"password" | "securityKey">();
   const mode = selected ?? (password ? "password" : "choose");
   const [value, setValue] = useState("");
+  // What the field holds right now: a click or Enter right after the last
+  // keystroke can run before the render that follows its change.
+  const typed = useRef("");
   const [error, setError] = useState<string>();
   const [isUnlocking, setIsUnlocking] = useState(false);
 
   const switchMode = (next: "password" | "securityKey") => {
     setMode(next);
+    typed.current = "";
     setValue("");
     setError(undefined);
   };
 
   const unlock = async () => {
     setError(undefined);
+    const value = typed.current;
     if (mode === "password" && password) {
       if (!value) {
         setError(strings.passwordIsRequired());
@@ -212,7 +217,10 @@ export function UnlockScreen(props: {
                 }
                 autoFocus
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => {
+                  typed.current = e.target.value;
+                  setValue(e.target.value);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") unlock();
                 }}

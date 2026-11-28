@@ -106,11 +106,9 @@ describe("properties round trips through the database", () => {
     await settle(async () => expect(await count(app, "popup-backdrop")).toBe(1));
     await app.press("enter");
     await settle(async () => expect(await count(app, "tag")).toBe(1));
-    // Desktop reopens the default suggestions once the field takes focus back
-    // after the add (web closes them). Dismiss them so the next tests can click.
-    await settle(async () => expect(await count(app, "popup-backdrop")).toBe(1));
-    await app.press("escape");
-    await settle(async () => expect(await count(app, "popup-backdrop")).toBe(0));
+    // The suggestions stay closed after the add, as on web.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(await count(app, "popup-backdrop")).toBe(0);
   });
 });
 

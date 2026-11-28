@@ -25,6 +25,7 @@ import {
   getElementById,
   measureInWindow,
   registerElementId,
+  setFocused,
   setScrollCommand,
   type ElementControl,
   type NativeNode
@@ -121,6 +122,17 @@ describe("a ref to a desktop primitive", () => {
     element.blur();
     expect(host.focus).toHaveBeenCalledOnce();
     expect(host.blur).toHaveBeenCalledOnce();
+  });
+
+  it("does nothing when focus is asked of the element that has it, as the DOM", () => {
+    const host = { focus: vi.fn(), blur: vi.fn() };
+    const element = elementFor(host)!;
+    setFocused(element, true);
+    element.focus();
+    expect(host.focus).not.toHaveBeenCalled();
+    setFocused(element, false);
+    element.focus();
+    expect(host.focus).toHaveBeenCalledOnce();
   });
 
   it("answers measureInWindow, which the kit's presenters use", () => {
