@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import transform from "css-to-react-native";
 import type { Declarations } from "../../shared/style/declarations";
 import { lineHeightRatio } from "../../shared/style/line-height";
+import { parseAnimation, parseTransition } from "../../shared/style/css-motion";
 
 export type { Declarations };
 
@@ -72,12 +73,16 @@ export interface TransitionInput {
   easing?: string;
 }
 
-export function convertTransition(transition: TransitionInput) {
+/** The kit's object, or a CSS `transition` string as apps/web writes it. */
+export function convertTransition(transition: TransitionInput | string) {
+  const input =
+    typeof transition === "string" ? parseTransition(transition) : transition;
+  if (!input) return undefined;
   return {
-    transitionProperty: transition.property,
-    transitionDuration: `${transition.duration}ms`,
-    transitionDelay: `${transition.delay ?? 0}ms`,
-    transitionTimingFunction: EASINGS[transition.easing ?? "ease"] ?? "ease"
+    transitionProperty: input.property,
+    transitionDuration: `${input.duration}ms`,
+    transitionDelay: `${input.delay ?? 0}ms`,
+    transitionTimingFunction: EASINGS[input.easing ?? "ease"] ?? "ease"
   };
 }
 
@@ -87,28 +92,49 @@ export interface AnimationInput {
   delay?: number;
   iterationCount?: number | "infinite";
   easing?: string;
+  fillMode?: string;
+  direction?: string;
 }
 
+/**
+ * The kit's object, or a CSS `animation` string naming keyframes registered
+ * with `keyframes` or a `<style>` element; undefined when none is registered.
+ */
 export function convertAnimation(
-  animation: AnimationInput,
+  animation: AnimationInput | string,
   resolveKeyframe: (frame: Declarations) => Declarations
 ) {
+  const input =
+    typeof animation === "string" ? parseAnimation(animation) : animation;
+  if (!input) return undefined;
   const animationName: Record<string, Declarations> = {};
-  for (const stop in animation.keyframes) {
+  for (const stop in input.keyframes) {
     animationName[stop] = convertStateDeclarations(
-      resolveKeyframe(animation.keyframes[stop])
+      resolveKeyframe(input.keyframes[stop])
     );
   }
-  return {
+  const style: Record<string, unknown> = {
     animationName,
-    animationDuration: `${animation.duration}ms`,
-    animationDelay: `${animation.delay ?? 0}ms`,
-    animationIterationCount: animation.iterationCount ?? 1,
-    animationTimingFunction: EASINGS[animation.easing ?? "ease"] ?? "ease"
+    animationDuration: `${input.duration}ms`,
+    animationDelay: `${input.delay ?? 0}ms`,
+    animationIterationCount: input.iterationCount ?? 1,
+    animationTimingFunction: EASINGS[input.easing ?? "ease"] ?? "ease"
   };
+  if (input.fillMode) style.animationFillMode = input.fillMode;
+  if (input.direction) style.animationDirection = input.direction;
+  return style;
 }
 
-const PX = /^(-?\d+(?:\.\d+)?)px$/;
+const PX = /^(-?\d*\.?\d+)px$/;
+// rem and em are multiples of 16px: desktop text has no root or inherited
+// font size to scale by.
+const REM = /^(-?\d*\.?\d+)r?em$/;
+const REM_PX = 16;
+const IMPORTANT = /\s*!important$/;
+// CSS values desktop has no layout for; the property is left unset.
+const UNDRAWABLE =
+  /^(?:unset|initial|revert|min-content|max-content|currentcolor)$|(?:calc|min|max|clamp|env)\(/i;
+const GRADIENT = /gradient\(/;
 const FLEX_ALIGN_KEYS = new Set([
   "alignItems",
   "alignSelf",
@@ -133,6 +159,7 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
 
   let result: [string, unknown][];
   const px = PX.exec(value);
+  const rem = REM.exec(value);
   const sideBorder = SIDE_BORDER.test(key)
     ? SIDE_BORDER_VALUE.exec(value)
     : null;
@@ -142,6 +169,7 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
   } else if (key === "border" && value === "none")
     result = [[`borderWidth`, 0]];
   else if (px) result = [[key, parseFloat(px[1])]];
+  else if (rem) result = [[key, parseFloat(rem[1]) * REM_PX]];
   else if (FLEX_ALIGN_KEYS.has(key) && LOGICAL.flex[value])
     result = [[key, LOGICAL.flex[value]]];
   else if (key === "textAlign" && LOGICAL.text[value])
@@ -266,7 +294,18 @@ export function convertDeclarations(
     if (value === undefined || value === null || value === "inherit") continue;
     // Desktop boxes already size to their content.
     if (value === "fit-content") continue;
+    if (typeof value === "string") {
+      // There is no cascade for `!important` to win.
+      if (IMPORTANT.test(value)) value = value.replace(IMPORTANT, "");
+      if (key !== "cursor" && UNDRAWABLE.test(value as string)) continue;
+    }
     switch (key) {
+      case "position":
+        // No viewport-fixed or sticky boxes: the nearest drawable ones.
+        if (value === "fixed") value = "absolute";
+        else if (value === "sticky") value = "relative";
+        else if (value === "static") continue;
+        break;
       case "fontWeight":
         if (value === "bolder") value = 700;
         break;
@@ -282,7 +321,7 @@ export function convertDeclarations(
         break;
       case "display":
         if (value === "none") style.display = "none";
-        else if (value === "flex") isFlex = true;
+        else if (value === "flex" || value === "inline-flex") isFlex = true;
         continue;
       case "flex": {
         const expanded = expandFlex(value);
@@ -297,8 +336,18 @@ export function convertDeclarations(
         nowrap = value === "nowrap";
         continue;
       case "background":
-        if (typeof value === "string" && !/gradient|url\(/.test(value))
+      case "backgroundImage":
+        // Gradients are drawn; images (`url()`) are not.
+        if (typeof value !== "string" || value === "none") continue;
+        if (GRADIENT.test(value)) style.experimental_backgroundImage = value;
+        else if (key === "background" && !/url\(/.test(value))
           style.backgroundColor = value;
+        continue;
+      case "backgroundSize":
+        if (value !== "auto") style.experimental_backgroundSize = value;
+        continue;
+      case "backgroundPosition":
+        style.experimental_backgroundPosition = value;
         continue;
       case "userSelect":
         converted.selectable = value !== "none";

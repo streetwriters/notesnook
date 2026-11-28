@@ -73,6 +73,7 @@ export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
 export { MenuPresenter, PopupPresenter } from "@notesnook/ui";
 export { useThemeUI } from "@theme-ui/core";
 export { alpha } from "@theme-ui/color";
+export { keyframes } from "@emotion/react";
 export { createButtonVariant } from "@notesnook/theme";
 export { showToast, ToastHost } from "./toast";
 export {

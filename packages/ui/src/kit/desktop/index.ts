@@ -40,6 +40,7 @@ export { WebView } from "./webview";
 export { PdfViewer } from "./pdf";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "../shared/style/data-color";
+export { keyframes } from "../shared/style/css-motion";
 export {
   ListSelectionContext,
   useListCursor,

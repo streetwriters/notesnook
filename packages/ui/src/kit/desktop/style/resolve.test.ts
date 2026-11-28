@@ -27,6 +27,7 @@ import {
   withAlpha,
   withDisabledStyle
 } from "./resolve";
+import { registerStylesheet } from "../../shared/style/css-motion";
 
 describe(":disabled", () => {
   test("applies while disabled and is dropped otherwise", () => {
@@ -147,5 +148,68 @@ describe("theme callbacks", () => {
       );
     expect(JSON.stringify(at(1))).toContain("15");
     expect(JSON.stringify(at(2))).toContain("25");
+  });
+});
+
+describe("CSS motion and theme-ui's forms in sx", () => {
+  const context = {
+    key: {},
+    theme: { space: { spacing2: 5 }, breakpoints: [] },
+    colors: { border: "#cccccc" }
+  } as never;
+
+  test("an animation string draws once its keyframes are registered", () => {
+    const sx = { animation: "resolveTestFade 0.8s ease-out 0.4s both" };
+    const before = resolveSx(sx as never, context, { breakpoint: 0 });
+    expect(before.animated).toBeUndefined();
+    expect(before.style).not.toHaveProperty("animationName");
+
+    registerStylesheet(
+      "@keyframes resolveTestFade { from { opacity: 0; } to { opacity: 1; } }"
+    );
+    const after = resolveSx(sx as never, context, { breakpoint: 0 });
+    expect(after.animated).toBe(true);
+    expect(after.style).toMatchObject({
+      animationName: { from: { opacity: 0 }, to: { opacity: 1 } },
+      animationDuration: "800ms",
+      animationDelay: "400ms",
+      animationFillMode: "both"
+    });
+  });
+
+  test("a transition string of undrawable properties animates nothing", () => {
+    const resolved = resolveSx(
+      { transition: "width 0.2s", opacity: 1 } as never,
+      context,
+      { breakpoint: 0 }
+    );
+    expect(resolved.animated).toBeUndefined();
+    expect(resolved.style).not.toHaveProperty("transition");
+    expect(
+      resolveSx({ transition: "opacity 0.2s" } as never, context, {
+        breakpoint: 0
+      }).style
+    ).toMatchObject({ transitionProperty: ["opacity"] });
+  });
+
+  test("selectors are ignored and a gradient's var(--token) is its colour", () => {
+    const { style } = resolveSx(
+      {
+        "& strong": { color: "accent" },
+        "&::-webkit-scrollbar": { display: "none" },
+        th: { fontWeight: "bold" },
+        backgroundImage:
+          "radial-gradient(circle, var(--border) 1px, transparent 1px)",
+        scrollSnapType: "y mandatory"
+      } as never,
+      context,
+      { breakpoint: 0 }
+    );
+    expect(style.experimental_backgroundImage).toBe(
+      "radial-gradient(circle, #cccccc 1px, transparent 1px)"
+    );
+    expect(style).not.toHaveProperty("& strong");
+    expect(style).not.toHaveProperty("th");
+    expect(style).not.toHaveProperty("&::-webkit-scrollbar");
   });
 });

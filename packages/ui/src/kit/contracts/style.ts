@@ -54,6 +54,16 @@ export type ColorValue = ColorToken | DataColor | CssVarColor | CssString;
  * (#rgb, #rgba, #rrggbb or #rrggbbaa); throws for anything else.
  */
 export declare function dataColor(hex: string): DataColor;
+
+/**
+ * Emotion's `keyframes` tag: the name of the rule, to be written into an
+ * `animation` string (`${fadeIn} 1s ease-out`). Desktop animates opacity,
+ * transform and colours.
+ */
+export declare function keyframes(
+  template: TemplateStringsArray,
+  ...values: unknown[]
+): string;
 export type SpaceToken =
   | Exclude<keyof ThemeSpace, keyof Array<unknown> | "small" | "auto">
   | "small"

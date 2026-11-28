@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { describe, expect, test } from "vitest";
-import { convertDeclarations, convertOutline, expandFlex } from "./convert";
+import {
+  convertAnimation,
+  convertDeclarations,
+  convertOutline,
+  convertTransition,
+  expandFlex
+} from "./convert";
+import { registerStylesheet } from "../../shared/style/css-motion";
 
 describe("sx keys taken from apps/web", () => {
   test("pointerEvents all is auto; colorScheme is ignored", () => {
@@ -346,5 +353,141 @@ describe("logical alignment from apps/web", () => {
     expect(convertDeclarations({ borderRadius: "150px" }).style.borderRadius).toBe(
       150
     );
+  });
+});
+
+describe("CSS values apps/web writes that the contract now accepts", () => {
+  test("rem and em are multiples of 16px", () => {
+    const { style } = convertDeclarations({
+      fontSize: "1.2rem",
+      width: "10rem",
+      marginTop: "0.5em",
+      letterSpacing: ".5rem"
+    });
+    expect(style.fontSize).toBeCloseTo(19.2);
+    expect(style.width).toBe(160);
+    expect(style.marginTop).toBe(8);
+    expect(style.letterSpacing).toBe(8);
+  });
+
+  test("fixed is absolute, sticky is relative, static is the default", () => {
+    expect(convertDeclarations({ position: "fixed" }).style.position).toBe(
+      "absolute"
+    );
+    expect(convertDeclarations({ position: "sticky" }).style.position).toBe(
+      "relative"
+    );
+    expect(convertDeclarations({ position: "static" }).style).not.toHaveProperty(
+      "position"
+    );
+    expect(convertDeclarations({ position: "absolute" }).style.position).toBe(
+      "absolute"
+    );
+  });
+
+  test("a gradient background is drawn, with its size and position", () => {
+    const { style } = convertDeclarations({
+      backgroundImage: "radial-gradient(circle, #ccc 1px, transparent 1px)",
+      backgroundSize: "20px 20px",
+      backgroundPosition: "center"
+    });
+    expect(style).toMatchObject({
+      experimental_backgroundImage:
+        "radial-gradient(circle, #ccc 1px, transparent 1px)",
+      experimental_backgroundSize: "20px 20px",
+      experimental_backgroundPosition: "center"
+    });
+    expect(style).not.toHaveProperty("backgroundImage");
+    expect(
+      convertDeclarations({
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+      }).style
+    ).toMatchObject({
+      experimental_backgroundImage:
+        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    });
+  });
+
+  test("a background with no gradient is a colour; none and url() draw nothing", () => {
+    expect(convertDeclarations({ background: "#ff0000" }).style.backgroundColor).toBe(
+      "#ff0000"
+    );
+    for (const value of ["none", "url(a.png)"]) {
+      const { style } = convertDeclarations({
+        background: value,
+        backgroundImage: value
+      });
+      expect(style).not.toHaveProperty("backgroundColor");
+      expect(style).not.toHaveProperty("experimental_backgroundImage");
+    }
+    expect(convertDeclarations({ backgroundSize: "auto" }).style).not.toHaveProperty(
+      "experimental_backgroundSize"
+    );
+  });
+
+  test("!important is dropped from the value", () => {
+    expect(
+      convertDeclarations({ width: "100px !important", color: "red!important" })
+        .style
+    ).toMatchObject({ width: 100, color: "red" });
+  });
+
+  test("values with no desktop layout leave the property unset", () => {
+    const { style } = convertDeclarations({
+      width: "calc(100% - 20px)",
+      maxWidth: "min(30%, 400px)",
+      height: "min-content",
+      color: "currentColor",
+      minHeight: "unset",
+      opacity: 0.5
+    });
+    expect(style).toEqual({ opacity: 0.5, flexShrink: 1 });
+  });
+
+  test("inline-flex lays out as a row, grid as the default column", () => {
+    expect(convertDeclarations({ display: "inline-flex" }).style.flexDirection).toBe(
+      "row"
+    );
+    const grid = convertDeclarations({
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr"
+    }).style;
+    expect(grid).not.toHaveProperty("display");
+    expect(grid).not.toHaveProperty("flexDirection");
+  });
+});
+
+describe("CSS motion strings", () => {
+  test("a transition string is the properties desktop animates", () => {
+    expect(convertTransition("opacity 0.2s ease-in-out")).toEqual({
+      transitionProperty: ["opacity"],
+      transitionDuration: "200ms",
+      transitionDelay: "0ms",
+      transitionTimingFunction: "ease-in-out"
+    });
+    expect(convertTransition("width 1s")).toBeUndefined();
+  });
+
+  test("an animation string draws registered keyframes, with its fill mode", () => {
+    registerStylesheet(
+      "@keyframes convertTestSlide { from { opacity: 0; transform: translateY(30px); width: 10px; } to { opacity: 1; transform: translateY(0); } }"
+    );
+    expect(
+      convertAnimation("convertTestSlide 1s ease-out 0.2s both", (frame) => frame)
+    ).toEqual({
+      // Only what desktop animates is kept from a frame (no width).
+      animationName: {
+        from: { opacity: 0, transform: "translateY(30px)" },
+        to: { opacity: 1, transform: "translateY(0)" }
+      },
+      animationDuration: "1000ms",
+      animationDelay: "200ms",
+      animationIterationCount: 1,
+      animationTimingFunction: "ease-out",
+      animationFillMode: "both"
+    });
+    expect(
+      convertAnimation("notRegistered 1s", (frame) => frame)
+    ).toBeUndefined();
   });
 });

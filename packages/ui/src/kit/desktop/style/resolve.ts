@@ -30,6 +30,7 @@ import {
   type TransitionInput
 } from "./convert";
 import { normalizeVariant } from "../../shared/style/variants";
+import { keyframesVersion } from "../../shared/style/css-motion";
 
 export interface ResolvedStyle {
   style: Record<string, unknown>;
@@ -77,9 +78,11 @@ const identityCache = new WeakMap<
 const fingerprintCache = new WeakMap<object, Map<string, ResolvedStyle>>();
 
 function optionsKey(options: ResolveOptions) {
+  // The keyframes an `animation` string names can be registered after the
+  // style was first resolved: a new rule makes a new cache entry.
   return `${options.variantGroup ?? ""}/${options.variant ?? ""}/${
     options.breakpoint
-  }`;
+  }/${keyframesVersion()}`;
 }
 
 type TransformPart = Record<string, number | string>;
@@ -245,14 +248,15 @@ function groupEntries(sx: SxProp) {
   const own: Record<string, unknown> = {};
   let groupHover: { group: string; style: Declarations } | undefined;
   let groupActive: { group: string; style: Declarations } | undefined;
-  let transition: TransitionInput | undefined;
-  let animation: AnimationInput | undefined;
+  let transition: TransitionInput | string | undefined;
+  let animation: AnimationInput | string | undefined;
   for (const key in sx) {
     const value = (sx as Record<string, unknown>)[key];
     if (key === ":group-hover") groupHover = value as typeof groupHover;
     else if (key === ":group-active") groupActive = value as typeof groupActive;
-    else if (key === "transition") transition = value as TransitionInput;
-    else if (key === "animation") animation = value as AnimationInput;
+    else if (key === "transition")
+      transition = value as TransitionInput | string;
+    else if (key === "animation") animation = value as AnimationInput | string;
     else own[key] = value;
   }
   return { own, groupHover, groupActive, transition, animation };
@@ -314,19 +318,22 @@ function compute(
   }
 
   const converted = convertDeclarations(base);
-  if (transition) Object.assign(converted.style, convertTransition(transition));
-  if (animation)
-    Object.assign(
-      converted.style,
-      convertAnimation(
-        animation,
-        (frame) =>
-          css(withCssTransform(frame) as never)(theme as never) as Declarations
-      )
-    );
+  const motion = [
+    transition ? convertTransition(transition) : undefined,
+    animation
+      ? convertAnimation(
+          animation,
+          (frame) =>
+            css(withCssTransform(resolveAlpha(frame, colors)) as never)(
+              theme as never
+            ) as Declarations
+        )
+      : undefined
+  ];
+  for (const style of motion) if (style) Object.assign(converted.style, style);
   const resolved: ResolvedStyle = {
     style: converted.style,
-    animated: transition || animation ? true : undefined,
+    animated: motion.some(Boolean) ? true : undefined,
     numberOfLines: converted.numberOfLines,
     selectable: converted.selectable,
     objectFit: converted.objectFit as ResolvedStyle["objectFit"]
