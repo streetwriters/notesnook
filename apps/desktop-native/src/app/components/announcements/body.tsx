@@ -400,8 +400,10 @@ function CalltoAction({
             break;
           }
           case "promo": {
-            const [coupon, plan] = action.data.split(":");
-            await BuyDialog.show({ plan, coupon });
+            // Web passes { plan, coupon }, which its BuyDialog ignores; the
+            // dialog takes the coupon as couponCode.
+            const [coupon] = action.data.split(":");
+            await BuyDialog.show({ couponCode: coupon });
             break;
           }
           case "force-sync": {

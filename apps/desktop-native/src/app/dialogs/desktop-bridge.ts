@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // here instead of using the globals, so their code stays the same as web's.
 
 import {
+  clipboard,
   environment,
   integration,
   lifecycle,
@@ -111,3 +112,14 @@ const nativeWindow = {
   }
 };
 export { nativeWindow as window };
+
+/** clipboard-polyfill's `writeText`, on the clipboard service. */
+export function writeText(text: string) {
+  return clipboard.write({ "text/plain": text });
+}
+
+/** The members of `navigator` the shared dialogs call. */
+const nativeNavigator = {
+  clipboard: { writeText }
+};
+export { nativeNavigator as navigator };

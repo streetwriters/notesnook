@@ -17,17 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { getFormattedDate } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import { PopupPresenter } from "@notesnook/ui-kit";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Flex } from "@notesnook/ui-kit";
-import { strings } from "@notesnook/intl";
+import { useRef, useState } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { store } from "../stores/note-store";
-import { showToast } from "../utils/toast";
-import { DateField } from "./components/date-field";
+import { DayPicker } from "../components/day-picker";
 import Dialog from "../components/dialog";
+import Field from "../components/field";
+import { CalendarDots } from "../components/icons";
+import { store } from "../stores/note-store";
+import { useStore as useThemeStore } from "../stores/theme-store";
+import { setDateOnly } from "../utils/date-time";
+import { showToast } from "../utils/toast";
 
 dayjs.extend(customParseFormat);
 
@@ -42,6 +47,9 @@ export const NoteExpiryDateDialog = DialogManager.register(
     const [date, setDate] = useState(
       expiryDate ? dayjs(expiryDate) : dayjs().add(7, "day")
     );
+    const [showCalendar, setShowCalendar] = useState(false);
+    const dateInputRef = useRef<HTMLInputElement>(null);
+    const theme = useThemeStore((store) => store.colorScheme);
 
     return (
       <Dialog
@@ -75,17 +83,64 @@ export const NoteExpiryDateDialog = DialogManager.register(
           onClick: () => onClose(false)
         }}
       >
-        <Flex sx={{ mt: "spacing6", mb: "spacing7", flexDirection: "column" }}>
-          <DateField
-            id="date"
-            label={strings.date()}
-            date={date}
-            onChange={setDate}
-            placeholder={`${db.settings.getDateFormat()}`}
+        <Field
+          id="date"
+          label={strings.date()}
+          required
+          inputRef={dateInputRef}
+          placeholder={`${db.settings.getDateFormat()}`}
+          action={{
+            icon: CalendarDots,
+            onClick() {
+              setShowCalendar(true);
+            }
+          }}
+          validate={(t) =>
+            dayjs(t, db.settings.getDateFormat(), true).isValid()
+          }
+          defaultValue={date.format(db.settings.getDateFormat())}
+          onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
+          sx={{
+            mt: "spacing6",
+            mb: "spacing7",
+            input: {
+              fontSize: "sm",
+              px: "spacing4",
+              py: "spacing6"
+            }
+          }}
+        />
+        <PopupPresenter
+          isOpen={showCalendar}
+          onClose={() => setShowCalendar(false)}
+          position={{
+            isTargetAbsolute: true,
+            target: dateInputRef.current,
+            location: "top"
+          }}
+        >
+          <DayPicker
+            sx={{
+              bg: "background",
+              p: 2,
+              boxShadow: `0px 0px 25px 5px ${
+                theme === "dark" ? "#000000aa" : "#0000004e"
+              }`,
+              borderRadius: "dialog",
+              width: 300
+            }}
+            selected={dayjs(date).toDate()}
             minDate={dayjs().add(1, "day").toDate()}
             maxDate={dayjs().add(1, "year").toDate()}
+            onSelect={(day) => {
+              if (!day) return;
+              const dateStr = getFormattedDate(day, "date");
+              setDate((d) => setDateOnly(dateStr, d));
+              if (dateInputRef.current) dateInputRef.current.value = dateStr;
+              setShowCalendar(false);
+            }}
           />
-        </Flex>
+        </PopupPresenter>
       </Dialog>
     );
   }

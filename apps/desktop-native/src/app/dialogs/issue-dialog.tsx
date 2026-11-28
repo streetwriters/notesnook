@@ -17,54 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
-import { Flex, Text, Box } from "@notesnook/ui-kit";
-import { clipboard } from "@platform";
+import { FormData } from "@notesnook/ui-kit";
+
+import { Flex, Link, Text } from "@notesnook/ui-kit";
+import Field from "../components/field";
+import Dialog from "../components/dialog";
+import { useState } from "react";
+import { writeText } from "./desktop-bridge";
 import { store as userstore } from "../stores/user-store";
+
+import { ErrorText } from "../components/error-text";
 import { Debug, IssueReportResponse } from "@notesnook/core";
 import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
 import { getSubscriptionInfo } from "./settings/components/user-profile";
-import { ErrorText } from "../components/error-text";
-import { Field } from "./components/field";
-import { LinkText } from "./components/link-text";
-import Dialog from "../components/dialog";
 
 type IssueDialogProps = BaseDialogProps<boolean>;
-
 export const IssueDialog = DialogManager.register(function IssueDialog(
   props: IssueDialogProps
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
-  const values = useRef({ title: "", body: "" });
-
-  const onSubmit = async () => {
-    try {
-      setIsSubmitting(true);
-      setError(undefined);
-      const requestData = { ...values.current };
-      if (!requestData.title.trim() || !requestData.body.trim()) return;
-      requestData.body = BODY_TEMPLATE(requestData.body);
-
-      const response = await Debug.report({
-        title: requestData.title,
-        body: requestData.body,
-        userId: userstore.get().user?.id
-      });
-      if (!response) throw new Error(strings.couldNotSubmitBugReport());
-      if ("error" in response) throw new Error(response.error);
-
-      props.onClose(true);
-      await showIssueReportedDialog(response);
-    } catch (e) {
-      if (e instanceof Error) setError(e.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <Dialog
@@ -73,7 +48,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
       onClose={() => props.onClose(false)}
       positiveButton={{
         text: strings.submit(),
-        onClick: onSubmit,
+        form: "issueForm",
         loading: isSubmitting,
         disabled: isSubmitting
       }}
@@ -82,53 +57,98 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
         onClick: () => props.onClose(false)
       }}
     >
-      <Flex sx={{ flexDirection: "column" }}>
-        <Box
-          as="form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit();
-          }}
-        >
-          <Field
-            required
-            label={strings.title()}
-            id="title"
-            placeholder={strings.issueTitlePlaceholder()}
-            autoFocus
-            onChange={({ target: { value: text } }) =>
-              (values.current.title = text)
-            }
-          />
-        </Box>
+      <Flex
+        id="issueForm"
+        as="form"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          try {
+            setIsSubmitting(true);
+            setError(undefined);
+
+            const formData = new FormData(e.target as HTMLFormElement);
+            const requestData = Object.fromEntries(
+              formData.entries() as IterableIterator<[string, string]>
+            );
+
+            if (!requestData.title.trim() || !requestData.body.trim()) return;
+            requestData.body = BODY_TEMPLATE(requestData.body);
+            const response = await Debug.report({
+              title: requestData.title,
+              body: requestData.body,
+              userId: userstore.get().user?.id
+            });
+            if (!response)
+              throw new Error(strings.couldNotSubmitBugReport());
+            if ("error" in response) throw new Error(response.error);
+
+            props.onClose(true);
+            await showIssueReportedDialog(response);
+          } catch (e) {
+            if (e instanceof Error) setError(e.message);
+          } finally {
+            setIsSubmitting(false);
+          }
+        }}
+        sx={{ flexDirection: "column" }}
+      >
+        <Field
+          required
+          label={strings.title()}
+          id="title"
+          name="title"
+          placeholder={strings.issueTitlePlaceholder()}
+          autoFocus
+        />
         <Field
           as="textarea"
           required
+          variant="forms.input"
           label={strings.description()}
           id="body"
+          name="body"
           placeholder={strings.issuePlaceholder()}
           sx={{ mt: 1 }}
-          styles={{ input: { minHeight: 150 } }}
-          onChange={({ target: { value: text } }) =>
-            (values.current.body = text)
-          }
+          styles={{
+            input: {
+              minHeight: 150
+            }
+          }}
         />
         <Text
           variant="error"
-          sx={{ bg: "background-error", mt: 1, p: 1, borderRadius: "default" }}
+          bg={"var(--background-error)"}
+          mt={1}
+          p={1}
+          sx={{ borderRadius: "default" }}
         >
           {strings.issueNotice[0]()}{" "}
-          <LinkText href="https://github.com/streetwriters/notesnook/issues">
+          <Link
+            href="https://github.com/streetwriters/notesnook/issues"
+            title="github.com/streetwriters/notesnook/issues"
+            target="_blank"
+          >
             github.com/streetwriters/notesnook/issues
-          </LinkText>
+          </Link>
           {strings.issueNotice[1]()}{" "}
-          <LinkText href="https://discord.gg/zQBK97EE22">
+          <Link
+            href="https://discord.gg/zQBK97EE22"
+            title={strings.issueNotice[2]()}
+            target="_blank"
+          >
             {strings.issueNotice[2]()}
-          </LinkText>
+          </Link>
           /
         </Text>
-        <Text variant="subBody" sx={{ mt: 1 }}>
-          {getDeviceInfo([`Plan: ${getSubscriptionInfo().title}`])}
+        <Text variant="subBody" mt={1}>
+          {getDeviceInfo([`Plan: ${getSubscriptionInfo().title}`])
+            .split("\n")
+            .map((t) => (
+              <>
+                {t}
+                <br />
+              </>
+            ))}
         </Text>
         <ErrorText error={error} />
       </Flex>
@@ -153,7 +173,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
         positiveButtonText: strings.copyLink(),
         subtitle: strings.featureRequestMessage(url)
       }).then((result) => {
-        result && clipboard.write({ "text/plain": url });
+        result && writeText(url);
       });
     }
     case "issue": {
@@ -163,7 +183,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
         positiveButtonText: strings.copyLink(),
         subtitle: strings.bugReportMessage(url)
       }).then((result) => {
-        result && clipboard.write({ "text/plain": url });
+        result && writeText(url);
       });
     }
   }

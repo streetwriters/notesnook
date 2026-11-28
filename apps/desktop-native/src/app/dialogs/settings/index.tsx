@@ -17,23 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { strings } from "@notesnook/intl";
-import { debounce, useIsFeatureAvailable } from "@notesnook/common";
-import { withFeatureCheck } from "../../common";
-import { environment } from "@platform";
-import {
-  Button,
-  Flex,
-  Input,
-  ScrollContainer,
-  Select,
-  Switch,
-  Text,
-  ThemeScope,
-  useWindowSize
-} from "@notesnook/ui-kit";
-import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import { Flex, Text, Button, Input, Switch } from "@notesnook/ui-kit";
+import Dialog from "../../components/dialog";
 import {
   About,
   Account,
@@ -41,12 +26,10 @@ import {
   Backup,
   Behaviour,
   CellphoneLock,
-  CircleEmpty,
   Desktop,
   Documentation,
   Editor,
   Import,
-  Inbox,
   Legal,
   Loading,
   Notification,
@@ -55,34 +38,15 @@ import {
   Pro,
   Servers,
   ShieldLock,
-  Sync
+  Sync,
+  Inbox,
+  CircleEmpty
 } from "../../components/icons";
 import NavigationItem from "../../components/navigation-menu/navigation-item";
-import { hashNavigate } from "../../navigation";
-import { useStore as useUserStore } from "../../stores/user-store";
-import { AppearanceSettings } from "./appearance-settings";
-import { AppLockSettings } from "./app-lock-settings";
-import { AuthenticationSettings } from "./auth-settings";
-import { BackupExportSettings } from "./backup-export-settings";
-import { BehaviourSettings } from "./behaviour-settings";
-import { DesktopIntegrationSettings } from "./desktop-integration-settings";
-import { EditorSettings } from "./editor-settings";
-import { ImporterSettings } from "./importer-settings";
-import { InboxSettings } from "./inbox-settings";
-import { NotesnookCircleSettings } from "./notesnook-circle-settings";
-import { NotificationsSettings } from "./notifications-settings";
+import { IS_DESKTOP_APP } from "../desktop-bridge";
+import { FlexScrollContainer } from "../../components/scroll-container";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  AboutSettings,
-  LegalSettings,
-  SupportSettings
-} from "./other-settings";
-import { PrivacySettings } from "./privacy-settings";
-import { ProfileSettings } from "./profile-settings";
-import { ServersSettings } from "./servers-settings";
-import { SubscriptionSettings } from "./subscription-settings";
-import { SyncSettings } from "./sync-settings";
-import { VaultSettings } from "./vault-settings";
-import type {
   DropdownSettingComponent,
   Section,
   SectionGroup,
@@ -90,7 +54,37 @@ import type {
   Setting,
   SettingsGroup
 } from "./types";
-import Dialog from "../../components/dialog";
+import { ProfileSettings } from "./profile-settings";
+import { AuthenticationSettings } from "./auth-settings";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { SyncSettings } from "./sync-settings";
+import { BehaviourSettings } from "./behaviour-settings";
+import { DesktopIntegrationSettings } from "./desktop-integration-settings";
+import { NotificationsSettings } from "./notifications-settings";
+
+import { BackupExportSettings } from "./backup-export-settings";
+import { ImporterSettings } from "./importer-settings";
+import { VaultSettings } from "./vault-settings";
+import { PrivacySettings } from "./privacy-settings";
+import { EditorSettings } from "./editor-settings";
+import {
+  AboutSettings,
+  LegalSettings,
+  SupportSettings
+} from "./other-settings";
+import { AppearanceSettings } from "./appearance-settings";
+import { debounce, useIsFeatureAvailable, usePromise } from "@notesnook/common";
+import { SubscriptionSettings } from "./subscription-settings";
+import { ScopedThemeProvider } from "../../components/theme-provider";
+import { AppLockSettings } from "./app-lock-settings";
+import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
+import { ServersSettings } from "./servers-settings";
+import { strings } from "@notesnook/intl";
+import { mdToHtml } from "../../utils/md";
+import { InboxSettings } from "./inbox-settings";
+import { withFeatureCheck } from "../../common";
+import { NotesnookCircleSettings } from "./notesnook-circle-settings";
+import { hashNavigate } from "../../navigation";
 
 type SettingsDialogProps = BaseDialogProps<false> & {
   activeSection?: SectionKeys;
@@ -145,7 +139,7 @@ const sectionGroups: SectionGroup[] = [
         key: "desktop",
         title: strings.desktopIntegration(),
         icon: Desktop,
-        isHidden: () => !environment.isDesktopApp
+        isHidden: () => !IS_DESKTOP_APP
       },
       {
         key: "notifications",
@@ -183,7 +177,7 @@ const sectionGroups: SectionGroup[] = [
   }
 ];
 
-const SettingsGroups: SettingsGroup[] = [
+const SettingsGroups = [
   ...ProfileSettings,
   ...AuthenticationSettings,
   ...SyncSettings,
@@ -206,173 +200,232 @@ const SettingsGroups: SettingsGroup[] = [
   ...NotesnookCircleSettings
 ];
 
-function findSection(key: SectionKeys): Section | undefined {
-  for (const group of sectionGroups)
-    for (const section of group.sections)
-      if (section.key === key) return section;
-}
+// Thoughts:
+// 1. Settings will be conditional
+//    - For example settings which have an enablement placeholder
+//    - Or settings that appear after another setting is enabled.
+//    - Or settings that are visible after a user signs in
+// 2. Settings will be synced so their state must be serializable
+// 3. Settings will be grouped
+//    - Where group header is customizable
+// 4. Sections/groups must be able to accommodate tips & tutorials for future.
+// 5. Settings will be stateful but independent such that any one setting
+// can appear independent of others (e.g. as a search result)
 
 export const SettingsDialog = DialogManager.register(function SettingsDialog(
   props: SettingsDialogProps
 ) {
-  const [route, setRoute] = useState<SectionKeys>(
-    props.activeSection || "profile"
+  const [activeSettings, setActiveSettings] = useState<SettingsGroup[]>(
+    SettingsGroups.filter(
+      (g) => g.section === (props.activeSection || "profile")
+    )
   );
-  const [query, setQuery] = useState("");
-  const groups = query ? searchGroups(query) : groupsOf(route);
-  const { width: windowWidth, height: windowHeight } = useWindowSize();
 
   return (
     <Dialog
-      testId="settings-dialog"
       isOpen={true}
-      width="968px"
+      width={"968px"}
       onClose={() => props.onClose(false)}
       noScroll
       sx={{ bg: "transparent" }}
     >
       <Flex
         sx={{
-          flexDirection: "row",
-          height: Math.min(windowWidth * 0.8, windowHeight * 0.7),
+          height: "80vw",
           overflow: "hidden"
         }}
       >
         <SettingsSideBar
-          route={route}
-          onSearch={setQuery}
-          onNavigate={(section) => {
-            setQuery("");
-            setRoute(section);
+          activeSection={props.activeSection}
+          onNavigate={(settings) => {
+            const scrollbar = document.getElementById("settings-scrollbar");
+            if (scrollbar !== null) scrollbar.scrollTop = 0;
+            setActiveSettings(settings);
           }}
         />
-        <ScrollContainer
-          data-test-id="settings-content"
-          sx={{ flex: 1, bg: "background", p: 20 }}
+        <FlexScrollContainer
+          id="settings-scrollbar"
+          style={{
+            display: "flex",
+            backgroundColor: "var(--background)",
+            flex: 1,
+            flexDirection: "column",
+            padding: 20,
+            gap: 20,
+            minHeight: "auto",
+            overflow: "auto"
+          }}
         >
-          <Flex sx={{ flexDirection: "column", gap: 20, pt: 20 }}>
-            {groups.length > 0 ? (
-              groups.map((group, index) => (
-                <SettingsGroupComponent
-                  key={`${group.key}-${index}`}
-                  item={group}
-                />
-              ))
-            ) : (
-              <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-                {strings.noResultsFound()}
-              </Text>
-            )}
-          </Flex>
-        </ScrollContainer>
+          {activeSettings.length > 0 ? (
+            activeSettings.map((group) => (
+              <SettingsGroupComponent item={group} />
+            ))
+          ) : (
+            <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+              {strings.noResultsFound()}
+            </Text>
+          )}
+        </FlexScrollContainer>
       </Flex>
     </Dialog>
   );
 });
 
-function groupsOf(section: SectionKeys) {
-  return SettingsGroups.filter((group) => group.section === section);
-}
-
-function searchGroups(text: string): SettingsGroup[] {
-  const query = text.toLowerCase().trim();
-  if (!query) return [];
-  const result: SettingsGroup[] = [];
-  for (const group of SettingsGroups) {
-    const section = findSection(group.section);
-    if (section?.isHidden?.() || group.isHidden?.()) continue;
-    const titleMatch =
-      typeof group.header === "string" &&
-      group.header.toLowerCase().includes(query);
-    if (titleMatch || group.section.toLowerCase().includes(query)) {
-      result.push(group);
-      continue;
-    }
-    const settings = group.settings.filter((setting) => {
-      const description =
-        typeof setting.description === "function"
-          ? setting.description()
-          : setting.description;
-      return [
-        description || "",
-        setting.keywords?.join(" ") || "",
-        setting.title
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(query);
-    });
-    if (settings.length) result.push({ ...group, settings });
-  }
-  return result;
-}
-
-function SettingsSideBar(props: {
-  route: SectionKeys;
-  onNavigate: (section: SectionKeys) => void;
-  onSearch: (query: string) => void;
-}) {
+type SettingsSideBarProps = {
+  onNavigate: (settings: SettingsGroup[]) => void;
+  activeSection?: SectionKeys;
+};
+function SettingsSideBar(props: SettingsSideBarProps) {
+  const { onNavigate, activeSection } = props;
+  const [route, setRoute] = useState<SectionKeys>(activeSection || "profile");
   useUserStore((store) => store.isLoggedIn);
 
   useEffect(() => {
-    hashNavigate(`/settings/${props.route}` as never, { notify: false });
-  }, [props.route]);
+    hashNavigate(`/settings/${route}`, {
+      notify: false
+    });
+  }, [route, activeSection]);
 
   return (
-    <ThemeScope scope="navigationMenu">
-      <Flex sx={{ width: 240, flexShrink: 0, bg: "background" }}>
-        <ScrollContainer
-          data-test-id="settings-navigation-menu"
-          sx={{ flex: 1, bg: "background" }}
+    <FlexScrollContainer
+      id="settings-side-menu"
+      className="theme-scope-navigationMenu"
+      style={{
+        width: 240,
+        overflow: "auto",
+        backgroundColor: "var(--background)"
+      }}
+      data-test-id="settings-navigation-menu"
+    >
+      <ScopedThemeProvider scope="navigationMenu" injectCssVars={false}>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            display: "flex",
+            overflow: "hidden",
+            gap: 2
+          }}
         >
-          <Flex sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}>
-            <Input
-              data-test-id="settings-search"
-              autoFocus
-              placeholder={strings.search()}
-              onChange={(e) => props.onSearch(e.target.value)}
-              sx={{ m: 1, bg: "background", py: "7px" }}
-            />
-            {sectionGroups.map((group) => (
-              <Flex
-                key={group.key}
-                sx={{ flexDirection: "column", mx: 1, gap: "small" }}
+          <Input
+            id="search"
+            name="search"
+            autoFocus
+            placeholder={strings.search()}
+            data-test-id="settings-search"
+            sx={{
+              m: 1,
+              width: "auto",
+              bg: "background",
+              py: "7px"
+            }}
+            onChange={(e) => {
+              const query = e.target.value.toLowerCase().trim();
+              if (!query)
+                return onNavigate(
+                  SettingsGroups.filter((g) => g.section === route)
+                );
+
+              let groups: SettingsGroup[] = [];
+              for (const group of SettingsGroups) {
+                const section = findSection(group.section);
+                if (section?.isHidden?.() || group.isHidden?.()) continue;
+
+                const isTitleMatch =
+                  typeof group.header === "string" &&
+                  group.header.toLowerCase().includes(query);
+                const isSectionMatch = group.section
+                  .toLowerCase()
+                  .includes(query);
+
+                if (isTitleMatch || isSectionMatch) {
+                  groups.push(group);
+                  continue;
+                }
+
+                const settings = group.settings.filter((setting) => {
+                  const description =
+                    typeof setting.description === "function"
+                      ? setting.description()
+                      : setting.description;
+
+                  return [
+                    description || "",
+                    setting.keywords?.join(" ") || "",
+                    setting.title
+                  ]
+                    .join(" ")
+                    ?.toLowerCase()
+                    .includes(query);
+                });
+                if (!settings.length) continue;
+                groups.push({ ...group, settings });
+              }
+              const matchedSections = findSections(query);
+              if (matchedSections.length > 0) {
+                const matchedGroups = SettingsGroups.filter((g) =>
+                  matchedSections.some((s) => s.key === g.section)
+                );
+                // remove groups whose sections were matched to avoid duplicate
+                // entries.
+                groups = groups.filter(
+                  (g) => !matchedGroups.some((mg) => mg.section === g.section)
+                );
+                groups.push(...matchedGroups);
+              }
+              onNavigate(groups);
+            }}
+          />
+          {sectionGroups.map((group) => (
+            <Flex
+              key={group.key}
+              sx={{ flexDirection: "column", mx: 1, gap: "small" }}
+            >
+              <Text
+                variant={"subBody"}
+                sx={{
+                  fontWeight: "bold",
+                  color: "heading",
+                  mb: 1,
+                  ml: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  wordSpacing: "nowrap"
+                }}
               >
-                <Text
-                  variant="subBody"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "heading",
-                    mb: 1,
-                    ml: 1
-                  }}
-                >
-                  {group.title}
-                </Text>
-                {group.sections.map((section) =>
-                  !section.isHidden || !section.isHidden() ? (
+                {group.title}
+              </Text>
+              {group.sections.map(
+                (section) =>
+                  (!section.isHidden || !section.isHidden()) && (
                     <NavigationItem
                       key={section.key}
                       icon={section.icon}
                       title={section.title}
-                      selected={section.key === props.route}
-                      onClick={() => props.onNavigate(section.key)}
+                      selected={section.key === route}
+                      onClick={() => {
+                        onNavigate(
+                          SettingsGroups.filter(
+                            (g) => g.section === section.key
+                          )
+                        );
+                        setRoute(section.key);
+                      }}
                     />
-                  ) : null
-                )}
-              </Flex>
-            ))}
-          </Flex>
-        </ScrollContainer>
-      </Flex>
-    </ThemeScope>
+                  )
+              )}
+            </Flex>
+          ))}
+        </Flex>
+      </ScopedThemeProvider>
+    </FlexScrollContainer>
   );
 }
 
 function SettingsGroupComponent(props: { item: SettingsGroup }) {
   const { item } = props;
   const { onRender, onStateChange } = item;
-  const [, setState] = useState<unknown>();
+
+  const [_, setState] = useState<unknown>();
 
   useEffect(() => {
     onRender?.();
@@ -385,14 +438,20 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
     };
   }, [onStateChange]);
 
-  const allHidden = item.settings.every((setting) => setting.isHidden?.());
+  const allHidden = item.settings.every((s) => s.isHidden?.());
   const hasComponentHeader = typeof item.header !== "string";
   if (item.isHidden?.() || (allHidden && !hasComponentHeader)) return null;
-  const Header = item.header;
 
   return (
-    <Flex sx={{ flexDirection: "column", flexShrink: 0, gap: 2 }}>
-      {typeof Header === "string" ? (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        flexShrink: 0,
+        gap: 2,
+        overflow: "hidden"
+      }}
+    >
+      {typeof item.header === "string" ? (
         <Text
           variant="subBody"
           sx={{
@@ -402,20 +461,16 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
             color: "accent"
           }}
         >
-          {Header.toUpperCase()}
+          {item.header.toUpperCase()}
         </Text>
       ) : (
-        <Header />
+        <item.header />
       )}
       {item.settings.map((setting) => (
         <SettingItem key={setting.key} item={setting} />
       ))}
     </Flex>
   );
-}
-
-function plain(markdown: string) {
-  return markdown.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/[*_`]/g, "");
 }
 
 function SettingItem(props: { item: Setting }) {
@@ -426,7 +481,7 @@ function SettingItem(props: { item: Setting }) {
 
   useEffect(() => {
     if (!item.onStateChange) return;
-    const unsubscribe = item.onStateChange((next) => setState(next));
+    const unsubscribe = item.onStateChange((state) => setState(state));
     return () => {
       unsubscribe?.();
     };
@@ -434,7 +489,7 @@ function SettingItem(props: { item: Setting }) {
 
   const workWithLoading = useCallback(
     async (index: number, action: () => Promise<unknown> | void) => {
-      if (workIndex !== undefined) return;
+      if (workIndex) return;
       try {
         setWorkIndex(index);
         await action();
@@ -446,57 +501,64 @@ function SettingItem(props: { item: Setting }) {
   );
 
   if (item.isHidden && item.isHidden(state)) return null;
+
   const components =
     typeof item.components === "function"
       ? item.components(state)
       : item.components;
-  const description =
-    typeof item.description === "function"
-      ? item.description(state)
-      : item.description;
 
   return (
     <Flex
-      data-test-id={`setting-${item.key}`}
       sx={{
         flexDirection: "column",
         pb: 4,
-        borderBottom: "1px solid",
-        borderBottomColor: "separator"
+        borderBottom: "1px solid var(--separator)"
       }}
+      data-test-id={`setting-${item.key}`}
     >
       <Flex
         sx={{
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "flex-start",
+          alignItems: "start",
           gap: 4
         }}
       >
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
+          <Flex sx={{ alignItems: "center", gap: 1 }}>
             <Text
-              variant="body"
+              variant={"body"}
               sx={{ fontWeight: "medium", color: "heading" }}
             >
               {item.title}
             </Text>
             {feature && !feature.isAllowed ? (
-              <Pro size={14} color="accent" />
+              <Pro size={14} color="orange" />
             ) : null}
           </Flex>
-          {description ? (
-            <Text variant="body" sx={{ mt: 1, color: "paragraph" }}>
-              {plain(description)}
-            </Text>
-          ) : null}
+          {item.description && (
+            <Text
+              as={"div"}
+              variant={"body"}
+              sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
+              dangerouslySetInnerHTML={{
+                __html: mdToHtml(
+                  typeof item.description === "function"
+                    ? item.description(state)
+                    : item.description
+                )
+              }}
+            />
+          )}
         </Flex>
+
         <Flex
           sx={{
-            flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-end",
-            gap: 2
+            justifyContent: "end",
+            gap: 2,
+            "& > label": { width: "auto" },
+            "& > *": { flexShrink: 0 }
           }}
         >
           {components.map((component, index) => {
@@ -504,42 +566,43 @@ function SettingItem(props: { item: Setting }) {
               case "button":
                 return (
                   <Button
-                    key={index}
-                    data-test-id={`setting-${item.key}-button-${index}`}
                     disabled={workIndex === index}
+                    title={component.title}
                     variant={component.variant}
                     onClick={withFeatureCheck(feature, () =>
                       workWithLoading(index, component.action)
                     )}
                   >
                     {workIndex === index ? (
-                      <Loading size={18} />
+                      <Loading size={18} sx={{ mr: 2 }} />
                     ) : (
-                      <Text>{component.title}</Text>
+                      component.title
                     )}
                   </Button>
                 );
               case "toggle":
                 return (
                   <Switch
-                    key={index}
-                    data-test-id={`setting-${item.key}-toggle-${index}`}
+                    sx={{
+                      m: 0,
+                      background: component.isToggled()
+                        ? "accent"
+                        : "icon-secondary"
+                    }}
                     disabled={workIndex === index}
-                    checked={component.isToggled()}
                     onChange={withFeatureCheck(feature, () =>
                       workWithLoading(index, component.toggle)
                     )}
+                    checked={component.isToggled()}
+                    data-checked={component.isToggled()}
                   />
                 );
               case "dropdown":
                 return (
                   <SelectComponent
-                    key={index}
-                    data-test-id={`setting-${item.key}-dropdown-${index}`}
                     {...component}
-                    onSelectionChanged={withFeatureCheck(
-                      feature,
-                      (value: string) => component.onSelectionChanged(value)
+                    onSelectionChanged={withFeatureCheck(feature, (value) =>
+                      component.onSelectionChanged(value)
                     )}
                   />
                 );
@@ -549,22 +612,27 @@ function SettingItem(props: { item: Setting }) {
                     key={component.defaultValue()}
                     min={component.min}
                     max={component.max}
+                    step={component.step}
                     defaultValue={component.defaultValue()}
-                    onChange={component.onChange}
+                    onChange={(value) => component.onChange(value)}
                   />
                 ) : (
-                  <TextInput
-                    key={index}
+                  <Input
+                    type={"text"}
                     defaultValue={component.defaultValue()}
-                    onChange={component.onChange}
+                    sx={{ width: 250, mr: 1 }}
+                    onChange={debounce(
+                      (e) => component.onChange(e.target.value),
+                      500
+                    )}
+                    onBlur={(e) => component.onChange(e.target.value)}
                   />
                 );
               case "icon":
                 return (
                   <component.icon
-                    key={index}
                     size={component.size}
-                    color={component.color as never}
+                    color={component.color}
                   />
                 );
               default:
@@ -573,121 +641,126 @@ function SettingItem(props: { item: Setting }) {
           })}
         </Flex>
       </Flex>
-      {components.map((component, index) =>
+      {components.map((component) =>
         component.type === "custom" ? (
-          <component.component key={`${item.key}-${index}`} />
+          <component.component key={item.key} />
         ) : null
       )}
     </Flex>
   );
 }
 
-export function SelectComponent(
-  props: Omit<DropdownSettingComponent, "type"> & { "data-test-id"?: string }
-) {
+export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
   const { onSelectionChanged, options } = props;
-  const [selected, setSelected] = useState<string | number>();
-
-  useEffect(() => {
-    Promise.resolve(props.selectedOption()).then(setSelected);
-  }, [props]);
+  const selectedOption = usePromise(() => props.selectedOption(), [props]);
 
   return (
-    <Select
-      data-test-id={props["data-test-id"]}
-      value={selected}
-      onChange={(e) => {
-        setSelected(e.target.value);
-        onSelectionChanged(e.target.value);
+    <select
+      style={{
+        backgroundColor: "var(--background-secondary)",
+        outline: "none",
+        border: "1px solid var(--border-secondary)",
+        borderRadius: "5px",
+        color: "var(--paragraph)",
+        padding: "5px",
+        overflow: "hidden"
       }}
+      value={
+        selectedOption.status === "fulfilled" ? selectedOption.value : undefined
+      }
+      onChange={(e) =>
+        onSelectionChanged((e.target as HTMLSelectElement).value)
+      }
     >
       {options.map((option) => (
-        <option key={option.value} value={option.value}>
+        <option
+          key={option.value}
+          value={option.value}
+          disabled={option.disabled}
+        >
           {option.title}
         </option>
       ))}
-    </Select>
+    </select>
   );
 }
 
-function TextInput(props: {
-  defaultValue: string;
-  onChange: (value: string) => void;
-}) {
-  const onChange = useRef(props.onChange);
-  onChange.current = props.onChange;
-  const debounced = useMemo(
-    () => debounce((value: string) => onChange.current(value), 500),
-    []
-  );
-  return (
-    <Input
-      type="text"
-      defaultValue={props.defaultValue}
-      onChange={(e) => debounced(e.target.value)}
-      sx={{ width: 250, mr: 1 }}
-    />
-  );
-}
-
-function NumberInput(props: {
+type NumberInputProps = {
   min: number;
   max: number;
+  step?: number;
   defaultValue: number;
   onChange: (value: number) => void;
-}) {
-  const { min, max, defaultValue, onChange } = props;
-  const [isInputValid, setIsInputValid] = useState(true);
-  const [inputKey, setInputKey] = useState(0);
-  const text = useRef(String(defaultValue));
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+};
 
-  const clampAndCommit = () => {
-    const raw = Number(text.current);
-    const clamped =
-      Number.isNaN(raw) || raw < min ? min : raw > max ? max : raw;
-    text.current = String(clamped);
-    setInputKey((k) => k + 1);
-    setIsInputValid(true);
-    onChange(clamped);
-  };
+function NumberInput({
+  min,
+  max,
+  step,
+  defaultValue,
+  onChange
+}: NumberInputProps) {
+  const [isInputValid, setIsInputValid] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <Flex sx={{ flexDirection: "column", alignItems: "flex-end" }}>
       <Input
-        key={inputKey}
-        type="number"
-        defaultValue={text.current}
-        onChange={({ target: { value: value } }) => {
-          text.current = value;
-          if (timer.current) clearTimeout(timer.current);
-          timer.current = setTimeout(() => {
-            const number = Number(value);
-            const isValid =
-              value.trim() !== "" &&
-              !Number.isNaN(number) &&
-              number >= min &&
-              number <= max;
-            setIsInputValid(isValid);
-            if (isValid) onChange(number);
-          }, 500);
-        }}
-        onBlur={clampAndCommit}
+        ref={inputRef}
+        type={"number"}
+        min={min}
+        max={max}
+        step={step}
+        defaultValue={defaultValue}
         sx={{
           width: 80,
           mr: 1,
-          outlineColor: isInputValid ? undefined : "accent-error",
-          outlineWidth: isInputValid ? undefined : 2
+          outline: isInputValid
+            ? undefined
+            : "2px solid var(--accent-error) !important"
+        }}
+        onChange={debounce((e) => {
+          const value = e.target.valueAsNumber;
+          const isValid = !Number.isNaN(value) && value >= min && value <= max;
+          setIsInputValid(isValid);
+          if (isValid) onChange(value);
+        }, 500)}
+        onBlur={(e) => {
+          const raw = e.target.valueAsNumber;
+          const clamped =
+            Number.isNaN(raw) || raw < min ? min : raw > max ? max : raw;
+          if (inputRef.current) inputRef.current.value = String(clamped);
+          setIsInputValid(true);
+          onChange(clamped);
         }}
       />
       {!isInputValid && (
         <Text
           variant="subBody"
-          sx={{ fontSize: 11, color: "paragraph-error", mt: 1, mr: 1 }}
+          sx={{ fontSize: 11, color: "error", mt: 1, mr: 1 }}
         >
           {strings.valueMustBeBetween(min, max)}
         </Text>
       )}
     </Flex>
   );
+}
+
+function findSection(key: SectionKeys) {
+  for (const group of sectionGroups) {
+    const section = group.sections.find((s) => s.key === key);
+    if (section) return section;
+  }
+  return null;
+}
+
+function findSections(query: string) {
+  const sections: Section[] = [];
+  for (const group of sectionGroups) {
+    for (const section of group.sections) {
+      if (section.isHidden?.()) continue;
+      if (section.title.toLowerCase().includes(query)) sections.push(section);
+    }
+  }
+  return sections;
 }

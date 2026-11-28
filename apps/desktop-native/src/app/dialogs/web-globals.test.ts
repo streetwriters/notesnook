@@ -40,9 +40,9 @@ const GLOBALS = new Set([
   "navigator",
   "localStorage",
   "FormData",
-  "IS_DESKTOP_APP",
-  "IS_TESTING"
+  "IS_DESKTOP_APP"
 ]);
+// IS_TESTING is not listed: src/targets/desktop/globals.ts defines it.
 const { TAGS } = createRequire(import.meta.url)(
   "../../../tools/babel-plugin-dom-elements.js"
 ) as { TAGS: Set<string> };

@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect } from "react";
-import { Button, Flex, Text, ThemeScope } from "@notesnook/ui-kit";
+import { Text, Flex, Button, Box, Image } from "@notesnook/ui-kit";
 import { Loading, Coupon } from "../../components/icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { PaddleCheckout } from "./paddle";
+import { Rocket } from "../../assets/files.generated";
 import { Features } from "./features";
+import { PaddleCheckout } from "./paddle";
 import { Plan, PricingInfo } from "./types";
 import { getPlans, PERIOD_METADATA, PLAN_METADATA } from "./plans";
 import {
@@ -36,7 +37,9 @@ import {
 import { useCheckoutStore } from "./store";
 import { formatPrice, toPricingInfo } from "./helpers";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
+import BaseDialog from "../../components/dialog";
 import { strings } from "@notesnook/intl";
+import { ScopedThemeProvider } from "../../components/theme-provider";
 import { Period, SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import dayjs from "dayjs";
@@ -44,14 +47,9 @@ import { PromptDialog } from "../prompt";
 import IconTag from "../../components/icon-tag";
 import { usePromise } from "@notesnook/common";
 import { getCurrencySymbol } from "../../common/currencies";
-import { environment } from "@platform";
-import { SvgImage } from "../../components/svg-image";
-import Dialog from "../../components/dialog";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
-  coupon?: string;
-  plan?: string;
   onShowPlans?: () => void;
   onCheckoutComplete?: () => void;
   onClose: () => void;
@@ -60,8 +58,7 @@ type BuyDialogProps = BaseDialogProps<false> & {
 export const BuyDialog = DialogManager.register(function BuyDialog(
   props: BuyDialogProps
 ) {
-  const { onClose, onShowPlans, onCheckoutComplete } = props;
-  const couponCode = props.couponCode ?? props.coupon;
+  const { onClose, onShowPlans, onCheckoutComplete, couponCode } = props;
 
   const applyCoupon = useCheckoutStore((store) => store.applyCoupon);
   const user = useUserStore((store) => store.user);
@@ -79,11 +76,15 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
   }, [couponCode, applyCoupon]);
 
   return (
-    <Dialog
+    <BaseDialog
       isOpen={true}
-      width="868px"
+      width={"868px"}
       onClose={() => onClose(false)}
       noScroll={!!selectedPlan}
+      sx={{
+        width: ["95%", "80%", "60%"],
+        height: ["auto", "auto", "80vw"]
+      }}
     >
       {selectedPlan ? (
         <Flex
@@ -91,32 +92,38 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
             width: "100%",
             height: "100%",
             overflow: "hidden",
+            position: "relative",
             flexDirection: ["column", "column", "row"],
+            alignSelf: "center",
+            overflowY: ["scroll", "scroll", "hidden"],
             bg: "background"
           }}
         >
-          <ThemeScope scope="navigationMenu">
-            <Flex
-              sx={{
-                flexDirection: "column",
-                bg: "background",
-                flexShrink: 0,
-                width: 350,
-                p: 4
-              }}
-            >
-              <CheckoutSideBar
-                selectedPlan={selectedPlan}
-                onShowPlans={
-                  onShowPlans ??
-                  (() => {
-                    selectPlan(undefined);
-                  })
-                }
-                user={user}
-              />
-            </Flex>
-          </ThemeScope>
+          <ScopedThemeProvider
+            scope="navigationMenu"
+            sx={{
+              display: "flex",
+              overflow: ["hidden", "hidden", "auto"],
+              flexDirection: "column",
+              backgroundColor: "background",
+              flexShrink: 0,
+              // alignItems: "center",
+              // justifyContent: "center",
+              width: ["100%", "100%", 350],
+              p: 4
+            }}
+          >
+            <CheckoutSideBar
+              selectedPlan={selectedPlan}
+              onShowPlans={
+                onShowPlans ??
+                (() => {
+                  selectPlan(undefined);
+                })
+              }
+              user={user}
+            />
+          </ScopedThemeProvider>
           <CheckoutDetails
             onComplete={onCheckoutComplete ?? (() => onClose(false))}
             user={user}
@@ -134,7 +141,8 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
             </Text>
             <Text
               variant="title"
-              sx={{ mt: 1, color: "heading-secondary", textAlign: "center" }}
+              mt={1}
+              sx={{ color: "heading-secondary", textAlign: "center" }}
             >
               {strings.oneSubscriptionLifetimeNotes()}
             </Text>
@@ -155,7 +163,7 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
           </Flex>
         </Flex>
       )}
-    </Dialog>
+    </BaseDialog>
   );
 });
 
@@ -220,15 +228,15 @@ export function CheckoutDetails({
 
 function AlreadyPremium() {
   return (
-    <Flex sx={{ flexDirection: "column" }}>
-      <SvgImage name="rocket" width={200} height={200} />
-      <Text variant="heading" sx={{ mt: 4, textAlign: "center" }}>
+    <>
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook
       </Text>
-      <Text variant="body" sx={{ mt: 1, textAlign: "center" }}>
+      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
         {strings.alreadySubscribedChangeFromSettings()}
       </Text>
-    </Flex>
+    </>
   );
 }
 
@@ -239,23 +247,24 @@ export function CheckoutCompleted(props: {
   const { onClose, buttonText } = props;
 
   return (
-    <Flex sx={{ flexDirection: "column", alignItems: "center" }}>
-      <SvgImage name="rocket" width={200} height={200} />
-      <Text variant="heading" sx={{ mt: 4, textAlign: "center" }}>
+    <>
+      <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         {strings.youAreAwesome()}
       </Text>
-      <Text variant="body" sx={{ mt: 1, textAlign: "center" }}>
+      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
         {strings.thankYouForSupportingPrivacy()}
       </Text>
       <Button
         variant="accent"
-        sx={{ mt: 2, borderRadius: 100, px: 6 }}
+        mt={2}
+        sx={{ borderRadius: 100, px: 6 }}
         onClick={onClose}
         data-test-id="see-all-plans"
       >
-        <Text>{buttonText || strings.continue()}</Text>
+        {buttonText || strings.continue()}
       </Button>
-    </Flex>
+    </>
   );
 }
 
@@ -276,15 +285,14 @@ function SelectedPlan(props: SelectedPlanProps) {
   const upsellDetails = usePromise(() => getUpsellDetails(plan), [plan]);
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
+    <>
       <Text variant="title">{strings.orderSummary()}</Text>
       <Flex
         sx={{
           flexDirection: "column",
           gap: 1,
           mt: 2,
-          borderBottom: "1px solid",
-          borderBottomColor: "border",
+          borderBottom: "1px solid var(--border)",
           mb: 2,
           pb: 2
         }}
@@ -308,7 +316,7 @@ function SelectedPlan(props: SelectedPlanProps) {
             {strings.billedPeriod(formatRecurringPeriod(plan.period))}
           </Text>
           <Button variant="anchor" onClick={onChangePlan}>
-            <Text>{strings.changePlan()}</Text>
+            {strings.changePlan()}
           </Button>
         </Flex>
         {upsellDetails.status === "fulfilled" && upsellDetails.value ? (
@@ -322,7 +330,7 @@ function SelectedPlan(props: SelectedPlanProps) {
         ) : null}
       </Flex>
       <CheckoutPricing pricingInfo={pricingInfo} />
-    </Flex>
+    </>
   );
 }
 
@@ -366,28 +374,27 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
   // }, [pricingInfo, onApplyCoupon, setIsApplyingCoupon]);
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
-      {environment.isTesting ? (
-        <Flex sx={{ flexDirection: "column" }}>
-          <Flex data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
+    <>
+      {IS_TESTING ? (
+        <>
+          <span data-test-id={`checkout-plan-country-${pricingInfo.country}`} />
           {pricingInfo.coupon && (
-            <Flex data-test-id="checkout-plan-coupon-applied" />
+            <span data-test-id={`checkout-plan-coupon-applied`} />
           )}
-        </Flex>
+        </>
       ) : null}
       <Flex
         sx={{
           flexDirection: "column",
           gap: 1,
-          borderBottom: "1px solid",
-          borderBottomColor: "border",
+          borderBottom: "1px solid var(--border)",
           mb: 2,
           pb: 2
         }}
       >
         <Flex sx={{ justifyContent: "space-between" }}>
           <Flex sx={{ flexDirection: "column" }}>
-            <Text variant="body" sx={{ color: "heading" }}>
+            <Text variant="body" color="heading">
               {strings.today()}
             </Text>
             {pricingInfo.price.trial_period ? (
@@ -399,21 +406,21 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             ) : null}
           </Flex>
           {pricingInfo.price.trial_period ? (
-            <Text variant="body" sx={{ color: "heading" }}>
+            <Text variant="body" color="heading">
               {formatPrice(0, pricingInfo.price.currency)}
             </Text>
           ) : (
-            <Text variant="body" sx={{ color: "heading" }}>
+            <Text variant="body" color="heading">
               {pricingInfo.price.subtotal}
             </Text>
           )}
         </Flex>
         {pricingInfo.price.trial_period ? (
-          <Flex sx={{ flexDirection: "column" }}>
-            <Flex sx={{ width: 2, bg: "border", height: 20 }} />
+          <>
+            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
             <Flex sx={{ justifyContent: "space-between" }}>
               <Flex sx={{ flexDirection: "column" }}>
-                <Text variant="body" sx={{ color: "heading" }}>
+                <Text variant="body" color="heading">
                   {strings.afterFreeTrialDays(
                     pricingInfo.price.trial_period.frequency
                   )}
@@ -424,19 +431,19 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
                     .format("YYYY-MM-DD")}{" "}
                 </Text>
               </Flex>
-              <Text variant="body" sx={{ color: "heading" }}>
+              <Text variant="body" color="heading">
                 {pricingInfo.price.subtotal}
               </Text>
             </Flex>
-          </Flex>
+          </>
         ) : null}
 
         {pricingInfo.recurringPrice ? (
-          <Flex sx={{ flexDirection: "column" }}>
-            <Flex sx={{ width: 2, bg: "border", height: 20 }} />
+          <>
+            <Box sx={{ width: "2px", bg: "border", height: "20px" }} />
             <Flex sx={{ justifyContent: "space-between" }}>
               <Flex sx={{ flexDirection: "column" }}>
-                <Text variant="body" sx={{ color: "heading" }}>
+                <Text variant="body" color="heading">
                   {pricingInfo.period === "monthly"
                     ? strings.nextMonth()
                     : pricingInfo.period === "yearly"
@@ -470,11 +477,11 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
                   </Text>
                 ) : null}
               </Flex>
-              <Text variant="body" sx={{ color: "heading" }}>
+              <Text variant="body" color="heading">
                 {pricingInfo.recurringPrice.subtotal}
               </Text>
             </Flex>
-          </Flex>
+          </>
         ) : null}
       </Flex>
       <Flex
@@ -499,7 +506,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           <Text
             data-test-id={`value`}
             variant="body"
-            sx={{ color: "paragraph-secondary" }}
+            color="paragraph-secondary"
           >
             {price.tax}
           </Text>
@@ -523,11 +530,15 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             <Loading size={14} />
           ) : pricingInfo.coupon ? (
             <Flex sx={{ alignItems: "center", gap: 1 }}>
-              <IconTag icon={Coupon} text={pricingInfo.coupon} />
+              <IconTag
+                icon={Coupon}
+                text={pricingInfo.coupon}
+                onDismiss={() => removeCoupon()}
+              />
               <Text
                 data-test-id={`value`}
                 variant="body"
-                sx={{ color: "paragraph-secondary" }}
+                color="paragraph-secondary"
               >
                 {price.discount}
               </Text>
@@ -556,14 +567,14 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             {strings.totalForToday()}
           </Text>
           {price.trial_period ? (
-            <Text variant="title" sx={{ textAlign: "right" }}>
+            <Text as="div" variant="title" sx={{ textAlign: "end" }}>
               {formatPrice(0, pricingInfo.price.currency)}
             </Text>
           ) : (
             <Text
               data-test-id={`value`}
               variant="title"
-              sx={{ textAlign: "right" }}
+              sx={{ textAlign: "end" }}
             >
               {price.total}
             </Text>
@@ -576,7 +587,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           )}
         </Text>
       </Flex>
-    </Flex>
+    </>
   );
 }
 

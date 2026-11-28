@@ -17,24 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FormData } from "@notesnook/ui-kit";
+
+import { Flex, Text } from "@notesnook/ui-kit";
 import { useCallback, useRef, useState } from "react";
-import { Flex, Text, Box } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { useTimer } from "../hooks/use-timer";
+import Field from "../components/field";
 import { Loading } from "../components/icons";
+import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { useStore as useUserStore } from "../stores/user-store";
-import { Field } from "./components/field";
-import Dialog from "../components/dialog";
 
 type EmailChangeState = {
   newEmail: string;
   password: string;
 };
-
 export type EmailChangeDialogProps = BaseDialogProps<boolean>;
-
 export const EmailChangeDialog = DialogManager.register(
   function EmailChangeDialog(props: EmailChangeDialogProps) {
     const [error, setError] = useState<string>();
@@ -43,13 +43,17 @@ export const EmailChangeDialog = DialogManager.register(
       useState<EmailChangeState>();
     const [isSending, setIsSending] = useState(false);
     const { elapsed, enabled, setEnabled } = useTimer(`email_change_code`, 60);
-    const values = useRef({ newEmail: "", password: "", code: "" });
+
+    const emailRef = useRef<HTMLInputElement>(null);
+    const passwordRef = useRef<HTMLInputElement>(null);
+    const codeRef = useRef<HTMLInputElement>(null);
 
     const sendCode = useCallback(
       async (emailChangeState: EmailChangeState) => {
         setIsSending(true);
         try {
           await db.user.sendVerificationEmail(emailChangeState.newEmail);
+
           setEnabled(false);
         } catch (e) {
           const error = e as Error;
@@ -61,42 +65,6 @@ export const EmailChangeDialog = DialogManager.register(
       [setEnabled]
     );
 
-    const onSubmit = async () => {
-      try {
-        setIsLoading(true);
-        setError(undefined);
-        const { password, newEmail, code } = values.current;
-
-        if (emailChangeState) {
-          if (!code || code.length < 6) {
-            setError(strings.enterSixDigitCode());
-            return;
-          }
-          await db.user.changeEmail(
-            emailChangeState.newEmail,
-            emailChangeState.password,
-            code
-          );
-          await useUserStore.getState().refreshUser();
-          props.onClose(true);
-          return;
-        }
-
-        if (!newEmail.trim() || !password.trim()) return;
-        if (!password || !(await db.user.verifyPassword(password))) {
-          setError(strings.passwordIncorrect());
-          return;
-        }
-        await db.user.sendVerificationEmail(newEmail);
-        setEnabled(false);
-        setEmailChangeState({ newEmail, password });
-      } catch (e) {
-        if (e instanceof Error) setError(e.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     return (
       <Dialog
         isOpen={true}
@@ -107,78 +75,106 @@ export const EmailChangeDialog = DialogManager.register(
           text: strings.next(),
           disabled: isLoading,
           loading: isLoading,
-          onClick: onSubmit
+          form: "changeEmailForm"
         }}
         negativeButton={{
           text: strings.cancel(),
           onClick: () => props.onClose(false)
         }}
       >
-        <Flex sx={{ flexDirection: "column" }}>
-          {emailChangeState ? (
-            <Box
-              as="form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit();
-              }}
-            >
-              <Field
-                id="code"
-                label={strings.sixDigitCode()}
-                helpText={strings.enterSixDigitCode()}
-                type="text"
-                required
-                onChange={({ target: { value: text } }) =>
-                  (values.current.code = text)
+        <Flex
+          id="changeEmailForm"
+          as="form"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              setIsLoading(true);
+              setError(undefined);
+
+              const formData = new FormData(e.target as HTMLFormElement);
+              const { password, newEmail, code } = Object.fromEntries(
+                formData.entries() as IterableIterator<[string, string]>
+              );
+
+              if (emailChangeState) {
+                if (!code || code.length < 6) {
+                  setError(strings.enterSixDigitCode());
+                  return;
                 }
-                action={{
-                  disabled: isSending || !enabled,
-                  component: (
-                    <Text variant="body">
-                      {isSending ? (
-                        <Loading size={18} />
-                      ) : enabled ? (
-                        strings.resendCode()
-                      ) : (
-                        strings.resendCode(elapsed)
-                      )}
-                    </Text>
-                  ),
-                  onClick: async () => {
-                    await sendCode(emailChangeState);
-                  }
-                }}
-              />
-            </Box>
+
+                await db.user.changeEmail(
+                  emailChangeState.newEmail,
+                  emailChangeState.password,
+                  code
+                );
+                await useUserStore.getState().refreshUser();
+                props.onClose(true);
+                return;
+              }
+
+              if (!newEmail.trim() || !password.trim()) return;
+
+              if (!password || !(await db.user.verifyPassword(password))) {
+                setError(strings.passwordIncorrect());
+                return;
+              }
+
+              await db.user.sendVerificationEmail(newEmail);
+              setEnabled(false);
+              setEmailChangeState({ newEmail, password });
+            } catch (e) {
+              if (e instanceof Error) setError(e.message);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          sx={{ flexDirection: "column" }}
+        >
+          {emailChangeState ? (
+            <Field
+              inputRef={codeRef}
+              id="code"
+              name="code"
+              label={strings.sixDigitCode()}
+              helpText={strings.enterSixDigitCode()}
+              type="text"
+              required
+              action={{
+                disabled: isSending || !enabled,
+                component: (
+                  <Text variant={"body"}>
+                    {isSending ? (
+                      <Loading size={18} />
+                    ) : enabled ? (
+                      strings.resendCode()
+                    ) : (
+                      strings.resendCode(elapsed)
+                    )}
+                  </Text>
+                ),
+                onClick: async () => {
+                  await sendCode(emailChangeState);
+                }
+              }}
+            />
           ) : (
             <>
               <Field
+                inputRef={emailRef}
                 id="newEmail"
+                name="newEmail"
                 label={strings.newEmail()}
                 type="email"
                 required
-                onChange={({ target: { value: text } }) =>
-                  (values.current.newEmail = text)
-                }
               />
-              <Box
-                as="form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  onSubmit();
-                }}
-              >
-                <Field
-                  id="password"
-                  label={strings.accountPassword()}
-                  type="password"
-                  required
-                  onChange={({ target: { value: text } }) =>
-                    (values.current.password = text)
-                  }
-                />
-              </Box>
+              <Field
+                inputRef={passwordRef}
+                id="password"
+                name="password"
+                label={strings.accountPassword()}
+                type="password"
+                required
+              />
               <Text variant="subBody" sx={{ mt: 1 }}>
                 {strings.changeEmailNotice()}
               </Text>

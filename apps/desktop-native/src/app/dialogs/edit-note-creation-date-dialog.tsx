@@ -17,21 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Flex } from "@notesnook/ui-kit";
+import { getFormattedDate } from "@notesnook/common";
 import { getTimeFormat } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { PopupPresenter } from "@notesnook/ui-kit";
+import { Flex } from "@notesnook/ui-kit";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useRef, useState } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { Clock } from "../components/icons";
-import { store as noteStore } from "../stores/note-store";
-import { setTimeOnly } from "../utils/date-time";
-import { showToast } from "../utils/toast";
-import { DateField } from "./components/date-field";
-import { Field } from "./components/field";
+import { DayPicker } from "../components/day-picker";
 import Dialog from "../components/dialog";
+import Field from "../components/field";
+import { CalendarDots, Clock } from "../components/icons";
+import { store as noteStore } from "../stores/note-store";
+import { useStore as useThemeStore } from "../stores/theme-store";
+import { setDateOnly, setTimeOnly } from "../utils/date-time";
+import { showToast } from "../utils/toast";
 
 dayjs.extend(customParseFormat);
 
@@ -48,18 +51,27 @@ export const EditNoteCreationDateDialog = DialogManager.register(
     dateEdited,
     onClose
   }: EditNoteCreationDateDialogProps) {
+    const [showCalendar, setShowCalendar] = useState(false);
     const [date, setDate] = useState<dayjs.Dayjs>(dayjs(dateCreated));
+    const dateInputRef = useRef<HTMLInputElement>(null);
+    const theme = useThemeStore((store) => store.colorScheme);
 
     return (
       <Dialog
         isOpen
         testId="edit-note-creation-date-dialog"
-        onClose={() => onClose(false)}
+        onClose={() => {
+          setShowCalendar(false);
+          onClose(false);
+        }}
         title={strings.editCreationDate()}
         description={`${strings.creationDateCannotBeAfterLastEditedDate()}`}
         negativeButton={{
           text: strings.cancel(),
-          onClick: () => onClose(false)
+          onClick: () => {
+            setShowCalendar(false);
+            onClose(false);
+          }
         }}
         positiveButton={{
           text: strings.save(),
@@ -72,7 +84,9 @@ export const EditNoteCreationDateDialog = DialogManager.register(
                 );
                 return;
               }
+
               await noteStore.get().updateDateCreated(noteId, date.valueOf());
+              setShowCalendar(false);
               onClose(false);
             } catch (error) {
               showToast(
@@ -91,14 +105,62 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             mb: "spacing7"
           }}
         >
-          <DateField
+          <Field
             id="date-created"
-            data-test-id="date-created-input"
             label={strings.date()}
-            date={date}
-            onChange={setDate}
-            maxDate={new Date(dateEdited)}
+            required
+            inputRef={dateInputRef}
+            data-test-id="date-created-input"
+            // helpText={`${db.settings.getDateFormat()}`}
+            action={{
+              icon: CalendarDots,
+              onClick() {
+                setShowCalendar(!showCalendar);
+              }
+            }}
+            validate={(t) =>
+              dayjs(t, db.settings.getDateFormat(), true).isValid()
+            }
+            defaultValue={date.format(db.settings.getDateFormat())}
+            onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
+            sx={{
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
           />
+          <PopupPresenter
+            isOpen={showCalendar}
+            onClose={() => setShowCalendar(false)}
+            position={{
+              isTargetAbsolute: true,
+              target: dateInputRef.current,
+              location: "below"
+            }}
+          >
+            <DayPicker
+              sx={{
+                bg: "background",
+                p: 2,
+                boxShadow: `0px 0px 25px 5px ${
+                  theme === "dark" ? "#000000aa" : "#0000004e"
+                }`,
+                borderRadius: "dialog",
+                width: 300
+              }}
+              selected={dayjs(date).toDate()}
+              maxDate={new Date(dateEdited)}
+              onSelect={(day) => {
+                if (!day) return;
+                const date = getFormattedDate(day, "date");
+                setDate((d) => setDateOnly(date, d));
+                if (dateInputRef.current) dateInputRef.current.value = date;
+                setShowCalendar(false);
+              }}
+            />
+          </PopupPresenter>
           <Field
             id="time-created"
             label={strings.time()}
@@ -117,9 +179,14 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             defaultValue={date.format(
               getTimeFormat(db.settings.getTimeFormat())
             )}
-            onChange={({ target: { value: text } }) =>
-              setDate((d) => setTimeOnly(text, d))
-            }
+            onChange={(e) => setDate((d) => setTimeOnly(e.target.value, d))}
+            sx={{
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
             rightActions={[{ icon: Clock }]}
           />
         </Flex>

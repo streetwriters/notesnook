@@ -229,22 +229,17 @@
     {
       "path": "dialogs/buy-dialog/plan-list.tsx",
       "category": "platform",
-      "reason": "The featured-on strip and the testimonials carousel are web's code. The plan cards, pricing and comparison table are still laid out with the kit's flexbox props: web sizes the plan cards from HTMLDivElement measurements and CSS grid, which the desktop layout has no equivalent for."
+      "reason": "PlansList, PlanCard, pricing, ComparePlans and Footer use CSS grid, which desktop's Grid draws as one column; FeaturedOn and TestimonialsCarousel are web's code."
     },
     {
       "path": "dialogs/add-reminder-dialog.tsx",
       "category": "platform",
-      "reason": "Web uses CSS grid, a :hover:not(:disabled) selector and DOM input/button refs (inputRef, HTMLInputElement) for the date and time fields; desktop has no grid or selectors and uses the kit's date fields."
+      "reason": "Web lays the day and time pickers out with CSS grid (gridTemplateColumns), which desktop's Grid draws as one column, and imports react-loading-skeleton."
     },
     {
       "path": "dialogs/attachments-dialog.tsx",
       "category": "platform",
-      "reason": "Web draws the attachment list as an HTML table (th/td and table sx keys); desktop has no table layout and draws rows with the kit's Virtuoso list."
-    },
-    {
-      "path": "dialogs/settings/index.tsx",
-      "category": "platform",
-      "reason": "Web reads input values with document.getElementById and DOM element refs (HTMLInputElement) to save the settings fields; desktop's scoped document has no form inputs to look up, so the fields hold their values in state. The '& > *, & > label' row styles now draw on desktop."
+      "reason": "Web draws the list with TableVirtuoso's table props (style tableLayout, rowRef/style on rows); desktop's TableVirtuoso has no table layout and passes no row ref or style."
     },
     {
       "path": "dialogs/command-palette/command-palette-dialog.tsx",
@@ -254,7 +249,7 @@
     {
       "path": "dialogs/mfa/steps.tsx",
       "category": "platform",
-      "reason": "Web uses the phone, file-saver and clipboard-polyfill packages, SVG asset URLs, the react-qrcode-logo re-export, CSS grid, :first-of-type selectors and DOM refs; desktop saves and copies through @platform and draws the QR code with the kit."
+      "reason": "Web lays the code inputs out with CSS grid and uses the phone, file-saver and react-qrcode-logo packages, which desktop does not ship."
     },
     {
       "path": "dialogs/settings/components/customize-toolbar.tsx",
@@ -262,24 +257,14 @@
       "reason": "Web's toolbar editor reads Tiptap tool definitions from @notesnook/editor and uses document.querySelector, #id hover selectors and :last-of-type; the native editor's toolbar items come from common/toolbar-*."
     },
     {
-      "path": "dialogs/settings/components/billing-history.tsx",
-      "category": "platform",
-      "reason": "Web draws the transactions as an HTML table (thead/tbody/th) and opens receipts with window.open; desktop has no table layout and opens links through @platform shell."
-    },
-    {
       "path": "dialogs/recovery-key-dialog.tsx",
       "category": "platform",
-      "reason": "Web renders the recovery key to an HTMLCanvasElement, saves it with file-saver and copies with navigator.clipboard and clipboard-polyfill; desktop uses @platform files and clipboard."
-    },
-    {
-      "path": "dialogs/inbox-history-dialog.tsx",
-      "category": "platform",
-      "reason": "Web draws the history as a table (th, td selectors, tableLayout, borderCollapse), sizes text in em and copies with clipboard-polyfill; desktop has no table layout or em units."
+      "reason": "Web renders the key to a canvas with react-qrcode-logo and saves it with file-saver; desktop has neither and saves through @platform files."
     },
     {
       "path": "dialogs/settings/components/themes-selector.tsx",
       "category": "platform",
-      "reason": "Web's theme grid uses nested :hover selectors and DOM file reading; desktop draws the grid with the kit and reads files through @platform."
+      "reason": "Web lists themes through the themes-server tRPC client and @tanstack/react-query, which desktop does not ship, and styles the grid with ':hover .child' selectors desktop does not match."
     },
     {
       "path": "dialogs/buy-dialog/paddle.tsx",
@@ -287,34 +272,9 @@
       "reason": "Web embeds Paddle.js checkout in an iframe (@paddle/paddle-js, window.addEventListener, window.location); desktop has no Paddle.js and opens checkout in the browser."
     },
     {
-      "path": "dialogs/create-color-dialog.tsx",
-      "category": "platform",
-      "reason": "Web passes a DOM input ref to Field (inputRef, HTMLInputElement) and sizes the colour swatch with theme space keys desktop types as lengths; desktop's Field has no inputRef."
-    },
-    {
       "path": "dialogs/note-linking-dialog.tsx",
       "category": "native-editor",
       "reason": "Web imports LinkAttributes from @notesnook/editor (Tiptap) and react-virtuoso directly and draws a raw <div>; the native editor takes links through its host actions."
-    },
-    {
-      "path": "dialogs/email-change-dialog.tsx",
-      "category": "platform",
-      "reason": "Web reads the fields through DOM input refs (inputRef, HTMLInputElement) on Field; desktop's Field has no inputRef."
-    },
-    {
-      "path": "dialogs/buy-dialog/buy-dialog.tsx",
-      "category": "platform",
-      "reason": "Web imports an SVG asset as a URL (rocket.svg?url) and reads the IS_TESTING build global; desktop takes assets from the generated asset modules and has no build globals. (<span> now draws on desktop.)"
-    },
-    {
-      "path": "dialogs/issue-dialog.tsx",
-      "category": "platform",
-      "reason": "Web copies with clipboard-polyfill, breaks lines with <br> and uses the forms.input variant path on a textarea; desktop copies through @platform clipboard."
-    },
-    {
-      "path": "dialogs/settings/components/inbox-api-keys.tsx",
-      "category": "platform",
-      "reason": "Web uses a native <option> select, navigator.clipboard, a '& + svg' selector and DOM input refs on Field; desktop has none of these."
     },
     {
       "path": "dialogs/attach-files-dialog.tsx",
@@ -332,34 +292,19 @@
       "reason": "Web crops with react-avatar-editor on a DOM canvas; desktop crops with the kit's AvatarEditor."
     },
     {
-      "path": "dialogs/edit-note-creation-date-dialog.tsx",
-      "category": "platform",
-      "reason": "Web anchors the date picker popup to a DOM input ref (inputRef, HTMLInputElement) and draws a raw CSS box-shadow; desktop anchors to the kit element and uses the theme's shadow."
-    },
-    {
-      "path": "dialogs/note-expiry-date-dialog.tsx",
-      "category": "platform",
-      "reason": "Web anchors the date picker popup to a DOM input ref (inputRef, HTMLInputElement) and draws a raw CSS box-shadow; desktop anchors to the kit element and uses the theme's shadow."
-    },
-    {
       "path": "dialogs/buy-dialog/features.tsx",
       "category": "platform",
-      "reason": "Web lays the feature table out with CSS grid and sizes text in rem; desktop lays out with flexbox only."
+      "reason": "Web lays the feature table out with CSS grid, which desktop's Grid draws as one column."
     },
     {
       "path": "dialogs/settings/components/subscription-status.tsx",
       "category": "platform",
-      "reason": "Web lays the status card out with CSS grid (gridTemplateRows, gridRow); desktop lays out with flexbox only."
+      "reason": "Web lays the status card out with CSS grid (gridTemplateRows, gridRow), which desktop draws as one column."
     },
     {
       "path": "dialogs/feature-dialog.tsx",
       "category": "platform",
-      "reason": "Web reads Config.has and the IS_TESTING build global and opens links with window.open; desktop's config has no has() and opens links through @platform shell."
-    },
-    {
-      "path": "dialogs/prompt.tsx",
-      "category": "platform",
-      "reason": "Web passes a DOM input ref to Field (inputRef, HTMLInputElement); desktop's Field has no inputRef."
+      "reason": "Web reads Config.has, which desktop's config service (MMKV, no synchronous key listing) does not have."
     },
     {
       "path": "dialogs/settings/app-lock-settings.ts",
@@ -369,7 +314,7 @@
     {
       "path": "dialogs/mfa/multi-factor-dialog.tsx",
       "category": "platform",
-      "reason": "Web's Next button submits the 2faForm form in steps.tsx; desktop's steps.tsx (allowlisted) submits through mfa/submit.ts, so the button calls submitStep."
+      "reason": "Web's Next button submits the 2faForm form in steps.tsx; desktop's steps.tsx (kept for CSS grid) submits through mfa/submit.ts."
     },
     {
       "path": "dialogs/buy-dialog/helpers.ts",
@@ -454,22 +399,22 @@
     {
       "path": "views/auth.tsx",
       "category": "platform",
-      "reason": "Native has no HTML form: AuthFormContext carries field values and submit, fields are controlled inputs, and links open through the shell service instead of window.open."
+      "reason": "Web reads history.replaceState and window.location, makeURL from navigation and the IS_BETA build global; the desktop host has no browser location or history (no shim yet), so routing goes through hardNavigate."
     },
     {
       "path": "views/email-confirmed.tsx",
       "category": "platform",
-      "reason": "Redirects through hardNavigate (no window.location), since the native host has no browser location."
+      "reason": "Web redirects through window.location; the desktop host has no browser location shim yet, so it redirects through hardNavigate."
     },
     {
       "path": "views/app-lock.tsx",
       "category": "platform",
-      "reason": "Waits for the key store to initialize and reveals the window (useWindowReveal) once the lock screen is drawn; password entry is a controlled field because the native host has no input refs."
+      "reason": "Web detects idle time with utils/idle-detection on DOM activity events; the desktop host has no such events, and reveals its window (useWindowReveal) once the lock screen is drawn."
     },
     {
       "path": "views/checkout.tsx",
       "category": "platform",
-      "reason": "Checkout page of the native host: validates the plan without zod and draws the logo with <Logo>; web's ReactNativeWebView bridge has no native counterpart."
+      "reason": "Web posts the result to window.ReactNativeWebView, the mobile app's webview bridge, which the desktop host does not have."
     },
     {
       "path": "views/payments.tsx",
@@ -479,7 +424,7 @@
     {
       "path": "views/recovery.tsx",
       "category": "platform",
-      "reason": "Native has no history.replaceState/window.open (uses hardNavigate) and no <input type=radio> (the radio group is drawn as controls)."
+      "reason": "Web navigates with history.replaceState/window.location and makeURL, and saves the key with file-saver and react-qrcode-logo; the desktop host has no browser location or history shim yet."
     },
     {
       "path": "views/notes.tsx",
@@ -889,7 +834,7 @@
     {
       "path": "views/notebooks.tsx",
       "category": "platform",
-      "reason": "Web pads Virtuoso's viewport through an attribute selector ('[data-viewport-type=\"element\"]') with a calc() width; desktop matches no attribute selectors and has no calc(), so the padding is on the container."
+      "reason": "Web pads Virtuoso's viewport through a '[data-viewport-type=\"element\"]' attribute selector, which desktop does not match."
     },
     {
       "path": "components/note/index.tsx",

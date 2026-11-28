@@ -18,11 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Box } from "@notesnook/ui-kit";
+import Field from "../components/field";
+import Dialog from "../components/dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { Field } from "./components/field";
-import Dialog from "../components/dialog";
 
 export type PromptDialogProps = BaseDialogProps<undefined | string> & {
   title: string;
@@ -34,7 +33,7 @@ export type PromptDialogProps = BaseDialogProps<undefined | string> & {
 export const PromptDialog = DialogManager.register(function PromptDialog(
   props: PromptDialogProps
 ) {
-  const value = useRef(props.defaultValue || "");
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <Dialog
       isOpen={true}
@@ -43,30 +42,32 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
       onClose={() => props.onClose(props.defaultValue)}
       positiveButton={{
         text: strings.submit(),
-        onClick: () => props.onClose(value.current)
+        onClick: () => props.onClose(inputRef.current?.value || "")
       }}
       negativeButton={{
         text: strings.cancel(),
         onClick: () => props.onClose(props.defaultValue)
       }}
     >
-      <Box
-        as="form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          props.onClose(value.current || "");
+      <Field
+        label={props.label}
+        placeholder={props.label}
+        inputRef={inputRef}
+        defaultValue={props.defaultValue}
+        autoFocus
+        onKeyUp={(e) => {
+          if (e.key == "Enter") props.onClose(inputRef.current?.value || "");
         }}
-      >
-        <Field
-          data-test-id="prompt-input"
-          label={props.label}
-          placeholder={props.label}
-          defaultValue={props.defaultValue}
-          autoFocus
-          onChange={({ target: { value: text } }) => (value.current = text)}
-          sx={{ mt: "spacing6", mb: "spacing7" }}
-        />
-      </Box>
+        sx={{
+          mt: "spacing6",
+          mb: "spacing7",
+          input: {
+            fontSize: "sm",
+            px: "spacing4",
+            py: "spacing6"
+          }
+        }}
+      />
     </Dialog>
   );
 });

@@ -20,63 +20,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { InboxItemsHistoryErrorContext } from "@notesnook/core";
-import {
-  Button,
-  dataColor,
-  Flex,
-  ScrollContainer,
-  Text,
-  useWindowSize
-} from "@notesnook/ui-kit";
-import { clipboard } from "@platform";
-import { strings } from "@notesnook/intl";
+import { Box, Button, Text } from "@notesnook/ui-kit";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import Dialog from "../components/dialog";
 import { Check, Copy, Trash } from "../components/icons";
+import ScrollContainer, {
+  FlexScrollContainer
+} from "../components/scroll-container";
+import { strings } from "@notesnook/intl";
+import { writeText } from "./desktop-bridge";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "./confirm";
-import Dialog from "../components/dialog";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
 const getColumns = () => [
-  { title: strings.dateSynced(), width: 160, flex: 0 },
-  { title: strings.error(), width: 120, flex: 0 },
-  { title: strings.description(), width: 0, flex: 1 },
-  { title: strings.details(), width: 0, flex: 1 },
-  { title: "", width: 40, flex: 0 }
+  { title: strings.dateSynced(), width: "160px" },
+  { title: strings.error(), width: "120px" },
+  { title: strings.description(), width: "1fr" },
+  { title: strings.details(), width: "1fr" },
+  { title: "", width: "40px" }
 ];
 
-type Chip = {
-  bg: "background-error" | ReturnType<typeof dataColor>;
-  color: "accent-error" | ReturnType<typeof dataColor>;
-};
-const ERROR_CHIP_STYLES: Record<string, Chip> = {
-  "Decryption failed": { bg: "background-error", color: "accent-error" },
-  "Invalid JSON": {
-    bg: dataColor("#ff980026"),
-    color: dataColor("#e65100")
+const ERROR_CHIP_STYLES: Record<
+  string,
+  { bg: string; color: string }
+> = {
+  get [strings.decryptionFailed()]() {
+    return { bg: "background-error", color: "accent-error" };
   },
-  "Validation failed": {
-    bg: dataColor("#ffc10726"),
-    color: dataColor("#8a6000")
-  }
+  get [strings.invalidJson()]() {
+    return { bg: "rgba(255, 152, 0, 0.15)", color: "#e65100" };
+  },
+  get [strings.validationFailed()]() {
+    return { bg: "rgba(255, 193, 7, 0.15)", color: "#8a6000" };
+  },
+  "Decryption failed": { bg: "background-error", color: "accent-error" },
+  "Invalid JSON": { bg: "rgba(255, 152, 0, 0.15)", color: "#e65100" },
+  "Validation failed": { bg: "rgba(255, 193, 7, 0.15)", color: "#8a6000" }
 };
-
-function chipFor(message: string): Chip {
-  if (message === strings.decryptionFailed())
-    return ERROR_CHIP_STYLES["Decryption failed"];
-  if (message === strings.invalidJson())
-    return ERROR_CHIP_STYLES["Invalid JSON"];
-  if (message === strings.validationFailed())
-    return ERROR_CHIP_STYLES["Validation failed"];
-  return (
-    ERROR_CHIP_STYLES[message] ?? {
-      bg: "background-error",
-      color: "accent-error"
-    }
-  );
-}
 
 function ErrorBadge({
   message
@@ -86,11 +69,16 @@ function ErrorBadge({
   if (!message) {
     return (
       <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-        {"—"}
+        —
       </Text>
     );
   }
-  const style = chipFor(message);
+
+  const style = ERROR_CHIP_STYLES[message] ?? {
+    bg: "background-error",
+    color: "accent-error"
+  };
+
   return (
     <Text
       sx={{
@@ -99,7 +87,7 @@ function ErrorBadge({
         borderRadius: "default",
         px: "6px",
         py: "2px",
-        fontSize: 10,
+        fontSize: "0.65em",
         fontWeight: 600
       }}
     >
@@ -109,39 +97,53 @@ function ErrorBadge({
 }
 
 function DetailsCell({ value }: { value: string }) {
+  const [hovered, setHovered] = useState(false);
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
-    clipboard.write({ "text/plain": value });
+    writeText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   }
 
   return (
-    <Flex sx={{ position: "relative", flexDirection: "row", gap: 1 }}>
-      <ScrollContainer sx={{ maxHeight: 100, flex: 1 }}>
-        <Text
-          selectable
+    <Box
+      sx={{ position: "relative" }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <ScrollContainer suppressScrollX style={{ maxHeight: 100 }}>
+        <Box
+          as="pre"
           sx={{
             color: "paragraph",
-            fontSize: 11,
-            fontFamily: "monospace",
+            m: 0,
+            fontSize: "0.72em",
             whiteSpace: "pre-wrap",
             wordBreak: "break-all"
           }}
         >
           {value}
-        </Text>
+        </Box>
       </ScrollContainer>
-      <Button
-        variant="icon"
-        title={strings.copy()}
-        onClick={handleCopy}
-        sx={{ p: "2px" }}
-      >
-        {copied ? <Check size={14} /> : <Copy size={14} />}
-      </Button>
-    </Flex>
+      {(hovered || copied) && (
+        <Button
+          variant="icon"
+          title={strings.copy()}
+          onClick={handleCopy}
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            p: "2px",
+            bg: "background",
+            color: copied ? "accent" : undefined
+          }}
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+        </Button>
+      )}
+    </Box>
   );
 }
 
@@ -149,6 +151,7 @@ function parseErrorContext(
   raw: string | undefined
 ): InboxItemsHistoryErrorContext | null {
   if (!raw) return null;
+
   try {
     return JSON.parse(raw) as InboxItemsHistoryErrorContext;
   } catch {
@@ -156,11 +159,8 @@ function parseErrorContext(
   }
 }
 
-const dash = "—";
-
 export const InboxHistoryDialog = DialogManager.register(
   function InboxHistoryDialog(props: InboxHistoryDialogProps) {
-    const { height: windowHeight } = useWindowSize();
     const result = usePromise(() => db.inboxItemsHistory.failed.items());
 
     async function deleteItem(id: string) {
@@ -179,6 +179,7 @@ export const InboxHistoryDialog = DialogManager.register(
         negativeButtonText: strings.no()
       });
       if (!ok) return;
+
       await db.inboxItemsHistory.deleteFailed();
       showToast("success", strings.allItemsDeleted());
       if (result.status !== "pending") {
@@ -191,11 +192,12 @@ export const InboxHistoryDialog = DialogManager.register(
         isOpen={true}
         title={strings.failedInboxItems()}
         titleAction={
-          result.status === "fulfilled" && result.value.length > 0 ? (
+          result.status === "fulfilled" &&
+          result.value.length > 0 && (
             <Button variant="errorSecondary" onClick={deleteAll}>
-              <Text>{strings.deleteAll()}</Text>
+              {strings.deleteAll()}
             </Button>
-          ) : undefined
+          )
         }
         onClose={() => props.onClose(false)}
         negativeButton={{
@@ -212,92 +214,100 @@ export const InboxHistoryDialog = DialogManager.register(
         ) : result.value.length === 0 ? (
           <Text sx={{ p: 3 }}>{strings.noFailedInboxItems()}</Text>
         ) : (
-          <ScrollContainer sx={{ maxHeight: windowHeight * 0.7 }}>
-            <Flex sx={{ p: 2, flexDirection: "column" }}>
-              <Flex sx={{ flexDirection: "row" }}>
-                {getColumns().map((col, index) => (
-                  <Flex
-                    key={index}
-                    sx={{
-                      width: col.width || undefined,
-                      flex: col.flex,
-                      px: 2,
-                      py: 1,
-                      borderBottom: "1px solid",
-                      borderBottomColor: "separator"
-                    }}
-                  >
-                    <Text variant="subtitle">{col.title}</Text>
-                  </Flex>
-                ))}
-              </Flex>
-              {result.value.map((item) => {
-                const ctx = parseErrorContext(item.errorContext);
-                const { message, description, ...rest } =
-                  ctx ??
-                  ({} as Partial<InboxItemsHistoryErrorContext> &
-                    Record<string, unknown>);
-                const hasExtra = Object.keys(rest).length > 0;
-                const columns = getColumns();
-                const cell = (index: number) => ({
-                  width: columns[index].width || undefined,
-                  flex: columns[index].flex,
-                  px: 2,
-                  py: 1,
-                  borderBottom: "1px solid" as const,
-                  borderBottomColor: "separator" as const
-                });
-                return (
-                  <Flex key={item.id} sx={{ flexDirection: "row" }}>
-                    <Flex sx={cell(0)}>
-                      <Text variant="body">
-                        {getFormattedDate(item.dateSynced)}
-                      </Text>
-                    </Flex>
-                    <Flex sx={cell(1)}>
-                      <ErrorBadge message={message} />
-                    </Flex>
-                    <Flex sx={cell(2)}>
-                      <Text variant="body">
-                        {(description as string) ?? dash}
-                      </Text>
-                    </Flex>
-                    <Flex sx={cell(3)}>
-                      {hasExtra ? (
-                        <DetailsCell value={JSON.stringify(rest, null, 2)} />
-                      ) : (
-                        <Text
-                          variant="body"
-                          sx={{ color: "paragraph-secondary" }}
-                        >
-                          {dash}
-                        </Text>
-                      )}
-                    </Flex>
-                    <Flex sx={{ ...cell(4), alignItems: "center" }}>
-                      <Button
-                        variant="icon"
-                        title={strings.delete()}
-                        onClick={async () => {
-                          const ok = await ConfirmDialog.show({
-                            title: strings.deleteItem(),
-                            subtitle: strings.areYouSure(),
-                            positiveButtonText: strings.yes(),
-                            negativeButtonText: strings.no()
-                          });
-                          if (!ok) return;
-                          deleteItem(item.id);
-                        }}
-                        sx={{ p: "2px" }}
+          <FlexScrollContainer style={{ maxHeight: "70vh" }}>
+            <Box sx={{ p: 2 }}>
+              <Box
+                as="table"
+                sx={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  tableLayout: "fixed",
+                  "th, td": {
+                    px: 2,
+                    py: 1,
+                    textAlign: "left",
+                    verticalAlign: "top",
+                    borderBottom: "1px solid var(--separator)"
+                  }
+                }}
+              >
+                <Box as="thead">
+                  <Box as="tr">
+                    {getColumns().map((col) => (
+                      <Box
+                        key={col.title}
+                        as="th"
+                        sx={{ width: col.width, whiteSpace: "nowrap" }}
                       >
-                        <Trash size={16} color="accent-error" />
-                      </Button>
-                    </Flex>
-                  </Flex>
-                );
-              })}
-            </Flex>
-          </ScrollContainer>
+                        <Text variant="subtitle">{col.title}</Text>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+                <Box as="tbody">
+                  {result.value.map((item) => {
+                    const ctx = parseErrorContext(item.errorContext);
+                    const { message, description, ...rest } =
+                      ctx ??
+                      ({} as Partial<InboxItemsHistoryErrorContext> &
+                        Record<string, unknown>);
+                    const hasExtra = Object.keys(rest).length > 0;
+                    return (
+                      <Box as="tr" key={item.id}>
+                        <Box as="td">
+                          <Text variant="body" sx={{ whiteSpace: "nowrap" }}>
+                            {getFormattedDate(item.dateSynced)}
+                          </Text>
+                        </Box>
+                        <Box as="td">
+                          <ErrorBadge message={message} />
+                        </Box>
+                        <Box as="td">
+                          <Text variant="body">
+                            {(description as string) ?? "—"}
+                          </Text>
+                        </Box>
+                        <Box as="td">
+                          {hasExtra ? (
+                            <DetailsCell
+                              value={JSON.stringify(rest, null, 2)}
+                            />
+                          ) : (
+                            <Text
+                              variant="body"
+                              sx={{ color: "paragraph-secondary" }}
+                            >
+                              —
+                            </Text>
+                          )}
+                        </Box>
+                        <Box as="td" sx={{ textAlign: "center" }}>
+                          <Button
+                            variant="icon"
+                            title={strings.delete()}
+                            onClick={async () => {
+                              const ok = await ConfirmDialog.show({
+                                title: strings.deleteItem(),
+                                subtitle: strings.areYouSure(),
+                                positiveButtonText: strings.yes(),
+                                negativeButtonText: strings.no()
+                              });
+                              if (!ok) return;
+
+                              deleteItem(item.id);
+                            }}
+                            sx={{ color: "accent-error", p: "2px" }}
+                          >
+                            <Trash size={16} />
+                          </Button>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
+            </Box>
+          </FlexScrollContainer>
         )}
       </Dialog>
     );
