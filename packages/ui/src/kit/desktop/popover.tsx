@@ -278,8 +278,14 @@ function Presenter(props: Contract.PopupPresenterProps) {
     // As react-modal on the web: the element that had the focus gets it back
     // when the popup closes, so the keyboard carries on where it was.
     const previous = activeElement();
-    content.current?.focus?.();
-    return () => previous?.focus();
+    const own = content.current;
+    own?.focus?.();
+    return () => {
+      // Only when the focus is still the popup's: something that took it in
+      // the meantime (a field that opened with autoFocus) keeps it.
+      const now = activeElement();
+      if (now === null || now === own) previous?.focus();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

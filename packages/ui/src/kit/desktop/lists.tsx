@@ -162,8 +162,13 @@ function VirtuosoCore(props: CoreProps) {
     () => Array.from({ length: count }, (_, index) => index),
     [count]
   );
-  const keyExtractor = (row: number) => String(rowKey(row));
-  const render = ({ item }: { item: number }) => <>{renderRow(item)}</>;
+  // The native list can ask once more for a row it held before the list
+  // shrank. The caller's callbacks index their data (`nodes[index].id`), as
+  // they safely can with react-virtuoso, so such a row is not passed on.
+  const keyExtractor = (row: number) =>
+    row < count ? String(rowKey(row)) : `stale-${row}`;
+  const render = ({ item }: { item: number }) =>
+    item < count ? <>{renderRow(item)}</> : null;
 
   const renderScroll = useMemo(
     () =>

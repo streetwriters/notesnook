@@ -110,6 +110,25 @@ type Framed = {
   frame: { x: number; y: number; width: number; height: number };
 };
 
+/**
+ * Clicks the route's own button (new reminder, clear trash…): the first of the
+ * buttons on the right of the route header's title row.
+ */
+export async function clickRouteButton(app: DesktopApp) {
+  const [header]: Framed[] = await app.query("testID", "routeHeader", true);
+  expect(header, "routeHeader").toBeDefined();
+  const buttons: Framed[] = (await app.query("role", "button", true)).filter(
+    (button: Framed) =>
+      button.frame.y >= header.frame.y &&
+      button.frame.y < header.frame.y + 50 &&
+      button.frame.x > header.frame.x + header.frame.width / 2 &&
+      button.frame.x < header.frame.x + header.frame.width
+  );
+  buttons.sort((a, b) => a.frame.x - b.frame.x);
+  expect(buttons.length, "route header buttons").toBeGreaterThan(0);
+  await app.click(buttons[0].tag);
+}
+
 /** Clicks the nth button (left to right) inside the element with this id. */
 export async function clickButtonIn(app: DesktopApp, id: string, nth = 0) {
   const [container]: Framed[] = await app.query("testID", id, true);

@@ -730,6 +730,11 @@ const TextField = forwardRef<UIInputElement, TextFieldProps>(function TextField(
 
   const fields: Record<string, unknown> = { ...nativeProps };
   delete fields.focusable;
+  // The focus reporting every focusable element gets is left off the native
+  // text field: with focus handlers it did not ask for, the field stopped
+  // getting Enter in the pdf search (pdf-preview.e2e).
+  if (!props.onFocus) delete fields.onFocus;
+  if (!props.onBlur) delete fields.onBlur;
   return (
     <AnyInput
       ref={setRef}

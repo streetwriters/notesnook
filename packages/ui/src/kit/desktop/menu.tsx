@@ -285,11 +285,35 @@ function MenuPanel(props: {
   );
 }
 
-type MenuNavigator = { handle: (key: string) => boolean };
+type MenuNavigator = {
+  handle: (key: string) => boolean;
+  hasFocus: () => boolean;
+};
 const navigators: MenuNavigator[] = [];
 let detachKeys: (() => void) | undefined;
+let detachEnter: (() => void) | undefined;
 
-const NAVIGATION_KEYS = ["up", "down", "left", "right", "home", "end", "enter"];
+const NAVIGATION_KEYS = ["up", "down", "left", "right", "home", "end"];
+
+// A registered key no longer reaches the focused text field, so Enter is
+// taken only while a menu item has the cursor: a field that opens a menu as
+// its suggestions (the editor's tag input) still gets Enter until then.
+function syncEnter() {
+  const wanted = !!navigators[navigators.length - 1]?.hasFocus();
+  if (wanted && !detachEnter)
+    detachEnter = keyboard.register(
+      ["enter"],
+      (event) => {
+        const top = navigators[navigators.length - 1];
+        if (top?.handle("enter")) event.preventDefault();
+      },
+      { allowInTextInput: true }
+    );
+  else if (!wanted && detachEnter) {
+    detachEnter();
+    detachEnter = undefined;
+  }
+}
 
 function attachKeys() {
   if (detachKeys) return;
@@ -317,6 +341,7 @@ function MenuItems(props: {
   const setFocusKey = (key: string | undefined) => {
     focusRef.current = key;
     setFocusKeyState(key);
+    syncEnter();
   };
   const navigable = items.filter(
     (item): item is MenuButtonItem =>
@@ -369,13 +394,16 @@ function MenuItems(props: {
   useEffect(() => {
     if (!props.navigation) return;
     const navigator: MenuNavigator = {
-      handle: (key) => handleRef.current(key)
+      handle: (key) => handleRef.current(key),
+      hasFocus: () => focusRef.current !== undefined
     };
     navigators.push(navigator);
     attachKeys();
+    syncEnter();
     return () => {
       const index = navigators.indexOf(navigator);
       if (index >= 0) navigators.splice(index, 1);
+      syncEnter();
       if (navigators.length === 0) {
         detachKeys?.();
         detachKeys = undefined;
