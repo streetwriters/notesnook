@@ -68,11 +68,16 @@ if (!narrow) await fitViewport();
 await page.goto(baseUrl, { waitUntil: "load" });
 await page.waitForTimeout(6000);
 const authPage = !!scenario.initialPath;
-if (authPage && scenario.initialPath !== "/signup") {
+if (authPage) {
   await page.goto(baseUrl + scenario.initialPath.slice(1), {
     waitUntil: "load"
   });
   await page.waitForTimeout(6000);
+  await page.evaluate(async (scheme) => {
+    const theme = await import("/src/app/stores/theme-store.ts");
+    theme.store.setColorScheme(scheme);
+  }, scheme);
+  await page.waitForTimeout(1000);
 }
 const offline = page.getByText("Use offline");
 if (!authPage && (await offline.count())) {
