@@ -123,6 +123,40 @@ export function App(props: { titleBarInset?: number }) {
 
 export default App;
 
+/**
+ * The sidebar's pane until the database is ready. Web's menu reads the
+ * database as it renders, so until then the pane is this frame, in the menu's
+ * width and background, with pale rows where its items go.
+ */
+function NavigationMenuPlaceholder() {
+  return (
+    <Flex
+      data-test-id="navigation-menu-placeholder"
+      sx={{
+        flex: 1,
+        flexDirection: "column",
+        py: "spacing4",
+        px: "spacing4",
+        bg: "background",
+        borderRight: "1px solid var(--separator)"
+      }}
+    >
+      {[0, 1, 2, 3, 4, 5].map((index) => (
+        <Flex
+          key={index}
+          sx={{
+            height: 28,
+            width: index % 2 ? "65%" : "85%",
+            mb: "spacing4",
+            borderRadius: "radius5",
+            bg: "background-tertiary"
+          }}
+        />
+      ))}
+    </Flex>
+  );
+}
+
 function DesktopAppContents(props: {
   navPane: { current: SplitPaneHandle | null };
   isFocusMode: boolean;
@@ -199,13 +233,16 @@ function DesktopAppContents(props: {
                 opacity: isFocused ? 1 : 0.7
               }}
             >
-              {/* The menu reads the database as it renders, as on web. */}
+              {/* The menu reads the database as it renders, as on web, so
+                  until the database is ready the pane shows its frame. */}
               {isDatabaseReady ? (
                 <NavigationMenu
                   onExpand={() => navPane.current?.expand(0)}
                   canExpand={!isTablet}
                 />
-              ) : null}
+              ) : (
+                <NavigationMenuPlaceholder />
+              )}
             </Flex>
           </ThemeScope>
         </Pane>
@@ -316,7 +353,11 @@ function MobileAppContents(props: {
       {index === 0 ? (
         <ThemeScope scope="navigationMenu">
           <Flex sx={{ flex: 1 }}>
-            {isDatabaseReady ? <NavigationMenu canExpand={false} /> : null}
+            {isDatabaseReady ? (
+              <NavigationMenu canExpand={false} />
+            ) : (
+              <NavigationMenuPlaceholder />
+            )}
           </Flex>
         </ThemeScope>
       ) : null}

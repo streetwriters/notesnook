@@ -11,6 +11,7 @@ import {
   rightClick,
   shiftClick,
   startViews,
+  texts,
   waitUntil,
   resetUi
 } from "./views";
@@ -40,6 +41,13 @@ describe("multi select", () => {
     await ctrlClick(app, "Travel itinerary");
     await waitUntil(() => isRowSelected(app, "Travel itinerary"));
     await waitUntil(() => isRowSelected(app, "Grocery list"));
+    // The open note is drawn as selected either way, so ask the selection
+    // itself: the menu of a selected row titles it with its size.
+    await rightClick(app, "Travel itinerary");
+    await waitUntil(async () =>
+      (await texts(app, "menu-title")).includes("2 items selected")
+    );
+    await closeMenu(app);
   });
 
   test("the context menu of a multi selection offers bulk actions", async () => {

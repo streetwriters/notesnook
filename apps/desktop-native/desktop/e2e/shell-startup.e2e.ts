@@ -23,19 +23,14 @@ import path from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { launchApp } from "./launch";
-import {
-  count,
-  itemCounts,
-  routeTitle,
-  seedNotes,
-  texts
-} from "./dialogs";
+import { count, itemCounts, routeTitle, seedNotes, texts } from "./dialogs";
 
 const DELAY = 6000;
 const SHELL = [
   "app",
   "tabs",
   "sidebar-toggle",
+  "navigation-menu-placeholder",
   "routeHeader",
   "theme-scope-statusBar",
   "editor-tabs-view"
@@ -81,7 +76,7 @@ test("the shell is on screen before the database is ready and content fills in a
   expect(await count(app!, "list-item")).toBe(0);
   expect(await count(app!, "authForm")).toBe(0);
   // The navigation menu is web's: it reads the database as it renders, so
-  // its pane stays empty until the database is ready.
+  // until the database is ready the pane shows its placeholder instead.
   expect(await count(app!, "theme-scope-navigationMenu")).toBe(0);
   expect(await texts(app!, "title")).not.toContain("Apple pie");
 
@@ -93,10 +88,11 @@ test("the shell is on screen before the database is ready and content fills in a
   expect(await count(app!, "list-placeholder")).toBe(0);
   expect(await count(app!, "list-item")).toBe(seedNotes.length);
   expect(await count(app!, "tab-home")).toBeGreaterThan(0);
-  await vi.waitFor(
-    async () => expect(await itemCounts(app!)).toContain("3"),
-    { timeout: 20000, interval: 300 }
-  );
+  expect(await count(app!, "navigation-menu-placeholder")).toBe(0);
+  await vi.waitFor(async () => expect(await itemCounts(app!)).toContain("3"), {
+    timeout: 20000,
+    interval: 300
+  });
 });
 
 test("an empty database shows the placeholder only once it is loaded", async () => {
@@ -106,10 +102,10 @@ test("an empty database shows the placeholder only once it is loaded", async () 
   expect(await count(app!, "list-placeholder")).toBe(0);
   expect(await itemCounts(app!)).not.toContain("0");
   await waitFor("list-placeholder");
-  await vi.waitFor(
-    async () => expect(await itemCounts(app!)).toContain("0"),
-    { timeout: 20000, interval: 300 }
-  );
+  await vi.waitFor(async () => expect(await itemCounts(app!)).toContain("0"), {
+    timeout: 20000,
+    interval: 300
+  });
 });
 
 test("a pending click on New note waits for the database and does not fail", async () => {

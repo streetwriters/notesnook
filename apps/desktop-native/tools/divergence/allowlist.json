@@ -449,7 +449,7 @@
     {
       "path": "app.tsx",
       "category": "platform",
-      "reason": "Root component of the native host: takes the title-bar inset, waits for the database host (useDatabaseReady), uses the kit's SplitPaneHandle and drops web-only startup code (WebExtensionRelay, console.timeEnd, window focus/fullscreen DOM state)."
+      "reason": "Root component of the native host: takes the title-bar inset, waits for the database host (useDatabaseReady) and, until then, shows an empty sidebar frame where web's menu (which reads the database as it renders) goes; uses the kit's SplitPaneHandle and drops web-only startup code (WebExtensionRelay, console.timeEnd, window focus/fullscreen DOM state)."
     },
     {
       "path": "views/auth.tsx",
