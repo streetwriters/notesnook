@@ -30,7 +30,7 @@ import {
   DomRoot,
   ToastHost
 } from "@notesnook/ui-kit";
-import { ActionBar } from "./components/editor/action-bar";
+import { EditorActionBar } from "./components/editor/action-bar";
 import GlobalMenuWrapper from "./components/global-menu-wrapper";
 import { DialogHost } from "./common/dialog-manager";
 import { useEditorStore } from "./stores/editor-store";
@@ -83,7 +83,7 @@ export function App(props: { titleBarInset?: number }) {
             borderBottomColor: "border"
           }}
         >
-          <ActionBar
+          <EditorActionBar
             isMobileEditorActive={isMobileEditorActive}
             isSidebarCollapsed={
               isMobile ? !isMobileSideMenuOpen : isNavPaneCollapsed
