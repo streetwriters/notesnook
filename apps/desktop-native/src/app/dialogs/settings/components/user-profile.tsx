@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { dataColor, Flex, Image, Progress, Text } from "@notesnook/ui-kit";
+import { Flex, Image, Progress, Text } from "@notesnook/ui-kit";
 import {
   Edit,
   User as UserIcon,
@@ -102,41 +102,6 @@ type Props = {
   minimal?: boolean;
 };
 
-function Avatar(props: {
-  size: number;
-  iconSize: number;
-  children?: React.ReactNode;
-  picture?: string;
-  bg?: "shade" | "background-tertiary";
-  mr?: number;
-}) {
-  return (
-    <Flex
-      sx={{
-        bg: props.bg ?? "shade",
-        width: props.size,
-        height: props.size,
-        mr: props.mr,
-        borderRadius: props.size,
-        overflow: "hidden",
-        position: "relative",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      {props.picture ? (
-        <Image
-          src={props.picture}
-          sx={{ objectFit: "contain", width: "100%", height: "100%" }}
-        />
-      ) : (
-        <UserIcon size={props.iconSize} />
-      )}
-      {props.children}
-    </Flex>
-  );
-}
-
 export function UserProfile({ minimal }: Props) {
   const user = useUserStore((store) => store.user);
   const profile = useSettingStore((store) => store.profile);
@@ -149,25 +114,28 @@ export function UserProfile({ minimal }: Props) {
         <Flex
           sx={{
             alignItems: "flex-start",
-            flexDirection: "row",
             gap: "spacing3",
             px: "spacing4"
           }}
         >
           <Flex
+            variant="columnCenter"
             sx={{
               bg: "background-tertiary",
-              boxShadow: "menu",
-              width: 25,
-              height: 25,
-              borderRadius: 12.5,
-              alignItems: "center",
-              justifyContent: "center"
+              boxShadow: "0 4px 34px 0 rgba(0, 0, 0, 0.10)",
+              size: 25,
+              borderRadius: "12.5px"
             }}
           >
             <UserProfileIcon size={15} color="icon-secondary" />
           </Flex>
-          <Flex sx={{ flexDirection: "column", gap: "spacing1" }}>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing1",
+              lineHeight: 1
+            }}
+          >
             <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
               {strings.loginMessage()}
             </Text>
@@ -183,14 +151,22 @@ export function UserProfile({ minimal }: Props) {
         sx={{
           borderRadius: "default",
           alignItems: "center",
-          flexDirection: "row",
-          bg: "background-secondary",
+          bg: "var(--background-secondary)",
           p: 1,
           mb: 4,
           gap: 1
         }}
       >
-        <Avatar size={40} iconSize={20} />
+        <Flex
+          variant="columnCenter"
+          sx={{
+            bg: "shade",
+            size: 40,
+            borderRadius: 80
+          }}
+        >
+          <UserIcon size={20} />
+        </Flex>
         <Flex sx={{ flexDirection: "column" }}>
           <Text variant="subtitle">{strings.loginMessage()}</Text>
           <Text variant="subBody">{strings.loginMessageActionText()}</Text>
@@ -204,17 +180,33 @@ export function UserProfile({ minimal }: Props) {
       <Flex
         sx={{
           alignItems: "flex-start",
-          flexDirection: "row",
           gap: "spacing3",
           px: "spacing4"
         }}
       >
-        <Avatar size={25} iconSize={20} picture={profile?.profilePicture} />
+        <Flex
+          variant="columnCenter"
+          sx={{
+            size: 25,
+            borderRadius: 80,
+            overflow: "hidden"
+          }}
+        >
+          {profile?.profilePicture ? (
+            <Image
+              sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+              src={profile.profilePicture}
+            />
+          ) : (
+            <UserIcon size={20} />
+          )}
+        </Flex>
         <Flex
           sx={{
             flexDirection: "column",
             flex: 1,
             gap: "spacing1",
+            fontSize: "3xs",
             lineHeight: 1,
             wordBreak: "break-word"
           }}
@@ -236,96 +228,118 @@ export function UserProfile({ minimal }: Props) {
       sx={{
         borderRadius: "default",
         alignItems: "center",
-        flexDirection: "row",
         justifyContent: "space-between",
-        bg: "background-secondary",
+        bg: "var(--background-secondary)",
         p: 1,
-        mb: 4
+        mb: minimal ? 0 : 4
       }}
     >
-      <Flex sx={{ alignItems: "center", flexDirection: "row", flex: 1 }}>
-        <Avatar
-          size={50}
-          iconSize={24}
-          mr={2}
-          picture={profile?.profilePicture}
+      <Flex sx={{ alignItems: "center", flex: 1 }}>
+        <Flex
+          variant="columnCenter"
+          sx={{
+            bg: "shade",
+            mr: 2,
+            size: minimal ? 40 : 50,
+            borderRadius: 80,
+            overflow: "hidden",
+            position: "relative",
+            ":hover #profile-picture-edit": {
+              visibility: minimal ? "hidden" : "visible"
+            }
+          }}
         >
+          {profile?.profilePicture ? (
+            <Image
+              sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+              src={profile.profilePicture}
+            />
+          ) : (
+            <UserIcon size={minimal ? 20 : 24} />
+          )}
           <Flex
-            title={strings.editProfilePicture()}
-            onClick={async () => {
-              await EditProfilePictureDialog.show({ profile });
-            }}
+            id="profile-picture-edit"
             sx={{
               position: "absolute",
               width: "100%",
               height: "100%",
-              bg: dataColor("#000000aa"),
+              bg: "#000000aa",
               top: 0,
               left: 0,
               alignItems: "center",
+              alignContent: "center",
               justifyContent: "center",
-              opacity: 0,
-              cursor: "pointer",
-              ":hover": { opacity: 1 }
+              visibility: "collapse",
+              cursor: "pointer"
+            }}
+            title={strings.editProfilePicture()}
+            onClick={async () => {
+              await EditProfilePictureDialog.show({ profile });
             }}
           >
-            <Text variant="subBody" sx={{ color: dataColor("#ffffff") }}>
+            <Text variant="subBody" sx={{ color: "white" }}>
               {strings.edit()}
             </Text>
           </Flex>
-        </Avatar>
+        </Flex>
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Text variant="subBody" sx={{ color: "accent" }}>
+          <Text
+            variant="subBody"
+            sx={{
+              color: "accent"
+            }}
+          >
             {`${title}${trial ? " (trial)" : ""}`}
           </Text>
 
-          <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
-            <Text variant="subtitle">
-              {profile?.fullName || strings.yourFullName()}
-            </Text>
-            <Edit
-              size={12}
-              title={strings.editFullName()}
-              onClick={async () => {
-                const fullName = await PromptDialog.show({
-                  title: strings.editFullName(),
-                  description: strings.setFullNameDesc(),
-                  defaultValue: profile?.fullName,
-                  label: strings.enterFullName()
-                });
-
-                if (fullName === profile?.fullName) return;
-
-                try {
-                  await db.settings.setProfile({
-                    fullName: fullName || undefined
+          <Text variant={minimal ? "body" : "subtitle"}>
+            {profile?.fullName || strings.yourFullName()}{" "}
+            {minimal ? null : (
+              <Edit
+                sx={{ display: "inline-block", cursor: "pointer" }}
+                size={12}
+                title={strings.editFullName()}
+                onClick={async () => {
+                  const fullName = await PromptDialog.show({
+                    title: strings.editFullName(),
+                    description: strings.setFullNameDesc(),
+                    defaultValue: profile?.fullName,
+                    label: strings.enterFullName()
                   });
-                  await useSettingStore.getState().refresh();
-                  showToast("success", strings.fullNameUpdated());
-                } catch (e) {
-                  showToast("error", (e as Error).message);
-                }
-              }}
-            />
-          </Flex>
-          <Text variant="subBody">
-            {`${user.email} \u2022 ${strings.memberSince(
-              getFormattedDate(getObjectIdTimestamp(user.id), "date")
-            )}`}
+
+                  if (fullName === profile?.fullName) return;
+
+                  try {
+                    await db.settings.setProfile({
+                      fullName: fullName || undefined
+                    });
+                    await useSettingStore.getState().refresh();
+                    showToast("success", strings.fullNameUpdated());
+                  } catch (e) {
+                    showToast("error", (e as Error).message);
+                  }
+                }}
+              />
+            )}
           </Text>
-          {user.totalStorage ? (
-            <Flex
-              sx={{
-                maxWidth: 300,
-                alignItems: "center",
-                flexDirection: "row",
-                gap: 1
-              }}
-            >
+          <Text variant={"subBody"}>
+            {user.email}
+            {minimal ? null : (
+              <>
+                {" "}
+                •{" "}
+                {strings.memberSince(
+                  getFormattedDate(getObjectIdTimestamp(user.id), "date")
+                )}
+              </>
+            )}
+          </Text>
+          {user.totalStorage && !minimal ? (
+            <Flex sx={{ maxWidth: 300, alignItems: "center", gap: 1 }}>
               <Progress
                 max={user.totalStorage === -1 ? Infinity : user.totalStorage}
                 value={user.storageUsed || 0}
-                sx={{ flex: 1 }}
+                color="var(--accent)"
               />
               <Text variant="subBody" sx={{ flexShrink: 0 }}>
                 {formatBytes(user.storageUsed || 0)}/
@@ -338,6 +352,21 @@ export function UserProfile({ minimal }: Props) {
           ) : null}
         </Flex>
       </Flex>
+      {/* <Button
+        variant="icon"
+        sx={{
+          borderRadius: 50,
+          p: 0,
+          m: 0,
+          width: 30,
+          height: 30,
+          alignSelf: "end"
+        }}
+        title="Edit profile"
+        onClick={() => showEditProfileDialog(profile)}
+      >
+        <Edit size={18} />
+      </Button> */}
     </Flex>
   );
 }

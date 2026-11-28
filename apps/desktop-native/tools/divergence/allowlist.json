@@ -49,7 +49,7 @@
     {
       "path": "components/lightbox/index.tsx",
       "category": "platform",
-      "reason": "Web's lightbox is a DOM image viewer that adds a class to document.body and listens for keys on document; desktop draws the image with kit primitives and takes keys from the kit and the window."
+      "reason": "Web's lightbox is a DOM image viewer (a class component that adds a class to document.body, listens for keys on document and reads touch points); desktop draws the image with kit primitives and takes keys from the kit and the window. It is opened as on web, with ReactDOM.render into #dialogContainer."
     },
     {
       "path": "components/diff-viewer/index.tsx",
@@ -164,7 +164,7 @@
     {
       "path": "components/attachment/index.tsx",
       "category": "platform",
-      "reason": "Desktop rows are flex layouts, not web's table rows. Attachments are read as base64 (downloadAttachment with base64) and PDFs open as base64 data URLs, because the desktop host has no Blob URLs (web uses URL.createObjectURL). The context menu opens at the pointer through the desktop menu hook."
+      "reason": "Desktop rows are flex layouts with fixed column widths, not web's table rows (<tr>/<td> in a TableVirtuoso): the desktop kit has no table layout, and dialogs/attachments-dialog.tsx draws its header to the same widths. Attachments are read as base64 and a PDF opens from a base64 data URL, because the desktop host has no Blob URLs (web uses URL.createObjectURL). The context menu and everything else are web's."
     },
     {
       "path": "components/publish-view/index.tsx",
@@ -275,11 +275,6 @@
       "path": "dialogs/inbox-history-dialog.tsx",
       "category": "platform",
       "reason": "Web draws the history as a table (th, td selectors, tableLayout, borderCollapse), sizes text in em and copies with clipboard-polyfill; desktop has no table layout or em units."
-    },
-    {
-      "path": "dialogs/settings/components/user-profile.tsx",
-      "category": "platform",
-      "reason": "Web shows the edit button through a ':hover #profile-picture-edit' selector; desktop matches no selector with a pseudo class and uses the kit's group hover."
     },
     {
       "path": "dialogs/settings/components/themes-selector.tsx",

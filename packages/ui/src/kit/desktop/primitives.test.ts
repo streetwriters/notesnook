@@ -102,6 +102,8 @@ const {
 } = await import("./primitives");
 const { createButtonVariant } = await import("./hooks");
 const { Select } = await import("./select");
+const { DomRoot, ReactDOM, HTMLElement } = await import("./react-dom");
+const { document } = await import("./dom");
 
 let root: ReactTestRenderer;
 function render(element: any) {
@@ -395,6 +397,22 @@ describe("element.click()", () => {
     );
     fire(() => element.click());
     expect(onClick).toHaveBeenCalledOnce();
+  });
+});
+
+describe("ReactDOM.render into a DomRoot", () => {
+  it("draws what is rendered into the element with its id, until it is unmounted", () => {
+    render(h(DomRoot, { id: "dialogContainer" }));
+    const container = document.getElementById("dialogContainer");
+    expect(container instanceof HTMLElement).toBe(true);
+    expect(JSON.stringify(root.toJSON())).not.toContain("Preview");
+    fire(() => ReactDOM.render(h(Text, {}, "Preview"), container));
+    expect(JSON.stringify(root.toJSON())).toContain("Preview");
+    fire(() => {
+      expect(ReactDOM.unmountComponentAtNode(container)).toBe(true);
+    });
+    expect(JSON.stringify(root.toJSON())).not.toContain("Preview");
+    expect(ReactDOM.unmountComponentAtNode(container)).toBe(false);
   });
 });
 
