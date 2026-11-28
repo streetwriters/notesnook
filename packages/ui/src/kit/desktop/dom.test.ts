@@ -73,6 +73,9 @@ vi.mock("@platform", () => ({ shell: { openExternal: vi.fn() } }));
 vi.mock("@react-native-gpui/core/desktop", () => ({ DragDrop: {} }));
 vi.mock("@react-native-gpui/fs", () => ({}));
 vi.mock("../shared/icons", () => ({ CaretDown: () => null }));
+// The select's menu loads the shared icon factory, which imports the kit by
+// its package name; no case here opens a menu.
+vi.mock("./menu", () => ({ MenuPresenter: () => null }));
 // The picker is a native wheel; the test draws it as a host element that
 // keeps the props the kit gives it.
 vi.mock("./color-picker", async () => {

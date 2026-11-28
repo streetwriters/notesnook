@@ -86,11 +86,15 @@ export function getPlatform(): string | null {
   return NODE_PLATFORMS[os as keyof typeof NODE_PLATFORMS] ?? os;
 }
 
-/** `navigator`, as far as shared code reads it: the system language. */
+/**
+ * `navigator`, as far as shared code reads it: the system language, and the
+ * clipboard's `writeText` the shared dialogs call.
+ */
 export const navigator = {
   get language() {
     return environment.locale;
-  }
+  },
+  clipboard: { writeText }
 };
 
 /** The members of `window` the shared files call. */
@@ -117,9 +121,3 @@ export { nativeWindow as window };
 export function writeText(text: string) {
   return clipboard.write({ "text/plain": text });
 }
-
-/** The members of `navigator` the shared dialogs call. */
-const nativeNavigator = {
-  clipboard: { writeText }
-};
-export { nativeNavigator as navigator };
