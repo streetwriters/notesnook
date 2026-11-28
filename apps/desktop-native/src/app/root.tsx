@@ -117,6 +117,7 @@ function RootContent(props: RootProps) {
           >
             <AppLock>
               <RouteWrapper
+                isDatabaseReady={state.status === "ready"}
                 isLoggedIn={
                   state.status === "ready"
                     ? !!state.user
@@ -145,7 +146,11 @@ function RootContent(props: RootProps) {
   );
 }
 
-function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
+function RouteWrapper(props: {
+  isLoggedIn: boolean;
+  isDatabaseReady: boolean;
+  titleBarInset?: number;
+}) {
   usePathname();
   const [isMigrating, setIsMigrating] = useState(false);
   const { route, path } = getRoute({ isLoggedIn: props.isLoggedIn });
@@ -195,6 +200,11 @@ function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
         </Text>
       </Flex>
     );
+
+  // Like web's root, which awaits loadDatabase before it renders a route: the
+  // standalone routes (wrapped, plans, checkout, auth…) query the database as
+  // they mount. The main app waits for it on its own.
+  if (path !== "default" && !props.isDatabaseReady) return null;
 
   return (
     <Component key={path} titleBarInset={props.titleBarInset} {...routeProps} />
