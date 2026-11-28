@@ -304,10 +304,11 @@ export function EditorActionBar({
                 justifyContent: "center",
                 alignItems: "center",
                 bg: tool.toggled ? "background-selected" : "transparent",
-                display: [
-                  "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
-                  tool.hidden ? "none" : "flex"
-                ],
+                display:
+                  tool.hidden ||
+                  (isMobile && "hideOnMobile" in tool && tool.hideOnMobile)
+                    ? "none"
+                    : "flex",
                 flexShrink: 0,
                 "&:hover svg path": {
                   fill:
@@ -325,12 +326,10 @@ export function EditorActionBar({
               !tools[index + 1].hidden && (
                 <Separator
                   sx={{
-                    display: [
-                      "hideOnMobile" in tool && tool.hideOnMobile
+                    display:
+                      isMobile && "hideOnMobile" in tool && tool.hideOnMobile
                         ? "none"
-                        : "block",
-                      "block"
-                    ]
+                        : "block"
                   }}
                 />
               )}
