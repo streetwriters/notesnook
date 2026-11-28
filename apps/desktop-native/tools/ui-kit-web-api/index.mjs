@@ -198,14 +198,15 @@ function build() {
     });
   }
 
-  const sxType = contract.typeNamed("SxProp");
   const sx = [...usage.sx]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, entry]) => ({
       name,
       uses: entry.count,
       where: entry.where[0]?.replace(/:\d+$/, "") ?? "",
-      status: contract.member(sxType, name) ? "kept" : "not in the contract"
+      // The type accepts every key (it is theme-ui's); what matters is
+      // whether desktop draws it.
+      status: sxException(name) !== undefined ? "not drawn" : "kept"
     }));
 
   return { files: usage.files, rows, sx };
@@ -247,8 +248,8 @@ function render({ files, rows, sx }) {
   out.push("", "### sx keys", "");
   out.push(
     `${sx.length} different keys are written in \`sx\` objects; ` +
-      `${sx.length - missing.length} are in the contract. ` +
-      "The rest are listed here with the reason desktop does not draw them; they do not fail the check."
+      `${sx.length - missing.length} are drawn on desktop. ` +
+      "The rest type-check and are ignored there; they are listed here with the reason, and do not fail the check."
   );
   out.push(
     "",

@@ -9,32 +9,33 @@ Throwaway branch `docket/5-3-web-on-kit-proof` (commit 872863230, on top of 4b2b
 - 116 files changed, 124 lines added, 124 removed.
 - Changes outside import statements: **0**.
 
-The zero is only the textual result: no fixes were made on the branch, and the type-check below shows that apps/web does **not** compile against the kit as it stands. The changes it would need are listed as exceptions.
+The zero is the textual result: no fixes were made on the branch. When the proof was first run apps/web did not compile against the kit; it does now, with no change in apps/web (see the type-check below).
 
 ## Type-check
 
-`tsc -p apps/web` mixes @types/react 18 (apps/web) and 19 (packages/ui) and fails 371 times before any change, so both runs used a scratch tsconfig that maps `react` to one copy of the types.
+`node tools/web-kit-proof/index.mjs typecheck` copies apps/web next to itself, switches the copy's imports and type-checks it before and after. `tsc -p apps/web` mixes @types/react 18 (apps/web) and 19 (packages/ui) and fails before any change, so both runs map `react` to apps/web's one copy of the types. An error is new when the baseline has fewer errors with the same file and code.
 
-| | errors |
-|---|---|
-| baseline (4b2b511c2) | 55 |
-| proof (872863230) | 427 |
-| new on the proof | 372, in 70 files |
+| | errors | new on the switch |
+|---|---|---|
+| first proof (872863230, kit as of 4b2b511c2) | 427 | 372, in 70 files |
+| now | 180, the same as the baseline | **0** |
 
-## Exceptions: non-import changes the switch needs
+The baseline count depends on what is built in the checkout (the errors are apps/web's own: missing `@notesnook/editor` types, the desktop tRPC bridge types, implicit `any`s). It was 55 for the first proof and is 180 in a checkout with only desktop-native's packages built; the switch adds nothing to either.
 
-Grouped by cause. Each is either a fix in apps/web or a widening of the kit's types; neither was made, so the proof is **not** an imports-only switch yet.
+No change was made in apps/web. Each cause from the first proof, and what the kit changed:
 
-| Cause | Errors | Reason | Fix |
-|---|---|---|---|
-| Lengths/spacing given as strings in `sx` (`"100%"`, `"1px"`, `"auto"`) | 59 | kit `sx` types lengths as numbers/tokens | widen kit length type to accept CSS strings |
-| Colours that aren't theme tokens (`"transparent"`, hex, `var(--…)`) | 43 | kit colour type is token-only | accept CSS colour strings |
-| `sx` keys the kit doesn't know | 28 | kit's key set is the desktop-drawable subset | add keys or ignore them on desktop |
-| theme-ui `ThemeUIStyleObject` values passed into `sx` | 28 | different type | kit to accept theme-ui's style type on web, or change call sites |
-| `display` other than `flex`/`none` | 12 | desktop draws only flex | accept on web, ignore on desktop |
-| transition/border/flex shorthand strings | ~20 | kit has no shorthands | parse or widen |
-| Event and ref shapes (`UIElement`, kit mouse/drag types vs DOM) | 18 | kit events aren't DOM events | type web kit events as DOM events |
-| Menu-item icon types and variant names, mostly downstream of the `sx` type | ~49 | follow from the above | revisit after the widening |
+| Cause (errors then) | What changed in the kit | Errors now |
+|---|---|---|
+| Lengths and spacing as strings in `sx`: `"100%"`, `"1px"`, `"auto"`, rem (59) | `SxProp` is built on theme-ui's own style type (`contracts/style.ts`), so every CSS value type-checks; desktop draws px, %, vw/vh and rem/em | 0 |
+| Colours that aren't theme tokens: `"transparent"`, hex, `var(--…)` (43) | the same type: a colour is a token or any CSS colour string | 0 |
+| `sx` keys the kit didn't know: selectors, grid, scroll snapping (28) | the same type: every CSS property and nested selector is a key. Desktop matches selectors that name a tag, class or id below, and ignores the rest | 0 |
+| theme-ui `ThemeUIStyleObject` values passed into `sx` (28) | theme-ui's object and its function-of-the-theme form are assignable to the kit's `sx` (`SxStyle`); desktop calls the function with the theme | 0 |
+| `display` other than `flex`/`none` (12) | accepted; desktop lays out `grid`, `block` and the rest as the default column | 0 |
+| Shorthand strings: `transition`, `animation`, `flex`, `border` (~20) | accepted; desktop parses the `transition` and `animation` shorthands (keyframes from the kit's `keyframes` tag or a `<style>` element) | 0 |
+| Event and ref shapes: `UIElement` and kit events vs DOM (18) | on the web the kit's elements are typed as what they are, theme-ui's components: DOM events, DOM element refs, theme-ui's props (`web/primitives.tsx`). The contract, which desktop compiles against, keeps the kit's DOM-shaped events | 0 |
+| Menu-item icon types and variant names (~49) | followed from the `sx` type; variants take any name, as theme-ui's do | 0 |
+
+What the zero does not show: it is a type-check. That desktop draws what the wider type lets through is checked separately, by the kit's unit tests and by running the app (the Wrapped and Plans views are apps/web's files and were opened in the desktop app); `docs/ui-kit-web-api.md` lists what desktop draws of `sx` and what it ignores.
 
 ## Web e2e
 

@@ -47,22 +47,53 @@ The command exits with 1 when `apps/web` uses something the contract does not ha
 
 On the web (`packages/ui/src/kit/web`) the kit is a thin layer, so what `apps/web` draws cannot change when it imports the kit:
 
-- `Box`, `Flex`, `Grid`, `Text`, `Button`, `Label`, `Link`, `Image`, `Input`, `Textarea`, `Checkbox`, `Radio`, `Select`, `Switch`, `Slider`, `Progress` and `Donut` are theme-ui's components (`primitives.tsx`); `sx` is handled by theme-ui.
+- `Box`, `Flex`, `Grid`, `Text`, `Button`, `Label`, `Link`, `Image`, `Input`, `Textarea`, `Checkbox`, `Radio`, `Select`, `Switch`, `Slider`, `Progress` and `Donut` are theme-ui's components (`primitives.tsx`); `sx` is handled by theme-ui. They are typed as theme-ui's too: its own props and `sx`, DOM events and DOM element refs, plus the kit's props (`KitProps`: `group`, `selectable`, `focusable`, `selectTextOnFocus`), and the prop types the web kit exports (`BoxProps`, `FlexProps`…) are theme-ui's with those added. This is what `apps/web` type-checks against. The kit's own web components are written against the contract and use the same elements typed that way (`KitBox`, `KitFlex`).
 - `Virtuoso`, `GroupedVirtuoso` and `TableVirtuoso` are react-virtuoso's, `Modal` is react-modal's, `MenuPresenter` and `PopupPresenter` are `@notesnook/ui`'s, `useThemeUI` is theme-ui's, `ScrollContainer` is `mac-scrollbar` (as in `apps/web`).
 - `WebThemeProvider` and `ThemeScope` (`theme.tsx`) mount theme-ui's theme and the scope's CSS variables. Without a `WebThemeProvider` above (the kit embedded in `apps/web`) `ThemeScope` uses the app's own `@notesnook/theme` theme.
 - `kit-sx.tsx` (`withKitSx`) wraps each theme-ui component. It rewrites the kit-only `sx` shapes (`transition` and `animation` objects, `transform` arrays, `lineClamp`, `:group-hover`, `:drag-over`, a colour token at the end of a `border`, in `sx.ts`) into CSS theme-ui takes, and does the few things theme-ui has no prop for: `group` becomes the class `:group-hover` selects on; `focusable`, `selectable` and `selectTextOnFocus` work as the kit's contract says; pointer events carry `x`/`y`; a `draggable`'s `onDragStart` return value is the drag ghost; an element with `onDrop` is `:drag-over` while a drag is over it. It accepts a drop unless its own `onDragOver` refuses it, as in the DOM. The defaults the kit has always set (`Link`'s `target`, the layout classes) are added under the caller's props. Every other prop reaches theme-ui as it is; the web kit knows only the DOM's names. The layout defaults (`Box` a column flexbox, `Flex` a row) are `LAYOUT_DEFAULTS_CSS`, which `LayoutRoot` injects.
 - `Icon`, `QRCode`, `ColorPicker`, `SplitPane`, `TitleBar`, `LayoutRoot`, the toast host and `SortableList` keep a web version of their own, built on those primitives. A web popover draws itself in a layer on `document.body`, next to its anchor, so it needs no `PopoverHost` (`apps/web` mounts none, and its editor dropdowns opened nothing before); `PopoverHost` stays as a no-op so existing mounts still compile.
 
-## Where the contract is stricter than the web
+## What `sx` accepts and what desktop draws of it
 
-The types reject what desktop cannot draw, so a mistake shows up at type-check and not as a screen that looks different:
+The kit's `sx` type is theme-ui's (`contracts/style.ts` builds `SxProp` on `@theme-ui/css`): every CSS property and value, responsive arrays, theme callbacks, pseudo selectors and nested selectors type-check, with the kit's own keys on top (`:group-hover`, `:group-active`, `:drag-over`, `input`, a `transition` or `animation` object, a `transform` list). An element's `sx` prop also takes theme-ui's function of the theme (`SxStyle`), and `style` is React's `CSSProperties`. So a file shared with `apps/web` needs no change to type-check; the types no longer say what desktop can draw. This section does.
 
-- `sx` and `style` take only the properties and values in `contracts/style.ts`. For example `float`, `display: "grid"` in `style`, and `objectFit: "scale-down"` are errors. Also accepted and converted on desktop: `vw`/`vh` lengths (measured against the window when the component draws), `px`/`%` radii and `%` spacing, `overflow` arrays and `unset`, `cursor: "unset"`, a dotted text variant path (`variant="text.body"`), theme callbacks for spacing (`pl: (t) => t.space.spacing6 - 2`, called before the style cache), `display: "block"` and `"fit-content"` sizes (drawn as the default layout), `fontWeight: "bolder"` (700) and `border: 0`. A menu item's `styles.icon.color` colours its icon. `resize` is accepted and draws nothing (desktop text areas have no handle).
+Desktop draws:
+
+- Lengths in `px`, `%`, `vw`/`vh` (measured against the window when the component draws) and `rem`/`em` (multiples of 16px: desktop text has no root or inherited size to scale by). CSS colours and theme tokens, also as `var(--token)`.
+- Flexbox. `display: "grid"`, `"block"` and other values lay out as the default column; `Grid` draws a number of equal columns and treats theme-ui's other forms as one column.
+- `position: "fixed"` as `absolute` and `"sticky"` as `relative`.
+- `overflow`, `overflowY` or `overflowX: "scroll"` makes the box scroll, with its direction, alignment, gap and padding on the scrolled content. `auto` only clips, as it always has: use `ScrollContainer`.
+- Gradients in `background` or `backgroundImage` (linear, radial, repeating), with `backgroundSize` and `backgroundPosition`; `url()` images are not drawn. A background clipped to the text (`WebkitBackgroundClip: "text"`) is left out and the text keeps its colour.
+- A CSS `transition` string, for opacity, transform and colours (`all` means those); other properties change at once.
+- A CSS `animation` string naming keyframes made with the kit's `keyframes` tag (Emotion's on the web) or written in a `<style>` element. A frame's opacity, transform and colours are animated; delay, iteration count, direction and fill mode are kept. An unknown name draws nothing.
+- The states `:hover`, `:active`, `:focus`, `:focus-visible`, `:disabled` (while the `disabled` prop is set), which change colours, opacity, outline, shadow and transform.
+- Nested selectors that name an element below by tag, class or id: `"& strong"`, `"th, td"`, `".tooltip"`, `"#edit"`, `"& > *"`. The last compound of each comma-separated selector is matched, and a child combinator means "anywhere below" (`shared/style/selectors.ts`). A rule from above wins over the element's own `sx`, as the more specific selector does in CSS.
+- `!important` is dropped from a value. A one-argument `skew()` is a skew along x.
+
+Accepted and ignored on desktop: selectors with a pseudo class or element, an attribute or a sibling combinator (`":hover .child"`, `":first-of-type"`, `"::placeholder"`, `"& + svg"`): use `:group-hover` for a hover that styles a child; grid, table, list-marker, scroll-snap and scrollbar properties; `wordSpacing`, `textWrap`; and values with no desktop layout (`calc()`, `min()`, `max()`, `clamp()`, `min-content`, `max-content`, `currentColor`, `unset`), which leave the property unset. The generated `sx` keys table lists each such key `apps/web` writes.
+
+Other things the contract takes that web does: a dotted text variant path (`variant="text.body"`) and any variant name (one the theme lacks draws no variant); `overflow` arrays and `unset`; `cursor: "unset"`; `fontWeight: "bolder"` (700); `border: 0`; a menu item's `styles.icon.color` colours its icon; `resize` draws nothing.
+
+Still stricter than the web:
+
 - Forms: `Button` takes `autoFocus` and `form` (the `id` of a `Box as="form"` it submits from outside), and the kit exports `FormData`: `new FormData(event.target)` in a form's `onSubmit` holds the value of every named text field and every checked named checkbox or radio in it, as the browser's does. On the web it is the browser's own `FormData`.
 - `as` takes one of the tags in `ElementTag`; `as="canvas"` is an error.
 - A ref must match its component: an `Input` ref is a `UIInputElement`, not a plain `UIElement`.
 
-`contracts/type-tests.tsx` holds one example of each accepted shape and one `@ts-expect-error` for each rejected one. It is type-checked by `npm run tsc`.
+`contracts/type-tests.tsx` holds one example of each accepted shape and a `@ts-expect-error` for each rejected one. It is type-checked by `npm run tsc`.
+
+## Raw HTML elements and DOM globals on desktop
+
+`apps/web` writes some elements as raw JSX tags and reaches for a few DOM globals. React Native has neither, so the desktop build supplies them, and a shared file keeps its code:
+
+- **Tags.** `tools/babel-plugin-dom-elements.js` (in `babel.config.js`, for `src`) rewrites each known lowercase tag to the element of that name in `desktop/dom.tsx`: `<strong>` becomes `<Dom.strong>`. Boxes (`div`, `section`, `form`…), text (`span`, `p`, `strong`, `b`, `em`, `i`, `u`, `s`, `code`, `pre`, `small`, `h1`–`h6`), `a`, `label`, `button`, `img`, `input` (a checkbox, a radio or a text field by its `type`), `textarea`, `select`, `hr`, lists (`ul`, `ol`, `li` with a bullet or a number) and tables (`table`, `thead`, `tbody`, `tr`, `th`, `td`: rows of equal-width cells, since there is no table layout). `br`, `option` and `optgroup` stay raw: `Text` and `Select` read them from their children. Any other tag is not rewritten and must not be drawn on desktop.
+- **`<style>`.** Registers its `@keyframes` rules for `animation` strings and draws nothing; other rules are ignored.
+- **`<svg><use href="#id" /></svg>`.** Draws the symbol registered under that id (`registerSvgSymbol`; `src/targets/desktop/svg-symbols.ts` registers the sprite of `apps/web/src/index.html`), with `var(--token)` fills in the theme's colours. Other inline SVG draws nothing.
+- **`Image` with an SVG `src`.** An SVG document, as text or a data URI, is drawn as vectors at the size the style gives, or at the size the document declares. `src/app/assets/files.generated.ts` (from `npm run gen:assets`) exports each asset under the name `apps/web` gives its import.
+- **`document`.** The same plugin rewrites a free `document` to the kit's (`desktop/dom.tsx`): `getElementById` and `querySelector("#id")` find the kit element with that `id`; other queries find nothing and listeners are not called. `typeof document` is left alone, so code asking whether there is a DOM is told there is none. There is no global `document`.
+- **`IntersectionObserver` and `ResizeObserver`.** `desktop/intersection-observer.ts`, installed by the desktop target's polyfills: observed elements are measured against the window every 150 ms, and the callbacks run when an element crosses a threshold or changes size. `console.time` and `console.timeEnd` are defined and do nothing.
+
+`src/app/dialogs/web-globals.test.ts` fails when a dialog draws a tag the plugin does not rewrite, or reads `window`, `navigator` or `localStorage` without importing it.
 
 ## Removed names
 
@@ -98,11 +129,11 @@ Three of the old props had a web name with a different shape, so they could not 
   - `PopupPresenter` (`desktop/popover.tsx`) and `MenuPresenter` (`desktop/menu.tsx`) place the popup with `shared/popup-position.ts`, which follows the web's `getPosition`. `movable`, `isMobile` and `container` are accepted and unused. A non-blocking popup has no backdrop, so a click outside it does not close it.
   - `ScrollContainer` (`desktop/layout.tsx`) scrolls on one axis: vertically, or horizontally when only `suppressScrollY` is set. Its ref and the `target` of its `onScroll` event give `scrollTop`, `scrollLeft`, `scrollHeight`, `clientHeight` and `scrollTo`. `trackStyle` and `thumbStyle` are accepted and unused: the scrollbar is the platform's.
   - These components are unit-tested by rendering them headlessly (`desktop/testing/render.ts`, with the stand-ins in `desktop/testing/mocks.ts`).
-- **What desktop does differently for a kept name.** `onPaste` is never raised (the native text field reports no paste). `preventDefault()` on a keyboard event does not stop the native key handling. `as` only selects form behaviour (`as="form"`); it sets no accessibility role. `dir`, `aria-invalid`, `aria-describedby`, `data-*` other than `data-test-id`, and on `Input` `name`, `required`, `pattern`, `min`, `max`, `step`, `autoComplete` and `inputMode` are accepted and ignored. `scrollIntoView`, `scrollTo` and setting `scrollTop` act on the nearest native scroll view. A `Label` with its own click handler does not also activate its control.
+- **What desktop does differently for a kept name.** `Input` and `Textarea` hand `onPaste` to the native text field and raise it with a `UIClipboardEvent` whose `clipboardData.getData("text")` is the pasted text, but react-native-gpui's TextInput reports no paste yet, so the handler does not run in the app until it does (a pasted OTP code still arrives through `onChange`). `preventDefault()` on a keyboard event does not stop the native key handling. `as` only selects form behaviour (`as="form"`); it sets no accessibility role. `dir`, `aria-invalid`, `aria-describedby`, `data-*` other than `data-test-id`, and on `Input` `name`, `required`, `pattern`, `min`, `max`, `step`, `autoComplete` and `inputMode` are accepted and ignored. `scrollIntoView`, `scrollTo` and setting `scrollTop` act on the nearest native scroll view. A `Label` with its own click handler does not also activate its control.
 - **`UIElement` has no `measureInWindow`.** A DOM element type such as `HTMLDivElement` fits a kit ref in both type-checks. The desktop kit's own presenters measure through `measureInWindow` in `desktop/element.ts`, which asks the native node and falls back to `getBoundingClientRect()`.
 - **DOM type names.** `apps/web` writes `useRef<HTMLDivElement>` and `React.MouseEvent<HTMLInputElement>`. Desktop is type-checked without the DOM library, where those names are empty stand-ins from `@types/react`. `desktop/dom-types.d.ts` makes `HTMLElement` a `UIElement` (and `HTMLInputElement`, `HTMLTextAreaElement` the input ones), and the handlers in `BaseProps` are declared as methods, so a handler typed with React's event names fits them. On desktop the handler still receives the kit's DOM-shaped event. React's DOM event types do not fit the kit's events, so a shared file that names them imports `import type * as React from "@notesnook/ui-kit/contracts/react"` instead of React, where `React.MouseEvent`, `React.KeyboardEvent`, `React.DragEvent`, `React.ChangeEvent`, `React.CSSProperties` and the rest are the kit's types; a file that types a handler with the global `KeyboardEvent` or `MouseEvent` imports the kit's `UINativeKeyboardEvent` or `UIMouseEvent` under that name. Only the imports differ from `apps/web`.
 - **`createButtonVariant`.** `@notesnook/theme`'s helper returns theme-ui selectors desktop cannot draw; the kit exports one with the same signature (on the web it is the theme's own), whose hover and pressed states are `:hover` and `:active`.
-- **`sx` keys.** `apps/web` writes CSS in `sx` that the contract rejects (selectors, grid, animations and so on). They are listed in the last table. They do not fail the check: each one needs a decision when its file is aligned, either to draw it on desktop and add it, or to rewrite the call site.
+- **`sx` keys.** Every key `apps/web` writes type-checks. The ones desktop does not draw are listed in the last table with the reason; they do not fail the check.
 - **Shape is checked by name, not by type.** The check compares names only: props, the members a handler reads from its event, the members used on a ref, the keys of `components` and of `Modal`'s `style`, and named imports. It does not compare the type of a value `apps/web` passes with the type the contract declares. A `kept` row proves the name exists, not that the value fits. The value types are proved by type-checking `apps/web` against the kit (plan item 5.3).
 - **Planned fixes.** Five raw DOM methods that `apps/web` reads from refs (`closest`, `querySelector`, `appendChild`, `classList`, `outerHTML`) are not in the kit, so the check fails on them until their call sites are aligned. `Image`'s `maxHeight` is no longer one of them: web now sets it in `sx`, which the kit types as `SxProp.maxHeight`.
 - **What the scan cannot see.** It reads the source without type-checking it. It follows app components whose props type extends a library's (`FieldProps = InputProps & …`), but not props that travel only through a spread of an untyped object, and not components chosen at runtime.
@@ -136,8 +167,8 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Box | `onMouseLeave` | prop | 1 | kept |  |
 | Box | `onSubmit` | prop | 4 | kept |  |
 | Box | `ref` | prop | 7 | kept |  |
-| Box | `style` | prop | 4 | subset | the keys of StyleProp only, no responsive arrays and no theme lookups |
-| Box | `sx` | prop | 83 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Box | `style` | prop | 4 | subset | React's CSSProperties; desktop draws what it draws of sx |
+| Box | `sx` | prop | 83 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Box | `onContextMenu → preventDefault` | event | 2 | kept |  |
 | Box | `onContextMenu → stopPropagation` | event | 2 | kept |  |
 | Box | `onDrop → dataTransfer.files` | event | 1 | kept |  |
@@ -164,7 +195,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Button | `px` | prop | 3 | kept |  |
 | Button | `py` | prop | 1 | kept |  |
 | Button | `ref` | prop | 4 | kept |  |
-| Button | `sx` | prop | 138 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Button | `sx` | prop | 138 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Button | `title` | prop | 24 | subset | shown as a tooltip on web; an accessible description on desktop |
 | Button | `type` | prop | 26 | kept |  |
 | Button | `variant` | prop | 145 | subset | the variants the Notesnook theme defines |
@@ -178,11 +209,11 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Checkbox | `id` | prop | 1 | kept |  |
 | Checkbox | `name` | prop | 2 | kept |  |
 | Checkbox | `onChange` | prop | 3 | kept |  |
-| Checkbox | `sx` | prop | 4 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Checkbox | `sx` | prop | 4 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Checkbox | `onChange → currentTarget.checked` | event | 2 | kept |  |
 | Donut | `max` | prop | 1 | kept |  |
 | Donut | `size` | prop | 1 | kept |  |
-| Donut | `sx` | prop | 1 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Donut | `sx` | prop | 1 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Donut | `value` | prop | 1 | kept |  |
 | Flex | `as` | prop | 12 | subset | one of the tags in ElementTag; desktop maps each to a role |
 | Flex | `bg` | prop | 17 | kept |  |
@@ -217,8 +248,8 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Flex | `px` | prop | 5 | kept |  |
 | Flex | `py` | prop | 3 | kept |  |
 | Flex | `ref` | prop | 17 | kept |  |
-| Flex | `style` | prop | 1 | subset | the keys of StyleProp only, no responsive arrays and no theme lookups |
-| Flex | `sx` | prop | 575 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Flex | `style` | prop | 1 | subset | React's CSSProperties; desktop draws what it draws of sx |
+| Flex | `sx` | prop | 575 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Flex | `tabIndex` | prop | 2 | subset | 0 and -1 only; desktop has no numbered tab order |
 | Flex | `title` | prop | 9 | subset | shown as a tooltip on web; an accessible description on desktop |
 | Flex | `variant` | prop | 20 | subset | the variants the Notesnook theme defines |
@@ -254,7 +285,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Flex | `ref.current.querySelector` | ref | 2 | MISSING | planned fix: move the raw DOM access behind @platform or the native editor; the kit gets no DOM methods |
 | Grid | `children` | prop | 2 | kept |  |
 | Grid | `columns` | prop | 1 | kept |  |
-| Grid | `sx` | prop | 2 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Grid | `sx` | prop | 2 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Image | `alt` | prop | 1 | kept |  |
 | Image | `draggable` | prop | 1 | kept |  |
 | Image | `onClick` | prop | 1 | kept |  |
@@ -268,8 +299,8 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Image | `onTouchMove` | prop | 1 | kept |  |
 | Image | `onTouchStart` | prop | 1 | kept |  |
 | Image | `src` | prop | 27 | kept |  |
-| Image | `style` | prop | 4 | subset | the keys of StyleProp only, no responsive arrays and no theme lookups |
-| Image | `sx` | prop | 22 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Image | `style` | prop | 4 | subset | React's CSSProperties; desktop draws what it draws of sx |
+| Image | `sx` | prop | 22 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Input | `aria-describedby` | prop | 1 | kept |  |
 | Input | `aria-invalid` | prop | 1 | kept |  |
 | Input | `aria-label` | prop | 1 | kept |  |
@@ -298,7 +329,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Input | `ref` | prop | 6 | kept |  |
 | Input | `required` | prop | 27 | subset | accepted; the browser's validation bubble has no desktop equivalent |
 | Input | `step` | prop | 1 | kept |  |
-| Input | `sx` | prop | 43 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Input | `sx` | prop | 43 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Input | `tabIndex` | prop | 1 | subset | 0 and -1 only; desktop has no numbered tab order |
 | Input | `type` | prop | 29 | subset | text, password, email, number, search, checkbox, radio, color and hidden |
 | Input | `value` | prop | 8 | kept |  |
@@ -320,30 +351,30 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Label | `htmlFor` | prop | 2 | kept |  |
 | Label | `id` | prop | 1 | kept |  |
 | Label | `mt` | prop | 1 | kept |  |
-| Label | `sx` | prop | 7 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Label | `sx` | prop | 7 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Label | `variant` | prop | 2 | subset | the variants the Notesnook theme defines |
 | Link | `as` | prop | 1 | subset | one of the tags in ElementTag; desktop maps each to a role |
 | Link | `children` | prop | 10 | kept |  |
 | Link | `href` | prop | 10 | kept |  |
 | Link | `rel` | prop | 3 | kept |  |
-| Link | `sx` | prop | 7 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Link | `sx` | prop | 7 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Link | `target` | prop | 10 | subset | _blank and _self |
 | Link | `title` | prop | 3 | subset | shown as a tooltip on web; an accessible description on desktop |
 | Link | `variant` | prop | 3 | subset | the variants the Notesnook theme defines |
 | Progress | `color` | prop | 1 | kept |  |
 | Progress | `max` | prop | 2 | kept |  |
-| Progress | `sx` | prop | 1 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Progress | `sx` | prop | 1 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Progress | `value` | prop | 2 | kept |  |
 | Select | `children` | prop | 1 | kept |  |
 | Select | `onChange` | prop | 1 | kept |  |
-| Select | `sx` | prop | 1 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Select | `sx` | prop | 1 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Select | `value` | prop | 1 | kept |  |
 | Select | `onChange → target.value` | event | 1 | kept |  |
 | Slider | `max` | prop | 1 | kept |  |
 | Slider | `min` | prop | 1 | kept |  |
 | Slider | `onChange` | prop | 1 | kept |  |
 | Slider | `step` | prop | 1 | kept |  |
-| Slider | `sx` | prop | 1 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Slider | `sx` | prop | 1 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Slider | `value` | prop | 1 | kept |  |
 | Slider | `onChange → target.valueAsNumber` | event | 1 | kept |  |
 | Switch | `aria-label` | prop | 2 | kept |  |
@@ -353,7 +384,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Switch | `onChange` | prop | 2 | kept |  |
 | Switch | `onClick` | prop | 1 | kept |  |
 | Switch | `ref` | prop | 1 | kept |  |
-| Switch | `sx` | prop | 4 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Switch | `sx` | prop | 4 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Switch | `title` | prop | 2 | subset | shown as a tooltip on web; an accessible description on desktop |
 | Switch | `onClick → stopPropagation` | event | 1 | kept |  |
 | Text | `aria-hidden` | prop | 1 | kept |  |
@@ -379,7 +410,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Text | `px` | prop | 2 | kept |  |
 | Text | `ref` | prop | 1 | kept |  |
 | Text | `rel` | prop | 2 | kept |  |
-| Text | `sx` | prop | 392 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Text | `sx` | prop | 392 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Text | `target` | prop | 2 | kept |  |
 | Text | `title` | prop | 4 | subset | shown as a tooltip on web; an accessible description on desktop |
 | Text | `variant` | prop | 281 | subset | the variants the Notesnook theme defines |
@@ -396,7 +427,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Textarea | `ref` | prop | 1 | kept |  |
 | Textarea | `rows` | prop | 1 | kept |  |
 | Textarea | `spellCheck` | prop | 1 | kept |  |
-| Textarea | `sx` | prop | 1 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| Textarea | `sx` | prop | 1 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | Textarea | `variant` | prop | 1 | subset | the variants the Notesnook theme defines |
 | Textarea | `wrap` | prop | 1 | kept |  |
 | Textarea | `onChange → target` | event | 1 | kept |  |
@@ -425,15 +456,15 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | Slider | `Slider` | export | 1 | kept |  |
 | Switch | `Switch` | export | 4 | kept |  |
 | SwitchProps | `SwitchProps` | export | 1 | kept |  |
-| SxProp | `SxProp` | export | 4 | subset | stricter than theme-ui's: only what desktop can draw |
+| SxProp | `SxProp` | export | 4 | subset | theme-ui's style object with the kit's own keys |
 | Text | `Text` | export | 97 | kept |  |
 | TextProps | `TextProps` | export | 1 | kept |  |
 | Textarea | `Textarea` | export | 1 | kept |  |
-| ThemeUICSSObject | `ThemeUICSSObject` | export | 1 | subset | an alias of the kit's stricter sx object |
-| ThemeUIStyleObject | `ThemeUIStyleObject` | export | 4 | subset | an alias of the kit's stricter sx object |
+| ThemeUICSSObject | `ThemeUICSSObject` | export | 1 | subset | an alias of the kit's sx object |
+| ThemeUIStyleObject | `ThemeUIStyleObject` | export | 4 | subset | the kit's sx object or a function of the theme |
 | alpha | `alpha` | export | 5 | kept |  |
 | useThemeUI | `useThemeUI` | export | 3 | kept |  |
-| style | `display` | style key | 3 | subset | the values desktop can lay out; no grid or inline |
+| style | `display` | style key | 3 | subset | any value; desktop lays out flex and none |
 | style | `flex` | style key | 5 | kept |  |
 | style | `flexDirection` | style key | 2 | kept |  |
 | style | `flexShrink` | style key | 7 | kept |  |
@@ -576,11 +607,11 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | PopupPresenter | `isOpen` | prop | 5 | kept |  |
 | PopupPresenter | `onClose` | prop | 5 | kept |  |
 | PopupPresenter | `position` | prop | 5 | kept |  |
-| PopupPresenter | `sx` | prop | 1 | subset | the keys and values desktop can draw (SxProp); see the sx keys table below |
+| PopupPresenter | `sx` | prop | 1 | subset | theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table) |
 | ScrollContainer | `children` | prop | 8 | kept |  |
 | ScrollContainer | `className` | prop | 4 | subset | accepted and ignored on desktop |
 | ScrollContainer | `onWheel` | prop | 2 | kept |  |
-| ScrollContainer | `style` | prop | 6 | subset | the keys of StyleProp only, no responsive arrays and no theme lookups |
+| ScrollContainer | `style` | prop | 6 | subset | React's CSSProperties; desktop draws what it draws of sx |
 | ScrollContainer | `suppressScrollX` | prop | 1 | kept |  |
 | ScrollContainer | `suppressScrollY` | prop | 3 | kept |  |
 | ScrollContainer | `thumbStyle` | prop | 3 | kept |  |
@@ -598,7 +629,7 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 
 ### sx keys
 
-174 different keys are written in `sx` objects; 107 are in the contract. The rest are listed here with the reason desktop does not draw them; they do not fail the check.
+174 different keys are written in `sx` objects; 132 are drawn on desktop. The rest type-check and are ignored there; they are listed here with the reason, and do not fail the check.
 
 | Key | Uses | Example | Note |
 |---|---:|---|---|
@@ -606,43 +637,21 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | `::-webkit-inner-spin-button` | 1 | src/components/otp-input/index.tsx | browser number-input spinner; desktop draws none |
 | `::-webkit-outer-spin-button` | 1 | src/components/otp-input/index.tsx | browser number-input spinner; desktop draws none |
 | `::placeholder` | 1 | src/components/editor/title-box.tsx | pseudo-element; the kit's Input draws its placeholder in the placeholder colour |
-| `:first-of-type` | 1 | src/dialogs/mfa/steps.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `:hover #profile-picture-edit` | 1 | src/dialogs/settings/components/user-profile.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `:hover #remove-item, :hover #add-item` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `:hover:not(:disabled):not(:active)` | 2 | src/dialogs/add-reminder-dialog.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `:last-of-type` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `:not(:first-of-type)` | 1 | src/views/auth.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.editor-container` | 1 | src/components/editor/tiptap.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.editor-loading-container.hidden` | 1 | src/components/editor/tiptap.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.match` | 2 | src/components/search-result/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-core__popover-body, .rpv-core__arrow` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-core__textbox` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-search__popover .rpv-core__button` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-search__popover .rpv-core__minimal-button` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-search__popover .rpv-core__textbox` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-search__popover label, .rpv-search__popover span` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.rpv-search__popover-label-checkbox` | 1 | src/components/pdf-preview/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `.tiptap.ProseMirror` | 1 | src/components/editor/tiptap.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `[data-viewport-type="element"]` | 1 | src/views/notebooks.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `& + svg` | 1 | src/dialogs/settings/components/inbox-api-keys.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `& > *` | 1 | src/dialogs/settings/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `& > label` | 1 | src/dialogs/settings/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `& label` | 2 | src/components/properties/toggle.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `& path` | 1 | src/dialogs/buy-dialog/upgrade-dialog.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `& strong` | 1 | src/views/wrapped.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&::-webkit-scrollbar` | 1 | src/views/wrapped.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
+| `:first-of-type` | 1 | src/dialogs/mfa/steps.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `:hover #profile-picture-edit` | 1 | src/dialogs/settings/components/user-profile.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `:hover #remove-item, :hover #add-item` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `:hover:not(:disabled):not(:active)` | 2 | src/dialogs/add-reminder-dialog.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `:last-of-type` | 1 | src/dialogs/settings/components/customize-toolbar.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `:not(:first-of-type)` | 1 | src/views/auth.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `[data-viewport-type="element"]` | 1 | src/views/notebooks.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `& + svg` | 1 | src/dialogs/settings/components/inbox-api-keys.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `&::-webkit-scrollbar` | 1 | src/views/wrapped.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
 | `&:focus` | 1 | src/components/otp-input/index.tsx | use the :focus state key |
 | `&:hover` | 1 | src/components/monthly-activity-heatmap/index.tsx | use the :hover state key |
-| `&:hover .add-sub-notebook, &:focus-within .add-sub-notebook` | 1 | src/components/notebook-picker.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&:hover .bar` | 1 | src/components/monthly-activity-heatmap/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&:hover .tooltip` | 1 | src/components/monthly-activity-heatmap/index.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&:hover svg path` | 5 | src/components/editor/action-bar.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&.active` | 1 | src/components/editor/table-of-contents.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&.active p` | 1 | src/components/editor/table-of-contents.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `&.active path` | 1 | src/components/editor/table-of-contents.tsx | desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover |
-| `backgroundImage` | 1 | src/views/wrapped.tsx | use experimental_backgroundImage; CSS url()/gradient strings are not parsed |
-| `backgroundPosition` | 1 | src/views/wrapped.tsx | use experimental_backgroundPosition |
-| `backgroundSize` | 2 | src/components/lightbox/index.tsx | use experimental_backgroundSize |
+| `&:hover .add-sub-notebook, &:focus-within .add-sub-notebook` | 1 | src/components/notebook-picker.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `&:hover .bar` | 1 | src/components/monthly-activity-heatmap/index.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `&:hover .tooltip` | 1 | src/components/monthly-activity-heatmap/index.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
+| `&:hover svg path` | 5 | src/components/editor/action-bar.tsx | not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states |
 | `borderCollapse` | 1 | src/dialogs/inbox-history-dialog.tsx | desktop has no table layout |
 | `fieldSizing` | 1 | src/components/editor/title-box.tsx | inputs do not size to their content on desktop |
 | `gridColumn` | 2 | src/dialogs/settings/components/subscription-status.tsx | desktop lays out with flexbox only; use Flex and widths |
@@ -652,8 +661,6 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | `justifySelf` | 2 | src/components/auth-container/index.jsx | a grid property; flexbox has alignSelf only |
 | `listStyle` | 1 | src/components/notebook-picker.tsx | desktop has no list markers |
 | `msOverflowStyle` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
-| `postion` | 1 | src/views/plans.tsx | a typo for position in apps/web; it has no effect there either |
-| `scale` | 1 | src/views/plans.tsx | use transform: [{ scale }] |
 | `scrollbarWidth` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
 | `scrollBehavior` | 1 | src/views/wrapped.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
 | `scrollSnapAlign` | 4 | src/app.tsx | scrollbars and scroll snapping are drawn by the platform; not styleable |
@@ -666,7 +673,6 @@ Scanned 339 files in `apps/web/src`: 463 items, 353 kept, 70 subset, 34 not supp
 | `transformOrigin` | 2 | src/components/auth-container/index.jsx | desktop transforms always use the element's centre |
 | `WebkitBackgroundClip` | 1 | src/views/wrapped.tsx | text clipping of a background is not drawn |
 | `WebkitBoxOrient` | 1 | src/components/list-item/index.tsx | use lineClamp |
-| `WebkitLineClamp` | 1 | src/components/list-item/index.tsx | use lineClamp |
 | `WebkitTextFillColor` | 1 | src/views/wrapped.tsx | text clipping of a background is not drawn |
 | `wordSpacing` | 3 | src/components/dialog/index.tsx | the desktop text layout has letterSpacing only |
 

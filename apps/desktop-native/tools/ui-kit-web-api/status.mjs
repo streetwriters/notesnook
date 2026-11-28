@@ -22,9 +22,9 @@ const RAW_DOM =
 
 export const SUBSET = {
   "*.sx":
-    "the keys and values desktop can draw (SxProp); see the sx keys table below",
+    "theme-ui's type; desktop draws part of it (see the section on sx and the sx keys table)",
   "*.style":
-    "the keys of StyleProp only, no responsive arrays and no theme lookups",
+    "React's CSSProperties; desktop draws what it draws of sx",
   "*.className": "accepted and ignored on desktop",
   "Text.className":
     "accepted; desktop reads the selectable class (text can be selected) and ignores the rest",
@@ -61,10 +61,10 @@ export const SUBSET = {
     "the props listed in this table and Modal.setAppElement, not the whole react-modal API",
   "Components.export":
     "EmptyPlaceholder, Footer, Header, Item, Scroller and TopItemList",
-  "SxProp.export": "stricter than theme-ui's: only what desktop can draw",
-  "ThemeUICSSObject.export": "an alias of the kit's stricter sx object",
-  "ThemeUIStyleObject.export": "an alias of the kit's stricter sx object",
-  "style.display": "the values desktop can lay out; no grid or inline"
+  "SxProp.export": "theme-ui's style object with the kit's own keys",
+  "ThemeUICSSObject.export": "an alias of the kit's sx object",
+  "ThemeUIStyleObject.export": "the kit's sx object or a function of the theme",
+  "style.display": "any value; desktop lays out flex and none"
 };
 
 // Used by apps/web but not in the kit. Each one fails the check until the kit
@@ -188,7 +188,7 @@ export const UNSUPPORTED = {
 };
 
 const NO_SELECTORS =
-  "desktop has no stylesheet or selectors; style the child itself, or use :hover / :group-hover";
+  "not matched on desktop: only a tag, class or id below the element is; use :hover / :group-hover for states";
 const NO_GRID = "desktop lays out with flexbox only; use Flex and widths";
 const NO_SCROLL_STYLE =
   "scrollbars and scroll snapping are drawn by the platform; not styleable";
@@ -200,7 +200,6 @@ export const SX_EXCEPTIONS = {
   "::-webkit-inner-spin-button": "browser number-input spinner; desktop draws none",
   "::-webkit-outer-spin-button": "browser number-input spinner; desktop draws none",
   "::placeholder": "pseudo-element; the kit's Input draws its placeholder in the placeholder colour",
-  ":disabled": "not a kit state; style from the disabled prop instead",
   ":first-of-type": NO_SELECTORS,
   ":last-of-type": NO_SELECTORS,
   ":not(:first-of-type)": NO_SELECTORS,
@@ -210,15 +209,10 @@ export const SX_EXCEPTIONS = {
   "[data-viewport-type=\"element\"]": NO_SELECTORS,
   "&:focus": "use the :focus state key",
   "&:hover": "use the :hover state key",
-  input: NO_SELECTORS,
   th: NO_TABLE,
   "th, td": NO_TABLE,
-  backgroundImage: "use experimental_backgroundImage; CSS url()/gradient strings are not parsed",
-  backgroundPosition: "use experimental_backgroundPosition",
-  backgroundSize: "use experimental_backgroundSize",
   borderCollapse: NO_TABLE,
   tableLayout: NO_TABLE,
-  colorScheme: "native form controls follow the kit theme, not a colour scheme",
   fieldSizing: "inputs do not size to their content on desktop",
   gridColumn: NO_GRID,
   gridRow: NO_GRID,
@@ -232,21 +226,28 @@ export const SX_EXCEPTIONS = {
   scrollSnapAlign: NO_SCROLL_STYLE,
   scrollSnapStop: NO_SCROLL_STYLE,
   scrollSnapType: NO_SCROLL_STYLE,
-  postion: "a typo for position in apps/web; it has no effect there either",
-  resize: "desktop text areas have no resize handle",
-  scale: "use transform: [{ scale }]",
   textWrap: "balance/pretty wrapping is not in the desktop text layout",
   transformOrigin: "desktop transforms always use the element's centre",
   WebkitBackgroundClip: "text clipping of a background is not drawn",
   WebkitTextFillColor: "text clipping of a background is not drawn",
   WebkitBoxOrient: "use lineClamp",
-  WebkitLineClamp: "use lineClamp",
   wordSpacing: "the desktop text layout has letterSpacing only"
 };
+
+const DRAWN_STATES = new Set([
+  ":hover",
+  ":active",
+  ":focus",
+  ":focus-visible",
+  ":disabled"
+]);
 
 /** The reason an sx key is not drawn on desktop, or undefined. */
 export function sxException(key) {
   if (key in SX_EXCEPTIONS) return SX_EXCEPTIONS[key];
-  if (/^[&.:[]/.test(key) || /[\s>+,]/.test(key)) return NO_SELECTORS;
+  // A selector naming a tag, class or id below the element is drawn
+  // (shared/style/selectors.ts); one with a pseudo, attribute or sibling is not.
+  if (DRAWN_STATES.has(key)) return undefined;
+  if (/[:[+~]/.test(key)) return NO_SELECTORS;
   return undefined;
 }
